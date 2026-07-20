@@ -8,10 +8,13 @@ bez dodawania modelu jako zależności pakietu.
 
 ## Zakres
 
-Pierwszy pomiar porównuje model polski
-`speakleash/Bielik-4.5B-v3.0-Instruct` z `qwen3:4b-instruct`. Każdy kandydat
-działa przez lokalną Ollamę, po uprzednim świadomym pobraniu przez użytkownika.
-Wagi, cache i wyniki robocze pozostają poza repozytorium.
+Benchmark jest dwustopniowy. Etap szybkościowy mierzy małe kandydaty:
+`speakleash/Bielik-1.5B-v3.0-Instruct-GGUF`, `qwen3:0.6b` i `qwen3:1.7b`.
+Etap jakościowy porównuje najlepszy mały model z
+`speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` i `qwen3:4b-instruct`. Każdy
+kandydat działa przez lokalną Ollamę albo `llama-server`, po uprzednim
+świadomym pobraniu przez użytkownika. Wagi, cache i wyniki robocze pozostają
+poza repozytorium.
 
 Wejściem benchmarku jest korpus E2E v2. Przypadki `llm_planned` są pozytywne,
 a `negative` mierzą fałszywe poprawki. Model otrzymuje istniejący wersjonowany
@@ -21,15 +24,18 @@ offsetów, kategorii i minimalnej sugestii co backend pakietu.
 ## Metryki i decyzja
 
 Raport zapisuje per kandydat i per kategorię: precision, recall, F1, dokładność
-pełnej korekty, odsetek poprawnego JSON, medianę/p95 czasu odpowiedzi, pamięć
-procesu runtime oraz wynik testu offline po pobraniu. Raport zawiera dokładny
-identyfikator modelu, kwantyzację, wersję Ollamy, platformę i parametry
-generowania.
+pełnej korekty, odsetek poprawnego JSON, czas do pierwszego tokenu, medianę/p95
+czasu odpowiedzi, tokeny na sekundę, pamięć procesu runtime oraz wynik testu
+offline po pobraniu. Raport zawiera dokładny identyfikator modelu, kwantyzację,
+rozmiar pobranych wag, wersję runtime, platformę i parametry generowania.
 
-Wybór wymaga braku zmiany dowolnego negatywu, poprawnego JSON dla wszystkich
-próbek oraz lepszego lub równego wyniku F1 względem alternatywy przy zasobach
-obsługiwanych przez M4/16 GB. Gdy żaden kandydat nie spełni warunków, ADR
-zapisze brak wyboru; nie wprowadzamy zastępczego modelu do runtime’u.
+Wybór wymaga braku zmiany dowolnego negatywu i poprawnego JSON dla wszystkich
+próbek. Spośród modeli spełniających te warunki wybieramy punkt na granicy
+Pareto jakość–p95–pamięć–rozmiar; przy porównywalnej jakości preferowany jest
+mniejszy i szybszy model. Model 4.5B jest uzasadniony tylko, gdy daje istotnie
+lepszy wynik na fleksji lub składni od kandydata 1.5B. Gdy żaden kandydat nie
+spełni warunków, ADR zapisze brak wyboru; nie wprowadzamy zastępczego modelu do
+runtime’u.
 
 ## Granice odpowiedzialności
 
@@ -41,6 +47,8 @@ zachowuje awarię backendu jako kontrolowaną, bezpieczną degradację.
 ## Ryzyka
 
 Ollama nie udostępnia obecnie oficjalnego tagu Bielika w swojej bibliotece,
-więc kandydat Bielik może wymagać lokalnego pliku GGUF i jawnego Modelfile.
-Jeśli nie będzie dostępny w poprawnej, licencjonowanej i mierzalnej postaci,
-raport odnotuje go jako niedostępnego zamiast podstawiać inny wariant.
+więc kandydaci Bielik wymagają lokalnego pliku GGUF i jawnego Modelfile.
+Repozytorium Bielika wymaga też zaakceptowania warunków dostępu przed pobraniem
+wag. Jeśli wariant nie będzie dostępny w poprawnej, licencjonowanej i
+mierzalnej postaci, raport odnotuje go jako niedostępnego zamiast podstawiać
+inny wariant.
