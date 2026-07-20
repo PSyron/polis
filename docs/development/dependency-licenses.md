@@ -42,6 +42,19 @@ and the README installs that exact release.
 | --- | --- | --- | --- | --- |
 | `uv` | 0.11.2 | Apache-2.0 OR MIT | environment bootstrap and locked workflow | [PyPI metadata](https://pypi.org/pypi/uv/0.11.2/json) and [upstream licensing](https://github.com/astral-sh/uv/tree/0.11.2#license); the compound expression receives explicit approval under the MIT option. Preserve the copyright and MIT license notice if redistributed. |
 
+## CI workflow actions
+
+The fast workflow uses only the following external actions. Each is pinned to
+the immutable commit published by its reviewed major release and is
+MIT-licensed. The action commits are not Python dependencies and do not change
+`uv.lock`.
+
+| Action | Commit | SPDX expression | Role | Evidence and obligations |
+| --- | --- | --- | --- | --- |
+| `actions/checkout` | `34e114876b0b11c390a56381ad16ebd13914f8d5` | MIT | Check out the proposed source revision. | [License](https://github.com/actions/checkout/blob/34e114876b0b11c390a56381ad16ebd13914f8d5/LICENSE); preserve notices if redistributed. |
+| `actions/setup-python` | `ece7cb06caefa5fff74198d8649806c4678c61a1` | MIT | Install the matrix-selected CPython interpreter; its [pinned input schema](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/action.yml) accepts `x86`, `x64`, or `arm64`, so ADR `x86_64` maps to `x64`. | [License](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/LICENSE); preserve notices if redistributed. |
+| `astral-sh/setup-uv` | `37802adc94f370d6bfd71619e3f0bf239e1f3b78` | MIT | Install uv 0.11.2 and cache the locked environment. | [License](https://github.com/astral-sh/setup-uv/blob/37802adc94f370d6bfd71619e3f0bf239e1f3b78/LICENSE); preserve notices if redistributed. |
+
 ## Adoption decision
 
 All locked packages except `pathspec` and `packaging` use a single SPDX license
