@@ -1,39 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<corpus schema_version="1" id="polis_e2e_polish_correction_corpus_v1">
-  <case id="spelling_zeby" description="Standardowy błąd ortograficzny: z/ż." tags="spelling,orthography">
-    <input>Zeby nauczyć się polskiego, trzeba ćwiczyć.</input>
-    <expected_output>Żeby nauczyć się polskiego, trzeba ćwiczyć.</expected_output>
-  </case>
-  <case id="spelling_wlasnie" description="Ortografia: 'wlasnie' -> 'właśnie'." tags="spelling,orthography">
-    <input>To wlasnie ten moment.</input>
-    <expected_output>To właśnie ten moment.</expected_output>
-  </case>
-  <case id="spelling_jestes" description="Ortografia i forma czasownika: 'jestes' -> 'jesteś'." tags="spelling,orthography,name">
-    <input>Jestes najlepsza, Ania.</input>
-    <expected_output>Jesteś najlepsza, Ania.</expected_output>
-  </case>
-  <case id="agreement_ty_imie" description="Zgoda podmiotu i orzeczenia z nazwą + zaimkiem." tags="agreement,name,person_inflection">
-    <input>Ania, ty jestem gotowa.</input>
-    <expected_output>Ania, ty jesteś gotowa.</expected_output>
-  </case>
-  <case id="agreement_oni_plural" description="Liczba podmiotu z orzeczeniem." tags="agreement,number">
-    <input>Oni jest gotowi.</input>
-    <expected_output>Oni są gotowi.</expected_output>
-  </case>
-  <case id="syntax_list_spacing" description="Brak spacji po numeracji listy." tags="syntax,spacing">
-    <input>1.Punkt pierwszy.</input>
-    <expected_output>1. Punkt pierwszy.</expected_output>
-  </case>
-  <case id="punctuation_comma_spacing" description="Brak spacji po przecinku." tags="punctuation,spacing">
-    <input>Jutro,powiem o tym jutro.</input>
-    <expected_output>Jutro, powiem o tym jutro.</expected_output>
-  </case>
-  <case id="name_case_forms_reference" description="Przypadki fleksyjne imion jako sygnał kontekstu nazw własnych." tags="name,name_inflection,stable">
-    <input>Agnieszka i Anię zaprosiłam do domu.</input>
-    <expected_output>Agnieszka i Anię zaprosiłam do domu.</expected_output>
-  </case>
-  <case id="name_plural_reference" description="Warianty nazw i imion w różnych rolach składniowych bez korekty." tags="name,stable,style">
-    <input>Pani Ania, pani Agnieszka i pan Kuba są gotowi.</input>
-    <expected_output>Pani Ania, pani Agnieszka i pan Kuba są gotowi.</expected_output>
-  </case>
+<corpus schema_version="2" id="polis_e2e_polish_correction_corpus_v2">
+  <case id="spelling_zeby" verification="rules" tags="spelling,orthography"><input>Zeby nauczyć się polskiego, trzeba ćwiczyć.</input><expected_output>Żeby nauczyć się polskiego, trzeba ćwiczyć.</expected_output></case>
+  <case id="spelling_wlasnie" verification="rules" tags="spelling,orthography"><input>To wlasnie ten moment.</input><expected_output>To właśnie ten moment.</expected_output></case>
+  <case id="spelling_jestes_with_name" verification="rules" tags="spelling,orthography,name,vocative"><input>Jestes gotowa, Aniu.</input><expected_output>Jesteś gotowa, Aniu.</expected_output></case>
+  <case id="agreement_second_person" verification="rules" tags="agreement,person_inflection,name"><input>Ania, ty jestem gotowa.</input><expected_output>Ania, ty jesteś gotowa.</expected_output></case>
+  <case id="agreement_plural_subject" verification="rules" tags="agreement,number"><input>Oni jest gotowi.</input><expected_output>Oni są gotowi.</expected_output></case>
+  <case id="syntax_list_spacing" verification="rules" tags="syntax,spacing"><input>1.Punkt pierwszy.</input><expected_output>1. Punkt pierwszy.</expected_output></case>
+  <case id="punctuation_comma_spacing" verification="rules" tags="punctuation,spacing"><input>Jutro,powiem o tym zespołowi.</input><expected_output>Jutro, powiem o tym zespołowi.</expected_output></case>
+  <case id="inflection_male_surname_instrumental" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Rozmawiałem z Janem Nowak.</input><expected_output>Rozmawiałem z Janem Nowakiem.</expected_output></case>
+  <case id="inflection_female_surname_dative" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Pomogłam pani Annie Kowalska.</input><expected_output>Pomogłam pani Annie Kowalskiej.</expected_output></case>
+  <case id="agreement_children_past_tense" verification="llm_planned" tracking_issue="42" tags="agreement,inflection,number"><input>Dzieci była gotowe do wyjścia.</input><expected_output>Dzieci były gotowe do wyjścia.</expected_output></case>
+  <case id="syntax_subordinate_mood" verification="llm_planned" tracking_issue="43" tags="syntax,word_order,inflection,subordinate_clause"><input>Chciałbym żeby jutro spotkać się z tobą.</input><expected_output>Chciałbym, żebyśmy jutro się spotkali.</expected_output></case>
+  <case id="punctuation_subordinate_clause" verification="llm_planned" tracking_issue="42" tags="punctuation,subordinate_clause,name"><input>Wiem że Ania już wróciła.</input><expected_output>Wiem, że Ania już wróciła.</expected_output></case>
+  <case id="punctuation_parenthetical_relative_clause" verification="llm_planned" tracking_issue="42" tags="punctuation,syntax,relative_clause,name"><input>Maria która mieszka w Krakowie jutro przyjedzie.</input><expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output></case>
+  <case id="punctuation_vocative" verification="llm_planned" tracking_issue="42" tags="punctuation,vocative,name"><input>Anno proszę zadzwoń wieczorem.</input><expected_output>Anno, proszę, zadzwoń wieczorem.</expected_output></case>
+  <case id="negative_female_name_instrumental" verification="negative" tags="negative,inflection,case,name,surname"><input>Rozmawiałem z Anną Kowalską.</input><expected_output>Rozmawiałem z Anną Kowalską.</expected_output></case>
+  <case id="negative_male_name_dative" verification="negative" tags="negative,inflection,case,name,surname"><input>Wręczyłem nagrodę Janowi Nowakowi.</input><expected_output>Wręczyłem nagrodę Janowi Nowakowi.</expected_output></case>
+  <case id="negative_marked_word_order" verification="negative" tags="negative,syntax,word_order,name"><input>Ten raport wczoraj przygotowała Anna.</input><expected_output>Ten raport wczoraj przygotowała Anna.</expected_output></case>
+  <case id="negative_relative_clause_punctuation" verification="negative" tags="negative,punctuation,relative_clause,name"><input>Maria, która mieszka w Krakowie, jutro przyjedzie.</input><expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output></case>
+  <case id="negative_conditional_punctuation" verification="negative" tags="negative,punctuation,subordinate_clause"><input>Jeśli jutro będzie padać, zostaniemy w domu.</input><expected_output>Jeśli jutro będzie padać, zostaniemy w domu.</expected_output></case>
 </corpus>

@@ -20,6 +20,8 @@ class E2ECase:
     source: str
     expected: str
     tags: tuple[str, ...]
+    verification: str
+    tracking_issue: int | None
 
 
 def _load_json_cases() -> dict[str, E2ECase]:
@@ -30,6 +32,8 @@ def _load_json_cases() -> dict[str, E2ECase]:
             source=item["input"],
             expected=item["expected_output"],
             tags=tuple(tag.strip() for tag in item["tags"]),
+            verification=item["verification"],
+            tracking_issue=item.get("tracking_issue"),
         )
         for item in raw["cases"]
     }
@@ -46,20 +50,31 @@ def _load_xml_cases() -> dict[str, E2ECase]:
         tags = tuple(
             tag for tag in (tag.strip() for tag in tags_text.split(",")) if tag
         )
+        tracking_issue_text = case.get("tracking_issue")
         cases[case_id] = E2ECase(
             case_id=case_id,
             source=source,
             expected=expected,
             tags=tags,
+            verification=case.get("verification", ""),
+            tracking_issue=(
+                int(tracking_issue_text) if tracking_issue_text is not None else None
+            ),
         )
     return cases
 
 
 def _normalize_result(
     cases: dict[str, E2ECase],
-) -> dict[str, tuple[str, str, tuple[str, ...]]]:
+) -> dict[str, tuple[str, str, tuple[str, ...], str, int | None]]:
     return {
-        key: (case.source, case.expected, tuple(case.tags))
+        key: (
+            case.source,
+            case.expected,
+            tuple(case.tags),
+            case.verification,
+            case.tracking_issue,
+        )
         for key, case in cases.items()
     }
 
@@ -72,21 +87,30 @@ def test_json_and_xml_corpora_cover_the_same_cases() -> None:
     assert _normalize_result(json_cases) == _normalize_result(xml_cases)
 
 
-@pytest.mark.parametrize("fixture", [_load_json_cases(), _load_xml_cases()])
-@pytest.mark.parametrize(
-    "case_id",
-    [
-        "spelling_zeby",
-        "spelling_wlasnie",
-        "spelling_jestes",
-        "agreement_ty_imie",
-        "agreement_oni_plural",
-        "syntax_list_spacing",
-        "punctuation_comma_spacing",
-        "name_case_forms_reference",
-        "name_plural_reference",
-    ],
+def test_corpus_declares_current_and_planned_verification_modes() -> None:
+    cases = _load_json_cases().values()
+
+    assert {case.verification for case in cases} == {
+        "rules",
+        "llm_planned",
+        "negative",
+    }
+    assert all(
+        case.tracking_issue in {42, 43}
+        for case in cases
+        if case.verification == "llm_planned"
+    )
+
+
+RULE_CASE_IDS = tuple(
+    case_id
+    for case_id, case in _load_json_cases().items()
+    if case.verification == "rules"
 )
+
+
+@pytest.mark.parametrize("fixture", [_load_json_cases(), _load_xml_cases()])
+@pytest.mark.parametrize("case_id", RULE_CASE_IDS)
 def test_end_to_end_polish_correction_corpus_fixtures(
     fixture: dict[str, E2ECase],
     case_id: str,
@@ -100,15 +124,39 @@ def test_end_to_end_polish_correction_corpus_fixtures(
     assert corrected == case.expected
 
 
-def test_corpus_contains_name_and_inflection_variants() -> None:
-    json_cases = _load_json_cases()
-    name_cases = [case for case in json_cases.values() if "name" in case.tags]
+@pytest.mark.parametrize("fixture", [_load_json_cases(), _load_xml_cases()])
+def test_negative_cases_produce_no_findings(fixture: dict[str, E2ECase]) -> None:
+    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
 
-    assert any("spelling" in case.tags for case in name_cases)
-    assert any(
-        "person_inflection" in case.tags or "number" in case.tags for case in name_cases
-    )
-    assert {case.case_id for case in name_cases} >= {
-        "spelling_jestes",
-        "agreement_ty_imie",
+    for case in fixture.values():
+        if case.verification == "negative":
+            assert case.source == case.expected
+            assert analyzer.analyze(case.source).issues == ()
+
+
+def test_planned_llm_cases_have_gold_output_category_and_tracking() -> None:
+    planned_cases = [
+        case
+        for case in _load_json_cases().values()
+        if case.verification == "llm_planned"
+    ]
+
+    assert planned_cases
+    assert all(case.source != case.expected for case in planned_cases)
+    assert all(case.tracking_issue in {42, 43} for case in planned_cases)
+    assert {"inflection", "syntax", "punctuation", "word_order"} <= {
+        tag for case in planned_cases for tag in case.tags
+    }
+
+
+def test_corpus_preserves_name_inflection_and_valid_word_order_negatives() -> None:
+    cases = _load_json_cases()
+    negative_cases = [
+        case for case in cases.values() if case.verification == "negative"
+    ]
+
+    assert {case.case_id for case in negative_cases} >= {
+        "negative_female_name_instrumental",
+        "negative_male_name_dative",
+        "negative_marked_word_order",
     }

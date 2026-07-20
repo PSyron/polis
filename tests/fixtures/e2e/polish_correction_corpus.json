@@ -1,69 +1,165 @@
 {
-  "schema_version": 1,
-  "id": "polis_e2e_polish_correction_corpus_v1",
+  "schema_version": 2,
+  "id": "polis_e2e_polish_correction_corpus_v2",
   "cases": [
     {
       "id": "spelling_zeby",
       "input": "Zeby nauczyć się polskiego, trzeba ćwiczyć.",
       "expected_output": "Żeby nauczyć się polskiego, trzeba ćwiczyć.",
       "description": "Standardowy błąd ortograficzny: z/ż.",
-      "tags": ["spelling", "orthography"]
+      "tags": ["spelling", "orthography"],
+      "verification": "rules"
     },
     {
       "id": "spelling_wlasnie",
       "input": "To wlasnie ten moment.",
       "expected_output": "To właśnie ten moment.",
-      "description": "Ortografia: 'wlasnie' -> 'właśnie'.",
-      "tags": ["spelling", "orthography"]
+      "description": "Ortografia: wlasnie -> właśnie.",
+      "tags": ["spelling", "orthography"],
+      "verification": "rules"
     },
     {
-      "id": "spelling_jestes",
-      "input": "Jestes najlepsza, Ania.",
-      "expected_output": "Jesteś najlepsza, Ania.",
-      "description": "Ortografia i forma czasownika: 'jestes' -> 'jesteś'.",
-      "tags": ["spelling", "orthography", "name"]
+      "id": "spelling_jestes_with_name",
+      "input": "Jestes gotowa, Aniu.",
+      "expected_output": "Jesteś gotowa, Aniu.",
+      "description": "Litera diakrytyczna w formie czasownika przy imieniu w wołaczu.",
+      "tags": ["spelling", "orthography", "name", "vocative"],
+      "verification": "rules"
     },
     {
-      "id": "agreement_ty_imie",
+      "id": "agreement_second_person",
       "input": "Ania, ty jestem gotowa.",
       "expected_output": "Ania, ty jesteś gotowa.",
-      "description": "Zgoda podmiotu i orzeczenia z nazwą + zaimkiem.",
-      "tags": ["agreement", "name", "person_inflection"]
+      "description": "Niezgodność osoby podmiotu i formy czasownika być.",
+      "tags": ["agreement", "person_inflection", "name"],
+      "verification": "rules"
     },
     {
-      "id": "agreement_oni_plural",
+      "id": "agreement_plural_subject",
       "input": "Oni jest gotowi.",
       "expected_output": "Oni są gotowi.",
-      "description": "Liczba podmiotu z orzeczeniem.",
-      "tags": ["agreement", "number"]
+      "description": "Niezgodność liczby podmiotu i orzeczenia.",
+      "tags": ["agreement", "number"],
+      "verification": "rules"
     },
     {
       "id": "syntax_list_spacing",
       "input": "1.Punkt pierwszy.",
       "expected_output": "1. Punkt pierwszy.",
       "description": "Brak spacji po numeracji listy.",
-      "tags": ["syntax", "spacing"]
+      "tags": ["syntax", "spacing"],
+      "verification": "rules"
     },
     {
       "id": "punctuation_comma_spacing",
-      "input": "Jutro,powiem o tym jutro.",
-      "expected_output": "Jutro, powiem o tym jutro.",
+      "input": "Jutro,powiem o tym zespołowi.",
+      "expected_output": "Jutro, powiem o tym zespołowi.",
       "description": "Brak spacji po przecinku.",
-      "tags": ["punctuation", "spacing"]
+      "tags": ["punctuation", "spacing"],
+      "verification": "rules"
     },
     {
-      "id": "name_case_forms_reference",
-      "input": "Agnieszka i Anię zaprosiłam do domu.",
-      "expected_output": "Agnieszka i Anię zaprosiłam do domu.",
-      "description": "Przypadki fleksyjne imion jako sygnał kontekstu nazw własnych.",
-      "tags": ["name", "name_inflection", "stable"]
+      "id": "inflection_male_surname_instrumental",
+      "input": "Rozmawiałem z Janem Nowak.",
+      "expected_output": "Rozmawiałem z Janem Nowakiem.",
+      "description": "Brak odmiany nazwiska męskiego w narzędniku.",
+      "tags": ["inflection", "case", "name", "surname"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
     },
     {
-      "id": "name_plural_reference",
-      "input": "Pani Ania, pani Agnieszka i pan Kuba są gotowi.",
-      "expected_output": "Pani Ania, pani Agnieszka i pan Kuba są gotowi.",
-      "description": "Warianty nazw i imion w różnych rolach składniowych bez korekty.",
-      "tags": ["name", "stable", "style"]
+      "id": "inflection_female_surname_dative",
+      "input": "Pomogłam pani Annie Kowalska.",
+      "expected_output": "Pomogłam pani Annie Kowalskiej.",
+      "description": "Brak odmiany nazwiska żeńskiego w celowniku.",
+      "tags": ["inflection", "case", "name", "surname"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
+    },
+    {
+      "id": "agreement_children_past_tense",
+      "input": "Dzieci była gotowe do wyjścia.",
+      "expected_output": "Dzieci były gotowe do wyjścia.",
+      "description": "Niezgodność liczby rzeczownika zbiorowego i czasu przeszłego.",
+      "tags": ["agreement", "inflection", "number"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
+    },
+    {
+      "id": "syntax_subordinate_mood",
+      "input": "Chciałbym żeby jutro spotkać się z tobą.",
+      "expected_output": "Chciałbym, żebyśmy jutro się spotkali.",
+      "description": "Konstrukcja podrzędna wymaga osobowej formy czasownika i właściwego szyku.",
+      "tags": ["syntax", "word_order", "inflection", "subordinate_clause"],
+      "verification": "llm_planned",
+      "tracking_issue": 43
+    },
+    {
+      "id": "punctuation_subordinate_clause",
+      "input": "Wiem że Ania już wróciła.",
+      "expected_output": "Wiem, że Ania już wróciła.",
+      "description": "Brak przecinka przed zdaniem podrzędnym.",
+      "tags": ["punctuation", "subordinate_clause", "name"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
+    },
+    {
+      "id": "punctuation_parenthetical_relative_clause",
+      "input": "Maria która mieszka w Krakowie jutro przyjedzie.",
+      "expected_output": "Maria, która mieszka w Krakowie, jutro przyjedzie.",
+      "description": "Brak pary przecinków wydzielających zdanie względne.",
+      "tags": ["punctuation", "syntax", "relative_clause", "name"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
+    },
+    {
+      "id": "punctuation_vocative",
+      "input": "Anno proszę zadzwoń wieczorem.",
+      "expected_output": "Anno, proszę, zadzwoń wieczorem.",
+      "description": "Wołacz i wtrącone proszę wymagają wydzielenia przecinkami.",
+      "tags": ["punctuation", "vocative", "name"],
+      "verification": "llm_planned",
+      "tracking_issue": 42
+    },
+    {
+      "id": "negative_female_name_instrumental",
+      "input": "Rozmawiałem z Anną Kowalską.",
+      "expected_output": "Rozmawiałem z Anną Kowalską.",
+      "description": "Poprawna odmiana imienia i nazwiska żeńskiego w narzędniku.",
+      "tags": ["negative", "inflection", "case", "name", "surname"],
+      "verification": "negative"
+    },
+    {
+      "id": "negative_male_name_dative",
+      "input": "Wręczyłem nagrodę Janowi Nowakowi.",
+      "expected_output": "Wręczyłem nagrodę Janowi Nowakowi.",
+      "description": "Poprawna odmiana imienia i nazwiska męskiego w celowniku.",
+      "tags": ["negative", "inflection", "case", "name", "surname"],
+      "verification": "negative"
+    },
+    {
+      "id": "negative_marked_word_order",
+      "input": "Ten raport wczoraj przygotowała Anna.",
+      "expected_output": "Ten raport wczoraj przygotowała Anna.",
+      "description": "Poprawny, nacechowany szyk zdania nie jest błędem stylistycznym.",
+      "tags": ["negative", "syntax", "word_order", "name"],
+      "verification": "negative"
+    },
+    {
+      "id": "negative_relative_clause_punctuation",
+      "input": "Maria, która mieszka w Krakowie, jutro przyjedzie.",
+      "expected_output": "Maria, która mieszka w Krakowie, jutro przyjedzie.",
+      "description": "Poprawnie wydzielone zdanie względne.",
+      "tags": ["negative", "punctuation", "relative_clause", "name"],
+      "verification": "negative"
+    },
+    {
+      "id": "negative_conditional_punctuation",
+      "input": "Jeśli jutro będzie padać, zostaniemy w domu.",
+      "expected_output": "Jeśli jutro będzie padać, zostaniemy w domu.",
+      "description": "Poprawny przecinek między zdaniem podrzędnym i nadrzędnym.",
+      "tags": ["negative", "punctuation", "subordinate_clause"],
+      "verification": "negative"
     }
   ]
 }
