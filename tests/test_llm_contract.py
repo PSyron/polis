@@ -42,7 +42,9 @@ def test_build_prompt_is_a_stable_snapshot() -> None:
 def test_build_prompt_explicitly_describes_every_response_field() -> None:
     prompt = build_prompt("Ala ma kota.")
 
-    assert LLM_PROMPT_VERSION == 2
+    assert LLM_PROMPT_VERSION == 3
+    assert "Analyze the input text for real Polish language errors." in prompt
+    assert "Only report high-confidence, minimal corrections" in prompt
     assert "The response object has exactly these fields:" in prompt
     assert "schema_version: integer 1." in prompt
     assert "findings: array of zero or more finding objects." in prompt
