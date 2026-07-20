@@ -67,6 +67,14 @@ resource-intensive pytest cases with `@pytest.mark.slow` and tests requiring a
 real local model with `@pytest.mark.model`; the local command above reproduces
 CI's exact marker selection.
 
+## Public models
+
+Polis currently provides immutable analysis result models and deterministic,
+strictly versioned JSON serialization. The
+[public analysis model contract](docs/public-api.md) documents field semantics,
+Unicode offset rules, validation failures, and schema compatibility. Analyzer
+orchestration and correction application remain future work.
+
 ## Dependency groups
 
 The default installation has no production dependencies. The `dev` extra is
