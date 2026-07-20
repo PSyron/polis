@@ -26,3 +26,8 @@ When testing or scripting:
 - avoid storing temporary files with sensitive text in world-readable paths,
 - and rotate temporary working files when you capture CLI input/output.
 
+## Audit status
+
+For release-time privacy and dependency evidence, see
+[Privacy and dependency audit](privacy-audit.md). It records network-blocking checks,
+artifact scans, secret-detection status, and residual risks.
