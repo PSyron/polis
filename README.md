@@ -69,11 +69,14 @@ CI's exact marker selection.
 
 ## Public models
 
-Polis currently provides immutable analysis result models and deterministic,
-strictly versioned JSON serialization. The
+Polis currently provides immutable analysis result models, deterministic,
+strictly versioned JSON serialization, and runtime protocols for future
+deterministic analyzers and local generation backends. The
 [public analysis model contract](docs/public-api.md) documents field semantics,
 Unicode offset rules, validation failures, and schema compatibility. Analyzer
-orchestration and correction application remain future work.
+orchestration, concrete rules, concrete backends, and correction application
+remain future work. The [protocol boundary](docs/architecture/protocols.md)
+documents the ownership and lifecycle rules for those future implementations.
 
 ## Evaluation data
 

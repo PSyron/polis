@@ -10,6 +10,14 @@ from polis.core.models import (
     Source,
     SourceKind,
 )
+from polis.core.protocols import (
+    AnalysisOrchestrator,
+    DeterministicAnalyzer,
+    LocalGenerationBackend,
+    MonotonicClock,
+    Rule,
+    RuleRegistry,
+)
 from polis.core.serialization import (
     ANALYSIS_SCHEMA_VERSION,
     analysis_result_from_json,
@@ -18,11 +26,17 @@ from polis.core.serialization import (
 
 __all__ = [
     "ANALYSIS_SCHEMA_VERSION",
+    "AnalysisOrchestrator",
     "AnalysisOptions",
     "AnalysisResult",
     "Category",
     "Confidence",
+    "DeterministicAnalyzer",
     "Finding",
+    "LocalGenerationBackend",
+    "MonotonicClock",
+    "Rule",
+    "RuleRegistry",
     "Severity",
     "Source",
     "SourceKind",
