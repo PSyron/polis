@@ -1,0 +1,36 @@
+# macOS arm64, CPython 3.12.13, uv 0.11.2
+anyio==4.14.2
+certifi==2026.6.17
+charset-normalizer==3.4.9
+click==8.4.2
+colorama==0.4.6
+emoji==2.15.0
+filelock==3.31.1
+fsspec==2026.6.0
+h11==0.16.0
+hf-xet==1.5.2
+httpcore==1.0.9
+httpx==0.28.1
+huggingface-hub==1.24.0
+idna==3.18
+jinja2==3.1.6
+markupsafe==3.0.3
+mpmath==1.3.0
+networkx==3.6.1
+numpy==2.5.1
+packaging==26.2
+platformdirs==4.10.1
+protobuf==7.35.1
+pyyaml==6.0.3
+regex==2026.7.19
+requests==2.34.2
+setuptools==83.0.0
+stanza @ https://files.pythonhosted.org/packages/62/d4/82b548b1953a296a86a2dcb991357c582f1847e0dde8556bd53c40ec2f89/stanza-1.14.0-py3-none-any.whl#sha256=b5e81d742e39671de146e69f3c6ca7ff76cc4201ed07cab3083d815b2cbab544
+sympy==1.14.0
+termcolor==3.3.0
+torch==2.13.0
+tqdm==4.69.0
+typing-extensions==4.16.0
+udapi==0.5.2
+udtools==0.2.8
+urllib3==2.7.0

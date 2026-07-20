@@ -1,0 +1,2 @@
+# macOS arm64, CPython 3.12.13, uv 0.11.2
+morfeusz2 @ https://files.pythonhosted.org/packages/a3/cf/87a496f0632b2c7d97bfbbf5f38000510d16c9b2e7c5d6ea8ffe11eebe07/morfeusz2-1.99.15-20260601-cp310-abi3-macosx_11_0_universal2.whl#sha256=8ff0d3f9d2ab814b905afc471bc9b70415b3abb4ffcbf6ed3904735de88dbdac

@@ -1,0 +1,46 @@
+# macOS arm64, CPython 3.12.13, uv 0.11.2
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.14.2
+blis==1.3.3
+catalogue==2.0.10
+certifi==2026.6.17
+charset-normalizer==3.4.9
+click==8.4.2
+cloudpathlib==0.24.0
+confection==1.3.3
+cymem==2.0.13
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.18
+jinja2==3.1.6
+markdown-it-py==4.2.0
+markupsafe==3.0.3
+mdurl==0.1.2
+murmurhash==1.0.15
+numpy==2.5.1
+packaging==26.2
+pl-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.8.0/pl_core_news_sm-3.8.0-py3-none-any.whl#sha256=9b536db854b0cdb9132a74f68b392b8112ab6030f971bb03282462362a940dbb
+preshed==3.0.13
+pydantic==2.13.4
+pydantic-core==2.46.4
+pygments==2.20.0
+requests==2.34.2
+rich==15.0.0
+setuptools==83.0.0
+shellingham==1.5.4
+smart-open==8.0.1
+spacy @ https://files.pythonhosted.org/packages/06/df/178bbab47fa209c8baf2f1e609cbddc6b18a985200be1ceee22bd5b89beb/spacy-3.8.14-cp312-cp312-macosx_11_0_arm64.whl#sha256=e3ebe50b93f2d40e8ec3451255528bb622ccb12be39fd140bb87668ce8d1075b
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+srsly==2.5.3
+thinc==8.3.13
+tqdm==4.69.0
+typer==0.27.0
+typing-extensions==4.16.0
+typing-inspection==0.4.2
+urllib3==2.7.0
+wasabi==1.1.3
+weasel==1.0.0
+wrapt==2.2.2
