@@ -1,0 +1,72 @@
+name: Technical task
+description: Plan a focused implementation, test, documentation, or maintenance change.
+title: ""
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this issue to one independently verifiable outcome. Do not include private text, secrets, or model files.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: State the single observable outcome.
+      placeholder: The project can...
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Explain why this work is needed and how it supports the product specification.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: In scope
+      description: List the concrete changes included in this issue.
+      placeholder: |-
+        - Change one
+        - Change two
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Out of scope
+      description: State adjacent work that must not be included.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Provide objective, independently verifiable checks.
+      placeholder: |-
+        - [ ] Criterion one
+        - [ ] Criterion two
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Required tests
+      description: Name the unit, integration, quality, or manual checks required.
+    validations:
+      required: true
+  - type: textarea
+    id: documentation
+    attributes:
+      label: Documentation
+      description: Name documentation to add or update, or explain why no documentation changes are needed.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blocking issues, or write "None".
+    validations:
+      required: true

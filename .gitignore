@@ -1,0 +1,56 @@
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Editors and local tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Packaging and build output
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Test and benchmark artifacts
+.tox/
+.nox/
+coverage.xml
+junit.xml
+benchmarks/results/
+benchmarks/results.json
+
+# Local language models and generated corpora
+models/
+*.gguf
+*.safetensors
+data/local/
+data/private/
+corpora/local/
+
+# Local worktrees
+.worktrees/
+worktrees/

@@ -1,0 +1,55 @@
+name: Architecture decision or research
+description: Resolve a blocking technical choice with evidence and a recorded decision.
+title: "[Decision] "
+labels:
+  - type:decision
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Decision question
+      description: State the single decision this issue must resolve.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: List product, privacy, licensing, compatibility, and performance constraints.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options to evaluate
+      description: List realistic alternatives without assuming the outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Required evidence
+      description: Define the benchmark, prototype, documentation review, or compatibility check.
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Decision criteria
+      description: Define how the evidence will be compared.
+    validations:
+      required: true
+  - type: textarea
+    id: artifact
+    attributes:
+      label: Decision artifact
+      description: Name the ADR or documentation that records the outcome and consequences.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blocking issues, or write "None".
+    validations:
+      required: true

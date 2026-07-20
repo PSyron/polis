@@ -12,6 +12,8 @@ Configure the repository for disciplined, issue-driven development and create a 
 
 - GitHub metadata, technical documentation, issue bodies, and `AGENTS.md` use English.
 - `PROMPT.md` remains in Polish and is the product source of truth.
+- The repository is owned by `PSyron`, and Paweł Cyroń remains the sole credited author; generated artifacts contain no tool attribution, co-author trailer, or generation disclosure.
+- Repository-authored content does not name automated tooling or claim that it performs work.
 - The backlog uses the balanced split: 32 independently verifiable issues across milestones M0-M4.
 - Every implementation issue has exactly one milestone, one `type:*` label, one `area:*` label, and one `priority:*` label.
 - Blocking relationships are written explicitly in issue bodies and mirrored in `docs/project/ROADMAP.md`.

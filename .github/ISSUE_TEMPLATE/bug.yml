@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible defect or language-quality regression.
+title: "[Bug] "
+labels:
+  - type:bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove private text and secrets. Reduce language examples to the smallest reproducible fragment.
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: Describe the incorrect result, including category and offsets when applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe the correct result.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the shortest privacy-safe example and exact command or API call.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide the Polis version, Python version, operating system, backend, and model when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: regression_test
+    attributes:
+      label: Regression test
+      description: Describe the failing test that must be added before the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized diagnostics
+      description: Include only diagnostics that do not expose the analyzed text, secrets, or local paths.
+    validations:
+      required: false
