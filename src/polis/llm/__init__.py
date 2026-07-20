@@ -2,6 +2,7 @@
 
 from polis.llm.adapter import (
     BackendRequest,
+    BackendRetryPolicy,
     LocalBackendTransport,
     MockHeuristicBackend,
     MockHeuristicTransport,
@@ -22,6 +23,7 @@ __all__ = [
     "build_prompt",
     "validate_llm_response",
     "BackendRequest",
+    "BackendRetryPolicy",
     "LocalBackendTransport",
     "MockHeuristicBackend",
     "MockHeuristicTransport",

@@ -2,17 +2,27 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
-from collections.abc import Iterable
+import math
+import time
+from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass
 from typing import Final, Protocol, TypedDict, cast
 
-from polis.core import BackendUnavailableError, InvalidBackendResponseError
+from polis.core import (
+    AnalysisTimeoutError,
+    BackendUnavailableError,
+    Finding,
+    InvalidBackendResponseError,
+)
 from polis.core.models import Category
+from polis.core.protocols import MonotonicClock
 from polis.llm.contracts import (
     LLM_PROMPT_VERSION,
     LLM_RESPONSE_SCHEMA_VERSION,
     build_prompt,
+    validate_llm_response,
 )
 
 
@@ -27,6 +37,13 @@ _PROMPT_CLOSE_MARKER: Final[str] = "</INPUT_JSON_END>"
 _MAX_PROMPT_CHARS: Final[int] = 25_000
 _MAX_RESPONSE_CHARS: Final[int] = 25_000
 _DEFAULT_MAX_FINDINGS: Final[int] = 8
+_DEFAULT_TIMEOUT_SECONDS: Final[float] = 1.0
+_DEFAULT_MAX_ATTEMPTS: Final[int] = 3
+_DEFAULT_RETRY_DELAYS: Final[tuple[float, ...]] = (0.0, 0.1, 0.1)
+_DEFAULT_OPERATION: Final[str] = "llm.generate"
+_DEFAULT_SLEEP: Final[Callable[[float], Awaitable[None]]] = asyncio.sleep
+
+OperationSleep = Callable[[float], Awaitable[None]]
 
 
 @dataclass(frozen=True)
@@ -43,6 +60,41 @@ class LocalBackendTransport(Protocol):
     def is_available(self) -> bool: ...
 
     async def request(self, prompt: str) -> str: ...
+
+
+@dataclass(frozen=True)
+class BackendRetryPolicy:
+    """Deterministic retry and timeout settings for local backend calls."""
+
+    timeout_seconds: float = _DEFAULT_TIMEOUT_SECONDS
+    max_attempts: int = _DEFAULT_MAX_ATTEMPTS
+    retry_delays: tuple[float, ...] = _DEFAULT_RETRY_DELAYS
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.timeout_seconds, (int, float)):
+            raise ValueError("timeout_seconds must be a number")
+        if not self.timeout_seconds > 0:
+            raise ValueError("timeout_seconds must be positive")
+        if not math.isfinite(self.timeout_seconds):
+            raise ValueError("timeout_seconds must be finite")
+        if not self.max_attempts > 0:
+            raise ValueError("max_attempts must be positive")
+        if not self.retry_delays:
+            raise ValueError("retry_delays must not be empty")
+        for delay in self.retry_delays:
+            if delay < 0:
+                raise ValueError("retry delays must be non-negative")
+
+
+class LocalGenerationRuntime(Protocol):
+    """Runtime boundary used by resilient local invocation helpers."""
+
+    @property
+    def name(self) -> str:
+        """Stable identifier used in contract diagnostics."""
+
+    async def generate(self, prompt: str) -> str:
+        """Generate one local response for one prompt."""
 
 
 @dataclass(frozen=True)
@@ -131,6 +183,127 @@ class MockHeuristicBackend:
             max_findings=self.max_findings,
         )
         return BackendRequest(prompt=prompt, text=text)
+
+    async def generate_findings(
+        self,
+        text: str,
+        *,
+        policy: BackendRetryPolicy | None = None,
+        clock: MonotonicClock | None = None,
+        sleep: OperationSleep = _DEFAULT_SLEEP,
+        operation: str = _DEFAULT_OPERATION,
+    ) -> tuple[Finding, ...]:
+        request = await self.build_request(text)
+        raw = await _generate_with_retries(
+            self,
+            request.prompt,
+            policy=policy,
+            clock=clock,
+            sleep=sleep,
+            operation=operation,
+        )
+        return _parse_and_validate_findings(
+            raw,
+            source_text=request.text,
+            source_name=self.name,
+            operation=operation,
+        )
+
+
+def _retry_delay(policy: BackendRetryPolicy, attempt: int) -> float:
+    index = attempt - 1
+    if index < 0:
+        return 0.0
+    if index < len(policy.retry_delays):
+        return policy.retry_delays[index]
+    return policy.retry_delays[-1]
+
+
+async def _generate_with_retries(
+    backend: LocalGenerationRuntime,
+    prompt: str,
+    *,
+    policy: BackendRetryPolicy | None = None,
+    clock: MonotonicClock | None = None,
+    sleep: OperationSleep = _DEFAULT_SLEEP,
+    operation: str = _DEFAULT_OPERATION,
+) -> str:
+    policy = policy or BackendRetryPolicy()
+    deadline_provider = clock or _DefaultClock()
+    start_time = deadline_provider.monotonic()
+
+    for attempt in range(1, policy.max_attempts + 1):
+        if attempt > 1:
+            await sleep(_retry_delay(policy, attempt - 1))
+
+        try:
+            elapsed = deadline_provider.monotonic() - start_time
+            remaining = policy.timeout_seconds - elapsed
+            if remaining <= 0.0:
+                raise AnalysisTimeoutError(
+                    "local backend request exceeded the configured timeout",
+                    code="analysis.timeout",
+                    retryable=True,
+                    context={"operation": operation, "backend": backend.name},
+                )
+            return await asyncio.wait_for(backend.generate(prompt), timeout=remaining)
+        except BackendUnavailableError as exc:
+            if not exc.retryable or attempt >= policy.max_attempts:
+                raise
+        except InvalidBackendResponseError as exc:
+            if not exc.retryable or attempt >= policy.max_attempts:
+                raise
+        except TimeoutError as exc:
+            if attempt >= policy.max_attempts:
+                raise AnalysisTimeoutError(
+                    "local backend request exceeded the configured timeout",
+                    code="analysis.timeout",
+                    retryable=True,
+                    context={"operation": operation, "backend": backend.name},
+                ) from exc
+        except Exception as exc:
+            if attempt >= policy.max_attempts:
+                raise InvalidBackendResponseError(
+                    "backend returned an unexpected failure",
+                    code="backend.invalid_response",
+                    retryable=False,
+                    context={"operation": operation, "backend": backend.name},
+                ) from exc
+            continue
+
+    raise InvalidBackendResponseError(
+        "backend returned no valid response",
+        code="backend.invalid_response",
+        retryable=False,
+        context={"operation": operation, "backend": backend.name},
+    )
+
+
+def _parse_and_validate_findings(
+    raw: str,
+    source_text: str,
+    source_name: str,
+    operation: str,
+) -> tuple[Finding, ...]:
+    try:
+        findings = validate_llm_response(
+            raw,
+            source_text=source_text,
+            source_name=source_name,
+        )
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise InvalidBackendResponseError(
+            "backend returned an invalid response",
+            code="backend.invalid_response",
+            retryable=False,
+            context={"operation": operation, "backend": source_name},
+        ) from exc
+    return cast(tuple[Finding, ...], findings)
+
+
+class _DefaultClock:
+    def monotonic(self) -> float:
+        return time.monotonic()
 
 
 def _sorted_categories(

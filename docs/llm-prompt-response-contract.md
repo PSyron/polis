@@ -98,3 +98,23 @@ Validation behavior:
 - Empty or malformed non-string backend responses are rejected.
 - Oversized prompts/responses are rejected with controlled validation exceptions.
 - The transport receives plain prompt text and returns raw model-like JSON only.
+
+## Response resilience and failure policy (M2-04)
+
+`M2-04` hardens local generation for production-safe behavior:
+
+- `MockHeuristicBackend.generate_findings(...)` uses a retryable execution helper.
+- Retries are governed by `BackendRetryPolicy`:
+  - `timeout_seconds` (default: `1.0`)
+  - `max_attempts` (default: `3`)
+  - `retry_delays` (default: `(0.0, 0.1, 0.1)`)
+- Retry attempts are deterministic and injectable:
+  - a caller can provide `sleep` and `clock` to deterministically test delays and deadlines.
+- Failure mapping:
+  - `BackendUnavailableError` with `retryable=True` is retried up to policy budget.
+  - `asyncio.TimeoutError` maps to `AnalysisTimeoutError` and is retryable.
+  - Invalid backend payloads map to `InvalidBackendResponseError` and are terminal.
+  - Unknown exceptions become `InvalidBackendResponseError` (non-retryable).
+- Validation errors are redacted:
+  - raw user text is not emitted in exception messages.
+  - diagnostics carry only operational metadata (`operation`, `backend`) for incident triage.
