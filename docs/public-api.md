@@ -1,8 +1,115 @@
 # Public Analysis Models
 
 Polis exposes immutable, typed data models from both `polis` and `polis.core`.
-This contract describes analysis data only. Analyzer orchestration and correction
-application are not part of the current package.
+This contract describes analysis data and the approved future analyzer surface.
+The currently distributed package implements only the immutable data models and
+JSON schema. [ADR-0003](architecture/decisions/0003-public-api-and-exception-contract.md)
+freezes analyzer and correction behavior before its implementation.
+
+## Approved analyzer contract
+
+The future package-root API is deliberately small:
+
+```python
+import polis
+from polis import AnalysisOptions, Analyzer
+
+analyzer = Analyzer.from_config("polis.toml")
+result: polis.AnalysisResult = analyzer.analyze(
+    "Te zdanie zawiera błąd.",
+    options=AnalysisOptions(categories={"agreement"}, minimum_confidence=0.8),
+)
+corrected = result.apply(issue_ids=(result.issues[0].id,))
+```
+
+`Analyzer.from_config(path)` reads an explicit local TOML configuration and
+never accesses the network. `Analyzer(config)` is the equivalent constructor
+when a caller has already validated an `AnalyzerConfig`. `analyze()` blocks the
+calling thread; `await analyze_async()` has identical inputs, result ordering,
+filters, and failures for event-loop applications. Passing `None` for options
+uses the default `AnalysisOptions()`; otherwise its category and confidence
+filters are reflected in `result.options`.
+
+One call either returns a complete, validated result for its configured scope or
+raises a controlled operational error. No partial `AnalysisResult` is returned.
+This avoids a successful-looking result that silently omits a failed backend.
+The current schema-version-1 result has no partial-state field; any future
+partial-analysis feature needs an explicit versioned outcome contract.
+
+`result.apply(issue_ids)` applies only named findings from that result. It
+validates the entire selection before changing output, rejects unknown,
+duplicate, unsuggestable, overlapping, or same-boundary corrections, and then
+applies compatible replacements right-to-left in original-text coordinates. An
+empty selection returns the source text. The operation is atomic: a selection
+error returns no partial corrected text.
+
+The future names above are represented by a typing-only public-package mirror
+while analyzer implementation is pending. It has one `AnalysisResult`
+declaration mirroring the real core model; `polis.core` and `polis` directly
+re-export that exact type. The checked examples prove bidirectional assignment
+compatibility among both imports and analyzer returns. The declarations are
+under `tests/typecheck/stubs/`, and the examples live in
+`tests/typecheck/api_contract_examples.py`.
+
+### Controlled failures
+
+All controlled operational errors derive from `PolisError` and expose a stable
+`code`, `retryable` flag, and a safe `context` mapping. They never contain the
+analyzed text, source fragments, suggestions, prompts, full backend output, or
+secrets. The complete hierarchy and context allowlist are in ADR-0003.
+
+```python
+from polis import (
+    AnalysisTimeoutError,
+    Analyzer,
+    BackendUnavailableError,
+    ConfigurationError,
+    CorrectionConflictError,
+    InvalidBackendResponseError,
+    UncorrectableFindingError,
+    UnknownFindingError,
+)
+
+try:
+    analyzer = Analyzer.from_config("polis.toml")
+except ConfigurationError as error:
+    assert error.code == "configuration.invalid"
+    assert error.retryable is False
+    assert error.context["path"] == "polis.toml"
+
+try:
+    result = Analyzer.from_config("polis.toml").analyze("Tekst")
+except BackendUnavailableError as error:
+    assert error.retryable is True
+    assert error.context["backend"]
+except AnalysisTimeoutError as error:
+    assert error.code == "analysis.timeout"
+    assert error.context["backend"]
+except InvalidBackendResponseError as error:
+    assert error.retryable is False
+    assert error.context["backend"]
+
+try:
+    result.apply(issue_ids=("finding_missing",))
+except UnknownFindingError as error:
+    assert error.code == "correction.unknown_finding"
+    assert error.retryable is False
+    assert error.context["finding_ids"] == "finding_missing"
+
+try:
+    result.apply(issue_ids=("finding_without_suggestion",))
+except UncorrectableFindingError as error:
+    assert error.code == "correction.uncorrectable_finding"
+    assert error.retryable is False
+    assert error.context["finding_ids"] == "finding_without_suggestion"
+
+try:
+    result.apply(issue_ids=("overlapping-first", "overlapping-second"))
+except CorrectionConflictError as error:
+    assert error.code == "correction.conflict"
+    assert error.retryable is False
+    assert error.context["finding_ids"]
+```
 
 ## Constructing a result
 

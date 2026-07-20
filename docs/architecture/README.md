@@ -8,3 +8,4 @@ when the policy changes.
 | --- | --- | --- |
 | [ADR-0001](decisions/0001-python-platform-licensing-policy.md) | Accepted | Python, platform, licensing, and asset policy |
 | [ADR-0002](decisions/0002-polish-nlp-dependency-strategy.md) | Accepted | Standard-library-first Polish NLP dependency strategy |
+| [ADR-0003](decisions/0003-public-api-and-exception-contract.md) | Accepted | Public API and exception contract |
