@@ -7,3 +7,4 @@ when the policy changes.
 | ADR | Status | Decision |
 | --- | --- | --- |
 | [ADR-0001](decisions/0001-python-platform-licensing-policy.md) | Accepted | Python, platform, licensing, and asset policy |
+| [ADR-0002](decisions/0002-polish-nlp-dependency-strategy.md) | Accepted | Standard-library-first Polish NLP dependency strategy |

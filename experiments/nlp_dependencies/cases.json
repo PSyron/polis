@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "source": "project-authored synthetic examples",
+    "license": "CC0-1.0",
+    "created": "2026-07-20",
+    "notes": "No private, copied, or corpus-derived text is included."
+  },
+  "cases": [
+    {
+      "id": "simple_sentences",
+      "kind": "positive",
+      "text": "Ala ma kota. Kot śpi!",
+      "capabilities": ["tokenization", "sentence_segmentation"],
+      "expected_tokens": ["Ala", "ma", "kota", ".", "Kot", "śpi", "!"],
+      "expected_sentences": ["Ala ma kota.", "Kot śpi!"]
+    },
+    {
+      "id": "polish_abbreviations",
+      "kind": "hard_negative",
+      "text": "Prof. Kowalski mieszka przy ul. Długiej. Wraca jutro.",
+      "capabilities": ["sentence_segmentation"],
+      "expected_sentences": [
+        "Prof. Kowalski mieszka przy ul. Długiej.",
+        "Wraca jutro."
+      ]
+    },
+    {
+      "id": "decimal_and_time",
+      "kind": "hard_negative",
+      "text": "Wynik to 21,5. Spotkanie zacznie się o 12.30.",
+      "capabilities": ["tokenization", "sentence_segmentation"],
+      "expected_tokens": [
+        "Wynik", "to", "21,5", ".", "Spotkanie", "zacznie", "się", "o", "12.30", "."
+      ],
+      "expected_sentences": [
+        "Wynik to 21,5.",
+        "Spotkanie zacznie się o 12.30."
+      ]
+    },
+    {
+      "id": "initial_and_hyphen",
+      "kind": "hard_negative",
+      "text": "J. Kowalski napisał e-mail. Odpisał dziś.",
+      "capabilities": ["tokenization", "sentence_segmentation"],
+      "expected_tokens": [
+        "J.", "Kowalski", "napisał", "e-mail", ".", "Odpisał", "dziś", "."
+      ],
+      "expected_sentences": [
+        "J. Kowalski napisał e-mail.",
+        "Odpisał dziś."
+      ]
+    },
+    {
+      "id": "quote_boundary",
+      "kind": "hard_negative",
+      "text": "Powiedziała: „To działa!”. Potem wyszła.",
+      "capabilities": ["tokenization", "sentence_segmentation"],
+      "expected_tokens": [
+        "Powiedziała", ":", "„", "To", "działa", "!", "”", ".", "Potem", "wyszła", "."
+      ],
+      "expected_sentences": [
+        "Powiedziała: „To działa!”.",
+        "Potem wyszła."
+      ]
+    },
+    {
+      "id": "inflection",
+      "kind": "positive",
+      "text": "Małe koty spały na miękkiej kanapie.",
+      "capabilities": ["morphology"],
+      "expected_sentences": ["Małe koty spały na miękkiej kanapie."],
+      "morphology_probes": [
+        {"surface": "koty", "lemma": "kot"},
+        {"surface": "spały", "lemma": "spać"},
+        {"surface": "kanapie", "lemma": "kanapa"}
+      ]
+    },
+    {
+      "id": "ambiguous_form",
+      "kind": "hard_negative",
+      "text": "Mam zamek, a zamek stoi na wzgórzu.",
+      "capabilities": ["morphology"],
+      "expected_sentences": ["Mam zamek, a zamek stoi na wzgórzu."],
+      "morphology_probes": [
+        {"surface": "zamek", "lemma": "zamek"}
+      ]
+    },
+    {
+      "id": "misspelling",
+      "kind": "positive",
+      "text": "To jest rzodki błąd ortograficzny.",
+      "capabilities": ["spelling"],
+      "expected_sentences": ["To jest rzodki błąd ortograficzny."],
+      "expected_spelling_flags": ["rzodki"]
+    },
+    {
+      "id": "rare_correct_words",
+      "kind": "hard_negative",
+      "text": "Chrząszcz brzmi w trzcinie.",
+      "capabilities": ["spelling"],
+      "expected_sentences": ["Chrząszcz brzmi w trzcinie."],
+      "expected_spelling_flags": []
+    },
+    {
+      "id": "proper_names",
+      "kind": "hard_negative",
+      "text": "Żaneta odwiedziła Szczebrzeszyn.",
+      "capabilities": ["morphology", "spelling"],
+      "expected_sentences": ["Żaneta odwiedziła Szczebrzeszyn."],
+      "expected_spelling_flags": []
+    }
+  ]
+}

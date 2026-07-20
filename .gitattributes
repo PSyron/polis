@@ -1,0 +1,5 @@
+# The NLP experiment assembles and verifies these artifacts byte-for-byte.
+# Keep their checkout representation stable on every supported platform.
+experiments/nlp_dependencies/*.json text eol=lf
+experiments/nlp_dependencies/raw/*.json text eol=lf
+experiments/nlp_dependencies/closures/*.txt text eol=lf

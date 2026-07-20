@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "case_manifest": "cases.json",
+  "case_manifest_sha256": "2bcc80e31ce8640eef488782662afb9d7e576ee4f35aaf1d3c945469766e011c",
+  "results_path": "results.json",
+  "environment": {
+    "recorded_at": "2026-07-20T15:06:00+02:00",
+    "os": "macOS 15.3.1 (Darwin 24.3.0)",
+    "architecture": "arm64",
+    "python": "CPython 3.12.13",
+    "installer": "uv 0.11.2",
+    "network_policy": "Network used for installation only; Stanza inference set download_method=None, but transport was not externally blocked.",
+    "bootstrap": {
+      "uv": {
+        "version": "0.11.2",
+        "artifact": "uv-aarch64-apple-darwin.tar.gz",
+        "url": "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-aarch64-apple-darwin.tar.gz",
+        "sha256": "4beaa9550f93ef7f0fc02f7c28c9c48cd61fe30db00f5ac8947e0a425c3fb282"
+      },
+      "python": {
+        "version": "3.12.13",
+        "managed_key": "cpython-3.12.13-macos-aarch64-none",
+        "install_directory": "UV_PYTHON_INSTALL_DIR"
+      }
+    }
+  },
+  "measurement_method": {
+    "behavior": "Each adapter processed cases.json in manifest order and emitted raw half-open character spans.",
+    "footprint": "Logical byte sizes of regular files, excluding symlinks, under each isolated environment's site-packages; external Stanza model files are added separately.",
+    "derived": "Exact token-list and sentence-list matches, expected lemma probe hits, and exact spelling-flag matches.",
+    "repeatability": "A second warm run of every candidate produced byte-identical raw JSON. This does not establish cross-platform bitwise determinism."
+  },
+  "raw_inputs": {
+    "stdlib": {
+      "path": "stdlib.json",
+      "sha256": "eb19cb294003e6f3067aaa358bbec633f8df77ed94c257fd2a1a61a6d58ccce4",
+      "distribution_version": "3.12.13"
+    },
+    "stdlib-morfeusz2": {
+      "path": "stdlib-morfeusz2.json",
+      "sha256": "9f3353f21edc36019752fda9f8c80698426eb51f781b034faebe1f84194839a7",
+      "distribution_version": "1.99.15"
+    },
+    "spacy-pl": {
+      "path": "spacy-pl.json",
+      "sha256": "b404cf4f9ddcb873d971128513964425cea834a282d40c3263970179922797e8",
+      "distribution_version": "3.8.14"
+    },
+    "stanza-pl": {
+      "path": "stanza-pl.json",
+      "sha256": "f608b2f3d99fd2583fd977aab850c1fa4e05d69e934096677d79663bae6e9f91",
+      "distribution_version": "1.14.0"
+    }
+  },
+  "candidates": [
+    {
+      "id": "stdlib",
+      "name": "CPython standard library baseline",
+      "version": "3.12.13",
+      "license": {
+        "spdx": "PSF-2.0",
+        "evidence_url": "https://docs.python.org/3/license.html"
+      },
+      "package_metadata_url": "https://docs.python.org/3.12/library/index.html",
+      "components": {
+        "segmentation": "re-based spike baseline",
+        "morphology": null,
+        "spelling": null
+      },
+      "offline_after_install": true,
+      "install_footprint": {
+        "bytes": 0,
+        "method": "no-third-party-files",
+        "included": "incremental third-party files"
+      },
+      "python_availability": "Built into tested CPython 3.12.13; the project policy also targets CPython 3.13 and 3.14.",
+      "platform_availability": "Follows CPython and has no native or model asset.",
+      "operational_complexity": "Low: no install, model download, native ABI, cache, or background service.",
+      "limitations": [
+        "The transparent baseline is experiment-only, not production segmentation.",
+        "It has no general morphology or spelling support.",
+        "Its abbreviation list is deliberately bounded and failed the initial case."
+      ],
+      "closure": {
+        "path": "stdlib.txt",
+        "sha256": "6e51119a12e39c374ae02e3af020ac60ea6e3cd54cf9f83a585d7782ddd4cca9",
+        "installed_distributions": {}
+      }
+    },
+    {
+      "id": "stdlib-morfeusz2",
+      "name": "Standard-library baseline plus Morfeusz2",
+      "version": "morfeusz2 1.99.15 on CPython 3.12.13",
+      "license": {
+        "spdx": "BSD-2-Clause",
+        "evidence_url": "https://morfeusz.sgjp.pl/doc/license/en"
+      },
+      "package_metadata_url": "https://pypi.org/pypi/morfeusz2/1.99.15/json",
+      "components": {
+        "segmentation": "re-based spike baseline",
+        "morphology": "Morfeusz2 SGJP",
+        "spelling": "unknown-form lexicon signal only"
+      },
+      "offline_after_install": true,
+      "install_footprint": {
+        "bytes": 40793559,
+        "method": "installed-files",
+        "included": "all regular files under site-packages",
+        "file_count": 13
+      },
+      "python_availability": "PyPI declares no Requires-Python value. The cp310-abi3 wheel ran on CPython 3.12.13; 3.13 and 3.14 were not executed.",
+      "platform_availability": "1.99.15 publishes macOS universal2, manylinux_2_28 x86_64, and Windows amd64 wheels; no sdist or Linux arm64 wheel was present in the queried release.",
+      "operational_complexity": "Medium: one native wheel embeds linguistic data; no runtime download or service was observed.",
+      "limitations": [
+        "Morfeusz2 does not supply sentence segmentation, so this strategy retains the experimental baseline.",
+        "Unknown-form detection is only a spelling suspicion signal, not a correction API.",
+        "Wheel coverage does not cover every platform in ADR-0001 and Requires-Python is undeclared."
+      ],
+      "closure": {
+        "path": "stdlib-morfeusz2.txt",
+        "sha256": "343755a5a5c59afa437e3c20377e330ff9c337fe66ff1fb3efc256261e6d6b90",
+        "installed_distributions": {
+          "morfeusz2": "1.99.15"
+        }
+      }
+    },
+    {
+      "id": "spacy-pl",
+      "name": "spaCy with pl_core_news_sm",
+      "version": "spacy 3.8.14 + pl_core_news_sm 3.8.0 + click 8.4.2",
+      "license": {
+        "spdx": "MIT AND LicenseRef-model-GPL-3.0-unspecified",
+        "evidence_url": "https://github.com/explosion/spacy-models/releases/tag/pl_core_news_sm-3.8.0"
+      },
+      "package_metadata_url": "https://pypi.org/pypi/spacy/3.8.14/json",
+      "components": {
+        "segmentation": "spaCy tokenizer and model parser/senter",
+        "morphology": "model morphologizer, tagger, and lemmatizer",
+        "spelling": null
+      },
+      "offline_after_install": true,
+      "install_footprint": {
+        "bytes": 111473931,
+        "method": "installed-files",
+        "included": "all regular files under site-packages, including model and explicit click repair",
+        "file_count": 5017
+      },
+      "python_availability": "spaCy metadata requires Python >=3.9,<3.15; the stack ran on CPython 3.12.13.",
+      "platform_availability": "spaCy 3.8.14 publishes platform wheels including tested macOS arm64; model 3.8.0 is a universal Python wheel.",
+      "operational_complexity": "Medium-high: 45 installed distributions after an explicit repair, compiled wheels, and a separately versioned model wheel.",
+      "limitations": [
+        "The Polish model release says GNU GPL 3.0 but does not state the exact SPDX -only or -or-later form; either form is outside ADR-0001's default allowlist.",
+        "A clean uv resolution imported no click package and spaCy failed at import; click 8.4.2 was explicitly added for the behavioral run.",
+        "The documented pipeline components include no spelling checker."
+      ],
+      "closure": {
+        "path": "spacy-pl.txt",
+        "sha256": "6457f1412e8540b43787b155524f9f9aa93b5db6b8896b33d41aefebdf423a0d",
+        "installed_distributions": {
+          "annotated-doc": "0.0.4",
+          "annotated-types": "0.7.0",
+          "anyio": "4.14.2",
+          "blis": "1.3.3",
+          "catalogue": "2.0.10",
+          "certifi": "2026.6.17",
+          "charset-normalizer": "3.4.9",
+          "click": "8.4.2",
+          "cloudpathlib": "0.24.0",
+          "confection": "1.3.3",
+          "cymem": "2.0.13",
+          "h11": "0.16.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "idna": "3.18",
+          "jinja2": "3.1.6",
+          "markdown-it-py": "4.2.0",
+          "markupsafe": "3.0.3",
+          "mdurl": "0.1.2",
+          "murmurhash": "1.0.15",
+          "numpy": "2.5.1",
+          "packaging": "26.2",
+          "pl-core-news-sm": "3.8.0",
+          "preshed": "3.0.13",
+          "pydantic": "2.13.4",
+          "pydantic-core": "2.46.4",
+          "pygments": "2.20.0",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "setuptools": "83.0.0",
+          "shellingham": "1.5.4",
+          "smart-open": "8.0.1",
+          "spacy": "3.8.14",
+          "spacy-legacy": "3.0.12",
+          "spacy-loggers": "1.0.5",
+          "srsly": "2.5.3",
+          "thinc": "8.3.13",
+          "tqdm": "4.69.0",
+          "typer": "0.27.0",
+          "typing-extensions": "4.16.0",
+          "typing-inspection": "0.4.2",
+          "urllib3": "2.7.0",
+          "wasabi": "1.1.3",
+          "weasel": "1.0.0",
+          "wrapt": "2.2.2"
+        }
+      }
+    },
+    {
+      "id": "stanza-pl",
+      "name": "Stanza Polish default_fast pipeline",
+      "version": "stanza 1.14.0 + torch 2.13.0 + resources_1.14.0 default_fast",
+      "license": {
+        "spdx": "Apache-2.0 AND ODC-By-1.0",
+        "evidence_url": "https://stanfordnlp.github.io/stanza/performance.html"
+      },
+      "package_metadata_url": "https://pypi.org/pypi/stanza/1.14.0/json",
+      "components": {
+        "segmentation": "PDB tokenize and MWT models",
+        "morphology": "PDB no-charlm POS and lemma models with conll17 pretrain",
+        "spelling": null
+      },
+      "offline_after_install": true,
+      "install_footprint": {
+        "bytes": 757336144,
+        "method": "installed-files",
+        "included": "623458856 bytes under site-packages plus 133877288 bytes in the model directory",
+        "file_count": 20532
+      },
+      "python_availability": "Stanza metadata requires Python >=3.9; the full closure ran on CPython 3.12.13.",
+      "platform_availability": "Stanza is a py3-none-any wheel, but its PyTorch dependency and downloaded models determine actual platform support.",
+      "operational_complexity": "High: 35 distributions including PyTorch, five Polish model files plus resources metadata, and an explicit offline model directory.",
+      "limitations": [
+        "Stanza states language packs are ODC-By-1.0 to the extent Stanford owns the rights; that license is outside ADR-0001's default allowlist.",
+        "Inference used download_method=None, but the host network was not externally disabled.",
+        "The documented processor list includes no spelling checker."
+      ],
+      "model_files": [
+        {
+          "path": "pl/tokenize/pdb.pt",
+          "bytes": 637744,
+          "sha256": "46baa72d2cd1c6cd14bcb6a18641e2f15aa47743ea062aec1bf8b7badc470a48",
+          "url": "https://huggingface.co/stanfordnlp/stanza-pl/resolve/731f2075c63dc52779dd07617e75aaa9ee178c20/models/tokenize/pdb.pt"
+        },
+        {
+          "path": "pl/mwt/pdb.pt",
+          "bytes": 517393,
+          "sha256": "5ad87d7ea4a5db7169424250751585862f3cab3d5838d82185e69f2c9e5e3387",
+          "url": "https://huggingface.co/stanfordnlp/stanza-pl/resolve/731f2075c63dc52779dd07617e75aaa9ee178c20/models/mwt/pdb.pt"
+        },
+        {
+          "path": "pl/pos/pdb_nocharlm.pt",
+          "bytes": 22451455,
+          "sha256": "044e6f2eaf2bf0ac67f5e8b5318e4fff7360f922edd2001122496f70a2b8ca6a",
+          "url": "https://huggingface.co/stanfordnlp/stanza-pl/resolve/731f2075c63dc52779dd07617e75aaa9ee178c20/models/pos/pdb_nocharlm.pt"
+        },
+        {
+          "path": "pl/lemma/pdb_nocharlm.pt",
+          "bytes": 2763534,
+          "sha256": "0b6546dd8170030817eecaf56beccb3bc640a1f97d88cd9137d9ccbb8926afed",
+          "url": "https://huggingface.co/stanfordnlp/stanza-pl/resolve/731f2075c63dc52779dd07617e75aaa9ee178c20/models/lemma/pdb_nocharlm.pt"
+        },
+        {
+          "path": "pl/pretrain/conll17.pt",
+          "bytes": 107049792,
+          "sha256": "086e275b2ea2031c01ca9ddc14f71e76b68aafce839a5025232bc30aa10de451",
+          "url": "https://huggingface.co/stanfordnlp/stanza-pl/resolve/731f2075c63dc52779dd07617e75aaa9ee178c20/models/pretrain/conll17.pt"
+        },
+        {
+          "path": "resources.json",
+          "bytes": 457370,
+          "sha256": "f7b0c91ec3648a892c1a75a93b59aa2b8be0d3221997bd98665d2840fa90885c",
+          "url": "https://raw.githubusercontent.com/stanfordnlp/stanza-resources/f2976f2de7509a59c964c23fccbda2ec5d0852e3/resources_1.14.0.json"
+        }
+      ],
+      "closure": {
+        "path": "stanza-pl.txt",
+        "sha256": "efbc2f37c0539745b5a2e3804b0f38d66db63e7d009ae2d7501f574f1fa62cc1",
+        "installed_distributions": {
+          "anyio": "4.14.2",
+          "certifi": "2026.6.17",
+          "charset-normalizer": "3.4.9",
+          "click": "8.4.2",
+          "colorama": "0.4.6",
+          "emoji": "2.15.0",
+          "filelock": "3.31.1",
+          "fsspec": "2026.6.0",
+          "h11": "0.16.0",
+          "hf-xet": "1.5.2",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface-hub": "1.24.0",
+          "idna": "3.18",
+          "jinja2": "3.1.6",
+          "markupsafe": "3.0.3",
+          "mpmath": "1.3.0",
+          "networkx": "3.6.1",
+          "numpy": "2.5.1",
+          "packaging": "26.2",
+          "platformdirs": "4.10.1",
+          "protobuf": "7.35.1",
+          "pyyaml": "6.0.3",
+          "regex": "2026.7.19",
+          "requests": "2.34.2",
+          "setuptools": "83.0.0",
+          "stanza": "1.14.0",
+          "sympy": "1.14.0",
+          "termcolor": "3.3.0",
+          "torch": "2.13.0",
+          "tqdm": "4.69.0",
+          "typing-extensions": "4.16.0",
+          "udapi": "0.5.2",
+          "udtools": "0.2.8",
+          "urllib3": "2.7.0"
+        }
+      },
+      "model_revision": {
+        "resources_version": "1.14.0",
+        "resources_commit": "f2976f2de7509a59c964c23fccbda2ec5d0852e3",
+        "model_repository": "stanfordnlp/stanza-pl",
+        "model_commit": "731f2075c63dc52779dd07617e75aaa9ee178c20"
+      }
+    }
+  ]
+}
