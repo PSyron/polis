@@ -73,7 +73,7 @@ Polis currently provides immutable analysis result models, deterministic,
 strictly versioned JSON serialization, and runtime protocols for future
 deterministic analyzers and local generation backends. The
 [public analysis model contract](docs/public-api.md) documents field semantics,
-[public analysis model contract](docs/public-api.md) documents field semantics,
+[offline verification guide](docs/offline-operation.md),
 Unicode offset rules, validation failures, and schema compatibility. The
 [quick start guide](docs/quick-start.md), [privacy guide](docs/privacy.md), and
 [limitations](docs/limitations.md) explain current behavior and boundaries.

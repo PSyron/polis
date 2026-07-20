@@ -182,6 +182,7 @@ Extension points and boundaries are documented in:
 
 - [rules](rules.md)
 - [customization](customization.md)
+- [offline operation](offline-operation.md)
 - [protocols](architecture/protocols.md)
 - [privacy](privacy.md)
 - [limitations](limitations.md)
