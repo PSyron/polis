@@ -24,7 +24,7 @@ where PyPI exposes only a legacy classifier.
 | `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | build, Hatchling, and pytest transitive | [PyPI metadata](https://pypi.org/pypi/packaging/26.2/json); the compound expression receives explicit approval under the BSD-2-Clause option. Preserve its copyright, license conditions, and disclaimer if redistributed. |
 | `pathspec` | 1.1.1 | MPL-2.0 | Hatchling and mypy transitive | [PyPI metadata](https://pypi.org/pypi/pathspec/1.1.1/json); MPL-2.0 is explicitly approved for this build/development-only dependency. Preserve notices and license text; if modified covered files are distributed, make their source available under MPL-2.0. Polis does not modify or bundle it. |
 | `pluggy` | 1.6.0 | MIT | pytest transitive | [PyPI metadata](https://pypi.org/pypi/pluggy/1.6.0/json); preserve the copyright and MIT notice if redistributed. |
-| `polis-nlp` | 0.0.0 | MIT | local project | `pyproject.toml` and `LICENSE`; project-authored code and documentation remain MIT-licensed. |
+| `polis-nlp` | 0.1.0 | MIT | local project | `pyproject.toml` and `LICENSE`; project-authored code and documentation remain MIT-licensed. |
 | `pygments` | 2.20.0 | BSD-2-Clause | pytest transitive | [PyPI metadata](https://pypi.org/pypi/pygments/2.20.0/json); preserve copyright, license conditions, and disclaimer if redistributed. |
 | `pyproject-hooks` | 1.2.0 | MIT | build transitive | [PyPI metadata](https://pypi.org/pypi/pyproject-hooks/1.2.0/json); preserve the copyright and MIT notice if redistributed. |
 | `pytest` | 9.1.1 | MIT | direct development | [PyPI metadata](https://pypi.org/pypi/pytest/9.1.1/json); preserve the copyright and MIT notice if redistributed. |

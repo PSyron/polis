@@ -38,7 +38,7 @@ def test_focused_package_modules_are_importable(module_name: str) -> None:
 
 
 def test_distribution_version_is_declared() -> None:
-    assert version("polis-nlp") == "0.0.0"
+    assert version("polis-nlp") == "0.1.0"
 
 
 def test_distribution_uses_unambiguous_project_name() -> None:

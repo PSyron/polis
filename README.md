@@ -83,6 +83,8 @@ Unicode offset rules, validation failures, and schema compatibility. The
 verification path.
 The [protocol boundary](docs/architecture/protocols.md) documents how richer
 orchestrators and adapter variants should be wired around the stable contracts.
+[Changelog](CHANGELOG.md) tracks release history and [release notes](docs/release-notes/0.1.0.md)
+document current support boundaries.
 
 ## Command-line interface
 
