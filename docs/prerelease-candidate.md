@@ -19,6 +19,9 @@ This runs:
 
 The script prints hashes for both artifacts.
 
+For milestone M4-03 distribution checks (wheel/sdist clean install and release
+publication checklist), continue with `docs/distribution-verification.md`.
+
 ## 2) Install artifacts in clean test location (manual)
 
 ```console
@@ -44,4 +47,3 @@ Store command output, artifact names, and hashes in milestone notes. Include:
 
 - This checklist is scoped to local checks and current repository assumptions.
 - Release publication and external upload are outside `M3-06`.
-
