@@ -30,17 +30,42 @@ uv sync --locked --extra dev
 Run every check through the same locked environment:
 
 ```console
-uv run --locked --extra dev pytest
+uv run --locked --extra dev pytest -m "not slow and not model"
 uv run --locked --extra dev ruff check .
 uv run --locked --extra dev ruff format --check .
 uv run --locked --extra dev mypy .
-uv run --locked --extra dev python -m unittest discover -s tests -v
 uv run --locked --extra dev python -m build --no-isolation
+```
+
+As an additional local compatibility gate, outside fast CI, the standard-library
+runner can be invoked separately:
+
+```console
+uv run --locked --extra dev python -m unittest discover -s tests -v
 ```
 
 `uv.lock` pins the complete build and development dependency graph. Use
 `uv lock --check` to verify that it agrees with `pyproject.toml`; intentionally
 update it with `uv lock` whenever declared dependencies change.
+
+## Continuous integration
+
+Every push and pull request runs the fast quality suite on the representative
+ADR-0001 matrix: Ubuntu x86_64 with CPython 3.12, 3.13, and 3.14; macOS arm64
+with 3.12 and 3.14; and Windows x86_64 with 3.12 and 3.14. It reproduces the
+locked development environment. The workflow maps policy name `x86_64` to the
+`setup-python` input `x64` and passes `arm64` through unchanged. It runs pytest
+with the fast marker selection, Ruff lint and format checks, strict mypy, and
+builds and inspects both distribution artifacts for MIT license metadata and
+`LICENSE` inclusion. Pytest also collects tests written as `unittest.TestCase`,
+so a second unfiltered test invocation is intentionally absent.
+
+This fast suite deliberately excludes slow tests, real-model tests, benchmarks,
+release publishing, and any network-dependent product checks. Those workloads
+require their own explicit jobs and remain outside the per-change gate. Mark
+resource-intensive pytest cases with `@pytest.mark.slow` and tests requiring a
+real local model with `@pytest.mark.model`; the local command above reproduces
+CI's exact marker selection.
 
 ## Dependency groups
 

@@ -1,0 +1,75 @@
+name: Fast CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# Fast suite deliberately excludes slow, model, benchmark, and release work.
+jobs:
+  quality:
+    name: ${{ matrix.os }} / CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            architecture: x86_64
+            setup-python-architecture: x64
+            python-version: "3.12"
+          - os: ubuntu-24.04
+            architecture: x86_64
+            setup-python-architecture: x64
+            python-version: "3.13"
+          - os: ubuntu-24.04
+            architecture: x86_64
+            setup-python-architecture: x64
+            python-version: "3.14"
+          - os: macos-15
+            architecture: arm64
+            setup-python-architecture: arm64
+            python-version: "3.12"
+          - os: macos-15
+            architecture: arm64
+            setup-python-architecture: arm64
+            python-version: "3.14"
+          - os: windows-2025
+            architecture: x86_64
+            setup-python-architecture: x64
+            python-version: "3.12"
+          - os: windows-2025
+            architecture: x86_64
+            setup-python-architecture: x64
+            python-version: "3.14"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Set up CPython
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.setup-python-architecture }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: 0.11.2
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - name: Synchronize locked development environment
+        run: uv sync --locked --extra dev
+      - name: Run pytest suite
+        run: uv run --locked --extra dev pytest -m "not slow and not model"
+      - name: Run Ruff lint
+        run: uv run --locked --extra dev ruff check .
+      - name: Run Ruff format check
+        run: uv run --locked --extra dev ruff format --check .
+      - name: Run strict mypy
+        run: uv run --locked --extra dev mypy .
+      - name: Build distributions
+        run: uv run --locked --extra dev python -m build --no-isolation
+      - name: Verify distribution artifacts
+        run: uv run --locked --extra dev python scripts/verify_distribution_artifacts.py

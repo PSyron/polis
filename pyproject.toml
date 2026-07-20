@@ -48,6 +48,10 @@ packages = ["src/polis"]
 testpaths = ["tests"]
 addopts = "-ra"
 pythonpath = ["."]
+markers = [
+  "slow: tests excluded from per-change CI because they are resource intensive",
+  "model: tests that require a real local language model",
+]
 
 [tool.ruff]
 line-length = 88
