@@ -1,0 +1,28 @@
+{
+  "cases": [
+    {
+      "name": "blank_lines",
+      "text": "Ala ma kota.\n\nPotem ma psa."
+    },
+    {
+      "name": "abbreviations",
+      "text": "Prawdopodobnie: m.in. np. i to dalej."
+    },
+    {
+      "name": "punctuation",
+      "text": "Tak! To? Zdecydowanie."
+    },
+    {
+      "name": "combining_characters",
+      "text": "To jest ko\u0301t.\nNowe zdanie?"
+    },
+    {
+      "name": "emoji",
+      "text": "Cieszę się\ud83d\ude0a!\nA teraz serio."
+    },
+    {
+      "name": "crlf",
+      "text": "Pierwszy wiersz.\r\nDrugi zdanie?\r\n\r\nKońć?"
+    }
+  ]
+}
