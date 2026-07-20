@@ -64,6 +64,9 @@
       "expected_output": "Rozmawiałem z Janem Nowakiem.",
       "description": "Brak odmiany nazwiska męskiego w narzędniku.",
       "tags": ["inflection", "case", "name", "surname"],
+      "expected_findings": [
+        {"category": "inflection", "start": 20, "end": 25, "original": "Nowak", "suggestion": "Nowakiem"}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -73,6 +76,9 @@
       "expected_output": "Pomogłam pani Annie Kowalskiej.",
       "description": "Brak odmiany nazwiska żeńskiego w celowniku.",
       "tags": ["inflection", "case", "name", "surname"],
+      "expected_findings": [
+        {"category": "inflection", "start": 20, "end": 28, "original": "Kowalska", "suggestion": "Kowalskiej"}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -82,6 +88,9 @@
       "expected_output": "Dzieci były gotowe do wyjścia.",
       "description": "Niezgodność liczby rzeczownika zbiorowego i czasu przeszłego.",
       "tags": ["agreement", "inflection", "number"],
+      "expected_findings": [
+        {"category": "agreement", "start": 7, "end": 11, "original": "była", "suggestion": "były"}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -91,6 +100,10 @@
       "expected_output": "Chciałbym, żebyśmy jutro się spotkali.",
       "description": "Konstrukcja podrzędna wymaga osobowej formy czasownika i właściwego szyku.",
       "tags": ["syntax", "word_order", "inflection", "subordinate_clause"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 9, "end": 9, "original": "", "suggestion": ","},
+        {"category": "syntax", "start": 10, "end": 40, "original": "żeby jutro spotkać się z tobą.", "suggestion": "żebyśmy jutro się spotkali."}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 43
     },
@@ -100,6 +113,9 @@
       "expected_output": "Wiem, że Ania już wróciła.",
       "description": "Brak przecinka przed zdaniem podrzędnym.",
       "tags": ["punctuation", "subordinate_clause", "name"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 4, "end": 4, "original": "", "suggestion": ","}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -109,6 +125,10 @@
       "expected_output": "Maria, która mieszka w Krakowie, jutro przyjedzie.",
       "description": "Brak pary przecinków wydzielających zdanie względne.",
       "tags": ["punctuation", "syntax", "relative_clause", "name"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 5, "end": 5, "original": "", "suggestion": ","},
+        {"category": "punctuation", "start": 30, "end": 30, "original": "", "suggestion": ","}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -118,6 +138,10 @@
       "expected_output": "Anno, proszę, zadzwoń wieczorem.",
       "description": "Wołacz i wtrącone proszę wymagają wydzielenia przecinkami.",
       "tags": ["punctuation", "vocative", "name"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 4, "end": 4, "original": "", "suggestion": ","},
+        {"category": "punctuation", "start": 11, "end": 11, "original": "", "suggestion": ","}
+      ],
       "verification": "llm_planned",
       "tracking_issue": 42
     },
@@ -127,6 +151,7 @@
       "expected_output": "Rozmawiałem z Anną Kowalską.",
       "description": "Poprawna odmiana imienia i nazwiska żeńskiego w narzędniku.",
       "tags": ["negative", "inflection", "case", "name", "surname"],
+      "expected_findings": [],
       "verification": "negative"
     },
     {
@@ -135,6 +160,7 @@
       "expected_output": "Wręczyłem nagrodę Janowi Nowakowi.",
       "description": "Poprawna odmiana imienia i nazwiska męskiego w celowniku.",
       "tags": ["negative", "inflection", "case", "name", "surname"],
+      "expected_findings": [],
       "verification": "negative"
     },
     {
@@ -143,6 +169,7 @@
       "expected_output": "Ten raport wczoraj przygotowała Anna.",
       "description": "Poprawny, nacechowany szyk zdania nie jest błędem stylistycznym.",
       "tags": ["negative", "syntax", "word_order", "name"],
+      "expected_findings": [],
       "verification": "negative"
     },
     {
@@ -151,6 +178,7 @@
       "expected_output": "Maria, która mieszka w Krakowie, jutro przyjedzie.",
       "description": "Poprawnie wydzielone zdanie względne.",
       "tags": ["negative", "punctuation", "relative_clause", "name"],
+      "expected_findings": [],
       "verification": "negative"
     },
     {
@@ -159,6 +187,7 @@
       "expected_output": "Jeśli jutro będzie padać, zostaniemy w domu.",
       "description": "Poprawny przecinek między zdaniem podrzędnym i nadrzędnym.",
       "tags": ["negative", "punctuation", "subordinate_clause"],
+      "expected_findings": [],
       "verification": "negative"
     }
   ]
