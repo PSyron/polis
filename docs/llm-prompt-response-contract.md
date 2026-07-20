@@ -70,3 +70,31 @@ Validation rules:
 
 `M2-02` is complete when prompt and schema snapshots are tested for regression,
 adversarial inputs are rejected, and strict positive-schema tests pass.
+
+## Local backend adapter (M2-03)
+
+`M2-03` uses **`mock-heu`** as the selected default adapter implementation.
+
+- Backend: `MockHeuristicBackend` with `MockHeuristicTransport`.
+- Entry point: `create_default_local_backend()`.
+- Prompt path: one strict payload wrapped in `<INPUT_JSON_START>` / `<INPUT_JSON_END>`.
+- Boundaries:
+  - Maximum prompt length: 25,000 characters.
+  - Maximum response length: 25,000 characters.
+  - No transport is contacted until the local transport receives a prompt string.
+- Configuration:
+  - `allowed_categories`: optional `frozenset[Category]` to limit suggestions.
+  - `max_findings`: per-call hard cap for emitted findings.
+  - `name`: stable backend identifier (`mock-heu`).
+
+Current runtime requirements:
+
+- No additional installation, no model download, and no external network access.
+- Deterministic behavior with no mutable model state.
+
+Validation behavior:
+
+- `prompt` is rejected when the transport is unavailable.
+- Empty or malformed non-string backend responses are rejected.
+- Oversized prompts/responses are rejected with controlled validation exceptions.
+- The transport receives plain prompt text and returns raw model-like JSON only.
