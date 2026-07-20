@@ -2,6 +2,7 @@
 
 from importlib.metadata import version
 
+from polis.analyzer import Analyzer, AnalyzerConfig
 from polis.core import (
     ANALYSIS_SCHEMA_VERSION,
     AnalysisOptions,
@@ -29,6 +30,8 @@ __version__ = version("polis-nlp")
 
 __all__ = [
     "ANALYSIS_SCHEMA_VERSION",
+    "Analyzer",
+    "AnalyzerConfig",
     "AnalysisOptions",
     "AnalysisResult",
     "Category",

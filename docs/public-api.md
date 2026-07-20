@@ -1,10 +1,9 @@
 # Public Analysis Models
 
 Polis exposes immutable, typed data models from both `polis` and `polis.core`.
-This contract describes analysis data and the approved future analyzer surface.
-The currently distributed package implements only the immutable data models and
-JSON schema. [ADR-0003](architecture/decisions/0003-public-api-and-exception-contract.md)
-freezes analyzer and correction behavior before its implementation.
+This contract describes analysis data and the public analyzer surface.
+The current package ships a thin runtime analyzer in `polis` and a stricter
+contract in [ADR-0003](architecture/decisions/0003-public-api-and-exception-contract.md).
 
 ## Approved analyzer contract
 
@@ -43,12 +42,11 @@ applies compatible replacements right-to-left in original-text coordinates. An
 empty selection returns the source text. The operation is atomic: a selection
 error returns no partial corrected text.
 
-The future names above are represented by a typing-only public-package mirror
-while analyzer implementation is pending. It has one `AnalysisResult`
-declaration mirroring the real core model; `polis.core` and `polis` directly
-re-export that exact type. The checked examples prove bidirectional assignment
-compatibility among both imports and analyzer returns. The declarations are
-under `tests/typecheck/stubs/`, and the examples live in
+The analyzer API above is implemented by a thin runtime in `polis` and remains
+small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`
+model and the checked examples prove bidirectional assignment compatibility
+among both imports and analyzer returns. The stubs remain the authoritative typing
+contract in `tests/typecheck/stubs/`, and the examples live in
 `tests/typecheck/api_contract_examples.py`.
 
 ### Controlled failures

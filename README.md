@@ -1,8 +1,8 @@
 # Polis
 
 Polis is an offline Python library for analysing Polish text and proposing
-minimal, structured corrections. It is at the package-foundation stage: no
-analyser behaviour, model backend, or command-line interface is available yet.
+minimal, structured corrections. It provides deterministic analysis and a thin
+CLI wrapper for manual and scripted use while the LLM-backed backend is developed.
 
 ## Development setup
 
@@ -77,6 +77,36 @@ Unicode offset rules, validation failures, and schema compatibility. Analyzer
 orchestration, concrete rules, concrete backends, and correction application
 remain future work. The [protocol boundary](docs/architecture/protocols.md)
 documents the ownership and lifecycle rules for those future implementations.
+
+## Command-line interface
+
+Polis also ships a thin CLI for manual or scripted analysis:
+
+```console
+python -m polis.cli analyze --json "Witaj,świecie."   # text argument
+printf 'Witaj,świecie.\n' | python -m polis.cli analyze --stdin --json  # stdin input
+python -m polis.cli analyze --file input.txt --json      # UTF-8 file input
+```
+
+Useful options:
+
+- `--category`: repeatable finding category filter
+- `--minimum-confidence`: minimum confidence threshold
+- `--apply <finding-id> ...`: apply selected findings
+- `--json`: emit structured JSON output
+
+Exit behavior:
+
+- `0`: command succeeded
+- `1`: analysis was valid but no applied selection could be executed
+- `2`: configuration/input parsing failed in CLI validation
+
+Privacy notes:
+
+- Input text is not logged to error output and does not leave the process by
+default.
+- Validation and runtime errors are reported using operation-level codes and
+safe context only.
 
 ## Evaluation data
 
