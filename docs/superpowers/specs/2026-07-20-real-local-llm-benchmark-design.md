@@ -48,7 +48,7 @@ zachowuje awarię backendu jako kontrolowaną, bezpieczną degradację.
 
 Ollama nie udostępnia obecnie oficjalnego tagu Bielika w swojej bibliotece,
 więc kandydaci Bielik wymagają lokalnego pliku GGUF i jawnego Modelfile.
-Repozytorium Bielika wymaga też zaakceptowania warunków dostępu przed pobraniem
-wag. Jeśli wariant nie będzie dostępny w poprawnej, licencjonowanej i
-mierzalnej postaci, raport odnotuje go jako niedostępnego zamiast podstawiać
-inny wariant.
+Oficjalne repozytoria GGUF Bielika są obecnie publiczne, lecz udostępniają
+warianty Q8_0 i fp16, a nie oficjalny Q4. Jeśli wariant nie będzie dostępny w
+poprawnej, licencjonowanej i mierzalnej postaci, raport odnotuje go jako
+niedostępnego zamiast podstawiać inny wariant.
