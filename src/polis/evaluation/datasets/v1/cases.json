@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "id": "polis_pl_initial_v1",
+  "provenance": {
+    "source": "project-authored synthetic Polish examples",
+    "license": "CC0-1.0",
+    "created": "2026-07-20",
+    "review_status": "human-reviewed",
+    "notes": "No private, copied, scraped, corpus-derived, or model-generated text is included."
+  },
+  "cases": [
+    {
+      "id": "agreement_pronoun_neuter",
+      "outcome": "incorrect",
+      "text": "Te zdanie jest poprawne.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "The demonstrative pronoun must agree with the neuter noun 'zdanie'."
+        }
+      ]
+    },
+    {
+      "id": "inflection_negated_accusative",
+      "outcome": "incorrect",
+      "text": "Nie widzę samochód.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 18,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "The direct object of the negated verb 'widzę' takes the genitive form here."
+        }
+      ]
+    },
+    {
+      "id": "syntax_destination_preposition",
+      "outcome": "incorrect",
+      "text": "Pojechałem Warszawy.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 11,
+          "end": 11,
+          "original": "",
+          "suggestion": "do ",
+          "rationale": "The destination phrase needs the preposition 'do' before 'Warszawy'."
+        }
+      ]
+    },
+    {
+      "id": "spelling_na_pewno",
+      "outcome": "incorrect",
+      "text": "To jest napewno ważne.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 8,
+          "end": 15,
+          "original": "napewno",
+          "suggestion": "na pewno",
+          "rationale": "The standard Polish expression is written as two words."
+        }
+      ]
+    },
+    {
+      "id": "punctuation_conditional_comma",
+      "outcome": "incorrect",
+      "text": "Jeśli pada zostaję w domu.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "A comma separates the initial conditional subordinate clause."
+        }
+      ]
+    },
+    {
+      "id": "punctuation_duplicate_comma",
+      "outcome": "incorrect",
+      "text": "Cześć,, Anno.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 6,
+          "end": 7,
+          "original": ",",
+          "suggestion": "",
+          "rationale": "Only one comma is needed after the greeting."
+        }
+      ]
+    },
+    {
+      "id": "style_repeated_intensifier",
+      "outcome": "incorrect",
+      "text": "Bardzo bardzo lubię tę książkę.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "style",
+          "start": 7,
+          "end": 14,
+          "original": "bardzo ",
+          "suggestion": "",
+          "rationale": "The immediate unpunctuated repetition is redundant in this deliberately plain sentence."
+        }
+      ]
+    },
+    {
+      "id": "correct_neuter_pronoun",
+      "outcome": "correct",
+      "text": "To zdanie jest poprawne.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative paired with a nearby agreement error."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_two_word_expression",
+      "outcome": "correct",
+      "text": "Na pewno przyjdę jutro.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative paired with a common spelling error."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_conditional_comma",
+      "outcome": "correct",
+      "text": "Jeśli pada, zostaję w domu.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative paired with a missing-comma error."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_abbreviations_and_address",
+      "outcome": "correct",
+      "text": "Prof. Anna Nowak mieszka przy ul. Długiej.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative with abbreviations and a fictional address."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_emphatic_repetition",
+      "outcome": "correct",
+      "text": "Bardzo, bardzo lubię tę książkę.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative that preserves intentional emphatic repetition."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_unicode_diacritics",
+      "outcome": "correct",
+      "text": "Żółw śpi pod dębem.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative with Polish Unicode characters."
+      },
+      "expected_findings": []
+    }
+  ]
+}

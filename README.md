@@ -75,6 +75,13 @@ strictly versioned JSON serialization. The
 Unicode offset rules, validation failures, and schema compatibility. Analyzer
 orchestration and correction application remain future work.
 
+## Evaluation data
+
+The initial licensed Polish gold set is versioned with the package and checked
+by a strict standard-library validator. Its schema, CC0 provenance, hard
+negatives, and contribution rules are documented in
+[the evaluation dataset guide](docs/evaluation-dataset.md).
+
 ## Dependency groups
 
 The default installation has no production dependencies. The `dev` extra is
