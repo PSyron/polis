@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<corpus schema_version="1" id="polis_e2e_polish_correction_corpus_v1">
+  <case id="spelling_zeby" description="Standardowy błąd ortograficzny: z/ż." tags="spelling,orthography">
+    <input>Zeby nauczyć się polskiego, trzeba ćwiczyć.</input>
+    <expected_output>Żeby nauczyć się polskiego, trzeba ćwiczyć.</expected_output>
+  </case>
+  <case id="spelling_wlasnie" description="Ortografia: 'wlasnie' -> 'właśnie'." tags="spelling,orthography">
+    <input>To wlasnie ten moment.</input>
+    <expected_output>To właśnie ten moment.</expected_output>
+  </case>
+  <case id="spelling_jestes" description="Ortografia i forma czasownika: 'jestes' -> 'jesteś'." tags="spelling,orthography,name">
+    <input>Jestes najlepsza, Ania.</input>
+    <expected_output>Jesteś najlepsza, Ania.</expected_output>
+  </case>
+  <case id="agreement_ty_imie" description="Zgoda podmiotu i orzeczenia z nazwą + zaimkiem." tags="agreement,name,person_inflection">
+    <input>Ania, ty jestem gotowa.</input>
+    <expected_output>Ania, ty jesteś gotowa.</expected_output>
+  </case>
+  <case id="agreement_oni_plural" description="Liczba podmiotu z orzeczeniem." tags="agreement,number">
+    <input>Oni jest gotowi.</input>
+    <expected_output>Oni są gotowi.</expected_output>
+  </case>
+  <case id="syntax_list_spacing" description="Brak spacji po numeracji listy." tags="syntax,spacing">
+    <input>1.Punkt pierwszy.</input>
+    <expected_output>1. Punkt pierwszy.</expected_output>
+  </case>
+  <case id="punctuation_comma_spacing" description="Brak spacji po przecinku." tags="punctuation,spacing">
+    <input>Jutro,powiem o tym jutro.</input>
+    <expected_output>Jutro, powiem o tym jutro.</expected_output>
+  </case>
+  <case id="name_case_forms_reference" description="Przypadki fleksyjne imion jako sygnał kontekstu nazw własnych." tags="name,name_inflection,stable">
+    <input>Agnieszka i Anię zaprosiłam do domu.</input>
+    <expected_output>Agnieszka i Anię zaprosiłam do domu.</expected_output>
+  </case>
+  <case id="name_plural_reference" description="Warianty nazw i imion w różnych rolach składniowych bez korekty." tags="name,stable,style">
+    <input>Pani Ania, pani Agnieszka i pan Kuba są gotowi.</input>
+    <expected_output>Pani Ania, pani Agnieszka i pan Kuba są gotowi.</expected_output>
+  </case>
+</corpus>

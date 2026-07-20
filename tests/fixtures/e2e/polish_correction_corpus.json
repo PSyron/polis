@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "polis_e2e_polish_correction_corpus_v1",
+  "cases": [
+    {
+      "id": "spelling_zeby",
+      "input": "Zeby nauczyć się polskiego, trzeba ćwiczyć.",
+      "expected_output": "Żeby nauczyć się polskiego, trzeba ćwiczyć.",
+      "description": "Standardowy błąd ortograficzny: z/ż.",
+      "tags": ["spelling", "orthography"]
+    },
+    {
+      "id": "spelling_wlasnie",
+      "input": "To wlasnie ten moment.",
+      "expected_output": "To właśnie ten moment.",
+      "description": "Ortografia: 'wlasnie' -> 'właśnie'.",
+      "tags": ["spelling", "orthography"]
+    },
+    {
+      "id": "spelling_jestes",
+      "input": "Jestes najlepsza, Ania.",
+      "expected_output": "Jesteś najlepsza, Ania.",
+      "description": "Ortografia i forma czasownika: 'jestes' -> 'jesteś'.",
+      "tags": ["spelling", "orthography", "name"]
+    },
+    {
+      "id": "agreement_ty_imie",
+      "input": "Ania, ty jestem gotowa.",
+      "expected_output": "Ania, ty jesteś gotowa.",
+      "description": "Zgoda podmiotu i orzeczenia z nazwą + zaimkiem.",
+      "tags": ["agreement", "name", "person_inflection"]
+    },
+    {
+      "id": "agreement_oni_plural",
+      "input": "Oni jest gotowi.",
+      "expected_output": "Oni są gotowi.",
+      "description": "Liczba podmiotu z orzeczeniem.",
+      "tags": ["agreement", "number"]
+    },
+    {
+      "id": "syntax_list_spacing",
+      "input": "1.Punkt pierwszy.",
+      "expected_output": "1. Punkt pierwszy.",
+      "description": "Brak spacji po numeracji listy.",
+      "tags": ["syntax", "spacing"]
+    },
+    {
+      "id": "punctuation_comma_spacing",
+      "input": "Jutro,powiem o tym jutro.",
+      "expected_output": "Jutro, powiem o tym jutro.",
+      "description": "Brak spacji po przecinku.",
+      "tags": ["punctuation", "spacing"]
+    },
+    {
+      "id": "name_case_forms_reference",
+      "input": "Agnieszka i Anię zaprosiłam do domu.",
+      "expected_output": "Agnieszka i Anię zaprosiłam do domu.",
+      "description": "Przypadki fleksyjne imion jako sygnał kontekstu nazw własnych.",
+      "tags": ["name", "name_inflection", "stable"]
+    },
+    {
+      "id": "name_plural_reference",
+      "input": "Pani Ania, pani Agnieszka i pan Kuba są gotowi.",
+      "expected_output": "Pani Ania, pani Agnieszka i pan Kuba są gotowi.",
+      "description": "Warianty nazw i imion w różnych rolach składniowych bez korekty.",
+      "tags": ["name", "stable", "style"]
+    }
+  ]
+}
