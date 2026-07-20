@@ -10,6 +10,7 @@ when the policy changes.
 | [ADR-0002](decisions/0002-polish-nlp-dependency-strategy.md) | Accepted | Standard-library-first Polish NLP dependency strategy |
 | [ADR-0003](decisions/0003-public-api-and-exception-contract.md) | Accepted | Public API and exception contract |
 | [ADR-0004](decisions/0004-local-llm-backend-selection.md) | Accepted | First local backend strategy and seed selection for MVP |
+| [ADR-0005](decisions/0005-real-local-polish-model-benchmark.md) | Accepted | No real model selected for automatic correction yet |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.
