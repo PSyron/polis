@@ -5,6 +5,19 @@ from importlib.metadata import metadata, version
 
 import pytest
 
+from polis import (
+    AnalysisOptions,
+    AnalysisResult,
+    Category,
+    Confidence,
+    Finding,
+    Severity,
+    Source,
+    SourceKind,
+    analysis_result_from_json,
+    analysis_result_to_json,
+)
+
 
 @pytest.mark.parametrize(
     "module_name",
@@ -37,3 +50,21 @@ def test_distribution_metadata_declares_mit_license() -> None:
 
     assert distribution_metadata["License-Expression"] == "MIT"
     assert distribution_metadata.get_all("License-File") == ["LICENSE"]
+
+
+def test_public_analysis_model_exports_are_intentional() -> None:
+    assert all(
+        exported is not None
+        for exported in (
+            AnalysisOptions,
+            AnalysisResult,
+            Category,
+            Confidence,
+            Finding,
+            Severity,
+            Source,
+            SourceKind,
+            analysis_result_from_json,
+            analysis_result_to_json,
+        )
+    )
