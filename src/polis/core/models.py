@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Self, cast
@@ -33,6 +33,54 @@ class Severity(StrEnum):
     ERROR = "error"
     WARNING = "warning"
     SUGGESTION = "suggestion"
+
+
+class PolisError(Exception):
+    """Root error type for public API failures."""
+
+    code: str
+    retryable: bool
+    context: Mapping[str, str]
+
+    def __init__(
+        self, message: str, *, code: str, retryable: bool, context: Mapping[str, str]
+    ):
+        super().__init__(message)
+        self.code = code
+        self.retryable = retryable
+        self.context = dict(context)
+
+
+class ConfigurationError(PolisError):
+    """Raised for invalid analyzer configuration."""
+
+
+class BackendUnavailableError(PolisError):
+    """Raised when configured local generation backend cannot be used."""
+
+
+class AnalysisTimeoutError(PolisError):
+    """Raised when analysis exceeds the configured timeout."""
+
+
+class InvalidBackendResponseError(PolisError):
+    """Raised when a backend returns invalid output."""
+
+
+class CorrectionSelectionError(PolisError):
+    """Raised when correction selection is invalid."""
+
+
+class UnknownFindingError(CorrectionSelectionError):
+    """Raised when a requested finding identifier is not available."""
+
+
+class UncorrectableFindingError(CorrectionSelectionError):
+    """Raised when a selected finding has no usable suggestion."""
+
+
+class CorrectionConflictError(CorrectionSelectionError):
+    """Raised when selected findings conflict by span rules."""
 
 
 class SourceKind(StrEnum):
@@ -303,6 +351,141 @@ class AnalysisResult:
         from polis.core.serialization import analysis_result_from_json
 
         return cast(AnalysisResult, analysis_result_from_json(value))
+
+    def apply(self, issue_ids: Iterable[str]) -> str:
+        """Return input text with selected findings applied.
+
+        Selection is validated atomically:
+        - every identifier must exist and be unique,
+        - every selected finding must be correctable,
+        - no selected spans may conflict.
+        The operation is deterministic with respect to selected findings.
+        """
+
+        if not isinstance(issue_ids, Iterable):
+            raise UnknownFindingError(
+                "issue ids must be iterable",
+                code="correction.unknown_finding",
+                retryable=False,
+                context={"operation": "analysis_result.apply", "finding_ids": ""},
+            )
+        if isinstance(issue_ids, (str, bytes)):
+            raise UnknownFindingError(
+                "issue ids must be an iterable of strings",
+                code="correction.unknown_finding",
+                retryable=False,
+                context={"operation": "analysis_result.apply", "finding_ids": ""},
+            )
+
+        issue_ids_tuple = tuple(issue_ids)
+        if len(issue_ids_tuple) == 0:
+            return self.text
+
+        for issue_id in issue_ids_tuple:
+            if not isinstance(issue_id, str):
+                raise UnknownFindingError(
+                    "finding id must be a non-empty string",
+                    code="correction.unknown_finding",
+                    retryable=False,
+                    context={"operation": "analysis_result.apply", "finding_ids": ""},
+                )
+            if not issue_id:
+                raise UnknownFindingError(
+                    "finding id must be a non-empty string",
+                    code="correction.unknown_finding",
+                    retryable=False,
+                    context={"operation": "analysis_result.apply", "finding_ids": ""},
+                )
+
+        seen = set[str]()
+        duplicates: list[str] = []
+        for issue_id in issue_ids_tuple:
+            if issue_id in seen:
+                duplicates.append(issue_id)
+            else:
+                seen.add(issue_id)
+
+        if duplicates:
+            ids = ",".join(sorted(set(issue_ids_tuple)))
+            raise UnknownFindingError(
+                "finding identifiers must be unique",
+                code="correction.unknown_finding",
+                retryable=False,
+                context={"operation": "analysis_result.apply", "finding_ids": ids},
+            )
+
+        by_id = {issue.id: issue for issue in self.issues}
+        selected: list[Finding] = []
+        unknown: list[str] = []
+
+        for issue_id in issue_ids_tuple:
+            finding = by_id.get(issue_id)
+            if finding is None:
+                unknown.append(issue_id)
+            else:
+                selected.append(finding)
+
+        if unknown:
+            ids = ",".join(sorted(set(unknown)))
+            raise UnknownFindingError(
+                "unknown finding identifier",
+                code="correction.unknown_finding",
+                retryable=False,
+                context={"operation": "analysis_result.apply", "finding_ids": ids},
+            )
+
+        uncorrectable = [
+            finding.id for finding in selected if finding.suggestion is None
+        ]
+        if uncorrectable:
+            ids = ",".join(sorted(set(uncorrectable)))
+            raise UncorrectableFindingError(
+                "selected finding is not correctable",
+                code="correction.uncorrectable_finding",
+                retryable=False,
+                context={"operation": "analysis_result.apply", "finding_ids": ids},
+            )
+
+        for finding in selected:
+            if self.text[finding.start : finding.end] != finding.original:
+                raise UncorrectableFindingError(
+                    "selected finding does not match current result text",
+                    code="correction.uncorrectable_finding",
+                    retryable=False,
+                    context={
+                        "operation": "analysis_result.apply",
+                        "finding_ids": finding.id,
+                    },
+                )
+
+        from polis.correction import validate_non_conflicting_corrections
+
+        try:
+            validate_non_conflicting_corrections(selected)
+        except ValueError as error:
+            raise CorrectionConflictError(
+                str(error),
+                code="correction.conflict",
+                retryable=False,
+                context={
+                    "operation": "analysis_result.apply",
+                    "finding_ids": ",".join(
+                        sorted(set(finding.id for finding in selected))
+                    ),
+                },
+            ) from error
+
+        corrected = self.text
+        from polis.correction import sort_findings_for_application
+
+        for finding in sort_findings_for_application(selected):
+            corrected = (
+                corrected[: finding.start]
+                + (finding.suggestion if finding.suggestion is not None else "")
+                + corrected[finding.end :]
+            )
+
+        return corrected
 
 
 def _require_non_blank_text(value: object, name: str) -> None:
