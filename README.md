@@ -73,10 +73,12 @@ Polis currently provides immutable analysis result models, deterministic,
 strictly versioned JSON serialization, and runtime protocols for future
 deterministic analyzers and local generation backends. The
 [public analysis model contract](docs/public-api.md) documents field semantics,
-Unicode offset rules, validation failures, and schema compatibility. Analyzer
-orchestration, concrete rules, concrete backends, and correction application
-remain future work. The [protocol boundary](docs/architecture/protocols.md)
-documents the ownership and lifecycle rules for those future implementations.
+[public analysis model contract](docs/public-api.md) documents field semantics,
+Unicode offset rules, validation failures, and schema compatibility. The
+[quick start guide](docs/quick-start.md), [privacy guide](docs/privacy.md), and
+[limitations](docs/limitations.md) explain current behavior and boundaries.
+The [protocol boundary](docs/architecture/protocols.md) documents how richer
+orchestrators and adapter variants should be wired around the stable contracts.
 
 ## Command-line interface
 
@@ -94,6 +96,7 @@ Useful options:
 - `--minimum-confidence`: minimum confidence threshold
 - `--apply <finding-id> ...`: apply selected findings
 - `--json`: emit structured JSON output
+- For extension points and custom adapters, see [Customization guide](docs/customization.md).
 
 Exit behavior:
 

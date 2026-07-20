@@ -176,6 +176,16 @@ collection means no categories. Category strings are normalized to `Category`
 values. `minimum_confidence` defaults to `0.0` and is normalized to
 `Confidence`.
 
+## Extension and stability references
+
+Extension points and boundaries are documented in:
+
+- [rules](rules.md)
+- [customization](customization.md)
+- [protocols](architecture/protocols.md)
+- [privacy](privacy.md)
+- [limitations](limitations.md)
+
 ## Offsets and validation
 
 Offsets always use Python string indices and the half-open convention
