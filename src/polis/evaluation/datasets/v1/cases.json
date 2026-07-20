@@ -32,6 +32,28 @@
       ]
     },
     {
+      "id": "agreement_plural_subject_verb",
+      "outcome": "incorrect",
+      "text": "Oni jestem gotowi.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 4,
+          "end": 10,
+          "original": "jestem",
+          "suggestion": "są",
+          "rationale": "Plural subjects such as 'oni' take the plural present form of 'być' here."
+        }
+      ]
+    },
+    {
       "id": "inflection_negated_accusative",
       "outcome": "incorrect",
       "text": "Nie widzę samochód.",
@@ -72,6 +94,28 @@
           "original": "",
           "suggestion": "do ",
           "rationale": "The destination phrase needs the preposition 'do' before 'Warszawy'."
+        }
+      ]
+    },
+    {
+      "id": "syntax_missing_list_space",
+      "outcome": "incorrect",
+      "text": "1.Punkt pierwszy.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "Written for this dataset; no external text was consulted."
+      },
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 2,
+          "end": 2,
+          "original": "",
+          "suggestion": " ",
+          "rationale": "List markers should be followed by a space before item text."
         }
       ]
     },
@@ -186,6 +230,32 @@
         "created": "2026-07-20",
         "review_status": "human-reviewed",
         "notes": "A hard negative paired with a common spelling error."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_plural_agreement",
+      "outcome": "correct",
+      "text": "Oni są gotowi.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative paired with a nearby agreement error."
+      },
+      "expected_findings": []
+    },
+    {
+      "id": "correct_list_space",
+      "outcome": "correct",
+      "text": "1. Punkt pierwszy.",
+      "provenance": {
+        "source": "project-authored synthetic Polish example",
+        "license": "CC0-1.0",
+        "created": "2026-07-20",
+        "review_status": "human-reviewed",
+        "notes": "A hard negative paired with list-marker spacing."
       },
       "expected_findings": []
     },

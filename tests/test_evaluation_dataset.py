@@ -43,8 +43,10 @@ def test_every_finding_maps_to_its_exact_unicode_fragment() -> None:
 def test_every_incorrect_case_yields_its_intended_grammatical_sentence() -> None:
     expected_corrections = {
         "agreement_pronoun_neuter": "To zdanie jest poprawne.",
+        "agreement_plural_subject_verb": "Oni są gotowi.",
         "inflection_negated_accusative": "Nie widzę samochodu.",
         "syntax_destination_preposition": "Pojechałem do Warszawy.",
+        "syntax_missing_list_space": "1. Punkt pierwszy.",
         "spelling_na_pewno": "To jest na pewno ważne.",
         "punctuation_conditional_comma": "Jeśli pada, zostaję w domu.",
         "punctuation_duplicate_comma": "Cześć, Anno.",
