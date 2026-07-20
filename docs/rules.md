@@ -79,3 +79,32 @@ by category:
 
 All three rules support category filtering through the shared `options.categories`
 mechanism and return deterministic findings with stable IDs.
+
+## Analysis normalization
+
+Normalization is performed in `polis.analysis` by the following deterministic
+steps:
+
+1. `filter_findings` removes findings outside the requested category set and
+   below `minimum_confidence`.
+2. `deduplicate_findings` keeps one canonical representative for each
+   stable finding identifier.
+3. `prioritize_findings` sorts findings by source text position, then by
+   confidence and tie-breakers to make output deterministic.
+4. `normalize_findings` runs the full pipeline and is the standard helper for
+   the public path.
+
+The same rules apply to any analyzer output before presentation.
+
+## Deterministic correction application
+
+`polis.analysis` and `polis.core` validate selected finding ids and apply
+replacements right-to-left using helpers in `polis.correction`.
+
+- `findings_conflict` encodes span-level compatibility.
+- `validate_non_conflicting_corrections` raises on invalid selection sets.
+- `sort_findings_for_application` applies compatible findings in stable right-to-
+  left order.
+
+`AnalysisResult.apply` is the public API for explicit selection-only
+correction.
