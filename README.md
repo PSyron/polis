@@ -77,6 +77,7 @@ deterministic analyzers and local generation backends. The
 Unicode offset rules, validation failures, and schema compatibility. The
 [quick start guide](docs/quick-start.md), [privacy guide](docs/privacy.md), and
 [limitations](docs/limitations.md) explain current behavior and boundaries.
+[compatibility and semver policy](docs/compatibility.md).
 [Prerelease candidate checklist](docs/prerelease-candidate.md) documents the release-gate
 verification path.
 The [protocol boundary](docs/architecture/protocols.md) documents how richer

@@ -185,6 +185,7 @@ Extension points and boundaries are documented in:
 - [offline operation](offline-operation.md)
 - [protocols](architecture/protocols.md)
 - [privacy](privacy.md)
+- [compatibility and semver](compatibility.md)
 - [limitations](limitations.md)
 
 ## Offsets and validation
