@@ -1,6 +1,5 @@
-from pathlib import Path
 import unittest
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / "docs/architecture/decisions/0001-python-platform-licensing-policy.md"
@@ -77,9 +76,9 @@ class ArchitecturePolicyTests(unittest.TestCase):
                 self.assertIn(host, adr)
 
     def test_plan_avoids_agent_specific_tool_instructions(self) -> None:
-        plan = (
-            ROOT / "docs/superpowers/plans/2026-07-20-issue-1-policy.md"
-        ).read_text(encoding="utf-8")
+        plan = (ROOT / "docs/superpowers/plans/2026-07-20-issue-1-policy.md").read_text(
+            encoding="utf-8"
+        )
         self.assertNotIn("superpowers:", plan)
 
 
