@@ -12,7 +12,12 @@ from experiments.real_llm_benchmark.run_benchmark import (
     FindingScore,
     GoldFinding,
     OllamaClient,
+    RuntimeMetadata,
     TimedResponse,
+    _build_client,
+    _default_base_url_for_engine,
+    _default_runtime_engine,
+    classify_case_failure,
     corrected_output_from_findings,
     load_cases,
     main,
@@ -20,6 +25,7 @@ from experiments.real_llm_benchmark.run_benchmark import (
     run_cases,
     score_case,
     score_findings,
+    select_healthy_client,
     summarize_observations,
 )
 
@@ -91,14 +97,143 @@ def test_client_posts_deterministic_json_to_local_chat_endpoint(
     assert request.full_url == "http://127.0.0.1:11434/api/chat"
     assert request.data is not None
     payload = json.loads(cast(bytes, request.data).decode("utf-8"))
-    assert payload == {
-        "format": "json",
-        "messages": [{"content": "strict prompt", "role": "user"}],
-        "model": "qwen3:0.6b",
-        "options": {"num_predict": 512, "seed": 42, "temperature": 0},
-        "stream": False,
-        "think": False,
-    }
+    assert payload["format"]["required"] == ["schema_version", "findings"]
+    assert payload["messages"] == [{"content": "strict prompt", "role": "user"}]
+    assert payload["model"] == "qwen3:0.6b"
+    assert payload["options"] == {"num_predict": 512, "seed": 42, "temperature": 0}
+    assert payload["stream"] is False
+    assert payload["think"] is False
+
+
+def test_default_engine_prefers_mlx_on_macos(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.platform.system", lambda: "Darwin"
+    )
+    assert _default_runtime_engine("auto") == "mlx"
+
+
+def test_default_base_url_for_mlx_is_compatible_with_local_inference_server() -> None:
+    assert _default_base_url_for_engine("mlx").startswith("http://127.0.0.1:")
+
+
+def test_build_client_supports_mlx_openai_compatible_endpoint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    class FakeResponse:
+        def __enter__(self) -> FakeResponse:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps(
+                {
+                    "choices": [
+                        {"message": {"content": '{"schema_version":1,"findings": []}'}}
+                    ]
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+
+    def fake_urlopen(request: object, *, timeout: float) -> FakeResponse:
+        captured["request"] = request
+        captured["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.urlopen", fake_urlopen
+    )
+    client = _build_client(
+        engine="mlx",
+        base_url="http://127.0.0.1:8080",
+        model="local-model",
+        timeout_seconds=7.0,
+    )
+    response = client.generate("strict prompt")
+
+    request = cast(Request, captured["request"])
+    payload = json.loads(cast(bytes, request.data).decode("utf-8"))
+    assert json.loads(response.raw_response) == {"schema_version": 1, "findings": []}
+    assert isinstance(payload["max_tokens"], int)
+    assert payload["max_tokens"] == 512
+    assert payload["response_format"]["type"] == "json_schema"
+    assert payload["response_format"]["json_schema"]["strict"] is True
+    assert request.full_url == "http://127.0.0.1:8080/v1/chat/completions"
+
+
+def test_ollama_preflight_records_loaded_model_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeResponse:
+        def __init__(self, payload: object) -> None:
+            self.payload = payload
+
+        def __enter__(self) -> FakeResponse:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps(self.payload).encode("utf-8")
+
+    def fake_urlopen(request: Request, *, timeout: float) -> FakeResponse:
+        assert timeout == 10.0
+        if request.full_url.endswith("/api/version"):
+            return FakeResponse({"version": "0.20.7"})
+        if request.full_url.endswith("/api/tags"):
+            return FakeResponse({"models": [{"name": "qwen3:0.6b"}]})
+        assert request.full_url.endswith("/api/ps")
+        return FakeResponse({"models": [{"name": "qwen3:0.6b", "size_vram": 522}]})
+
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.urlopen", fake_urlopen
+    )
+
+    metadata = OllamaClient("http://127.0.0.1:11434", "qwen3:0.6b", 10.0).preflight()
+
+    assert metadata.engine == "ollama"
+    assert metadata.model_identifier == "qwen3:0.6b"
+    assert metadata.runtime_version == "0.20.7"
+    assert metadata.loaded_memory_bytes == 522
+
+
+def test_ollama_preflight_accepts_an_installed_but_idle_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeResponse:
+        def __init__(self, payload: object) -> None:
+            self.payload = payload
+
+        def __enter__(self) -> FakeResponse:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps(self.payload).encode("utf-8")
+
+    def fake_urlopen(request: Request, *, timeout: float) -> FakeResponse:
+        if request.full_url.endswith("/api/version"):
+            return FakeResponse({"version": "0.20.7"})
+        if request.full_url.endswith("/api/tags"):
+            return FakeResponse({"models": [{"name": "qwen3:0.6b"}]})
+        assert request.full_url.endswith("/api/ps")
+        return FakeResponse({"models": []})
+
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.urlopen", fake_urlopen
+    )
+
+    metadata = OllamaClient("http://127.0.0.1:11434", "qwen3:0.6b", 10.0).preflight()
+
+    assert metadata.model_identifier == "qwen3:0.6b"
+    assert metadata.loaded_memory_bytes is None
 
 
 def test_negative_finding_disqualifies_candidate() -> None:
@@ -307,6 +442,7 @@ def test_run_cases_turns_an_invalid_model_response_into_a_safe_observation() -> 
     assert observation.valid_response is False
     assert observation.corrected_output == case.source
     assert observation.finding_score == FindingScore(0, 0, 0)
+    assert observation.status == "invalid_schema"
 
 
 def test_run_cases_accepts_a_valid_empty_response() -> None:
@@ -355,22 +491,27 @@ def test_report_as_json_is_a_stable_auditable_summary() -> None:
 
     payload = json.loads(report_as_json(report))
 
-    assert payload == {
-        "category_metrics": {},
-        "overall_metrics": {
-            "f1": 0.0,
+    assert payload["safety_eligible"] is True
+    assert payload["median_latency_ms"] == 7.5
+    assert payload["p95_latency_ms"] == 7.5
+    assert payload["throughput_chars_per_second"] > 0
+    assert payload["runtime"] is None
+    assert payload["corpus_sha256"] is None
+    assert payload["cases"] == [
+        {
+            "call_count": 1,
+            "elapsed_ms": 7.5,
+            "exact_match": True,
             "false_negatives": 0,
             "false_positives": 0,
-            "precision": 0.0,
-            "recall": 0.0,
+            "id": "safe",
+            "status": "valid",
             "true_positives": 0,
-        },
-        "safety_eligible": True,
-        "median_latency_ms": 7.5,
-        "negative_cases_changed": 0,
-        "total_responses": 1,
-        "valid_responses": 1,
-    }
+            "valid_response": True,
+        }
+    ]
+    assert "Poprawne zdanie" not in report_as_json(report)
+    assert report_as_json(report) == report_as_json(report)
 
 
 def test_main_writes_json_report_without_network(
@@ -402,6 +543,318 @@ def test_main_writes_json_report_without_network(
         ),
     )
 
+    class HealthyClient:
+        def preflight(self) -> RuntimeMetadata:
+            return RuntimeMetadata("ollama", "local-test", "test")
+
+        def generate(self, prompt: str) -> TimedResponse:
+            raise AssertionError("run_cases is patched")
+
+    healthy = HealthyClient()
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.select_healthy_client",
+        lambda *_: ("ollama", healthy),
+    )
+
     assert main(["--model", "local-test", "--corpus", str(CORPUS_PATH)]) == 0
 
-    assert json.loads(capsys.readouterr().out)["safety_eligible"] is True
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["safety_eligible"] is True
+    assert payload["runtime"]["engine"] == "ollama"
+    assert payload["runtime"]["model_identifier"] == "local-test"
+    assert len(payload["corpus_sha256"]) == 64
+
+
+def test_category_metrics_attribute_extra_finding_to_its_emitted_category() -> None:
+    case = BenchmarkCase(
+        case_id="cross-category",
+        source="Jan poszedł do dom.",
+        expected_output="Jan poszedł do domu.",
+        tags=("inflection",),
+        verification="llm_planned",
+        tracking_issue=48,
+        expected_findings=(GoldFinding("inflection", 15, 18, "dom", "domu"),),
+    )
+    findings = validate_llm_response(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "findings": [
+                    {
+                        "start": 15,
+                        "end": 18,
+                        "category": "inflection",
+                        "severity": "error",
+                        "message": "Odmiana.",
+                        "explanation": "Dopełniacz.",
+                        "original": "dom",
+                        "suggestion": "domu",
+                        "confidence": 0.9,
+                    },
+                    {
+                        "start": 0,
+                        "end": 3,
+                        "category": "style",
+                        "severity": "suggestion",
+                        "message": "Niepotrzebna zmiana.",
+                        "explanation": "Test kategorii.",
+                        "original": "Jan",
+                        "suggestion": "Jaś",
+                        "confidence": 0.2,
+                    },
+                ],
+            }
+        ),
+        source_text=case.source,
+        source_name="benchmark-test",
+    )
+
+    report = summarize_observations(
+        (
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=20.0,
+                finding_score=score_findings(case, findings),
+                corrected_output=case.expected_output,
+            ),
+        )
+    )
+
+    assert report.category_metrics["inflection"].false_positives == 0
+    assert report.category_metrics["style"].false_positives == 1
+
+
+def test_negative_case_false_positive_is_attributed_to_emitted_category() -> None:
+    case = BenchmarkCase(
+        case_id="negative-category",
+        source="Anna Kowalska przeczytała raport.",
+        expected_output="Anna Kowalska przeczytała raport.",
+        tags=("negative", "name"),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+    findings = validate_llm_response(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "findings": [
+                    {
+                        "start": 0,
+                        "end": 4,
+                        "category": "style",
+                        "severity": "suggestion",
+                        "message": "Nieuzasadniona zmiana.",
+                        "explanation": "Negatywny przypadek.",
+                        "original": "Anna",
+                        "suggestion": "Ania",
+                        "confidence": 0.2,
+                    }
+                ],
+            }
+        ),
+        source_text=case.source,
+        source_name="benchmark-test",
+    )
+
+    report = summarize_observations(
+        (
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=20.0,
+                finding_score=score_findings(case, findings),
+                corrected_output="Ania Kowalska przeczytała raport.",
+            ),
+        )
+    )
+
+    assert report.category_metrics["style"].false_positives == 1
+    assert report.category_metrics["style"].true_positives == 0
+
+
+def test_failure_classifier_separates_invalid_span_and_conflicting_edits() -> None:
+    assert (
+        classify_case_failure(ValueError("original must match source range"))
+        == "invalid_span"
+    )
+    assert (
+        classify_case_failure(ValueError("selected finding identifiers conflict"))
+        == "conflict"
+    )
+
+
+def test_auto_selection_skips_an_unhealthy_preferred_runtime() -> None:
+    class UnhealthyClient:
+        def preflight(self) -> RuntimeMetadata:
+            raise OSError("connection refused")
+
+        def generate(self, prompt: str) -> TimedResponse:
+            raise AssertionError("unreachable")
+
+    class HealthyClient:
+        def preflight(self) -> RuntimeMetadata:
+            return RuntimeMetadata("ollama", "local-test", "test")
+
+        def generate(self, prompt: str) -> TimedResponse:
+            return TimedResponse('{"schema_version":1,"findings":[]}', 1.0)
+
+    selected_engine, selected = select_healthy_client(
+        "auto",
+        (("mlx", UnhealthyClient()), ("ollama", HealthyClient())),
+    )
+
+    assert selected_engine == "ollama"
+    assert isinstance(selected, HealthyClient)
+
+
+def test_run_cases_records_duplicate_findings_without_stopping() -> None:
+    case = BenchmarkCase(
+        case_id="duplicate",
+        source="Ala ma kot.",
+        expected_output="Ala ma kota.",
+        tags=("inflection",),
+        verification="llm_planned",
+        tracking_issue=48,
+        expected_findings=(GoldFinding("inflection", 7, 10, "kot", "kota"),),
+    )
+    finding = {
+        "start": 7,
+        "end": 10,
+        "category": "inflection",
+        "severity": "error",
+        "message": "Odmiana.",
+        "explanation": "Dopełniacz.",
+        "original": "kot",
+        "suggestion": "kota",
+        "confidence": 0.9,
+    }
+
+    class DuplicateClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            return TimedResponse(
+                json.dumps({"schema_version": 1, "findings": [finding, finding]}),
+                12.0,
+            )
+
+    observation = run_cases(DuplicateClient(), (case,))[0]
+
+    assert observation.status == "duplicate"
+    assert observation.valid_response is True
+    assert observation.corrected_output == case.source
+
+
+def test_run_cases_records_conflicting_edits_without_stopping() -> None:
+    case = BenchmarkCase(
+        case_id="conflict",
+        source="Ala ma kota.",
+        expected_output="Ola ma kota.",
+        tags=("spelling",),
+        verification="llm_planned",
+        tracking_issue=48,
+        expected_findings=(GoldFinding("spelling", 0, 3, "Ala", "Ola"),),
+    )
+
+    class ConflictClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            return TimedResponse(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "findings": [
+                            {
+                                "start": 0,
+                                "end": 3,
+                                "category": "spelling",
+                                "severity": "error",
+                                "message": "Pisownia.",
+                                "explanation": "Test konfliktu.",
+                                "original": "Ala",
+                                "suggestion": "Ola",
+                                "confidence": 0.9,
+                            },
+                            {
+                                "start": 0,
+                                "end": 6,
+                                "category": "style",
+                                "severity": "suggestion",
+                                "message": "Styl.",
+                                "explanation": "Test konfliktu.",
+                                "original": "Ala ma",
+                                "suggestion": "Ola ma",
+                                "confidence": 0.2,
+                            },
+                        ],
+                    }
+                ),
+                12.0,
+            )
+
+    observation = run_cases(ConflictClient(), (case,))[0]
+
+    assert observation.status == "conflict"
+    assert observation.valid_response is True
+    assert observation.corrected_output == case.source
+
+
+def test_run_cases_records_unexpected_client_failure_without_stopping() -> None:
+    case = BenchmarkCase(
+        case_id="runtime-error",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    class FailingClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            raise RuntimeError("unexpected local runtime failure")
+
+    observation = run_cases(FailingClient(), (case,))[0]
+
+    assert observation.status == "application_failure"
+    assert observation.valid_response is False
+
+
+def test_run_cases_records_invalid_span_separately_from_invalid_schema() -> None:
+    case = BenchmarkCase(
+        case_id="bad-span",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    class InvalidSpanClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            return TimedResponse(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "findings": [
+                            {
+                                "start": 0,
+                                "end": 100,
+                                "category": "style",
+                                "severity": "suggestion",
+                                "message": "Zakres.",
+                                "explanation": "Test zakresu.",
+                                "original": "Poprawne zdanie.",
+                                "suggestion": "Inne zdanie.",
+                                "confidence": 0.2,
+                            }
+                        ],
+                    }
+                ),
+                5.0,
+            )
+
+    observation = run_cases(InvalidSpanClient(), (case,))[0]
+
+    assert observation.status == "invalid_span"
+    assert observation.valid_response is False

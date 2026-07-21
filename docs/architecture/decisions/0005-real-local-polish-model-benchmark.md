@@ -19,6 +19,12 @@ memory, corpus `polis_e2e_polish_correction_corpus_v2`, seed 42, temperature
 
 ## Evidence
 
+> Historical evidence notice: the measurements below predate the repaired
+> scorer from issue #55. They remain useful for comparison, but they must not
+> be used to select or qualify a runtime until reproduced with a report that
+> records per-case outcomes, emitted-category false positives, runtime health,
+> corpus hash, and artifact metadata.
+
 | Candidate | Quantization | Valid responses | Gold finding F1 | Negative safety | Median latency |
 | --- | --- | ---: | ---: | --- | ---: |
 | Qwen3 0.6B | Ollama default, 522 MB | 0/12 with v2; v3 emitted invalid findings | 0.000 | ineligible | 1,289 ms (v2) |

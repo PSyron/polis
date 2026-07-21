@@ -3,21 +3,61 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import math
+import platform
 import time
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Protocol, cast
+from typing import Literal, Protocol, cast
+from urllib.error import URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from polis.core import AnalysisResult, Finding
+from polis.core import AnalysisResult, Finding, PolisError
 from polis.llm import build_prompt, validate_llm_response
 
 _ALLOWED_VERIFICATION = frozenset({"rules", "llm_planned", "negative"})
 _BENCHMARK_VERIFICATION = frozenset({"llm_planned", "negative"})
 _LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
+_OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434"
+_OPENAI_COMPAT_BASE_URL = "http://127.0.0.1:8080"
+_CASE_STATUSES = frozenset(
+    {
+        "valid",
+        "valid_empty",
+        "unavailable",
+        "timed_out",
+        "invalid_schema",
+        "invalid_span",
+        "duplicate",
+        "conflict",
+        "application_failure",
+    }
+)
+_FINDING_RESPONSE_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["schema_version", "findings"],
+    "properties": {
+        "schema_version": {"type": "integer", "const": 1},
+        "findings": {"type": "array"},
+    },
+}
+
+CaseStatus = Literal[
+    "valid",
+    "valid_empty",
+    "unavailable",
+    "timed_out",
+    "invalid_schema",
+    "invalid_span",
+    "duplicate",
+    "conflict",
+    "application_failure",
+]
 
 
 @dataclass(frozen=True)
@@ -51,6 +91,7 @@ class FindingScore:
     true_positives: int
     false_positives: int
     false_negatives: int
+    category_metrics: dict[str, CategoryMetrics] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -65,6 +106,21 @@ class CaseScore:
 
 
 @dataclass(frozen=True)
+class CaseEvidence:
+    """Per-case metrics with identifiers only; never includes analyzed text."""
+
+    case_id: str
+    status: CaseStatus
+    valid_response: bool
+    exact_match: bool
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+    elapsed_ms: float
+    call_count: int
+
+
+@dataclass(frozen=True)
 class TimedResponse:
     """Raw local-model response together with wall-clock latency."""
 
@@ -72,11 +128,32 @@ class TimedResponse:
     elapsed_ms: float
 
 
+@dataclass(frozen=True)
+class RuntimeMetadata:
+    """Non-sensitive evidence collected before benchmark scoring begins."""
+
+    engine: str
+    model_identifier: str
+    runtime_version: str | None
+    artifact_revision: str | None = None
+    quantization: str | None = None
+    hardware_class: str | None = None
+    loaded_memory_bytes: int | None = None
+    cold_start: bool | None = None
+
+
 class PromptClient(Protocol):
     """Minimal local transport needed by the benchmark runner."""
 
     def generate(self, prompt: str) -> TimedResponse:
         """Return one raw response with its elapsed time."""
+
+
+class RuntimeClient(PromptClient, Protocol):
+    """A benchmark transport that can be preflighted before corpus scoring."""
+
+    def preflight(self) -> RuntimeMetadata:
+        """Verify the local runtime and return non-text metadata."""
 
 
 @dataclass(frozen=True)
@@ -88,6 +165,8 @@ class BenchmarkObservation:
     elapsed_ms: float
     finding_score: FindingScore
     corrected_output: str
+    status: CaseStatus = "valid"
+    call_count: int = 1
 
 
 @dataclass(frozen=True)
@@ -124,6 +203,13 @@ class BenchmarkReport:
     median_latency_ms: float
     overall_metrics: CategoryMetrics
     category_metrics: dict[str, CategoryMetrics]
+    p95_latency_ms: float = 0.0
+    throughput_chars_per_second: float = 0.0
+    case_results: tuple[CaseScore, ...] = ()
+    case_statuses: tuple[CaseStatus, ...] = ()
+    case_evidence: tuple[CaseEvidence, ...] = ()
+    corpus_sha256: str | None = None
+    runtime_metadata: RuntimeMetadata | None = None
 
     @property
     def safety_eligible(self) -> bool:
@@ -132,6 +218,7 @@ class BenchmarkReport:
         return (
             self.valid_responses == self.total_responses
             and not self.negative_cases_changed
+            and all(status in {"valid", "valid_empty"} for status in self.case_statuses)
         )
 
 
@@ -144,11 +231,7 @@ class OllamaClient:
     timeout_seconds: float
 
     def __post_init__(self) -> None:
-        parsed = urlparse(self.base_url)
-        if parsed.scheme not in {"http", "https"}:
-            raise ValueError("Ollama base URL must use HTTP")
-        if parsed.hostname not in _LOOPBACK_HOSTS:
-            raise ValueError("Ollama base URL must use a loopback host")
+        _validate_loopback_base_url(self.base_url, "Ollama base")
         if not self.model:
             raise ValueError("Ollama model must be non-empty")
         if self.timeout_seconds <= 0:
@@ -162,7 +245,7 @@ class OllamaClient:
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-                "format": "json",
+                "format": _FINDING_RESPONSE_SCHEMA,
                 "think": False,
                 "options": {"num_predict": 512, "seed": 42, "temperature": 0},
             },
@@ -189,6 +272,229 @@ class OllamaClient:
             raw_response=message["content"],
             elapsed_ms=elapsed_ms,
         )
+
+    def preflight(self) -> RuntimeMetadata:
+        """Verify the requested local Ollama model before any corpus call."""
+
+        version = _get_json(
+            f"{self.base_url.rstrip('/')}/api/version", self.timeout_seconds
+        )
+        installed = _get_json(
+            f"{self.base_url.rstrip('/')}/api/tags", self.timeout_seconds
+        )
+        processes = _get_json(
+            f"{self.base_url.rstrip('/')}/api/ps", self.timeout_seconds
+        )
+        if (
+            not isinstance(version, dict)
+            or not isinstance(installed, dict)
+            or not isinstance(processes, dict)
+        ):
+            raise ValueError("Ollama health response must be an object")
+        runtime_version = version.get("version")
+        if runtime_version is not None and not isinstance(runtime_version, str):
+            raise ValueError("Ollama version must be a string")
+        installed_models = installed.get("models")
+        processes_models = processes.get("models")
+        if not isinstance(installed_models, list) or not isinstance(
+            processes_models, list
+        ):
+            raise ValueError("Ollama process response must contain models")
+        if not any(
+            isinstance(item, dict) and item.get("name") == self.model
+            for item in installed_models
+        ):
+            raise OSError("requested Ollama model is unavailable")
+        selected = next(
+            (
+                item
+                for item in processes_models
+                if isinstance(item, dict) and item.get("name") == self.model
+            ),
+            None,
+        )
+        loaded_memory = (
+            None
+            if selected is None
+            else selected.get("size_vram", selected.get("size"))
+        )
+        if isinstance(loaded_memory, bool) or not isinstance(loaded_memory, int):
+            loaded_memory = None
+        return RuntimeMetadata(
+            engine="ollama",
+            model_identifier=self.model,
+            runtime_version=runtime_version,
+            loaded_memory_bytes=loaded_memory,
+        )
+
+
+@dataclass(frozen=True)
+class OpenAICompatibleClient:
+    """Minimal compatibility client for local OpenAI-style chat endpoints."""
+
+    base_url: str
+    model: str
+    timeout_seconds: float
+    request_path: str = "/v1/chat/completions"
+
+    def __post_init__(self) -> None:
+        _validate_loopback_base_url(self.base_url, "OpenAI-compatible base")
+        if not self.model:
+            raise ValueError("OpenAI-compatible model must be non-empty")
+        if self.timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive")
+
+    def generate(self, prompt: str) -> TimedResponse:
+        payload = json.dumps(
+            {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "temperature": 0,
+                "max_tokens": 512,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "polis_finding_response_v1",
+                        "strict": True,
+                        "schema": _FINDING_RESPONSE_SCHEMA,
+                    },
+                },
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        request = Request(
+            f"{self.base_url.rstrip('/')}{self.request_path}",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        started = time.perf_counter()
+        with urlopen(request, timeout=self.timeout_seconds) as response:  # noqa: S310
+            raw_envelope = response.read().decode("utf-8")
+        elapsed_ms = (time.perf_counter() - started) * 1_000
+        envelope = json.loads(raw_envelope)
+        if not isinstance(envelope, dict):
+            raise ValueError("OpenAI-compatible response must be an object")
+        choices = envelope.get("choices")
+        if not isinstance(choices, list) or not choices:
+            raise ValueError(
+                "OpenAI-compatible response must contain non-empty choices"
+            )
+        message = choices[0]
+        if not isinstance(message, dict):
+            raise ValueError("OpenAI-compatible choice must be an object")
+        content = message.get("message")
+        if not isinstance(content, dict) or not isinstance(content.get("content"), str):
+            raise ValueError(
+                "OpenAI-compatible response must contain choices[0].message.content"
+            )
+        return TimedResponse(
+            raw_response=content["content"],
+            elapsed_ms=elapsed_ms,
+        )
+
+    def preflight(self) -> RuntimeMetadata:
+        """Verify a local OpenAI-compatible runtime without sending corpus text."""
+
+        envelope = _get_json(
+            f"{self.base_url.rstrip('/')}/v1/models", self.timeout_seconds
+        )
+        if not isinstance(envelope, dict):
+            raise ValueError("OpenAI-compatible health response must be an object")
+        models = envelope.get("data")
+        if not isinstance(models, list):
+            raise ValueError("OpenAI-compatible health response must contain data")
+        identifiers = {
+            item.get("id")
+            for item in models
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        }
+        if identifiers and self.model not in identifiers:
+            raise OSError("requested local model is unavailable")
+        return RuntimeMetadata(
+            engine="mlx",
+            model_identifier=self.model,
+            runtime_version=None,
+        )
+
+
+def _default_runtime_engine(requested_engine: str) -> str:
+    """Resolve engine aliases and choose MLX first on macOS."""
+
+    if requested_engine == "auto":
+        if platform.system() == "Darwin":
+            return "mlx"
+        return "ollama"
+    return requested_engine
+
+
+def _default_base_url_for_engine(engine: str) -> str:
+    """Return local defaults for benchmark-compatible runtimes."""
+
+    if engine == "mlx":
+        return _OPENAI_COMPAT_BASE_URL
+    return _OLLAMA_DEFAULT_BASE_URL
+
+
+def _validate_loopback_base_url(base_url: str, label: str) -> None:
+    parsed = urlparse(base_url)
+    if parsed.scheme not in {"http", "https"}:
+        raise ValueError(f"{label} URL must use HTTP")
+    if parsed.hostname not in _LOOPBACK_HOSTS:
+        raise ValueError(f"{label} URL must use a loopback host")
+
+
+def _get_json(url: str, timeout_seconds: float) -> object:
+    """Fetch a local health endpoint with no benchmark source text."""
+
+    request = Request(url, method="GET")
+    with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310
+        return json.loads(response.read().decode("utf-8"))
+
+
+def _build_client(
+    *,
+    engine: str,
+    base_url: str,
+    model: str,
+    timeout_seconds: float,
+) -> RuntimeClient:
+    """Build a benchmark client for the selected local runtime."""
+
+    engine = _default_runtime_engine(engine)
+    if engine == "ollama":
+        return OllamaClient(base_url, model, timeout_seconds)
+    if engine == "mlx":
+        return OpenAICompatibleClient(base_url, model, timeout_seconds)
+    raise ValueError(f"unsupported benchmark engine: {engine!r}")
+
+
+def select_healthy_client(
+    requested_engine: str,
+    candidates: Iterable[tuple[str, RuntimeClient]],
+) -> tuple[str, RuntimeClient]:
+    """Return the first healthy permitted runtime, or fail before scoring."""
+
+    failures: list[str] = []
+    for engine, client in candidates:
+        if requested_engine != "auto" and engine != requested_engine:
+            continue
+        try:
+            client.preflight()
+        except (
+            OSError,
+            TimeoutError,
+            URLError,
+            ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            failures.append(f"{engine}: {classify_case_failure(error)}")
+            continue
+        return engine, client
+    attempted = ", ".join(failures) or "no supported runtime candidates"
+    raise RuntimeError(f"no healthy local runtime is available ({attempted})")
 
 
 def load_cases(path: Path) -> tuple[BenchmarkCase, ...]:
@@ -326,11 +632,46 @@ def score_findings(case: BenchmarkCase, findings: Iterable[Finding]) -> FindingS
         for finding in findings
     }
     matched = expected & observed
+    categories = {item[0] for item in expected | observed}
+    category_metrics: dict[str, CategoryMetrics] = {}
+    for category in categories:
+        expected_for_category = {item for item in expected if item[0] == category}
+        observed_for_category = {item for item in observed if item[0] == category}
+        category_metrics[category] = CategoryMetrics(
+            true_positives=len(expected_for_category & observed_for_category),
+            false_positives=len(observed_for_category - expected_for_category),
+            false_negatives=len(expected_for_category - observed_for_category),
+        )
     return FindingScore(
         true_positives=len(matched),
         false_positives=len(observed - expected),
         false_negatives=len(expected - observed),
+        category_metrics=category_metrics,
     )
+
+
+def classify_case_failure(error: BaseException) -> CaseStatus:
+    """Map expected local failures to safe, source-text-free evidence states."""
+
+    if isinstance(error, TimeoutError):
+        return "timed_out"
+    if isinstance(error, (OSError, URLError)):
+        return "unavailable"
+    message = str(error).lower()
+    if "conflict" in message:
+        return "conflict"
+    if "duplicate" in message:
+        return "duplicate"
+    if (
+        "range" in message
+        or "outside the input text" in message
+        or "original must match" in message
+        or "original does not match" in message
+    ):
+        return "invalid_span"
+    if isinstance(error, (json.JSONDecodeError, TypeError, ValueError)):
+        return "invalid_schema"
+    return "application_failure"
 
 
 def summarize_observations(
@@ -344,24 +685,22 @@ def summarize_observations(
 
     metrics: dict[str, CategoryMetrics] = {}
     for observation in collected:
-        categories = {
-            finding.category for finding in observation.case.expected_findings
-        }
-        for category in categories:
-            current = metrics.get(category, CategoryMetrics(0, 0, 0))
-            expected_count = sum(
-                finding.category == category
+        category_scores = observation.finding_score.category_metrics
+        if not category_scores:
+            category_scores = {
+                finding.category: CategoryMetrics(
+                    true_positives=observation.finding_score.true_positives,
+                    false_positives=observation.finding_score.false_positives,
+                    false_negatives=observation.finding_score.false_negatives,
+                )
                 for finding in observation.case.expected_findings
-            )
-            true_positives = min(
-                observation.finding_score.true_positives,
-                expected_count,
-            )
+            }
+        for category, score in category_scores.items():
+            current = metrics.get(category, CategoryMetrics(0, 0, 0))
             metrics[category] = CategoryMetrics(
-                true_positives=current.true_positives + true_positives,
-                false_positives=current.false_positives,
-                false_negatives=current.false_negatives
-                + max(expected_count - true_positives, 0),
+                true_positives=current.true_positives + score.true_positives,
+                false_positives=current.false_positives + score.false_positives,
+                false_negatives=current.false_negatives + score.false_negatives,
             )
 
     negative_cases_changed = sum(
@@ -382,6 +721,19 @@ def summarize_observations(
         if len(elapsed) % 2
         else (elapsed[midpoint - 1] + elapsed[midpoint]) / 2
     )
+    p95_latency_ms = _percentile(elapsed, 0.95)
+    total_elapsed_ms = sum(elapsed)
+    throughput = (
+        sum(
+            len(observation.case.source)
+            for observation in collected
+            if observation.valid_response
+        )
+        * 1_000
+        / total_elapsed_ms
+        if total_elapsed_ms
+        else 0.0
+    )
     return BenchmarkReport(
         valid_responses=sum(observation.valid_response for observation in collected),
         total_responses=len(collected),
@@ -399,7 +751,43 @@ def summarize_observations(
             ),
         ),
         category_metrics=metrics,
+        p95_latency_ms=p95_latency_ms,
+        throughput_chars_per_second=throughput,
+        case_results=tuple(
+            score_case(
+                observation.case,
+                corrected_output=observation.corrected_output,
+                valid_response=observation.valid_response,
+                elapsed_ms=observation.elapsed_ms,
+            )
+            for observation in collected
+        ),
+        case_statuses=tuple(observation.status for observation in collected),
+        case_evidence=tuple(
+            CaseEvidence(
+                case_id=observation.case.case_id,
+                status=observation.status,
+                valid_response=observation.valid_response,
+                exact_match=observation.corrected_output
+                == observation.case.expected_output,
+                true_positives=observation.finding_score.true_positives,
+                false_positives=observation.finding_score.false_positives,
+                false_negatives=observation.finding_score.false_negatives,
+                elapsed_ms=observation.elapsed_ms,
+                call_count=observation.call_count,
+            )
+            for observation in collected
+        ),
     )
+
+
+def _percentile(sorted_values: list[float], percentile: float) -> float:
+    """Return a deterministic nearest-rank percentile for latency evidence."""
+
+    if not sorted_values:
+        return 0.0
+    index = max(0, math.ceil(len(sorted_values) * percentile) - 1)
+    return sorted_values[index]
 
 
 def run_cases(
@@ -417,7 +805,7 @@ def run_cases(
                 source_text=case.source,
                 source_name=f"benchmark-{case.case_id}",
             )
-        except (OSError, TimeoutError, TypeError, ValueError, json.JSONDecodeError):
+        except Exception as error:
             observations.append(
                 BenchmarkObservation(
                     case=case,
@@ -425,6 +813,35 @@ def run_cases(
                     elapsed_ms=0.0,
                     finding_score=FindingScore(0, 0, 0),
                     corrected_output=case.source,
+                    status=classify_case_failure(error),
+                )
+            )
+            continue
+
+        if len({finding.id for finding in findings}) != len(findings):
+            observations.append(
+                BenchmarkObservation(
+                    case=case,
+                    valid_response=True,
+                    elapsed_ms=response.elapsed_ms,
+                    finding_score=score_findings(case, findings),
+                    corrected_output=case.source,
+                    status="duplicate",
+                )
+            )
+            continue
+
+        try:
+            corrected_output = corrected_output_from_findings(case.source, findings)
+        except (PolisError, TypeError, ValueError) as error:
+            observations.append(
+                BenchmarkObservation(
+                    case=case,
+                    valid_response=True,
+                    elapsed_ms=response.elapsed_ms,
+                    finding_score=score_findings(case, findings),
+                    corrected_output=case.source,
+                    status=classify_case_failure(error),
                 )
             )
             continue
@@ -435,7 +852,8 @@ def run_cases(
                 valid_response=True,
                 elapsed_ms=response.elapsed_ms,
                 finding_score=score_findings(case, findings),
-                corrected_output=corrected_output_from_findings(case.source, findings),
+                corrected_output=corrected_output,
+                status="valid_empty" if not findings else "valid",
             )
         )
     return tuple(observations)
@@ -459,6 +877,8 @@ def report_as_json(report: BenchmarkReport) -> str:
             },
             "safety_eligible": report.safety_eligible,
             "median_latency_ms": report.median_latency_ms,
+            "p95_latency_ms": report.p95_latency_ms,
+            "throughput_chars_per_second": report.throughput_chars_per_second,
             "negative_cases_changed": report.negative_cases_changed,
             "overall_metrics": {
                 "f1": report.overall_metrics.f1,
@@ -470,6 +890,33 @@ def report_as_json(report: BenchmarkReport) -> str:
             },
             "total_responses": report.total_responses,
             "valid_responses": report.valid_responses,
+            "corpus_sha256": report.corpus_sha256,
+            "runtime": None
+            if report.runtime_metadata is None
+            else {
+                "artifact_revision": report.runtime_metadata.artifact_revision,
+                "cold_start": report.runtime_metadata.cold_start,
+                "engine": report.runtime_metadata.engine,
+                "hardware_class": report.runtime_metadata.hardware_class,
+                "loaded_memory_bytes": report.runtime_metadata.loaded_memory_bytes,
+                "model_identifier": report.runtime_metadata.model_identifier,
+                "quantization": report.runtime_metadata.quantization,
+                "runtime_version": report.runtime_metadata.runtime_version,
+            },
+            "cases": [
+                {
+                    "call_count": item.call_count,
+                    "elapsed_ms": item.elapsed_ms,
+                    "exact_match": item.exact_match,
+                    "false_negatives": item.false_negatives,
+                    "false_positives": item.false_positives,
+                    "id": item.case_id,
+                    "status": item.status,
+                    "true_positives": item.true_positives,
+                    "valid_response": item.valid_response,
+                }
+                for item in report.case_evidence
+            ],
         },
         ensure_ascii=False,
         sort_keys=True,
@@ -480,7 +927,9 @@ def main(argv: list[str] | None = None) -> int:
     """Run the local benchmark and print its machine-readable evidence."""
 
     parser = argparse.ArgumentParser(
-        description="Benchmark a local Ollama model against the Polis E2E corpus."
+        description=(
+            "Benchmark a local Polish correction model against the Polis E2E corpus."
+        )
     )
     parser.add_argument("--model", required=True)
     parser.add_argument(
@@ -488,16 +937,61 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=Path("tests/fixtures/e2e/polish_correction_corpus.json"),
     )
-    parser.add_argument("--base-url", default="http://127.0.0.1:11434")
-    parser.add_argument("--timeout-seconds", type=float, default=60.0)
-    arguments = parser.parse_args(argv)
-
-    client = OllamaClient(
-        base_url=arguments.base_url,
-        model=arguments.model,
-        timeout_seconds=arguments.timeout_seconds,
+    parser.add_argument(
+        "--engine",
+        default="auto",
+        choices=("auto", "ollama", "mlx"),
+        help=(
+            "Runtime used to serve the local model. 'auto' prefers MLX on macOS "
+            "and Ollama elsewhere."
+        ),
     )
-    report = summarize_observations(run_cases(client, load_cases(arguments.corpus)))
+    parser.add_argument("--base-url")
+    parser.add_argument("--timeout-seconds", type=float, default=60.0)
+    parser.add_argument("--artifact-revision")
+    parser.add_argument("--quantization")
+    parser.add_argument("--hardware-class", default=platform.platform())
+    parser.add_argument("--cold-start", action="store_true")
+    arguments = parser.parse_args(argv)
+    candidate_engines = (
+        ("mlx", "ollama")
+        if arguments.engine == "auto" and platform.system() == "Darwin"
+        else ("ollama", "mlx")
+        if arguments.engine == "auto"
+        else (arguments.engine,)
+    )
+    candidates = tuple(
+        (
+            engine,
+            _build_client(
+                engine=engine,
+                base_url=arguments.base_url
+                if arguments.base_url is not None
+                else _default_base_url_for_engine(engine),
+                model=arguments.model,
+                timeout_seconds=arguments.timeout_seconds,
+            ),
+        )
+        for engine in candidate_engines
+    )
+    selected_engine, client = select_healthy_client(arguments.engine, candidates)
+    runtime_metadata = client.preflight()
+    if runtime_metadata.engine != selected_engine:
+        raise RuntimeError("runtime preflight returned an unexpected engine")
+    runtime_metadata = replace(
+        runtime_metadata,
+        artifact_revision=arguments.artifact_revision,
+        quantization=arguments.quantization,
+        hardware_class=arguments.hardware_class,
+        cold_start=arguments.cold_start,
+    )
+    cases = load_cases(arguments.corpus)
+    report = summarize_observations(run_cases(client, cases))
+    report = replace(
+        report,
+        corpus_sha256=hashlib.sha256(arguments.corpus.read_bytes()).hexdigest(),
+        runtime_metadata=runtime_metadata,
+    )
     print(report_as_json(report))
     return 0
 

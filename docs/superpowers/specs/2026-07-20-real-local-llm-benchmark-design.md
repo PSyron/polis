@@ -12,8 +12,8 @@ Benchmark jest dwustopniowy. Etap szybkościowy mierzy małe kandydaty:
 `speakleash/Bielik-1.5B-v3.0-Instruct-GGUF`, `qwen3:0.6b` i `qwen3:1.7b`.
 Etap jakościowy porównuje najlepszy mały model z
 `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` i `qwen3:4b-instruct`. Każdy
-kandydat działa przez lokalną Ollamę albo `llama-server`, po uprzednim
-świadomym pobraniu przez użytkownika. Wagi, cache i wyniki robocze pozostają
+kandydat działa przez lokalną Ollamę albo lokalny serwer OpenAI-compat (w tym
+stack MLX), po uprzednim świadomym pobraniu przez użytkownika. Wagi, cache i wyniki robocze pozostają
 poza repozytorium.
 
 Wejściem benchmarku jest korpus E2E v2. Przypadki `llm_planned` są pozytywne,
