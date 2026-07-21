@@ -51,6 +51,7 @@ DEFAULT_CORPUS_PATH = Path("tests/fixtures/evaluation/polish_correction_corpus_v
 _LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 _OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 _OPENAI_COMPAT_BASE_URL = "http://127.0.0.1:8080"
+DEFAULT_REPETITIONS: Final[int] = 1
 
 CaseStatus = Literal[
     "valid",
@@ -143,6 +144,7 @@ class RoleBenchmarkObservation:
     corrected_output: str
     status: CaseStatus = "valid"
     call_count: int = 1
+    latencies_ms: tuple[float, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -193,6 +195,9 @@ class RoleBenchmarkReport:
     case_evidence: tuple[RoleBenchmarkObservation, ...] = ()
     corpus_sha256: str | None = None
     runtime_metadata: RuntimeMetadata | None = None
+    repetitions: int = 1
+    cold_latency_ms: float | None = None
+    warm_latency_ms: float | None = None
 
     @property
     def exact_output_match_rate(self) -> float:
@@ -783,32 +788,73 @@ def _run_case_for_protocol(
     raise ValueError(f"unsupported protocol: {protocol!r}")
 
 
+def _run_case_with_repetitions(
+    client: PromptClient,
+    protocol: ProtocolName,
+    case: RoleBenchmarkCase,
+    *,
+    repetitions: int,
+) -> RoleBenchmarkObservation:
+    repetitions = max(1, repetitions)
+    attempts: list[str] = []
+    latencies_ms: list[float] = []
+    call_count = 0
+    statuses: list[CaseStatus] = []
+
+    for _ in range(repetitions):
+        try:
+            corrected, attempt_calls, elapsed_ms = _run_case_for_protocol(
+                client, protocol, case
+            )
+            attempts.append(corrected)
+            latencies_ms.append(elapsed_ms)
+            call_count += attempt_calls
+        except Exception as error:
+            statuses.append(classify_case_failure(error))
+
+    if not statuses:
+        corrected = attempts[0]
+        elapsed_ms = sum(latencies_ms) / len(latencies_ms)
+        return RoleBenchmarkObservation(
+            case=case,
+            protocol=protocol,
+            valid_response=True,
+            elapsed_ms=elapsed_ms,
+            exact_output_match=corrected == case.expected_output,
+            exact_edit_match=_is_exact_edit_match(case, corrected),
+            corrected_output=corrected,
+            status=("valid_empty" if corrected == case.source else "valid"),
+            call_count=call_count,
+            latencies_ms=tuple(latencies_ms),
+        )
+
+    return RoleBenchmarkObservation(
+        case=case,
+        protocol=protocol,
+        valid_response=False,
+        elapsed_ms=0.0,
+        exact_output_match=False,
+        exact_edit_match=False,
+        corrected_output=case.source,
+        status=statuses[0],
+        call_count=call_count,
+        latencies_ms=tuple(latencies_ms),
+    )
+
+
 def run_cases(
     client: PromptClient,
     protocol: ProtocolName,
     cases: Iterable[RoleBenchmarkCase],
+    *,
+    repetitions: int = DEFAULT_REPETITIONS,
 ) -> tuple[RoleBenchmarkObservation, ...]:
     observations: list[RoleBenchmarkObservation] = []
     for case in cases:
         try:
-            corrected, call_count, elapsed_ms = _run_case_for_protocol(
-                client, protocol, case
-            )
-            exact_output_match = corrected == case.expected_output
-            exact_edit_match = _is_exact_edit_match(case, corrected)
-            status: CaseStatus = "valid_empty" if corrected == case.source else "valid"
-
             observations.append(
-                RoleBenchmarkObservation(
-                    case=case,
-                    protocol=protocol,
-                    valid_response=True,
-                    elapsed_ms=elapsed_ms,
-                    exact_output_match=exact_output_match,
-                    exact_edit_match=exact_edit_match,
-                    corrected_output=corrected,
-                    status=status,
-                    call_count=call_count,
+                _run_case_with_repetitions(
+                    client, protocol, case, repetitions=repetitions
                 )
             )
         except Exception as error:
@@ -823,6 +869,7 @@ def run_cases(
                     corrected_output=case.source,
                     status=classify_case_failure(error),
                     call_count=0,
+                    latencies_ms=(),
                 )
             )
 
@@ -836,6 +883,18 @@ def _percentile(sorted_values: list[float], percentile: float) -> float:
     return sorted_values[index]
 
 
+def _median_latency(values: tuple[float, ...]) -> float:
+    if not values:
+        return 0.0
+    sorted_values = sorted(values)
+    length = len(sorted_values)
+    return (
+        sorted_values[length // 2]
+        if length % 2
+        else (sorted_values[length // 2 - 1] + sorted_values[length // 2]) / 2
+    )
+
+
 def summarize_observations(
     observations: Iterable[RoleBenchmarkObservation],
 ) -> RoleBenchmarkReport:
@@ -847,18 +906,23 @@ def summarize_observations(
     if any(item.protocol != protocol for item in collected):
         raise ValueError("summarize requires a single-protocol observation stream")
 
-    elapsed = sorted(item.elapsed_ms for item in collected if item.valid_response)
-    median_latency_ms = (
-        0.0
-        if not elapsed
-        else elapsed[len(elapsed) // 2]
-        if len(elapsed) % 2
-        else (elapsed[len(elapsed) // 2 - 1] + elapsed[len(elapsed) // 2]) / 2
+    valid_latencies = tuple(
+        item.elapsed_ms for item in collected if item.valid_response
     )
-    p95_latency_ms = _percentile(elapsed, 0.95)
+    median_latency_ms = _median_latency(valid_latencies)
+    p95_latency_ms = _percentile(sorted(valid_latencies), 0.95)
 
-    total_response_chars = sum(len(item.case.source) for item in collected)
-    total_elapsed_ms = sum(item.elapsed_ms for item in collected if item.valid_response)
+    total_response_chars = sum(
+        len(item.case.source) * len(item.latencies_ms)
+        if item.latencies_ms
+        else len(item.case.source)
+        for item in collected
+    )
+    total_elapsed_ms = sum(
+        sum(item.latencies_ms)
+        for item in collected
+        if item.valid_response and item.latencies_ms
+    )
     throughput_chars_per_second = (
         (total_response_chars * 1_000.0 / total_elapsed_ms)
         if total_elapsed_ms > 0
@@ -964,6 +1028,25 @@ def summarize_observations(
     )
 
     valid_responses = sum(1 for item in collected if item.valid_response)
+
+    valid_latencies_tuple = tuple(
+        item.latencies_ms
+        for item in collected
+        if item.valid_response and item.latencies_ms
+    )
+    cold_case_latencies = tuple(
+        item_latencies[0] for item_latencies in valid_latencies_tuple if item_latencies
+    )
+    warm_case_latencies = tuple(
+        latency
+        for item_latencies in valid_latencies_tuple
+        for latency in item_latencies[1:]
+    )
+    repetitions = (
+        max((len(item.latencies_ms) for item in collected), default=DEFAULT_REPETITIONS)
+    )
+    cold_latency_ms = _median_latency(cold_case_latencies) if repetitions > 1 else None
+    warm_latency_ms = _median_latency(warm_case_latencies) if repetitions > 1 else None
     return RoleBenchmarkReport(
         protocol=protocol,
         valid_responses=valid_responses,
@@ -988,6 +1071,9 @@ def summarize_observations(
         schema_valid_rate=valid_responses / len(collected),
         focus_metrics=focus_payload,
         case_evidence=collected,
+        repetitions=repetitions,
+        cold_latency_ms=cold_latency_ms,
+        warm_latency_ms=warm_latency_ms,
     )
 
 
@@ -1080,6 +1166,7 @@ def report_as_json(
         "valid_responses": report.valid_responses,
         "total_responses": report.total_responses,
         "calls_per_case": calls_per_case,
+        "repetitions": report.repetitions,
         "protocol": report.protocol,
         "corpus_sha256": report.corpus_sha256,
         "focus_metrics": report.focus_metrics,
@@ -1096,6 +1183,9 @@ def report_as_json(
             "runtime_version": report.runtime_metadata.runtime_version,
         },
     }
+    if report.repetitions > 1:
+        payload["cold_latency_ms"] = report.cold_latency_ms
+        payload["warm_latency_ms"] = report.warm_latency_ms
 
     if include_cases:
         payload["cases"] = [
@@ -1109,6 +1199,7 @@ def report_as_json(
                 "exact_edit_match": item.exact_edit_match,
                 "valid_response": item.valid_response,
                 "elapsed_ms": item.elapsed_ms,
+                "repetitions": len(item.latencies_ms),
                 "call_count": item.call_count,
                 "protocol": item.protocol,
             }
@@ -1118,47 +1209,70 @@ def report_as_json(
     return json.dumps(payload, ensure_ascii=False, sort_keys=True)
 
 
+def _run_protocol_payload(
+    *,
+    client: RuntimeClient,
+    protocol: ProtocolName,
+    cases: tuple[RoleBenchmarkCase, ...],
+    corpus_sha256: str,
+    runtime_metadata: RuntimeMetadata,
+    repetitions: int,
+    include_cases: bool,
+) -> dict[str, object]:
+    report = summarize_observations(
+        run_cases(client, protocol, cases, repetitions=repetitions)
+    )
+    report = replace(
+        report,
+        corpus_sha256=corpus_sha256,
+        runtime_metadata=runtime_metadata,
+    )
+    return cast(
+        dict[str, object],
+        json.loads(report_as_json(report, include_cases=include_cases)),
+    )
+
+
 def run_protocol_matrix(
     client: RuntimeClient,
     protocols: tuple[ProtocolName, ...],
     cases_by_split: tuple[tuple[str, tuple[RoleBenchmarkCase, ...]], ...],
     *,
     include_cases: bool = False,
+    repetitions: int = DEFAULT_REPETITIONS,
 ) -> dict[str, object]:
     """Run all requested protocols and optionally all splits."""
 
     runtime_metadata = client.preflight()
+    corpus_sha256 = hashlib.sha256(Path(DEFAULT_CORPUS_PATH).read_bytes()).hexdigest()
     matrix: dict[str, object] = {}
 
     for split_name, cases in cases_by_split:
         if len(protocols) == 1:
             protocol = protocols[0]
-            report = summarize_observations(run_cases(client, protocol, cases))
-            report = replace(
-                report,
-                corpus_sha256=hashlib.sha256(
-                    Path(DEFAULT_CORPUS_PATH).read_bytes()
-                ).hexdigest(),
-                runtime_metadata=runtime_metadata,
-            )
             matrix_key = f"{split_name}/{protocol}"
-            matrix[matrix_key] = json.loads(
-                report_as_json(report, include_cases=include_cases)
+            matrix[matrix_key] = _run_protocol_payload(
+                client=client,
+                protocol=protocol,
+                cases=cases,
+                corpus_sha256=corpus_sha256,
+                runtime_metadata=runtime_metadata,
+                repetitions=repetitions,
+                include_cases=include_cases,
             )
             continue
 
         matrix[split_name] = {}
         for protocol in protocols:
-            report = summarize_observations(run_cases(client, protocol, cases))
-            report = replace(
-                report,
-                corpus_sha256=hashlib.sha256(
-                    Path(DEFAULT_CORPUS_PATH).read_bytes()
-                ).hexdigest(),
+            split_payload = cast(dict[str, object], matrix[split_name])
+            split_payload[protocol] = _run_protocol_payload(
+                client=client,
+                protocol=protocol,
+                cases=cases,
+                corpus_sha256=corpus_sha256,
                 runtime_metadata=runtime_metadata,
-            )
-            cast(dict[str, object], matrix[split_name])[protocol] = json.loads(
-                report_as_json(report, include_cases=include_cases)
+                repetitions=repetitions,
+                include_cases=include_cases,
             )
 
     return matrix
@@ -1192,6 +1306,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--base-url")
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
+    parser.add_argument(
+        "--repetitions",
+        type=int,
+        default=DEFAULT_REPETITIONS,
+        help="Number of timing repetitions per case.",
+    )
     parser.add_argument("--artifact-revision")
     parser.add_argument("--quantization")
     parser.add_argument("--hardware-class", default=platform.platform())
@@ -1232,6 +1352,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     requested_split = cast(Literal["development", "holdout", "all"], arguments.split)
+    repetitions = max(DEFAULT_REPETITIONS, arguments.repetitions)
     split_targets: tuple[Literal["development", "holdout"], ...] = (
         (requested_split,)
         if requested_split in {"development", "holdout"}
@@ -1249,7 +1370,9 @@ def main(argv: list[str] | None = None) -> int:
         protocol = selected_protocols[0]
         split_matrix: dict[str, object] = {}
         for split_name, cases in cases_by_split:
-            report = summarize_observations(run_cases(client, protocol, cases))
+            report = summarize_observations(
+                run_cases(client, protocol, cases, repetitions=repetitions)
+            )
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,
@@ -1270,7 +1393,9 @@ def main(argv: list[str] | None = None) -> int:
         split_name, cases = cases_by_split[0]
         protocol_payload: dict[str, object] = {}
         for protocol in selected_protocols:
-            report = summarize_observations(run_cases(client, protocol, cases))
+            report = summarize_observations(
+                run_cases(client, protocol, cases, repetitions=repetitions)
+            )
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,
@@ -1284,7 +1409,9 @@ def main(argv: list[str] | None = None) -> int:
     for split_name, cases in cases_by_split:
         split_payload = {}
         for protocol in selected_protocols:
-            report = summarize_observations(run_cases(client, protocol, cases))
+            report = summarize_observations(
+                run_cases(client, protocol, cases, repetitions=repetitions)
+            )
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,

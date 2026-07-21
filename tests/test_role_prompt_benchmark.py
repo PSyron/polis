@@ -8,6 +8,7 @@ import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
 from experiments.role_prompt_benchmark.run_benchmark import (
+    ProtocolName,
     ProtocolRequest,
     RoleBenchmarkCase,
     RoleBenchmarkObservation,
@@ -161,12 +162,47 @@ def test_run_cases_validates_schema_and_records_exact_match() -> None:
         corrected_output="Jan był z Anią na pikniku.",
         status="valid_empty",
         call_count=1,
+        latencies_ms=(12.0,),
     )
     request = client.calls[0]
     request = cast(ProtocolRequest, request)
     assert request.messages[0]["role"] == "system"
     assert request.messages[1]["role"] == "user"
     assert request.prompt_hash
+
+
+def test_run_cases_with_multiple_repetitions_reports_cold_and_warm_metrics() -> None:
+    case = _make_case(
+        case_id="repeated",
+        source="Ala ma kota.",
+        expected_output="Ala ma kota.",
+        tags=("syntax",),
+        verification="positive",
+        focus="syntax",
+    )
+
+    class RepeatingClient:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate(self, request: object) -> TimedResponse:
+            self.calls += 1
+            return TimedResponse('{"corrected_text":"Ala ma kota."}', 10.0 * self.calls)
+
+    observations = run_cases(RepeatingClient(), "specialist", (case,), repetitions=3)
+    observation = observations[0]
+
+    assert observation.latencies_ms == (10.0, 20.0, 30.0)
+    assert observation.call_count == 3
+    assert observation.elapsed_ms == 20.0
+
+    report = summarize_observations(observations)
+    assert report.repetitions == 3
+    assert report.cold_latency_ms == 10.0
+    assert report.warm_latency_ms == 25.0
+    assert report.throughput_chars_per_second == pytest.approx(
+        len(case.source) * 3 * 1000.0 / 60.0
+    )
 
 
 def test_run_cases_marks_invalid_schema_as_failed() -> None:
@@ -551,3 +587,91 @@ def test_main_runs_all_protocols_on_all_splits(
         protocol_payload = cast(dict[str, object], protocol_payload)
         assert protocol_payload["protocol"] in protocols
         assert protocol_payload["corpus_sha256"] is not None
+
+
+def test_main_respects_repetitions_argument(
+    monkeypatch: MonkeyPatch,
+    capsys: CaptureFixture[str],
+) -> None:
+    case = _make_case(
+        case_id="safe",
+        source="Ala ma kota.",
+        expected_output="Ala ma kota.",
+        tags=("syntax",),
+        verification="positive",
+        split="development",
+        focus="syntax",
+    )
+
+    def fake_run_cases(
+        client: object,
+        protocol: ProtocolName,
+        cases: tuple[RoleBenchmarkCase, ...],
+        *,
+        repetitions: int = 1,
+    ) -> tuple[RoleBenchmarkObservation, ...]:
+        assert repetitions == 3
+        assert len(cases) == 1
+        assert cases[0] == case
+        return (
+            RoleBenchmarkObservation(
+                case=case,
+                protocol=protocol,
+                valid_response=True,
+                elapsed_ms=2.0,
+                exact_output_match=True,
+                exact_edit_match=True,
+                corrected_output="Ala ma kota.",
+                status="valid",
+                call_count=3,
+                latencies_ms=(1.0, 2.0, 3.0),
+            ),
+        )
+
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark.load_cases",
+        lambda *_args, **_kwargs: (case,),
+    )
+
+    class FakeClient:
+        def preflight(self) -> RuntimeMetadata:
+            return RuntimeMetadata(
+                engine="ollama",
+                model_identifier="local-test",
+                runtime_version="0.0.0",
+            )
+
+        def generate(self, request: object) -> TimedResponse:
+            raise AssertionError("run_cases is monkeypatched in this test")
+
+    class FakeBuilder:
+        def __call__(self, *args: object, **kwargs: object) -> FakeClient:
+            return FakeClient()
+
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark._build_client", FakeBuilder()
+    )
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark.run_cases", fake_run_cases
+    )
+
+    assert (
+        main(
+            [
+                "--model",
+                "local-test",
+                "--protocol",
+                "specialist",
+                "--repetitions",
+                "3",
+                "--corpus",
+                str(CORPUS_PATH),
+            ]
+        )
+        == 0
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["repetitions"] == 3
+    assert payload["cold_latency_ms"] == 1.0
+    assert payload["warm_latency_ms"] == 2.5
