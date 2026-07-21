@@ -42,6 +42,18 @@ class _HealthyClient:
         return TimedResponse('{"corrected_text":"Ala ma kota."}', 1.0)
 
 
+class _UnavailableClient:
+    def __init__(self) -> None:
+        self.preflight_calls = 0
+
+    def preflight(self) -> RuntimeMetadata:
+        self.preflight_calls += 1
+        raise OSError("service unavailable")
+
+    def generate(self, request: object) -> TimedResponse:
+        raise AssertionError("generate must not be called when preflight fails")
+
+
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = (
     ROOT / "tests" / "fixtures" / "evaluation" / "polish_correction_corpus_v3.json"
@@ -389,6 +401,30 @@ def test_select_healthy_client_picks_the_first_configured_service() -> None:
     selected_name, selected = select_healthy_client("auto", candidates)
     assert selected_name == "ollama"
     assert selected and cast(_HealthyClient, selected).preflight_calls == 1
+
+
+def test_select_healthy_client_skips_unavailable_engine_for_requested_profile() -> None:
+    candidates = (
+        ("ollama", _UnavailableClient()),
+        ("mlx", _HealthyClient(engine="mlx", model="local-mlx")),
+    )
+
+    selected_name, selected = select_healthy_client("auto", candidates)
+    assert selected_name == "mlx"
+    assert isinstance(selected, _HealthyClient)
+    assert selected.preflight_calls == 1
+
+
+def test_select_healthy_client_respects_requested_engine() -> None:
+    candidates = (
+        ("ollama", _HealthyClient(engine="ollama", model="local-ollama")),
+        ("mlx", _HealthyClient(engine="mlx", model="local-mlx")),
+    )
+
+    selected_name, selected = select_healthy_client("mlx", candidates)
+    assert selected_name == "mlx"
+    assert selected and isinstance(selected, _HealthyClient)
+    assert selected._metadata.model_identifier == "local-mlx"
 
 
 def test_run_protocol_matrix_includes_runtime_metadata() -> None:
