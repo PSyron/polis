@@ -735,6 +735,7 @@ def _run_case_for_protocol(
         corrected = validate_corrected_text_response(
             response.raw_response,
             source_text=case.source,
+            focus=case.focus,
         )
         return corrected, call_count, elapsed_ms
 
@@ -750,7 +751,9 @@ def _run_case_for_protocol(
         elapsed_ms += response.elapsed_ms
 
         proposal = validate_corrected_text_response(
-            response.raw_response, source_text=case.source
+            response.raw_response,
+            source_text=case.source,
+            focus=case.focus,
         )
         if proposal == case.source:
             return proposal, call_count, elapsed_ms

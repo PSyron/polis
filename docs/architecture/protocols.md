@@ -42,6 +42,15 @@ does not create a timeout, retry, response validator, finding, or analysis
 result. It remains a local implementation boundary: this protocol does not
 authorize a network call, model-server dependency, or model download.
 
+The legacy finding path passes one flat prompt through this protocol for
+compatibility. The specialist path from #59 exposes a model-independent
+`PromptRequest` in `polis.llm`: two ordered role messages, a closed response
+schema, protocol and schema versions, deterministic generation settings, and
+explicit limits. A future runtime adapter must apply its native chat template
+to those messages instead of flattening them. Neither request shape contains a
+runtime or model name, and adding specialist orchestration does not silently
+reinterpret the existing flat finding contract.
+
 ## MonotonicClock
 
 `MonotonicClock` is the only time dependency required at this stage. A future
