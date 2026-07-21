@@ -51,6 +51,14 @@ to those messages instead of flattening them. Neither request shape contains a
 runtime or model name, and adding specialist orchestration does not silently
 reinterpret the existing flat finding contract.
 
+Issue #60 adds `HybridSuggestionEngine` in `polis.analysis.hybrid`. It consumes
+an injected deterministic task router and specialist backend, never a model or
+server name. Tasks use sentence-local offsets; accepted edits are translated
+once into original paragraph offsets. Unchanged output stops after one call,
+changed output receives one accept/reject verifier call, and every resulting
+finding is suggestion-only. Optional failures return explicit safe status while
+the analyzer retains deterministic findings and source-policy corrections.
+
 ## MonotonicClock
 
 `MonotonicClock` is the only time dependency required at this stage. A future

@@ -10,6 +10,9 @@ Current guarantees:
 - `PolisError.context` intentionally contains only operation metadata (`operation`,
   `backend`, `path`, `finding_ids`), never analyzed fragments, full prompts, or raw
   response payloads.
+- Specialist outcomes contain only a stable backend identifier, operation and
+  protocol versions, status, suggestion count, and call count. They never carry
+  source text, candidates, prompts, proposals, or raw responses.
 
 ## Operational defaults
 
@@ -17,6 +20,9 @@ Current guarantees:
   local handling explicit.
 - For local backend failures, we map transport/protocol issues to structured
   operational errors instead of exposing backend internals.
+- Optional specialist failures use a fixed privacy-safe diagnostic and preserve
+  completed deterministic findings. Injection does not authorize remote
+  transport: a production adapter must separately enforce local-only execution.
 
 ## Recommended user practice
 

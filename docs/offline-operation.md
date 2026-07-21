@@ -6,6 +6,9 @@ This project is designed to run analysis without external network access.
 
 - Runtime uses `Analyzer` and deterministic rule registry in-process.
 - Optional mock backend uses local prompt parsing and local transport (`MockHeuristicBackend`).
+- The specialist engine is disabled unless a caller explicitly injects both a
+  router and backend. The #60 engine performs no I/O itself; the injected
+  adapter remains responsible for proving local-only transport.
 - Optional LanguageTool support connects only to a separately started
   LanguageTool 6.8 server on a numeric loopback address. It never uses a public
   LanguageTool API, DNS name, proxy, or redirect.
@@ -51,6 +54,7 @@ optional findings and does not discard findings from in-process rules.
 This verification does not start or validate separately installed runtimes.
 For external backends, add an explicit offline policy and integration test for that
 runtime before calling it supported.
+No real specialist model is enabled by the current supported configuration.
 
 For source-level reproducibility audits, this repository includes
 `third_party/languagetool-pl` with pinned LanguageTool provenance and local build

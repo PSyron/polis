@@ -1,6 +1,6 @@
 """Typing-only future public package surface approved by ADR-0003."""
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Final, Literal, Self
 
@@ -47,6 +47,7 @@ class CorrectionResult:
     applied_findings: tuple[Finding, ...]
     skipped_findings: tuple[Finding, ...]
     suggestion_outcomes: tuple[SuggestionOutcome, ...]
+    def apply_suggestions(self, finding_ids: Iterable[str]) -> str: ...
 
 
 SuggestionStatus = Literal["complete", "unavailable", "timed_out", "invalid_response"]
@@ -57,12 +58,19 @@ class SuggestionOutcome:
     backend: str
     operation: str
     suggestions: int
+    model_calls: int
+    protocol_versions: tuple[str, ...]
     operation_version: str
     source_policy_version: str
 
 
 class Analyzer:
-    def __init__(self, config: AnalyzerConfig) -> None: ...
+    def __init__(
+        self,
+        config: AnalyzerConfig,
+        *,
+        specialist_engine: object | None = None,
+    ) -> None: ...
 
     @classmethod
     def from_config(cls, path: str | Path) -> Self: ...
@@ -76,6 +84,7 @@ class Analyzer:
     ) -> AnalysisResult: ...
 
     def correct(self, text: str) -> CorrectionResult: ...
+    async def correct_async(self, text: str) -> CorrectionResult: ...
 
 
 def analysis_result_to_json(result: AnalysisResult) -> str: ...

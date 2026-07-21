@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Added the rules-first hybrid suggestion policy with injected specialist task
+  routing, finite-candidate selection, bounded corrected-text proposals, and an
+  accept/reject verifier.
+- Added equivalent synchronous and asynchronous correction paths, explicit
+  optional-suggestion outcomes and call counts, and caller-selected application
+  of reviewable suggestions.
+- Model-derived edits remain suggestion-only regardless of confidence or
+  verifier acceptance; no real specialist model is enabled by default.
+
 ## 0.1.0 (2026-07-20)
 
 - Added release-focused reliability work before stable publication:

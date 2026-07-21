@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, cast
 
+from polis.analysis import normalize_findings
+from polis.analysis.hybrid import HybridSuggestionEngine
 from polis.analysis.pipeline import analyze_text, analyze_text_async
 from polis.core import (
     AnalysisOptions,
@@ -41,7 +43,6 @@ from polis.rules.languagetool import (
     LocalLanguageToolRule,
     LoopbackLanguageToolHttpTransport,
 )
-from polis.segmentation import segment_sentences
 
 __all__ = [
     "Analyzer",
@@ -82,6 +83,8 @@ class SuggestionOutcome:
     backend: str
     operation: str
     suggestions: int
+    model_calls: int
+    protocol_versions: tuple[str, ...] = ()
     operation_version: str = _SUGGESTION_OUTCOME_VERSION
     source_policy_version: str = _SUGGESTION_BACKEND_POLICY
 
@@ -284,18 +287,51 @@ class CorrectionResult:
     skipped_findings: tuple[Finding, ...]
     suggestion_outcomes: tuple[SuggestionOutcome, ...]
 
+    def apply_suggestions(self, finding_ids: Iterable[str]) -> str:
+        """Apply explicitly selected skipped suggestions with automatic findings."""
+
+        selected_ids = tuple(finding_ids)
+        if not selected_ids:
+            return self.corrected_text
+        reviewable = AnalysisResult(self.original_text, self.skipped_findings)
+        reviewable.apply(selected_ids)
+        selected_set = set(selected_ids)
+        selected = tuple(
+            finding for finding in self.skipped_findings if finding.id in selected_set
+        )
+        combined = AnalysisResult(
+            self.original_text,
+            (*self.applied_findings, *selected),
+        )
+        return cast(
+            str,
+            combined.apply(
+                finding.id for finding in (*self.applied_findings, *selected)
+            ),
+        )
+
 
 class Analyzer:
     """Thin runtime analyzer with deterministic rules and optional mock backend."""
 
-    def __init__(self, config: AnalyzerConfig) -> None:
+    def __init__(
+        self,
+        config: AnalyzerConfig,
+        *,
+        specialist_engine: HybridSuggestionEngine | None = None,
+    ) -> None:
         if not isinstance(config, AnalyzerConfig):
             raise TypeError("config must be AnalyzerConfig")
+        if specialist_engine is not None and not isinstance(
+            specialist_engine, HybridSuggestionEngine
+        ):
+            raise TypeError("specialist_engine must be a HybridSuggestionEngine")
         self._config = config
         self._registry = _make_default_registry(config)
         self._backend = (
             _make_mock_backend() if config.use_local_heuristic_backend else None
         )
+        self._specialist_engine = specialist_engine
 
     @classmethod
     def from_config(cls, path: str | Path) -> Analyzer:
@@ -337,10 +373,50 @@ class Analyzer:
     def correct(self, text: str) -> CorrectionResult:
         """Apply only high-confidence, non-conflicting deterministic corrections."""
 
-        analysis = self.analyze(text)
+        return asyncio.run(self.correct_async(text))
+
+    async def correct_async(self, text: str) -> CorrectionResult:
+        """Asynchronously return the same conservative correction outcome."""
+
+        options = AnalysisOptions(
+            categories=self._config.categories,
+            minimum_confidence=self._config.minimum_confidence,
+        )
+        analysis, outcomes = await self._analysis_for_correction(text, options)
+        suggestions: tuple[Finding, ...] = ()
+        if self._specialist_engine is not None:
+            specialist_run = await self._specialist_engine.suggest(
+                text,
+                deterministic_findings=tuple(
+                    finding
+                    for finding in analysis.issues
+                    if finding.source.kind is SourceKind.RULE
+                ),
+            )
+            suggestions = specialist_run.suggestions
+            outcomes += (
+                SuggestionOutcome(
+                    status=specialist_run.status,
+                    backend=specialist_run.backend,
+                    operation="analysis.correct.specialist",
+                    suggestions=len(specialist_run.suggestions),
+                    model_calls=specialist_run.model_calls,
+                    protocol_versions=specialist_run.operation_versions,
+                ),
+            )
+
+        combined = normalize_findings(
+            (*analysis.issues, *suggestions),
+            options=analysis.options,
+        )
+        correction_analysis = AnalysisResult(
+            text=text,
+            issues=combined,
+            options=analysis.options,
+        )
         selected: list[Finding] = []
         skipped: list[Finding] = []
-        for finding in analysis.issues:
+        for finding in correction_analysis.issues:
             if (
                 finding.suggestion is not None
                 and self._should_apply_automatically(finding)
@@ -349,50 +425,64 @@ class Analyzer:
                 selected.append(finding)
             else:
                 skipped.append(finding)
-        suggestion_outcomes = self._suggestion_outcomes(text, analysis.options)
         return CorrectionResult(
-            original_text=analysis.text,
-            corrected_text=analysis.apply(item.id for item in selected),
+            original_text=correction_analysis.text,
+            corrected_text=correction_analysis.apply(item.id for item in selected),
             applied_findings=tuple(selected),
             skipped_findings=tuple(skipped),
-            suggestion_outcomes=tuple(suggestion_outcomes),
+            suggestion_outcomes=outcomes,
         )
 
-    def _suggestion_outcomes(
-        self, text: str, options: AnalysisOptions
-    ) -> tuple[SuggestionOutcome, ...]:
-        if self._backend is None:
-            return ()
-        status = self._collect_backend_status(text, options=options)
-        analysis = self.analyze(text, options=options)
-        suggestion_count = _count_llm_suggestion_findings(analysis.issues)
-        return (
-            SuggestionOutcome(
-                status=status,
-                backend=self._backend.name,
-                operation=_SUGGESTION_BACKEND_OPERATION,
-                suggestions=suggestion_count,
-            ),
-        )
-
-    def _collect_backend_status(
+    async def _analysis_for_correction(
         self,
         text: str,
-        *,
         options: AnalysisOptions,
-    ) -> SuggestionStatus:
-        del options
-        assert self._backend is not None
+    ) -> tuple[AnalysisResult, tuple[SuggestionOutcome, ...]]:
+        if self._backend is None:
+            findings = await analyze_text_async(
+                text,
+                registry=self._registry,
+                local_backend=None,
+                options=options,
+            )
+            return AnalysisResult(text=text, issues=findings, options=options), ()
+
+        counted_backend = _CountingFindingBackend(self._backend)
 
         try:
-            _run_llm_backend_segmented(self._backend, text)
-            return "complete"
+            findings = await analyze_text_async(
+                text,
+                registry=self._registry,
+                local_backend=counted_backend,
+                options=options,
+                ignore_backend_failures=False,
+                operation=_SUGGESTION_BACKEND_OPERATION,
+            )
+            status: SuggestionStatus = "complete"
         except BackendUnavailableError:
-            return "unavailable"
+            status = "unavailable"
         except AnalysisTimeoutError:
-            return "timed_out"
+            status = "timed_out"
         except InvalidBackendResponseError:
-            return "invalid_response"
+            status = "invalid_response"
+
+        if status != "complete":
+            findings = await analyze_text_async(
+                text,
+                registry=self._registry,
+                local_backend=None,
+                options=options,
+            )
+
+        analysis = AnalysisResult(text=text, issues=findings, options=options)
+        outcome = SuggestionOutcome(
+            status=status,
+            backend=counted_backend.name,
+            operation=_SUGGESTION_BACKEND_OPERATION,
+            suggestions=_count_llm_suggestion_findings(analysis.issues),
+            model_calls=counted_backend.calls,
+        )
+        return analysis, (outcome,)
 
     def _should_apply_automatically(self, finding: Finding) -> bool:
         policy = _POLICY_BY_SOURCE.get(finding.source)
@@ -440,28 +530,34 @@ def _make_mock_backend() -> MockHeuristicBackend:
     )
 
 
-def _run_llm_backend_segmented(
-    backend: object,
-    text: str,
-) -> None:
-    """Run the configured backend across sentence segments and raise on failure."""
+class _CountingFindingBackend:
+    """Count calls while preserving the existing finding-backend interface."""
 
-    if not hasattr(backend, "generate_findings"):
-        raise TypeError("backend must expose generate_findings")
+    def __init__(self, backend: Any) -> None:
+        self._backend = backend
+        self.name = backend.name
+        self.calls = 0
 
-    async def run() -> None:
-        for fragment in segment_sentences(text):
-            if not fragment.text:
-                continue
-            await backend.generate_findings(
-                fragment.text,
-                policy=None,
-                clock=None,
-                sleep=asyncio.sleep,
-                operation=_SUGGESTION_BACKEND_OPERATION,
-            )
-
-    asyncio.run(run())
+    async def generate_findings(
+        self,
+        text: str,
+        *,
+        policy: object | None = None,
+        clock: object | None = None,
+        sleep: Any = None,
+        operation: str = "analysis.llm.generate",
+    ) -> tuple[Finding, ...]:
+        self.calls += 1
+        return cast(
+            "tuple[Finding, ...]",
+            await self._backend.generate_findings(
+                text,
+                policy=policy,
+                clock=clock,
+                sleep=sleep,
+                operation=operation,
+            ),
+        )
 
 
 def _count_llm_suggestion_findings(

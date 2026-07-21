@@ -107,6 +107,21 @@ asyncio.run(run_analysis())
 For validated structured backend responses, prefer `polis.llm.adapter.MockHeuristicBackend`
 plus a dedicated transport implementation.
 
+## Add a specialist suggestion backend
+
+Issue #60 exposes `HybridSuggestionEngine` for role-separated #59 contracts. A
+specialist backend implements `name` and asynchronous
+`generate(request: PromptRequest) -> str`; a deterministic router returns
+`SyntaxTask` or `InflectionTask` values for unresolved sentence-local work.
+Inject the composed engine with `Analyzer(config, specialist_engine=engine)`.
+
+The router, not the model, decides which operation is eligible. Candidate tasks
+must use a finite candidate set containing the original surface form. Syntax
+tasks can declare protected name spans; URLs, numbers, and quotations are
+protected by the engine. The default analyzer injects neither component and
+makes no specialist calls. A custom adapter must remain local, must not download
+artifacts implicitly, and must preserve request roles and native chat templating.
+
 ## Enable the reviewed LanguageTool layer
 
 LanguageTool is optional and disabled by default. Run a separately installed

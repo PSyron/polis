@@ -19,6 +19,10 @@ assert result.corrected_text == "Żeby jutro, powiem o tym."
 
 The method does not rewrite prose, send text over the network, or apply
 low-confidence and model-generated suggestions automatically.
+`await Analyzer.correct_async(...)` provides the same result and ordering for
+event-loop applications. Optional specialist suggestions, when explicitly
+injected, remain in `skipped_findings` and report a versioned outcome with their
+actual one-call/two-call budget; no real specialist model is enabled by default.
 
 ## Development setup
 

@@ -35,6 +35,12 @@ async def analyze_without_blocking_an_event_loop() -> str:
     return result.apply(issue_ids=())
 
 
+async def correct_without_blocking_an_event_loop() -> str:
+    analyzer = Analyzer.from_config("polis.toml")
+    result = await analyzer.correct_async("Zeby zacząć, przyjdź jutro.")
+    return result.corrected_text
+
+
 def root_result_as_core(
     result: polis.AnalysisResult,
 ) -> polis.core.AnalysisResult:

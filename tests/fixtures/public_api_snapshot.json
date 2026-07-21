@@ -22,6 +22,8 @@
     "Severity",
     "Source",
     "SourceKind",
+    "SuggestionOutcome",
+    "SuggestionStatus",
     "UnknownFindingError",
     "UncorrectableFindingError",
     "analysis_result_from_json",

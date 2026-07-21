@@ -72,10 +72,16 @@ def test_correct_skips_a_conflicting_rule_suggestion(
         source=source,
     )
     analyzer = Analyzer(AnalyzerConfig())
+
+    async def fake_analysis_for_correction(
+        _text: str, _options: object
+    ) -> tuple[AnalysisResult, tuple[object, ...]]:
+        return AnalysisResult(text, (first, second)), ()
+
     monkeypatch.setattr(
         analyzer,
-        "analyze",
-        lambda _text: AnalysisResult(text, (first, second)),
+        "_analysis_for_correction",
+        fake_analysis_for_correction,
     )
 
     result = analyzer.correct(text)

@@ -51,6 +51,9 @@ error returns no partial corrected text.
 ## Conservative correction
 
 `Analyzer.correct(text)` is the convenience path for a sentence or paragraph.
+`await Analyzer.correct_async(text)` runs the identical orchestration without
+starting an event loop; results, ordering, call budgets, failures, and policy
+decisions are equivalent.
 It returns `CorrectionResult` with `original_text`, `corrected_text`,
 `applied_findings`, `skipped_findings`, and `suggestion_outcomes`.
 It automatically applies only non-conflicting deterministic rule findings that are
@@ -74,11 +77,28 @@ attempts. For each suggestion-capable operation it records:
 - `backend`: stable backend identifier
 - `operation`: operation name used for the suggestion call
 - `suggestions`: number of model-sourced suggestions produced by analysis
+- `model_calls`: actual calls made for that optional suggestion path
+- `protocol_versions`: ordered specialist operation/version identifiers used
 - `operation_version`: suggestion operation contract version
 - `source_policy_version`: source-policy contract version
 
 Model findings are never auto-applied in this method; callers can still use
-`analyze()` and explicit `AnalysisResult.apply()` selection for review workflows.
+`CorrectionResult.apply_suggestions(finding_ids)` to explicitly select entries
+from `skipped_findings`. The method atomically reapplies the automatic findings
+and selected suggestions against the original text; unknown, duplicate,
+unsuggestable, or conflicting selections use the existing controlled correction
+errors.
+An unchanged specialist result consumes one call. A changed candidate or syntax
+proposal is validated and then consumes exactly one additional accept/reject
+verifier call. The verifier cannot replace the proposal. Accepted specialist
+edits carry original paragraph offsets and remain in `skipped_findings` until a
+caller explicitly selects their IDs through `apply_suggestions()`.
+
+Specialist orchestration is dependency-injected with
+`Analyzer(config, specialist_engine=...)`. The default is `None`, so ordinary
+construction makes no specialist calls. Issue #60 provides the
+model-independent engine and fake-tested policy; no real model/runtime is
+selected or enabled by this API.
 
 `AnalyzerConfig` also accepts `language_tool_url` and
 `language_tool_timeout_seconds`. A TOML `[language_tool]` table maps its

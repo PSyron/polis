@@ -5,6 +5,9 @@
   No tested local model has qualified for production correction or suggestions;
   the repaired evidence, specialist prompts, runtime comparison, and production
   adapter are tracked by M5 and [#43](https://github.com/PSyron/polis/issues/43).
+- The #60 specialist engine and router boundary are implemented and tested with
+  injected fakes. No default router identifies residual syntax or inflection
+  work, and no real specialist backend is configured until later M5 selection.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
@@ -19,8 +22,9 @@
   and has not passed the M5 automatic-correction source-policy gate.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
-  now applies a versioned source-policy for deterministic rules and exposes
-  optional suggestion outcomes for backend visibility.
+  and `correct_async()` share one orchestration path, apply a versioned
+  source-policy for deterministic rules, keep every model edit reviewable, and
+  expose optional suggestion status and actual call counts.
 
 ## Accuracy and policy notes
 
