@@ -17,6 +17,7 @@ from polis.rules.syntax import (
     SyntaxCommaSpacingRule,
     SyntaxListSpacingRule,
     SyntaxQuoteSpacingRule,
+    SyntaxSentenceSpacingRule,
 )
 
 
@@ -167,6 +168,7 @@ __all__ = [
     "SyntaxCommaSpacingRule",
     "SyntaxListSpacingRule",
     "SyntaxQuoteSpacingRule",
+    "SyntaxSentenceSpacingRule",
     "RuleRegistration",
     "RuleRegistryError",
 ]

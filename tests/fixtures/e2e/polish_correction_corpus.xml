@@ -7,6 +7,7 @@
   <case id="agreement_plural_subject" verification="rules" tags="agreement,number"><input>Oni jest gotowi.</input><expected_output>Oni są gotowi.</expected_output></case>
   <case id="syntax_list_spacing" verification="rules" tags="syntax,spacing"><input>1.Punkt pierwszy.</input><expected_output>1. Punkt pierwszy.</expected_output></case>
   <case id="punctuation_comma_spacing" verification="rules" tags="punctuation,spacing"><input>Jutro,powiem o tym zespołowi.</input><expected_output>Jutro, powiem o tym zespołowi.</expected_output></case>
+  <case id="punctuation_sentence_spacing" verification="rules" tags="punctuation,spacing,sentence_boundary"><input>To działa.Następne zdanie też działa.</input><expected_output>To działa. Następne zdanie też działa.</expected_output></case>
   <case id="inflection_male_surname_instrumental" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Rozmawiałem z Janem Nowak.</input><expected_output>Rozmawiałem z Janem Nowakiem.</expected_output></case>
   <case id="inflection_female_surname_dative" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Pomogłam pani Annie Kowalska.</input><expected_output>Pomogłam pani Annie Kowalskiej.</expected_output></case>
   <case id="agreement_children_past_tense" verification="llm_planned" tracking_issue="42" tags="agreement,inflection,number"><input>Dzieci była gotowe do wyjścia.</input><expected_output>Dzieci były gotowe do wyjścia.</expected_output></case>

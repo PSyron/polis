@@ -7,6 +7,7 @@ from polis.rules import (
     SyntaxCommaSpacingRule,
     SyntaxListSpacingRule,
     SyntaxQuoteSpacingRule,
+    SyntaxSentenceSpacingRule,
 )
 
 
@@ -73,3 +74,20 @@ def test_syntax_quote_space_rule_ignores_whitespace_prefixed_quotes() -> None:
     ).find(text, options=AnalysisOptions(categories={Category.PUNCTUATION}))
 
     assert findings == ()
+
+
+def test_sentence_space_rule_skips_abbreviations() -> None:
+    text = "To działa.Następne zdanie. np.Tak nie zapisujemy."
+
+    findings = DeterministicRuleRegistry(
+        (
+            RuleRegistration(
+                rule=SyntaxSentenceSpacingRule(), categories={Category.PUNCTUATION}
+            ),
+        )
+    ).find(text, options=AnalysisOptions(categories={Category.PUNCTUATION}))
+
+    assert len(findings) == 1
+    assert findings[0].original == "."
+    assert findings[0].suggestion == ". "
+    assert findings[0].start == len("To działa")

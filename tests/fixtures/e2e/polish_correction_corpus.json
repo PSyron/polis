@@ -59,6 +59,14 @@
       "verification": "rules"
     },
     {
+      "id": "punctuation_sentence_spacing",
+      "input": "To działa.Następne zdanie też działa.",
+      "expected_output": "To działa. Następne zdanie też działa.",
+      "description": "Brak spacji między zdaniami po kropce.",
+      "tags": ["punctuation", "spacing", "sentence_boundary"],
+      "verification": "rules"
+    },
+    {
       "id": "inflection_male_surname_instrumental",
       "input": "Rozmawiałem z Janem Nowak.",
       "expected_output": "Rozmawiałem z Janem Nowakiem.",

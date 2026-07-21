@@ -52,6 +52,35 @@ class SyntaxCommaSpacingRule:
         return tuple(findings)
 
 
+class SyntaxSentenceSpacingRule:
+    """Fix a missing space between two sentence-like fragments."""
+
+    _CATEGORY = Category.PUNCTUATION
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.sentence_space")
+        self._pattern = re.compile(
+            r"(?<!\d)(?<!\bnp)(?<!\bitp)(?<!\btj)\.(?=[A-ZĄĆĘŁŃÓŚŹŻ])"
+        )
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        return tuple(
+            _make_insertion_or_replacement(
+                match.start(),
+                match.end(),
+                ".",
+                ". ",
+                self.source,
+                category=self._CATEGORY,
+                message="Brakuje spacji między zdaniami.",
+                explanation="Po kropce kończącej zdanie stawiamy spację.",
+            )
+            for match in self._pattern.finditer(text)
+        )
+
+
 class SyntaxListSpacingRule:
     """Fix missing space after markdown-like list markers."""
 
@@ -171,6 +200,7 @@ _ABBREVIATIONS = frozenset({"itp", "np", "tj", "m.in", "i.e", "np."})
 
 __all__ = [
     "SyntaxCommaSpacingRule",
+    "SyntaxSentenceSpacingRule",
     "SyntaxListSpacingRule",
     "SyntaxQuoteSpacingRule",
 ]

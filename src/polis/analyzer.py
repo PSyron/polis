@@ -28,6 +28,7 @@ from polis.rules import (
     SyntaxCommaSpacingRule,
     SyntaxListSpacingRule,
     SyntaxQuoteSpacingRule,
+    SyntaxSentenceSpacingRule,
 )
 
 __all__ = [
@@ -232,6 +233,7 @@ def _make_default_registry() -> DeterministicRuleRegistry:
         RuleRegistration(rule=SyntaxCommaSpacingRule()),
         RuleRegistration(rule=SyntaxListSpacingRule()),
         RuleRegistration(rule=SyntaxQuoteSpacingRule()),
+        RuleRegistration(rule=SyntaxSentenceSpacingRule()),
     )
     return DeterministicRuleRegistry(registrations)
 
