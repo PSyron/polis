@@ -68,14 +68,17 @@ def test_v3_corpus_has_exact_stratum_and_intended_split_balance() -> None:
         assert sum(case.split == "holdout" for case in cases) == 40
 
 
-def test_all_candidates_have_cc0_provenance_and_pending_review() -> None:
+def test_all_owner_reviewed_candidates_have_explicit_review_metadata() -> None:
     corpus = load_correction_corpus_json(JSON_CORPUS)
 
     assert corpus.provenance.license == "CC0-1.0"
     assert all(case.provenance.license == "CC0-1.0" for case in corpus.cases)
-    assert all(case.review.status == "pending-human-review" for case in corpus.cases)
-    assert all(case.review.reviewer is None for case in corpus.cases)
-    assert all(case.review.reviewed_at is None for case in corpus.cases)
+    reviewed = list(corpus.cases)
+
+    assert len(reviewed) == 240
+    assert all(case.review.status == "human-reviewed" for case in reviewed)
+    assert all(case.review.reviewer == "Paweł Cyroń" for case in reviewed)
+    assert all(case.review.reviewed_at == "2026-07-21" for case in reviewed)
 
 
 def test_every_candidate_has_case_specific_review_text() -> None:
@@ -672,12 +675,23 @@ def test_validator_rejects_overlapping_or_wrong_unicode_edits() -> None:
         validate_correction_corpus(raw)
 
 
-def test_unapproved_candidates_cannot_be_selected_for_any_protected_use() -> None:
+def test_only_reviewed_development_candidates_are_available_for_benchmark() -> None:
     corpus = load_correction_corpus_json(JSON_CORPUS)
 
-    for purpose in ("benchmark", "quality_gate", "training"):
-        with pytest.raises(CorpusUsageError, match="pending-human-review|training"):
-            select_cases_for_purpose(corpus, purpose=purpose)
+    benchmark = select_cases_for_purpose(corpus, purpose="benchmark")
+
+    assert len(benchmark) == 80
+    assert {case.stratum for case in benchmark} == {
+        "inflection",
+        "syntax",
+        "punctuation",
+        "hard_negative",
+    }
+    assert {case.split for case in benchmark} == {"development"}
+    with pytest.raises(CorpusUsageError, match="frozen holdout"):
+        select_cases_for_purpose(corpus, purpose="quality_gate")
+    with pytest.raises(CorpusUsageError, match="training"):
+        select_cases_for_purpose(corpus, purpose="training")
 
 
 def test_human_review_date_must_be_iso_8601() -> None:
@@ -719,23 +733,27 @@ def test_holdout_is_exposed_only_by_explicit_frozen_quality_gate() -> None:
     assert {case.split for case in quality_gate} == {"holdout"}
 
 
-def test_real_model_benchmark_defaults_to_v3_and_rejects_pending_candidates() -> None:
+def test_real_model_benchmark_defaults_to_v3_and_uses_reviewed_candidates() -> None:
     assert DEFAULT_CORPUS_PATH == Path(
         "tests/fixtures/evaluation/polish_correction_corpus_v3.json"
     )
-    with pytest.raises(CorpusUsageError, match="pending-human-review"):
-        load_benchmark_cases(JSON_CORPUS)
+    cases = load_benchmark_cases(JSON_CORPUS)
+    corpus = load_correction_corpus_json(JSON_CORPUS)
+    expected_ids = {case.id for case in corpus.cases if case.split == "development"}
+
+    assert len(cases) == 80
+    assert {case.case_id for case in cases} == expected_ids
 
 
-def test_benchmark_rejects_pending_corpus_before_runtime_preflight(
+def test_benchmark_reaches_runtime_preflight_after_development_review(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def unexpected_client(**_kwargs: object) -> object:
-        raise AssertionError("runtime client must not be constructed")
+    def preflight_started(**_kwargs: object) -> object:
+        raise RuntimeError("runtime preflight started")
 
-    monkeypatch.setattr(benchmark_runner, "_build_client", unexpected_client)
+    monkeypatch.setattr(benchmark_runner, "_build_client", preflight_started)
 
-    with pytest.raises(CorpusUsageError, match="pending-human-review"):
+    with pytest.raises(RuntimeError, match="runtime preflight started"):
         benchmark_runner.main(["--model", "local-test", "--corpus", str(JSON_CORPUS)])
 
 
