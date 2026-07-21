@@ -1,0 +1,11 @@
+This project contains LGPL-2.1-or-later-derived source material from LanguageTool.
+
+The full legal text for the GNU Lesser General Public License, version 2.1,
+February 1999, is available at:
+
+https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+For downstream distributions, keep this file as `LICENSE-LGPL-2.1.txt` next to
+the modified LanguageTool-derived tree and preserve any upstream copyright
+notices in the relevant source files.
+

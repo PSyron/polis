@@ -51,3 +51,19 @@ optional findings and does not discard findings from in-process rules.
 This verification does not start or validate separately installed runtimes.
 For external backends, add an explicit offline policy and integration test for that
 runtime before calling it supported.
+
+For source-level reproducibility audits, this repository includes
+`third_party/languagetool-pl` with pinned LanguageTool provenance and local build
+scripts. This directory is explicitly excluded from packaged artifacts.
+
+After one online dependency-preparation build, the vendored subset can be
+rebuilt and exercised without network access:
+
+```console
+cd third_party/languagetool-pl
+POLIS_LT_OFFLINE=1 ./scripts/build.sh
+./scripts/run_stdio.sh
+```
+
+The stdio process does not bind a port. It loads the checked-in Polish 6.8
+rules and resources and returns only the two corpus-qualified comma rule IDs.

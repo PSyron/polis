@@ -1,0 +1,22 @@
+This project includes source modules from LanguageTool under LGPL-2.1-or-later.
+
+Upstream project:
+LanguageTool
+Copyright (C) 2005-2026 LanguageTool.
+
+This vendored subset keeps project notices and source-level modifications
+documented in `UPSTREAM.md` and `manifest.json`.
+
+Two upstream build-metadata files are changed by the documented patch
+`patches/0001-reproducible-build-metadata.patch`: the core POM receives a fixed
+manifest date and stops reading the enclosing repository, and a deterministic
+`git.properties` records the pinned LanguageTool 6.8 identity. All other
+included upstream files are unmodified copies from the LanguageTool 6.8 release
+commit. The stdio bridge, Maven wrapper, and scripts are separate project-authored
+files listed in `manifest.json`.
+
+Polish dictionary resources carry their own preserved notices at
+`sources/languagetool-language-modules/pl/src/main/resources/org/languagetool/resource/pl/README.txt`
+and `sources/languagetool-language-modules/pl/src/main/resources/org/languagetool/resource/pl/hunspell/README_en.txt`.
+Their license expressions are recorded separately in `manifest.json` rather
+than being represented as LGPL-only.

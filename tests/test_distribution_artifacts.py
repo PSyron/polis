@@ -46,6 +46,8 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
 
     assert not any("tests/typecheck/" in name for name in wheel_names)
     assert not any("tests/typecheck/" in name for name in sdist_names)
+    assert not any("third_party/languagetool-pl" in name for name in wheel_names)
+    assert not any("third_party/languagetool-pl" in name for name in sdist_names)
     assert any(name.endswith("/src/polis/__init__.py") for name in sdist_names)
     assert any(name.endswith("/tests/test_public_models.py") for name in sdist_names)
     assert any(

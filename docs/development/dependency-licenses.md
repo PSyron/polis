@@ -77,5 +77,18 @@ adapter communicates with an unmodified, separately installed process over
 HTTP and does not redistribute its binaries. OpenJDK 17 is likewise supplied
 by the local package manager rather than Polis.
 
+For M4, this repository carries the unmodified LanguageTool 6.8 core and Polish
+`src/main` trees in `third_party/languagetool-pl`, together with exact
+provenance, the LGPL text, and a machine-readable inclusion manifest. The
+project-authored stdio bridge links against locally built, uncombined core and
+Polish JARs. Its Maven cache, runtime libraries, and Java build products remain
+ignored local artifacts; the entire directory is excluded from Python wheel
+and sdist output.
+
+The Polish morphology resource preserves its BSD-2-Clause notice. The Hunspell
+resource preserves its upstream GPL/LGPL/MPL/CC-SA-1.0 options and Apache-2.0
+frequency-data notice. These resource-specific notices are referenced from the
+module manifest and `NOTICE`; they are not collapsed into the core LGPL label.
+
 Any proposal to bundle, modify, or redistribute LanguageTool or a JVM requires
 a new license and distribution review; ADR-0006 does not approve bundling.

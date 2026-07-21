@@ -1,0 +1,81 @@
+{
+  "module": "third_party/languagetool-pl",
+  "name": "polish-languagetool-vendored-pl",
+  "language": "pl-PL",
+  "runtime": {
+    "mode": "offline-local",
+    "entry": "org.polis.languagetool.PolisStdioServer",
+    "protocol": "stdin-stdout-json"
+  },
+  "upstream": {
+    "repository": "https://github.com/languagetool-org/languagetool.git",
+    "tag": "v6.8",
+    "version": "6.8",
+    "commit": "e807fcde6a6506191e1470744d2345da28c26be6",
+    "retrieved_utc": "2026-07-21T00:00:00Z"
+  },
+  "build": {
+    "jdk": "17.0.19",
+    "maven": "3.9.16",
+    "artifacts": [
+      "target/languagetool-pl-stdio-0.1.0-SNAPSHOT.jar",
+      "target/dependency/",
+      "manifest.json"
+    ]
+  },
+  "included_upstream_paths": [
+    "pom.xml",
+    "languagetool-core/pom.xml",
+    "languagetool-core/src/main",
+    "languagetool-language-modules/pl/pom.xml",
+    "languagetool-language-modules/pl/src/main"
+  ],
+  "excluded_upstream_paths": [
+    "languagetool-standalone",
+    "languagetool-tools",
+    "languagetool-wikipedia",
+    "languagetool-office-extension",
+    "languagetool-website"
+  ],
+  "modified_upstream_files": [
+    {
+      "path": "languagetool-core/pom.xml",
+      "patch": "patches/0001-reproducible-build-metadata.patch",
+      "reason": "Fixes the manifest date and prevents the upstream Maven plugin from reading metadata from the enclosing repository."
+    },
+    {
+      "path": "languagetool-core/src/main/resources/git.properties",
+      "patch": "patches/0001-reproducible-build-metadata.patch",
+      "reason": "Records only the pinned LanguageTool v6.8 identity needed by LtBuildInfo."
+    }
+  ],
+  "project_files": [
+    "pom.xml",
+    "README.md",
+    "BENCHMARK.md",
+    "UPSTREAM.md",
+    "NOTICE",
+    "patches/0001-reproducible-build-metadata.patch",
+    "scripts/bootstrap.sh",
+    "scripts/build.sh",
+    "scripts/run_stdio.sh",
+    "scripts/verify.sh",
+    "manifest.json",
+    "src/main/java/org/polis/languagetool/PolisStdioServer.java",
+    "scripts/benchmark.py",
+    "scripts/benchmark.sh"
+  ],
+  "direct_build_dependencies": [
+    "org.languagetool:languagetool-core:6.8",
+    "org.languagetool:language-pl:6.8",
+    "com.fasterxml.jackson.core:jackson-databind:2.18.0"
+  ],
+  "license": "LGPL-2.1-or-later",
+  "resource_license_notices": {
+    "org/languagetool/resource/pl/README.txt": "BSD-2-Clause",
+    "org/languagetool/resource/pl/hunspell/README_en.txt": "GPL OR LGPL OR MPL OR CC-SA-1.0; bundled frequency data Apache-2.0"
+  },
+  "verification": {
+    "notes": "See scripts/verify.sh and docs/development/dependency-licenses.md"
+  }
+}

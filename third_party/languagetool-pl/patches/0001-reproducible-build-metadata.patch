@@ -1,0 +1,37 @@
+--- a/languagetool-core/pom.xml
++++ b/languagetool-core/pom.xml
+@@ -277,7 +277,8 @@
+                     <archive>
+                         <manifestEntries>
+                             <ComponentVersion>${project.version}</ComponentVersion>
+-                            <Implementation-Date>${maven.build.timestamp}</Implementation-Date>
++                            <!-- POLIS MODIFICATION 2026-07-21: keep the vendored build reproducible. -->
++                            <Implementation-Date>2026-05-05 15:03:23 +0000</Implementation-Date>
+                         </manifestEntries>
+                     </archive>
+                 </configuration>
+@@ -307,14 +308,9 @@
+             <activation>
+                 <jdk>[11,)</jdk>
+             </activation>
+-            <build>
+-                <plugins>
+-                    <plugin>
+-                        <groupId>io.github.git-commit-id</groupId>
+-                        <artifactId>git-commit-id-maven-plugin</artifactId>
+-                    </plugin>
+-                </plugins>
+-            </build>
++            <!-- POLIS MODIFICATION 2026-07-21: the upstream plugin would read
++                 metadata from the enclosing repository. A reviewed static
++                 git.properties resource records the pinned upstream release. -->
+         </profile>
+         <profile>
+             <id>protoc</id>
+--- /dev/null
++++ b/languagetool-core/src/main/resources/git.properties
+@@ -0,0 +1,4 @@
++# POLIS MODIFICATION 2026-07-21: deterministic metadata for LanguageTool v6.8.
++git.build.time=2026-05-05T17:03:23+0200
++git.commit.id.abbrev=e807fcd
++git.build.version=6.8

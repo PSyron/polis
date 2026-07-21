@@ -3,3 +3,8 @@
 experiments/nlp_dependencies/*.json text eol=lf
 experiments/nlp_dependencies/raw/*.json text eol=lf
 experiments/nlp_dependencies/closures/*.txt text eol=lf
+
+# The vendored LanguageTool source is retained byte-for-byte for LGPL source
+# correspondence. Its upstream whitespace is intentionally not normalized.
+third_party/languagetool-pl/sources/** whitespace=-trailing-space,-space-before-tab,-blank-at-eof
+third_party/languagetool-pl/LICENSE-LGPL-2.1.txt whitespace=-blank-at-eof

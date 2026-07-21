@@ -44,6 +44,13 @@ benchmarks/results/
 benchmarks/results.json
 experiments/real_llm_benchmark/results.json
 experiments/languagetool_spike/results.json
+third_party/languagetool-pl/.upstream/
+third_party/languagetool-pl/.tmp/
+third_party/languagetool-pl/.m2/
+third_party/languagetool-pl/target/
+third_party/languagetool-pl/sources/**/target/
+third_party/languagetool-pl/sources/**/.flattened-pom.xml
+third_party/languagetool-pl/*.log
 
 # Local language models and generated corpora
 models/

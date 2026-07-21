@@ -70,9 +70,9 @@ dedicated release-license review.
 
 Fast tests validate directory boundaries, required license and provenance
 files, manifest consistency, absence of Java artifacts from Python
-distributions, and JSON protocol fixtures. Slow tests build the module,
-exercise it offline over stdin/stdout, and compare its emitted allowlisted
-findings to the existing 33-case corpus.
+distributions, benchmark scoring, and source-level integration markers. The
+slow workflow builds the module, exercises unseen cases offline over
+stdin/stdout, audits open sockets, and runs every case in the 33-case corpus.
 
 Qualification records disk size, cold-start latency, warm p50/p95 latency, and
 RSS against the 6.8 baseline: 733 MB installed, 630 MiB RSS, 1.34 s cold start,

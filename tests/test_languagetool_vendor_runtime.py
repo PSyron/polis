@@ -1,0 +1,92 @@
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
+RUNNER = MODULE_ROOT / "scripts" / "run_stdio.sh"
+
+
+def _check(text: str) -> dict[str, Any]:
+    process = subprocess.run(
+        [os.fspath(RUNNER)],
+        input=json.dumps({"text": text, "language": "pl-PL"}),
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=30,
+    )
+    payload: Any = json.loads(process.stdout)
+    assert isinstance(payload, dict)
+    return payload
+
+
+@pytest.mark.slow
+def test_vendored_engine_finds_upstream_rule_on_unseen_sentence() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    payload = _check("Powiedział że jutro wróci.")
+    matches = payload["matches"]
+    assert isinstance(matches, list)
+    assert matches
+    assert {match["rule"]["id"] for match in matches} <= {
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+    }
+    assert any(match["rule"]["id"] == "BRAK_PRZECINKA_ZE" for match in matches)
+
+
+@pytest.mark.slow
+def test_vendored_engine_keeps_unseen_correct_sentence_clean() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    payload = _check("Powiedział, że jutro wróci.")
+    assert payload["matches"] == []
+
+
+@pytest.mark.slow
+def test_vendored_engine_opens_no_network_socket() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+    lsof = shutil.which("lsof")
+    if lsof is None:
+        pytest.skip("lsof is required for the runtime socket audit")
+    assert lsof is not None
+
+    process = subprocess.Popen(
+        [os.fspath(RUNNER)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    try:
+        assert process.stdin is not None
+        assert process.stdout is not None
+        process.stdin.write(
+            json.dumps({"text": "To jest test.", "language": "pl-PL"}) + "\n"
+        )
+        process.stdin.flush()
+        json.loads(process.stdout.readline())
+        sockets = subprocess.run(
+            [lsof, "-nP", "-a", "-p", str(process.pid), "-i"],
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=5,
+        )
+        assert sockets.stdout.strip() == ""
+    finally:
+        if process.stdin is not None:
+            process.stdin.close()
+        process.wait(timeout=10)
