@@ -43,6 +43,7 @@ junit.xml
 benchmarks/results/
 benchmarks/results.json
 experiments/real_llm_benchmark/results.json
+experiments/languagetool_spike/results.json
 
 # Local language models and generated corpora
 models/

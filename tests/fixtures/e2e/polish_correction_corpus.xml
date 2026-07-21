@@ -1,36 +1,241 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <corpus schema_version="2" id="polis_e2e_polish_correction_corpus_v2">
-  <case id="spelling_zeby" verification="rules" tags="spelling,orthography"><input>Zeby nauczyć się polskiego, trzeba ćwiczyć.</input><expected_output>Żeby nauczyć się polskiego, trzeba ćwiczyć.</expected_output></case>
-  <case id="spelling_wlasnie" verification="rules" tags="spelling,orthography"><input>To wlasnie ten moment.</input><expected_output>To właśnie ten moment.</expected_output></case>
-  <case id="spelling_jestes_with_name" verification="rules" tags="spelling,orthography,name,vocative"><input>Jestes gotowa, Aniu.</input><expected_output>Jesteś gotowa, Aniu.</expected_output></case>
-  <case id="agreement_second_person" verification="rules" tags="agreement,person_inflection,name"><input>Ania, ty jestem gotowa.</input><expected_output>Ania, ty jesteś gotowa.</expected_output></case>
-  <case id="agreement_plural_subject" verification="rules" tags="agreement,number"><input>Oni jest gotowi.</input><expected_output>Oni są gotowi.</expected_output></case>
-  <case id="syntax_list_spacing" verification="rules" tags="syntax,spacing"><input>1.Punkt pierwszy.</input><expected_output>1. Punkt pierwszy.</expected_output></case>
-  <case id="punctuation_comma_spacing" verification="rules" tags="punctuation,spacing"><input>Jutro,powiem o tym zespołowi.</input><expected_output>Jutro, powiem o tym zespołowi.</expected_output></case>
-  <case id="punctuation_sentence_spacing" verification="rules" tags="punctuation,spacing,sentence_boundary"><input>To działa.Następne zdanie też działa.</input><expected_output>To działa. Następne zdanie też działa.</expected_output></case>
-  <case id="inflection_male_surname_instrumental" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Rozmawiałem z Janem Nowak.</input><expected_output>Rozmawiałem z Janem Nowakiem.</expected_output></case>
-  <case id="inflection_female_surname_dative" verification="llm_planned" tracking_issue="42" tags="inflection,case,name,surname"><input>Pomogłam pani Annie Kowalska.</input><expected_output>Pomogłam pani Annie Kowalskiej.</expected_output></case>
-  <case id="agreement_children_past_tense" verification="llm_planned" tracking_issue="42" tags="agreement,inflection,number"><input>Dzieci była gotowe do wyjścia.</input><expected_output>Dzieci były gotowe do wyjścia.</expected_output></case>
-  <case id="syntax_subordinate_mood" verification="llm_planned" tracking_issue="43" tags="syntax,word_order,inflection,subordinate_clause"><input>Chciałbym żeby jutro spotkać się z tobą.</input><expected_output>Chciałbym, żebyśmy jutro się spotkali.</expected_output></case>
-  <case id="punctuation_subordinate_clause" verification="llm_planned" tracking_issue="42" tags="punctuation,subordinate_clause,name"><input>Wiem że Ania już wróciła.</input><expected_output>Wiem, że Ania już wróciła.</expected_output></case>
-  <case id="punctuation_parenthetical_relative_clause" verification="llm_planned" tracking_issue="42" tags="punctuation,syntax,relative_clause,name"><input>Maria która mieszka w Krakowie jutro przyjedzie.</input><expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output></case>
-  <case id="punctuation_vocative" verification="llm_planned" tracking_issue="42" tags="punctuation,vocative,name"><input>Anno proszę zadzwoń wieczorem.</input><expected_output>Anno, proszę, zadzwoń wieczorem.</expected_output></case>
-  <case id="negative_female_name_instrumental" verification="negative" tags="negative,inflection,case,name,surname"><input>Rozmawiałem z Anną Kowalską.</input><expected_output>Rozmawiałem z Anną Kowalską.</expected_output></case>
-  <case id="negative_male_name_dative" verification="negative" tags="negative,inflection,case,name,surname"><input>Wręczyłem nagrodę Janowi Nowakowi.</input><expected_output>Wręczyłem nagrodę Janowi Nowakowi.</expected_output></case>
-  <case id="negative_marked_word_order" verification="negative" tags="negative,syntax,word_order,name"><input>Ten raport wczoraj przygotowała Anna.</input><expected_output>Ten raport wczoraj przygotowała Anna.</expected_output></case>
-  <case id="negative_relative_clause_punctuation" verification="negative" tags="negative,punctuation,relative_clause,name"><input>Maria, która mieszka w Krakowie, jutro przyjedzie.</input><expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output></case>
-  <case id="negative_conditional_punctuation" verification="negative" tags="negative,punctuation,subordinate_clause"><input>Jeśli jutro będzie padać, zostaniemy w domu.</input><expected_output>Jeśli jutro będzie padać, zostaniemy w domu.</expected_output></case>
-  <case id="combined_maria_nowak" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Maria powiedziała że chce żeby jutro spotkać się z Jan Nowak.</input><expected_output>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</expected_output></case>
-  <case id="combined_anna_zielinski" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Anna przyznała że chce żeby jutro spotkać się z Piotr Zieliński.</input><expected_output>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</expected_output></case>
-  <case id="combined_jan_kowalska" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Jan wyjaśnił że chce żeby jutro spotkać się z Anna Kowalska.</input><expected_output>Jan wyjaśnił, że chce, żeby jutro się spotkał z Anną Kowalską.</expected_output></case>
-  <case id="combined_tomasz_nowicka" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Tomasz napisał że chce żeby jutro spotkać się z Marta Nowicka.</input><expected_output>Tomasz napisał, że chce, żeby jutro się spotkał z Martą Nowicką.</expected_output></case>
-  <case id="combined_ewa_wisniewski" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Ewa dodała że chce żeby jutro spotkać się z Adam Wiśniewski.</input><expected_output>Ewa dodała, że chce, żeby jutro się spotkała z Adamem Wiśniewskim.</expected_output></case>
-  <case id="combined_krzysztof_nowak" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Krzysztof uznał że chce żeby jutro spotkać się z Julia Nowak.</input><expected_output>Krzysztof uznał, że chce, żeby jutro się spotkał z Julią Nowak.</expected_output></case>
-  <case id="combined_ola_kwiatkowski" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Ola wspomniała że chce żeby jutro spotkać się z Michał Kwiatkowski.</input><expected_output>Ola wspomniała, że chce, żeby jutro się spotkała z Michałem Kwiatkowskim.</expected_output></case>
-  <case id="combined_pawel_wojcik" verification="llm_planned" tracking_issue="49" tags="inflection,syntax,punctuation,name,surname,subordinate_clause"><input>Paweł zaznaczył że chce żeby jutro spotkać się z Katarzyna Wójcik.</input><expected_output>Paweł zaznaczył, że chce, żeby jutro się spotkał z Katarzyną Wójcik.</expected_output></case>
-  <case id="negative_combined_maria_nowak" verification="negative" tags="negative,inflection,syntax,punctuation,name,surname"><input>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</input><expected_output>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</expected_output></case>
-  <case id="negative_combined_anna_zielinski" verification="negative" tags="negative,inflection,syntax,punctuation,name,surname"><input>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</input><expected_output>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</expected_output></case>
-  <case id="negative_marked_order_kowalska" verification="negative" tags="negative,syntax,word_order,name,surname"><input>Ten list wczoraj napisała Anna Kowalska.</input><expected_output>Ten list wczoraj napisała Anna Kowalska.</expected_output></case>
-  <case id="negative_marked_order_nowak" verification="negative" tags="negative,syntax,word_order,name,surname,inflection"><input>Dopiero jutro z Janem Nowakiem spotka się Maria.</input><expected_output>Dopiero jutro z Janem Nowakiem spotka się Maria.</expected_output></case>
-  <case id="negative_subordinate_kowalska" verification="negative" tags="negative,syntax,punctuation,name,surname,subordinate_clause"><input>Kiedy wróci Anna Kowalska, zaczniemy spotkanie.</input><expected_output>Kiedy wróci Anna Kowalska, zaczniemy spotkanie.</expected_output></case>
+  <case id="spelling_zeby" verification="rules" tags="spelling,orthography">
+    <input>Zeby nauczyć się polskiego, trzeba ćwiczyć.</input>
+    <expected_output>Żeby nauczyć się polskiego, trzeba ćwiczyć.</expected_output>
+    <expected_findings>
+      <finding category="spelling" start="0" end="4" original="Zeby" suggestion="Żeby" />
+    </expected_findings>
+  </case>
+  <case id="spelling_wlasnie" verification="rules" tags="spelling,orthography">
+    <input>To wlasnie ten moment.</input>
+    <expected_output>To właśnie ten moment.</expected_output>
+    <expected_findings>
+      <finding category="spelling" start="3" end="10" original="wlasnie" suggestion="właśnie" />
+    </expected_findings>
+  </case>
+  <case id="spelling_jestes_with_name" verification="rules" tags="spelling,orthography,name,vocative">
+    <input>Jestes gotowa, Aniu.</input>
+    <expected_output>Jesteś gotowa, Aniu.</expected_output>
+    <expected_findings>
+      <finding category="spelling" start="0" end="6" original="Jestes" suggestion="Jesteś" />
+    </expected_findings>
+  </case>
+  <case id="agreement_second_person" verification="rules" tags="agreement,person_inflection,name">
+    <input>Ania, ty jestem gotowa.</input>
+    <expected_output>Ania, ty jesteś gotowa.</expected_output>
+    <expected_findings>
+      <finding category="agreement" start="9" end="15" original="jestem" suggestion="jesteś" />
+    </expected_findings>
+  </case>
+  <case id="agreement_plural_subject" verification="rules" tags="agreement,number">
+    <input>Oni jest gotowi.</input>
+    <expected_output>Oni są gotowi.</expected_output>
+    <expected_findings>
+      <finding category="agreement" start="4" end="8" original="jest" suggestion="są" />
+    </expected_findings>
+  </case>
+  <case id="syntax_list_spacing" verification="rules" tags="syntax,spacing">
+    <input>1.Punkt pierwszy.</input>
+    <expected_output>1. Punkt pierwszy.</expected_output>
+    <expected_findings>
+      <finding category="syntax" start="2" end="2" original="" suggestion=" " />
+    </expected_findings>
+  </case>
+  <case id="punctuation_comma_spacing" verification="rules" tags="punctuation,spacing">
+    <input>Jutro,powiem o tym zespołowi.</input>
+    <expected_output>Jutro, powiem o tym zespołowi.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="6" end="6" original="" suggestion=" " />
+    </expected_findings>
+  </case>
+  <case id="punctuation_sentence_spacing" verification="rules" tags="punctuation,spacing,sentence_boundary">
+    <input>To działa.Następne zdanie też działa.</input>
+    <expected_output>To działa. Następne zdanie też działa.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="10" end="10" original="" suggestion=" " />
+    </expected_findings>
+  </case>
+  <case id="inflection_male_surname_instrumental" verification="llm_planned" tags="inflection,case,name,surname" tracking_issue="42">
+    <input>Rozmawiałem z Janem Nowak.</input>
+    <expected_output>Rozmawiałem z Janem Nowakiem.</expected_output>
+    <expected_findings>
+      <finding category="inflection" start="20" end="25" original="Nowak" suggestion="Nowakiem" />
+    </expected_findings>
+  </case>
+  <case id="inflection_female_surname_dative" verification="llm_planned" tags="inflection,case,name,surname" tracking_issue="42">
+    <input>Pomogłam pani Annie Kowalska.</input>
+    <expected_output>Pomogłam pani Annie Kowalskiej.</expected_output>
+    <expected_findings>
+      <finding category="inflection" start="20" end="28" original="Kowalska" suggestion="Kowalskiej" />
+    </expected_findings>
+  </case>
+  <case id="agreement_children_past_tense" verification="llm_planned" tags="agreement,inflection,number" tracking_issue="42">
+    <input>Dzieci była gotowe do wyjścia.</input>
+    <expected_output>Dzieci były gotowe do wyjścia.</expected_output>
+    <expected_findings>
+      <finding category="agreement" start="7" end="11" original="była" suggestion="były" />
+    </expected_findings>
+  </case>
+  <case id="syntax_subordinate_mood" verification="llm_planned" tags="syntax,word_order,inflection,subordinate_clause" tracking_issue="43">
+    <input>Chciałbym żeby jutro spotkać się z tobą.</input>
+    <expected_output>Chciałbym, żebyśmy jutro się spotkali.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="9" end="9" original="" suggestion="," />
+      <finding category="syntax" start="10" end="40" original="żeby jutro spotkać się z tobą." suggestion="żebyśmy jutro się spotkali." />
+    </expected_findings>
+  </case>
+  <case id="punctuation_subordinate_clause" verification="llm_planned" tags="punctuation,subordinate_clause,name" tracking_issue="42">
+    <input>Wiem że Ania już wróciła.</input>
+    <expected_output>Wiem, że Ania już wróciła.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="4" end="4" original="" suggestion="," />
+    </expected_findings>
+  </case>
+  <case id="punctuation_parenthetical_relative_clause" verification="llm_planned" tags="punctuation,syntax,relative_clause,name" tracking_issue="42">
+    <input>Maria która mieszka w Krakowie jutro przyjedzie.</input>
+    <expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="5" end="5" original="" suggestion="," />
+      <finding category="punctuation" start="30" end="30" original="" suggestion="," />
+    </expected_findings>
+  </case>
+  <case id="punctuation_vocative" verification="llm_planned" tags="punctuation,vocative,name" tracking_issue="42">
+    <input>Anno proszę zadzwoń wieczorem.</input>
+    <expected_output>Anno, proszę, zadzwoń wieczorem.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="4" end="4" original="" suggestion="," />
+      <finding category="punctuation" start="11" end="11" original="" suggestion="," />
+    </expected_findings>
+  </case>
+  <case id="negative_female_name_instrumental" verification="negative" tags="negative,inflection,case,name,surname">
+    <input>Rozmawiałem z Anną Kowalską.</input>
+    <expected_output>Rozmawiałem z Anną Kowalską.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_male_name_dative" verification="negative" tags="negative,inflection,case,name,surname">
+    <input>Wręczyłem nagrodę Janowi Nowakowi.</input>
+    <expected_output>Wręczyłem nagrodę Janowi Nowakowi.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_marked_word_order" verification="negative" tags="negative,syntax,word_order,name">
+    <input>Ten raport wczoraj przygotowała Anna.</input>
+    <expected_output>Ten raport wczoraj przygotowała Anna.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_relative_clause_punctuation" verification="negative" tags="negative,punctuation,relative_clause,name">
+    <input>Maria, która mieszka w Krakowie, jutro przyjedzie.</input>
+    <expected_output>Maria, która mieszka w Krakowie, jutro przyjedzie.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_conditional_punctuation" verification="negative" tags="negative,punctuation,subordinate_clause">
+    <input>Jeśli jutro będzie padać, zostaniemy w domu.</input>
+    <expected_output>Jeśli jutro będzie padać, zostaniemy w domu.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="combined_maria_nowak" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Maria powiedziała że chce żeby jutro spotkać się z Jan Nowak.</input>
+    <expected_output>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="17" end="17" original="" suggestion="," />
+      <finding category="punctuation" start="25" end="25" original="" suggestion="," />
+      <finding category="syntax" start="26" end="48" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkała" />
+      <finding category="inflection" start="51" end="60" original="Jan Nowak" suggestion="Janem Nowakiem" />
+    </expected_findings>
+  </case>
+  <case id="combined_anna_zielinski" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Anna przyznała że chce żeby jutro spotkać się z Piotr Zieliński.</input>
+    <expected_output>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="14" end="14" original="" suggestion="," />
+      <finding category="punctuation" start="22" end="22" original="" suggestion="," />
+      <finding category="syntax" start="23" end="45" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkała" />
+      <finding category="inflection" start="48" end="63" original="Piotr Zieliński" suggestion="Piotrem Zielińskim" />
+    </expected_findings>
+  </case>
+  <case id="combined_jan_kowalska" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Jan wyjaśnił że chce żeby jutro spotkać się z Anna Kowalska.</input>
+    <expected_output>Jan wyjaśnił, że chce, żeby jutro się spotkał z Anną Kowalską.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="12" end="12" original="" suggestion="," />
+      <finding category="punctuation" start="20" end="20" original="" suggestion="," />
+      <finding category="syntax" start="21" end="43" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkał" />
+      <finding category="inflection" start="46" end="59" original="Anna Kowalska" suggestion="Anną Kowalską" />
+    </expected_findings>
+  </case>
+  <case id="combined_tomasz_nowicka" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Tomasz napisał że chce żeby jutro spotkać się z Marta Nowicka.</input>
+    <expected_output>Tomasz napisał, że chce, żeby jutro się spotkał z Martą Nowicką.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="14" end="14" original="" suggestion="," />
+      <finding category="punctuation" start="22" end="22" original="" suggestion="," />
+      <finding category="syntax" start="23" end="45" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkał" />
+      <finding category="inflection" start="48" end="61" original="Marta Nowicka" suggestion="Martą Nowicką" />
+    </expected_findings>
+  </case>
+  <case id="combined_ewa_wisniewski" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Ewa dodała że chce żeby jutro spotkać się z Adam Wiśniewski.</input>
+    <expected_output>Ewa dodała, że chce, żeby jutro się spotkała z Adamem Wiśniewskim.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="10" end="10" original="" suggestion="," />
+      <finding category="punctuation" start="18" end="18" original="" suggestion="," />
+      <finding category="syntax" start="19" end="41" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkała" />
+      <finding category="inflection" start="44" end="59" original="Adam Wiśniewski" suggestion="Adamem Wiśniewskim" />
+    </expected_findings>
+  </case>
+  <case id="combined_krzysztof_nowak" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Krzysztof uznał że chce żeby jutro spotkać się z Julia Nowak.</input>
+    <expected_output>Krzysztof uznał, że chce, żeby jutro się spotkał z Julią Nowak.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="15" end="15" original="" suggestion="," />
+      <finding category="punctuation" start="23" end="23" original="" suggestion="," />
+      <finding category="syntax" start="24" end="46" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkał" />
+      <finding category="inflection" start="49" end="60" original="Julia Nowak" suggestion="Julią Nowak" />
+    </expected_findings>
+  </case>
+  <case id="combined_ola_kwiatkowski" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Ola wspomniała że chce żeby jutro spotkać się z Michał Kwiatkowski.</input>
+    <expected_output>Ola wspomniała, że chce, żeby jutro się spotkała z Michałem Kwiatkowskim.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="14" end="14" original="" suggestion="," />
+      <finding category="punctuation" start="22" end="22" original="" suggestion="," />
+      <finding category="syntax" start="23" end="45" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkała" />
+      <finding category="inflection" start="48" end="66" original="Michał Kwiatkowski" suggestion="Michałem Kwiatkowskim" />
+    </expected_findings>
+  </case>
+  <case id="combined_pawel_wojcik" verification="llm_planned" tags="inflection,syntax,punctuation,name,surname,subordinate_clause" tracking_issue="49">
+    <input>Paweł zaznaczył że chce żeby jutro spotkać się z Katarzyna Wójcik.</input>
+    <expected_output>Paweł zaznaczył, że chce, żeby jutro się spotkał z Katarzyną Wójcik.</expected_output>
+    <expected_findings>
+      <finding category="punctuation" start="15" end="15" original="" suggestion="," />
+      <finding category="punctuation" start="23" end="23" original="" suggestion="," />
+      <finding category="syntax" start="24" end="46" original="żeby jutro spotkać się" suggestion="żeby jutro się spotkał" />
+      <finding category="inflection" start="49" end="65" original="Katarzyna Wójcik" suggestion="Katarzyną Wójcik" />
+    </expected_findings>
+  </case>
+  <case id="negative_combined_maria_nowak" verification="negative" tags="negative,inflection,syntax,punctuation,name,surname">
+    <input>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</input>
+    <expected_output>Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_combined_anna_zielinski" verification="negative" tags="negative,inflection,syntax,punctuation,name,surname">
+    <input>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</input>
+    <expected_output>Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_marked_order_kowalska" verification="negative" tags="negative,syntax,word_order,name,surname">
+    <input>Ten list wczoraj napisała Anna Kowalska.</input>
+    <expected_output>Ten list wczoraj napisała Anna Kowalska.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_marked_order_nowak" verification="negative" tags="negative,syntax,word_order,name,surname,inflection">
+    <input>Dopiero jutro z Janem Nowakiem spotka się Maria.</input>
+    <expected_output>Dopiero jutro z Janem Nowakiem spotka się Maria.</expected_output>
+    <expected_findings />
+  </case>
+  <case id="negative_subordinate_kowalska" verification="negative" tags="negative,syntax,punctuation,name,surname,subordinate_clause">
+    <input>Kiedy wróci Anna Kowalska, zaczniemy spotkanie.</input>
+    <expected_output>Kiedy wróci Anna Kowalska, zaczniemy spotkanie.</expected_output>
+    <expected_findings />
+  </case>
 </corpus>

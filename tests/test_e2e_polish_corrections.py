@@ -16,6 +16,15 @@ QUALITY_GATES = ROOT / "docs" / "llm-quality-gates.md"
 
 
 @dataclass(frozen=True, slots=True)
+class E2EExpectedFinding:
+    category: str
+    start: int
+    end: int
+    original: str
+    suggestion: str
+
+
+@dataclass(frozen=True, slots=True)
 class E2ECase:
     case_id: str
     source: str
@@ -23,6 +32,7 @@ class E2ECase:
     tags: tuple[str, ...]
     verification: str
     tracking_issue: int | None
+    expected_findings: tuple[E2EExpectedFinding, ...]
 
 
 def _load_json_cases() -> dict[str, E2ECase]:
@@ -35,6 +45,16 @@ def _load_json_cases() -> dict[str, E2ECase]:
             tags=tuple(tag.strip() for tag in item["tags"]),
             verification=item["verification"],
             tracking_issue=item.get("tracking_issue"),
+            expected_findings=tuple(
+                E2EExpectedFinding(
+                    finding["category"],
+                    finding["start"],
+                    finding["end"],
+                    finding["original"],
+                    finding["suggestion"],
+                )
+                for finding in item["expected_findings"]
+            ),
         )
         for item in raw["cases"]
     }
@@ -52,6 +72,8 @@ def _load_xml_cases() -> dict[str, E2ECase]:
             tag for tag in (tag.strip() for tag in tags_text.split(",")) if tag
         )
         tracking_issue_text = case.get("tracking_issue")
+        expected_findings = case.find("expected_findings")
+        assert expected_findings is not None
         cases[case_id] = E2ECase(
             case_id=case_id,
             source=source,
@@ -61,13 +83,33 @@ def _load_xml_cases() -> dict[str, E2ECase]:
             tracking_issue=(
                 int(tracking_issue_text) if tracking_issue_text is not None else None
             ),
+            expected_findings=tuple(
+                E2EExpectedFinding(
+                    finding.get("category", ""),
+                    int(finding.get("start", "-1")),
+                    int(finding.get("end", "-1")),
+                    finding.get("original", ""),
+                    finding.get("suggestion", ""),
+                )
+                for finding in expected_findings.findall("finding")
+            ),
         )
     return cases
 
 
 def _normalize_result(
     cases: dict[str, E2ECase],
-) -> dict[str, tuple[str, str, tuple[str, ...], str, int | None]]:
+) -> dict[
+    str,
+    tuple[
+        str,
+        str,
+        tuple[str, ...],
+        str,
+        int | None,
+        tuple[E2EExpectedFinding, ...],
+    ],
+]:
     return {
         key: (
             case.source,
@@ -75,6 +117,7 @@ def _normalize_result(
             tuple(case.tags),
             case.verification,
             case.tracking_issue,
+            case.expected_findings,
         )
         for key, case in cases.items()
     }
@@ -150,12 +193,11 @@ def test_planned_llm_cases_have_gold_output_category_and_tracking() -> None:
     }
 
 
-def test_planned_llm_findings_reconstruct_their_expected_output() -> None:
+def test_all_corpus_cases_have_explicit_gold_edits_that_reconstruct_output() -> None:
     raw = json.loads(JSON_FIXTURE.read_text(encoding="utf-8"))
 
     for case in raw["cases"]:
-        if case["verification"] != "llm_planned":
-            continue
+        assert isinstance(case.get("expected_findings"), list), case["id"]
         corrected = case["input"]
         for finding in sorted(
             case["expected_findings"], key=lambda item: item["start"], reverse=True

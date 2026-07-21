@@ -8,6 +8,9 @@
       "expected_output": "Żeby nauczyć się polskiego, trzeba ćwiczyć.",
       "description": "Standardowy błąd ortograficzny: z/ż.",
       "tags": ["spelling", "orthography"],
+      "expected_findings": [
+        {"category": "spelling", "start": 0, "end": 4, "original": "Zeby", "suggestion": "Żeby"}
+      ],
       "verification": "rules"
     },
     {
@@ -16,6 +19,9 @@
       "expected_output": "To właśnie ten moment.",
       "description": "Ortografia: wlasnie -> właśnie.",
       "tags": ["spelling", "orthography"],
+      "expected_findings": [
+        {"category": "spelling", "start": 3, "end": 10, "original": "wlasnie", "suggestion": "właśnie"}
+      ],
       "verification": "rules"
     },
     {
@@ -24,6 +30,9 @@
       "expected_output": "Jesteś gotowa, Aniu.",
       "description": "Litera diakrytyczna w formie czasownika przy imieniu w wołaczu.",
       "tags": ["spelling", "orthography", "name", "vocative"],
+      "expected_findings": [
+        {"category": "spelling", "start": 0, "end": 6, "original": "Jestes", "suggestion": "Jesteś"}
+      ],
       "verification": "rules"
     },
     {
@@ -32,6 +41,9 @@
       "expected_output": "Ania, ty jesteś gotowa.",
       "description": "Niezgodność osoby podmiotu i formy czasownika być.",
       "tags": ["agreement", "person_inflection", "name"],
+      "expected_findings": [
+        {"category": "agreement", "start": 9, "end": 15, "original": "jestem", "suggestion": "jesteś"}
+      ],
       "verification": "rules"
     },
     {
@@ -40,6 +52,9 @@
       "expected_output": "Oni są gotowi.",
       "description": "Niezgodność liczby podmiotu i orzeczenia.",
       "tags": ["agreement", "number"],
+      "expected_findings": [
+        {"category": "agreement", "start": 4, "end": 8, "original": "jest", "suggestion": "są"}
+      ],
       "verification": "rules"
     },
     {
@@ -48,6 +63,9 @@
       "expected_output": "1. Punkt pierwszy.",
       "description": "Brak spacji po numeracji listy.",
       "tags": ["syntax", "spacing"],
+      "expected_findings": [
+        {"category": "syntax", "start": 2, "end": 2, "original": "", "suggestion": " "}
+      ],
       "verification": "rules"
     },
     {
@@ -56,6 +74,9 @@
       "expected_output": "Jutro, powiem o tym zespołowi.",
       "description": "Brak spacji po przecinku.",
       "tags": ["punctuation", "spacing"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 6, "end": 6, "original": "", "suggestion": " "}
+      ],
       "verification": "rules"
     },
     {
@@ -64,6 +85,9 @@
       "expected_output": "To działa. Następne zdanie też działa.",
       "description": "Brak spacji między zdaniami po kropce.",
       "tags": ["punctuation", "spacing", "sentence_boundary"],
+      "expected_findings": [
+        {"category": "punctuation", "start": 10, "end": 10, "original": "", "suggestion": " "}
+      ],
       "verification": "rules"
     },
     {
