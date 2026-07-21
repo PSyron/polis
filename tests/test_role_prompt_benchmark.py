@@ -207,6 +207,64 @@ def test_run_cases_with_multiple_repetitions_reports_cold_and_warm_metrics() -> 
     )
 
 
+def test_run_cases_proposal_protocol_uses_two_steps_only_when_text_changes() -> None:
+    case = _make_case(
+        case_id="proposal_two_step",
+        source="Idzie na spotkanie.",
+        expected_output="Idzie na spotkanie.",
+        tags=("syntax",),
+        verification="positive",
+        focus="syntax",
+    )
+
+    class SingleStepClient:
+        def __init__(self) -> None:
+            self.responses = iter([('{"corrected_text":"Idzie na spotkanie."}', 18.0)])
+            self.calls = 0
+
+        def generate(self, request: object) -> TimedResponse:
+            self.calls += 1
+            response = next(self.responses)
+            return TimedResponse(raw_response=response[0], elapsed_ms=response[1])
+
+    single_observation = run_cases(SingleStepClient(), "proposal", (case,))[0]
+    assert single_observation.call_count == 1
+    assert single_observation.corrected_output == case.source
+
+
+def test_run_cases_proposal_protocol_changes_require_verification_step() -> None:
+    case = _make_case(
+        case_id="proposal_verification",
+        source="Idziemy na spotkanie",
+        expected_output="Idziemy na spotkanie!",
+        tags=("punctuation",),
+        verification="positive",
+        focus="punctuation",
+    )
+
+    class TwoStepClient:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate(self, request: object) -> TimedResponse:
+            self.calls += 1
+            if self.calls == 1:
+                return TimedResponse(
+                    raw_response='{"corrected_text":"Idziemy na spotkanie!"}',
+                    elapsed_ms=8.0,
+                )
+            return TimedResponse(raw_response='{"decision":"accept"}', elapsed_ms=9.0)
+
+    two_step_client = TwoStepClient()
+    two_step_observation = run_cases(
+        two_step_client, "proposal", (case,), repetitions=1
+    )[0]
+    assert two_step_observation.call_count == 2
+    assert two_step_observation.corrected_output == "Idziemy na spotkanie!"
+
+    assert two_step_observation.latencies_ms == (17.0,)
+
+
 def test_run_cases_marks_invalid_schema_as_failed() -> None:
     case = _make_case(
         case_id="invalid_schema",
