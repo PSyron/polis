@@ -198,6 +198,8 @@ class RoleBenchmarkReport:
     repetitions: int = 1
     cold_latency_ms: float | None = None
     warm_latency_ms: float | None = None
+    cold_p95_latency_ms: float | None = None
+    warm_p95_latency_ms: float | None = None
 
     @property
     def exact_output_match_rate(self) -> float:
@@ -1042,11 +1044,21 @@ def summarize_observations(
         for item_latencies in valid_latencies_tuple
         for latency in item_latencies[1:]
     )
-    repetitions = (
-        max((len(item.latencies_ms) for item in collected), default=DEFAULT_REPETITIONS)
+    repetitions = max(
+        (len(item.latencies_ms) for item in collected), default=DEFAULT_REPETITIONS
     )
     cold_latency_ms = _median_latency(cold_case_latencies) if repetitions > 1 else None
     warm_latency_ms = _median_latency(warm_case_latencies) if repetitions > 1 else None
+    cold_p95_latency_ms = (
+        _percentile(sorted(cold_case_latencies), 0.95)
+        if repetitions > 1 and cold_case_latencies
+        else None
+    )
+    warm_p95_latency_ms = (
+        _percentile(sorted(warm_case_latencies), 0.95)
+        if repetitions > 1 and warm_case_latencies
+        else None
+    )
     return RoleBenchmarkReport(
         protocol=protocol,
         valid_responses=valid_responses,
@@ -1074,6 +1086,8 @@ def summarize_observations(
         repetitions=repetitions,
         cold_latency_ms=cold_latency_ms,
         warm_latency_ms=warm_latency_ms,
+        cold_p95_latency_ms=cold_p95_latency_ms,
+        warm_p95_latency_ms=warm_p95_latency_ms,
     )
 
 
@@ -1186,6 +1200,8 @@ def report_as_json(
     if report.repetitions > 1:
         payload["cold_latency_ms"] = report.cold_latency_ms
         payload["warm_latency_ms"] = report.warm_latency_ms
+        payload["cold_p95_latency_ms"] = report.cold_p95_latency_ms
+        payload["warm_p95_latency_ms"] = report.warm_p95_latency_ms
 
     if include_cases:
         payload["cases"] = [

@@ -200,6 +200,8 @@ def test_run_cases_with_multiple_repetitions_reports_cold_and_warm_metrics() -> 
     assert report.repetitions == 3
     assert report.cold_latency_ms == 10.0
     assert report.warm_latency_ms == 25.0
+    assert report.cold_p95_latency_ms == 10.0
+    assert report.warm_p95_latency_ms == 30.0
     assert report.throughput_chars_per_second == pytest.approx(
         len(case.source) * 3 * 1000.0 / 60.0
     )
@@ -675,3 +677,5 @@ def test_main_respects_repetitions_argument(
     assert payload["repetitions"] == 3
     assert payload["cold_latency_ms"] == 1.0
     assert payload["warm_latency_ms"] == 2.5
+    assert payload["cold_p95_latency_ms"] == 1.0
+    assert payload["warm_p95_latency_ms"] == 3.0
