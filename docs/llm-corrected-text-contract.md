@@ -1,21 +1,72 @@
-# Experimental corrected-text response contract
+# Specialist correction contracts
 
-This contract is an evaluation experiment. It is not a production backend
-contract and does not authorize automatic application of model output.
+This document defines evaluation-only contracts used by specialist-model correction
+flows. These contracts are intentionally narrow and do not authorize automatic
+text application.
 
-The model must return only this JSON object:
+## Shared constraints
+
+- Input text and candidate data are always treated as data inside explicit
+  delimiters, not as free prompt instructions.
+- Prompts use separate system and user messages.
+- Response schemas are versioned and strictly validated.
+- No model output that is not valid JSON for the requested schema is accepted.
+- Private text is kept out of exception diagnostics.
+
+## Corrected-text operation (`specialist-corrected-text`)
+
+`build_specialist_corrected_text_prompt_request(text, focus)` builds a prompt with:
+
+- protocol id: `specialist-corrected-text`
+- protocol version: `1.0`
+- system focus: exactly one of `inflection`, `syntax`, `punctuation`
+- response schema version: `1`
+- response schema:
 
 ```json
-{"corrected_text":"minimal corrected Polish text"}
+{"required":["corrected_text"],"type":"object","properties":{"corrected_text":{"type":"string"}},"additionalProperties":false}
 ```
 
-The object has exactly one string field. Polis rejects missing or extra fields,
-then derives non-overlapping edits against the original input with original
-Unicode offsets. A response that shares no meaningful source word with the
-input is rejected as a wholesale rewrite. The derived edits remain subject to
-the corpus safety gates before any model can be selected.
+Failure modes:
 
-This format deliberately makes no claim about the category or confidence of a
-change. It is used only to determine whether a model can produce a safe,
-minimal corrected sentence before a richer production response contract is
-considered.
+- Missing/extra top-level fields.
+- Too many rewrite spans.
+- No token overlap with source text.
+- Response type mismatch.
+
+## Inflection candidate-selection operation (`specialist-candidate-selection`)
+
+`build_inflection_candidate_prompt_request(text, candidates)` expects either:
+
+- `{"unchanged": true}`
+- `{"candidate_id": "..."}`
+
+where `candidate_id` must be supplied by the caller and must belong to the
+provided candidate list.
+
+Failure modes:
+
+- Duplicate/missing candidate IDs.
+- Candidate IDs not in the provided set.
+- Invalid payload shape.
+
+## Proposal-verifier operation (`specialist-proposal-verifier`)
+
+`build_proposal_verifier_prompt_request(source_text, proposal_text)` accepts only:
+
+- `{"decision": "accept"}`
+- `{"decision": "reject"}`
+
+Failure modes:
+
+- Invalid decision value.
+- Extra fields in response.
+
+## Derived edits
+
+`derive_text_edits(source_text, corrected_text)` converts model output into
+deterministic non-overlapping byte/Unicode spans. It rejects overlapping,
+excessive rewrite spans, and edits touching protected name-like tokens.
+
+These operations remain separate from the general LLM backend contract and are used
+only by the specialist path.
