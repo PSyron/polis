@@ -68,15 +68,14 @@ decisions satisfy ADR-0001's dedicated-review requirement. A change to any
 reviewed expression, role, version, or redistribution model requires a new
 review.
 
-## Experiment-only external rule engine
+## Optional external rule engine
 
-LanguageTool 6.8 was installed locally for issue #52 but is not present in
+LanguageTool 6.8 is supported as an optional local process but is not present in
 `pyproject.toml`, `uv.lock`, wheels, or source distributions. Its open-source
 core and Polish grammar rules are licensed under LGPL-2.1-or-later. The
-experiment communicates with an unmodified, separately installed process over
+adapter communicates with an unmodified, separately installed process over
 HTTP and does not redistribute its binaries. OpenJDK 17 is likewise supplied
 by the local package manager rather than Polis.
 
-A future integration must keep LanguageTool optional and separately installed.
 Any proposal to bundle, modify, or redistribute LanguageTool or a JVM requires
 a new license and distribution review; ADR-0006 does not approve bundling.

@@ -1,0 +1,42 @@
+{
+  "tool": "LanguageTool",
+  "version": "6.8",
+  "corpus_sha256": "d5ce257f78a67ad2bdc6ed71ed1ec4f4403d0f287a71db7a316e68bd32f4d468",
+  "findings_by_case": {
+    "syntax_subordinate_mood": [[9, 9, ","]],
+    "punctuation_subordinate_clause": [[4, 4, ","]],
+    "combined_maria_nowak": [[17, 17, ","], [25, 25, ","]],
+    "combined_anna_zielinski": [[14, 14, ","], [22, 22, ","]],
+    "combined_jan_kowalska": [[12, 12, ","], [20, 20, ","]],
+    "combined_tomasz_nowicka": [[14, 14, ","], [22, 22, ","]],
+    "combined_ewa_wisniewski": [[10, 10, ","], [18, 18, ","]],
+    "combined_krzysztof_nowak": [[15, 15, ","], [23, 23, ","]],
+    "combined_ola_kwiatkowski": [[14, 14, ","], [22, 22, ","]],
+    "combined_pawel_wojcik": [[15, 15, ","], [23, 23, ","]]
+  },
+  "zero_finding_case_ids": [
+    "spelling_zeby",
+    "spelling_wlasnie",
+    "spelling_jestes_with_name",
+    "agreement_second_person",
+    "agreement_plural_subject",
+    "syntax_list_spacing",
+    "punctuation_comma_spacing",
+    "punctuation_sentence_spacing",
+    "inflection_male_surname_instrumental",
+    "inflection_female_surname_dative",
+    "agreement_children_past_tense",
+    "punctuation_parenthetical_relative_clause",
+    "punctuation_vocative",
+    "negative_female_name_instrumental",
+    "negative_male_name_dative",
+    "negative_marked_word_order",
+    "negative_relative_clause_punctuation",
+    "negative_conditional_punctuation",
+    "negative_combined_maria_nowak",
+    "negative_combined_anna_zielinski",
+    "negative_marked_order_kowalska",
+    "negative_marked_order_nowak",
+    "negative_subordinate_kowalska"
+  ]
+}

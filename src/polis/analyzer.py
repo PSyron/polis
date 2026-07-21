@@ -30,6 +30,11 @@ from polis.rules import (
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
 )
+from polis.rules.languagetool import (
+    LanguageToolRuleConfig,
+    LocalLanguageToolRule,
+    LoopbackLanguageToolHttpTransport,
+)
 
 __all__ = [
     "Analyzer",
@@ -45,6 +50,15 @@ class AnalyzerConfig:
     categories: frozenset[Category] | None = None
     minimum_confidence: float = 0.0
     use_local_heuristic_backend: bool = False
+    language_tool_url: str | None = None
+    language_tool_timeout_seconds: float = 1.0
+
+    def __post_init__(self) -> None:
+        if self.language_tool_url is not None:
+            LanguageToolRuleConfig(
+                base_url=self.language_tool_url,
+                timeout_seconds=self.language_tool_timeout_seconds,
+            )
 
     @classmethod
     def from_toml(cls, path: str | Path) -> AnalyzerConfig:
@@ -121,15 +135,43 @@ class AnalyzerConfig:
 
         use_local = bool(backend.get("use_mock", False))
 
+        language_tool_present = "language_tool" in raw
+        language_tool = raw.get("language_tool", {})
+        if not isinstance(language_tool, Mapping):
+            raise ConfigurationError(
+                "'language_tool' section must be a table",
+                code="configuration.invalid_file",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        language_tool_url = language_tool.get("base_url")
+        if language_tool_present and language_tool_url is None:
+            raise ConfigurationError(
+                "'language_tool.base_url' is required when the section is present",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        if language_tool_url is not None and not isinstance(language_tool_url, str):
+            raise ConfigurationError(
+                "'language_tool.base_url' must be a string",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        language_tool_timeout = language_tool.get("timeout_seconds", 1.0)
+
         try:
             return cls(
                 categories=categories,
                 minimum_confidence=float(minimum_confidence),
                 use_local_heuristic_backend=use_local,
+                language_tool_url=language_tool_url,
+                language_tool_timeout_seconds=float(language_tool_timeout),
             )
         except (TypeError, ValueError) as exc:
             raise ConfigurationError(
-                "invalid numeric values in analysis configuration",
+                "invalid analysis or LanguageTool configuration",
                 code="configuration.invalid_value",
                 retryable=False,
                 context={"path": str(path_obj)},
@@ -157,7 +199,7 @@ class Analyzer:
         if not isinstance(config, AnalyzerConfig):
             raise TypeError("config must be AnalyzerConfig")
         self._config = config
-        self._registry = _make_default_registry()
+        self._registry = _make_default_registry(config)
         self._backend = (
             _make_mock_backend() if config.use_local_heuristic_backend else None
         )
@@ -224,8 +266,8 @@ class Analyzer:
         )
 
 
-def _make_default_registry() -> DeterministicRuleRegistry:
-    registrations = (
+def _make_default_registry(config: AnalyzerConfig) -> DeterministicRuleRegistry:
+    registrations = [
         RuleRegistration(rule=AgreementCopulaRule()),
         RuleRegistration(rule=SpellingJestesRule()),
         RuleRegistration(rule=SpellingWlasnieRule()),
@@ -234,7 +276,21 @@ def _make_default_registry() -> DeterministicRuleRegistry:
         RuleRegistration(rule=SyntaxListSpacingRule()),
         RuleRegistration(rule=SyntaxQuoteSpacingRule()),
         RuleRegistration(rule=SyntaxSentenceSpacingRule()),
-    )
+    ]
+    if config.language_tool_url is not None:
+        rule_config = LanguageToolRuleConfig(
+            base_url=config.language_tool_url,
+            timeout_seconds=config.language_tool_timeout_seconds,
+        )
+        registrations.append(
+            RuleRegistration(
+                rule=LocalLanguageToolRule(
+                    config=rule_config,
+                    transport=LoopbackLanguageToolHttpTransport(rule_config),
+                ),
+                categories=frozenset({Category.PUNCTUATION}),
+            )
+        )
     return DeterministicRuleRegistry(registrations)
 
 

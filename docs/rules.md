@@ -80,6 +80,20 @@ by category:
 All three rules support category filtering through the shared `options.categories`
 mechanism and return deterministic findings with stable IDs.
 
+## Optional LanguageTool punctuation rule
+
+`LocalLanguageToolRule` is registered only when `[language_tool]` is configured.
+It accepts a separately installed local LanguageTool 6.8 server and maps only
+`BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY` to minimal comma insertions with
+source `rule:languagetool.pl` and confidence `0.85`.
+
+The rule converts Java UTF-16 offsets to Python code-point offsets, minimizes
+wide replacements, rejects ambiguous alternatives and conflicting findings,
+and drops every unknown rule or non-comma change. Its reviewed corpus result is
+18 true-positive insertions, zero false positives, six missed punctuation edits,
+and no findings on 10 correct hard negatives. General LanguageTool spelling,
+grammar, style, and morphology findings are intentionally excluded.
+
 ## Analysis normalization
 
 Normalization is performed in `polis.analysis` by the following deterministic

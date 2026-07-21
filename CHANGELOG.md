@@ -11,6 +11,8 @@
   pass clean installation smoke tests from both wheel and sdist.
 - No runtime dependencies were introduced; production distribution remains
   dependency-light.
+- Added a disabled-by-default local LanguageTool 6.8 punctuation layer with a
+  strict loopback endpoint policy and a reviewed two-rule allowlist.
 
 ### Known limitations
 

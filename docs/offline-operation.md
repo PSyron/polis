@@ -6,6 +6,9 @@ This project is designed to run analysis without external network access.
 
 - Runtime uses `Analyzer` and deterministic rule registry in-process.
 - Optional mock backend uses local prompt parsing and local transport (`MockHeuristicBackend`).
+- Optional LanguageTool support connects only to a separately started
+  LanguageTool 6.8 server on a numeric loopback address. It never uses a public
+  LanguageTool API, DNS name, proxy, or redirect.
 - Dependency installation uses locked `uv` files from the repository.
 
 ## Verification command
@@ -25,8 +28,26 @@ use causes the test to fail before analysis starts.
 - Analyzer succeeds with config-based local mock backend enabled.
 - No private input text is logged by these checks.
 
+## Optional local LanguageTool
+
+Start a separately installed LanguageTool 6.8 server bound to loopback, then
+enable it explicitly:
+
+```toml
+[language_tool]
+base_url = "http://127.0.0.1:8081"
+timeout_seconds = 1.0
+```
+
+Omit the entire section to disable the adapter. Configuration does not start or
+download the server. Before sending analyzed text, Polis makes a fixed-text
+preflight request and requires server name `LanguageTool` and version `6.8`.
+Only reviewed comma findings from `BRAK_PRZECINKA_ZE` and
+`BRAK_PRZECINKA_ZEBY` are retained. A local sidecar failure produces no
+optional findings and does not discard findings from in-process rules.
+
 ## Supported configuration limits
 
-This verification does not validate third-party LLM services or non-locked runtimes.
+This verification does not start or validate separately installed runtimes.
 For external backends, add an explicit offline policy and integration test for that
 runtime before calling it supported.

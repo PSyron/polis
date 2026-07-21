@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-21
 - Owner: Paweł Cyroń
-- Issue: #52
+- Issues: #52, #53
 
 ## Context
 
@@ -60,12 +60,25 @@ the existing deterministic rules. Its general grammar output is not accurate
 enough for automatic correction on this corpus, and a roughly 733 MB external
 runtime footprint is too large for a mandatory dependency.
 
-The result does justify a separate, optional integration experiment limited to
-reviewed high-precision rule IDs and categories. That follow-up may expose a
-loopback LanguageTool sidecar as a rule analyzer, normalize edits, and feed only
-validated residual findings into later analysis. It must remain disabled by
-default and must not make its suggestions automatically applicable until its
-own allowlist passes zero-negative and per-category gates.
+The result justifies an optional production adapter limited to the reviewed
+`BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY` rule IDs. On the corpus, this
+allowlist emitted 18 exact comma insertions with precision 1.0, punctuation
+recall 0.75, F1 0.857, and no finding on any of the 10 correct hard negatives.
+Its findings use confidence 0.85, so `Analyzer.correct()` never applies them
+automatically.
+
+The adapter accepts only LanguageTool 6.8 at a numeric loopback HTTP endpoint,
+bypasses configured proxies, rejects redirects, limits responses to 1 MiB, and
+checks fixed server identity metadata before sending private text. It is
+disabled unless `[language_tool]` is present in local configuration. Public and
+premium LanguageTool services remain prohibited.
+
+This adapter is a narrow exception to the general atomic backend-failure rule.
+An unavailable, timed-out, incompatible, or malformed optional sidecar returns
+no LanguageTool findings while preserving completed in-process rule findings.
+Required analyzers and local LLM backends retain the all-or-error policy. This
+exception is contained inside `LocalLanguageToolRule.find()` and is not a
+general partial-result state in `AnalysisResult`.
 
 The small local LLM remains responsible only for residual contextual problems,
 especially word order and constructions that deterministic rules cannot
@@ -76,7 +89,9 @@ model.
 
 - The production Python package keeps zero runtime dependencies.
 - Public or premium LanguageTool APIs remain prohibited by the offline policy.
-- A follow-up issue may implement an optional local adapter with strict
-  version, loopback, offset, category, and allowlist validation.
+- The optional adapter adds no Python or bundled JVM dependency and requires a
+  separately installed LanguageTool 6.8 process.
+- The synchronous rule call can block `analyze()` and `analyze_async()` for up
+  to the configured timeout; asynchronous external rules remain future work.
 - The benchmark remains reproducible and its generated report stays ignored
   because reports may describe local runtime details.

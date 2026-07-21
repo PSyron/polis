@@ -7,6 +7,12 @@ from dataclasses import dataclass
 
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source
 from polis.rules.agreement import AgreementCopulaRule
+from polis.rules.languagetool import (
+    LanguageToolRuleConfig,
+    LanguageToolTransport,
+    LocalLanguageToolRule,
+    LoopbackLanguageToolHttpTransport,
+)
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingWlasnieRule,
@@ -160,6 +166,10 @@ __all__ = [
     "DuplicateFindingError",
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
+    "LanguageToolRuleConfig",
+    "LanguageToolTransport",
+    "LocalLanguageToolRule",
+    "LoopbackLanguageToolHttpTransport",
     "SpellingJestesRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",

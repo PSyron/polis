@@ -9,12 +9,18 @@
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
   intentionally conservative.
+- Optional LanguageTool support requires a separately installed LanguageTool
+  6.8 process and Java runtime. The measured local installation plus OpenJDK was
+  about 733 MB, with about 630 MiB RSS after startup.
+- The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
+  can wait up to its configured timeout, and it only covers reviewed missing
+  commas before `że` and `żeby`.
 
 ## Accuracy and policy notes
 
 The system is conservative by design:
 
-- false positives are preferred over aggressive rewriting,
+- missed findings are preferred over aggressive rewriting,
 - unresolvable edits are not applied,
 - and correction selection is explicit.
 

@@ -29,11 +29,17 @@ filters, and failures for event-loop applications. Passing `None` for options
 uses the default `AnalysisOptions()`; otherwise its category and confidence
 filters are reflected in `result.options`.
 
-One call either returns a complete, validated result for its configured scope or
-raises a controlled operational error. No partial `AnalysisResult` is returned.
+One call either returns a complete, validated result for its required configured
+scope or raises a controlled operational error. No partial `AnalysisResult` is returned.
 This avoids a successful-looking result that silently omits a failed backend.
 The current schema-version-1 result has no partial-state field; any future
 partial-analysis feature needs an explicit versioned outcome contract.
+
+The disabled-by-default LanguageTool rule is a documented narrow exception:
+because it is an optional best-effort rule, local service failure is represented
+as zero findings from that rule while completed built-in findings remain. This
+does not alter failure handling for required analyzers or LLM backends and does
+not introduce a partial-result field.
 
 `result.apply(issue_ids)` applies only named findings from that result. It
 validates the entire selection before changing output, rejects unknown,
@@ -51,6 +57,11 @@ non-conflicting deterministic rule findings with confidence at least `0.9`.
 It deliberately leaves low-confidence, LLM-generated, and unsuggestable
 findings unapplied; callers can still use `analyze()` and select corrections
 explicitly.
+
+`AnalyzerConfig` also accepts `language_tool_url` and
+`language_tool_timeout_seconds`. A TOML `[language_tool]` table maps its
+`base_url` and `timeout_seconds` keys to those fields. Omission disables all
+LanguageTool I/O and registration.
 
 The analyzer API above is implemented by a thin runtime in `polis` and remains
 small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`

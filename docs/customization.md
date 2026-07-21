@@ -106,3 +106,25 @@ asyncio.run(run_analysis())
 
 For validated structured backend responses, prefer `polis.llm.adapter.MockHeuristicBackend`
 plus a dedicated transport implementation.
+
+## Enable the reviewed LanguageTool layer
+
+LanguageTool is optional and disabled by default. Run a separately installed
+LanguageTool 6.8 server on numeric loopback and add:
+
+```toml
+[language_tool]
+base_url = "http://127.0.0.1:8081"
+timeout_seconds = 1.0
+```
+
+The endpoint must use plain HTTP, an explicit port, and literal `127.0.0.0/8`
+or `::1`; hostnames, credentials, paths, queries, proxies, redirects, other
+versions, and remote services are rejected. The adapter keeps only two reviewed
+Polish comma rules. Its confidence is deliberately below the automatic
+correction threshold, so callers review and explicitly select its findings.
+
+The call is synchronous and may wait for `timeout_seconds`, including through
+`analyze_async()`. If the optional server is unavailable or returns invalid
+data, analysis continues with the built-in rules and no LanguageTool findings.
+Removing `[language_tool]` fully removes the adapter from the analyzer registry.
