@@ -418,6 +418,10 @@ def test_summary_excludes_invalid_responses_from_latency_median() -> None:
     )
 
     assert report.median_latency_ms == 120.0
+    assert report.warm_median_latency_ms == 0.0
+    assert report.warm_p95_latency_ms == 0.0
+    assert report.cold_median_latency_ms == 120.0
+    assert report.cold_p95_latency_ms == 120.0
 
 
 def test_run_cases_turns_an_invalid_model_response_into_a_safe_observation() -> None:
@@ -443,6 +447,37 @@ def test_run_cases_turns_an_invalid_model_response_into_a_safe_observation() -> 
     assert observation.corrected_output == case.source
     assert observation.finding_score == FindingScore(0, 0, 0)
     assert observation.status == "invalid_schema"
+
+
+def test_run_cases_with_cache_probe_records_cold_and_warm_latencies() -> None:
+    case = BenchmarkCase(
+        case_id="cache_probe",
+        source="Jan ma kota.",
+        expected_output="Jan ma kota.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    class RepeatingClient:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate(self, prompt: str) -> TimedResponse:
+            self.calls += 1
+            return TimedResponse(
+                '{"schema_version":1,"findings":[]}',
+                10.0 * self.calls,
+            )
+
+    observation = run_cases(RepeatingClient(), (case,), cache_probe=True)[0]
+
+    assert observation.valid_response is True
+    assert observation.call_count == 2
+    assert observation.elapsed_ms == 15.0
+    assert observation.cold_elapsed_ms == 10.0
+    assert observation.warm_elapsed_ms == 20.0
 
 
 def test_run_cases_accepts_a_valid_empty_response() -> None:
@@ -500,6 +535,7 @@ def test_report_as_json_is_a_stable_auditable_summary() -> None:
     assert payload["cases"] == [
         {
             "call_count": 1,
+            "cold_elapsed_ms": 7.5,
             "elapsed_ms": 7.5,
             "exact_match": True,
             "false_negatives": 0,
@@ -508,6 +544,7 @@ def test_report_as_json_is_a_stable_auditable_summary() -> None:
             "status": "valid",
             "true_positives": 0,
             "valid_response": True,
+            "warm_elapsed_ms": 0.0,
         }
     ]
     assert "Poprawne zdanie" not in report_as_json(report)
@@ -532,7 +569,7 @@ def test_main_writes_json_report_without_network(
     )
     monkeypatch.setattr(
         "experiments.real_llm_benchmark.run_benchmark.run_cases",
-        lambda *_: (
+        lambda *_args, **_kwargs: (
             BenchmarkObservation(
                 case=case,
                 valid_response=True,
@@ -563,6 +600,130 @@ def test_main_writes_json_report_without_network(
     assert payload["runtime"]["engine"] == "ollama"
     assert payload["runtime"]["model_identifier"] == "local-test"
     assert len(payload["corpus_sha256"]) == 64
+
+
+def test_main_records_memory_reported_after_the_benchmark(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    case = BenchmarkCase(
+        case_id="safe",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.load_cases",
+        lambda _: (case,),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.run_cases",
+        lambda *_args, **_kwargs: (
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=10.0,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output=case.source,
+            ),
+        ),
+    )
+
+    class LoadingClient:
+        def __init__(self) -> None:
+            self.preflight_calls = 0
+
+        def preflight(self) -> RuntimeMetadata:
+            self.preflight_calls += 1
+            return RuntimeMetadata(
+                "ollama",
+                "local-test",
+                "test",
+                loaded_memory_bytes=1_024 * self.preflight_calls,
+            )
+
+        def generate(self, prompt: str) -> TimedResponse:
+            raise AssertionError("run_cases is patched")
+
+    loading = LoadingClient()
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.select_healthy_client",
+        lambda *_: ("ollama", loading),
+    )
+
+    assert main(["--model", "local-test", "--corpus", str(CORPUS_PATH)]) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    assert loading.preflight_calls == 2
+    assert payload["runtime"]["loaded_memory_bytes"] == 2_048
+
+
+def test_main_accepts_an_explicit_loaded_memory_observation(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    case = BenchmarkCase(
+        case_id="safe",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.load_cases",
+        lambda _: (case,),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.run_cases",
+        lambda *_args, **_kwargs: (
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=10.0,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output=case.source,
+            ),
+        ),
+    )
+
+    class HealthyClient:
+        def preflight(self) -> RuntimeMetadata:
+            return RuntimeMetadata("mlx", "local-test", "test")
+
+        def generate(self, prompt: str) -> TimedResponse:
+            raise AssertionError("run_cases is patched")
+
+    healthy = HealthyClient()
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.select_healthy_client",
+        lambda *_: ("mlx", healthy),
+    )
+
+    assert (
+        main(
+            [
+                "--model",
+                "local-test",
+                "--corpus",
+                str(CORPUS_PATH),
+                "--loaded-memory-bytes",
+                "4096",
+                "--runtime-version",
+                "0.31.3",
+                "--operating-system",
+                "macOS 15.3.1",
+            ]
+        )
+        == 0
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["runtime"]["loaded_memory_bytes"] == 4096
+    assert payload["runtime"]["runtime_version"] == "0.31.3"
+    assert payload["runtime"]["operating_system"] == "macOS 15.3.1"
 
 
 def test_category_metrics_attribute_extra_finding_to_its_emitted_category() -> None:

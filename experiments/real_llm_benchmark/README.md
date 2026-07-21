@@ -33,8 +33,16 @@ an example candidate is `Llama-PLLuM-8B-instruct-2512`.
 uv run python experiments/real_llm_benchmark/run_benchmark.py \
   --engine auto \
   --model hf.co/speakleash/Bielik-Minitron-7B-v3.0-Instruct-GGUF:Q4_K_M \
+  --cache-probe \
   > experiments/real_llm_benchmark/results.json
 ```
+
+`--cache-probe` sends each case twice with the identical versioned prompt. The
+report records the first request as `cold_elapsed_ms` and the immediate repeat
+as `warm_elapsed_ms`, together with cold and warm p50/p95 aggregates. Without
+this flag, the only request is recorded as cold latency and the warm metrics
+remain zero. Use the flag for every runtime comparison that evaluates prompt
+cache benefit.
 
 On macOS the benchmark defaults to `--engine mlx` for local inference stacks that
 can provide an OpenAI-compatible chat endpoint. If needed, you can override to
@@ -43,11 +51,22 @@ can provide an OpenAI-compatible chat endpoint. If needed, you can override to
 For MLX style local servers, use the default URL or provide your own:
 
 ```bash
+mlx_lm.server \
+  --model mlx-community/Qwen3-1.7B-4bit \
+  --host 127.0.0.1 \
+  --port 8080 \
+  --prompt-cache-size 8 \
+  --chat-template-args '{"enable_thinking":false}'
+
 uv run python experiments/real_llm_benchmark/run_benchmark.py \
   --engine mlx \
   --base-url http://127.0.0.1:8080 \
   --model <local-model-id>
 ```
+
+For Qwen reasoning variants, `enable_thinking=false` is required: otherwise
+reasoning tokens can consume the JSON response budget before a finding payload
+is emitted.
 
 For Ollama, keep the same command shape:
 
@@ -75,7 +94,8 @@ model responses. A report records:
 - per-case status, exact TP/FP/FN, exact corrected-output result, validity,
   latency, and call count;
 - aggregate exact category metrics, negative-case changes, response validity,
-  p50/p95 latency, and character throughput.
+  generic p50/p95 latency, separate cold and warm p50/p95 latency, and
+  character throughput.
 
 Use the optional provenance flags when the local runtime cannot expose all
 artifact details itself:
@@ -86,9 +106,21 @@ uv run python experiments/real_llm_benchmark/run_benchmark.py \
   --model <model-id> \
   --artifact-revision <immutable-artifact-revision> \
   --quantization <quantization> \
+  --runtime-version <runtime-version> \
   --hardware-class "Apple M4, 16 GB unified memory" \
+  --operating-system "macOS 15.3.1" \
   --cold-start
 ```
+
+Some OpenAI-compatible local servers, including the MLX server used in this
+experiment, do not expose loaded memory through their HTTP API. Record a
+measurement from a local process monitor explicitly in that case:
+
+```bash
+--loaded-memory-bytes <measured-byte-count>
+```
+
+The explicit value is provenance, not an estimate by the benchmark runner.
 
 ## Interpretation
 

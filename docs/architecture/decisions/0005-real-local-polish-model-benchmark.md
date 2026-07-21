@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-21
 - Owner: Paweł Cyroń
-- Issues: #42, #48, #50, #51
+- Issues: #42, #48, #50, #51, #61
 
 ## Context
 
@@ -72,6 +72,41 @@ consensus for 19/25 cases, matched 15/25 complete expected outputs, and changed
 specialist requests took approximately four to seven seconds each. This is a
 large improvement over the single finding prompt, but it still fails the 100%
 validity gate and remains far below the 0.90 per-category release gates.
+
+### Reproduced runtime comparison (#61)
+
+Issue #61 repeated the strict finding benchmark with the same 25-case corpus
+split and prompt contract on macOS 15.3.1, Apple M4 Mac mini with 16 GB unified
+memory.
+The corpus SHA-256 was
+`d5ce257f78a67ad2bdc6ed71ed1ec4f4403d0f287a71db7a316e68bd32f4d468`.
+Each case was sent twice; the first call is the cache-cold measurement and the
+immediate repeat is cache-warm. Both runs were local-only and had 25/25
+schema-valid responses, zero changes to negative cases, and exact finding F1
+of 0.000 (42 false negatives, no true positives). Thus the table compares
+runtime cost and transport validity, not correction quality.
+
+| Runtime / candidate | Artifact and configuration | Loaded memory | Cold p50/p95 | Warm p50/p95 | Throughput |
+| --- | --- | ---: | ---: | ---: | ---: |
+| MLX-LM 0.31.3 / MLX 0.32.0 | `mlx-community/Qwen3-1.7B-4bit`, revision `3b1b1768f8f8cf8351c712464f906e86c2b8269e`, 4-bit, `enable_thinking=false` | 1,305,067,520 B RSS | 380 / 405 ms | 318 / 332 ms | 135.8 chars/s |
+| Ollama 0.20.7 | `qwen3:1.7b`, artifact `8f68893c685c`, Ollama default quantization | 2,355,771,424 B | 387 / 394 ms | 335 / 339 ms | 122.4 chars/s |
+| MLX-LM 0.31.3 / MLX 0.32.0 | `speakleash/Bielik-1.5B-v3.0-Instruct-MLX-8bit`, revision `a67fe1c442b12685cf2d1c32d02359d9e52c8ddd`, 8-bit | 1,830,961,152 B RSS | 664 / 695 ms | 592 / 597 ms | 76.4 chars/s |
+| Ollama 0.20.7 | `hf.co/speakleash/Bielik-1.5B-v3.0-Instruct-GGUF:Q8_0`, artifact `9ab8e213bb88`, Q8_0 | 2,145,648,640 B | 487 / 492 ms | 438 / 442 ms | 95.9 chars/s |
+
+MLX-LM does not expose loaded memory through its OpenAI-compatible API; the
+MLX value is an explicit macOS process RSS observation recorded in the report.
+The server initially produced invalid responses because Qwen reasoning was
+enabled; `enable_thinking=false` is necessary for this JSON-only benchmark
+contract. MLX is faster and uses less memory for Qwen, while Ollama is faster
+for Bielik. Neither runtime/model combination qualifies for correction because
+valid empty findings have zero recall.
+
+Measured installed sizes on that machine were 289,324 KiB for the `mlx-lm`
+tool environment and 494,516 KiB for `Ollama.app`. Artifact cache sizes were
+960,980 KiB for MLX Qwen and 1,661,112 KiB for MLX Bielik; `ollama list`
+reported 1.4 GB for Qwen3 1.7B and 1.7 GB for Bielik 1.5B Q8_0. These values
+include local packaging or cache overhead where applicable and are operational
+observations, not model-parameter sizes.
 
 ## Decision
 

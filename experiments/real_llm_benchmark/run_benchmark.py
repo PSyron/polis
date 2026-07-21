@@ -29,6 +29,7 @@ _LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 _OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434"
 _OPENAI_COMPAT_BASE_URL = "http://127.0.0.1:8080"
 DEFAULT_CORPUS_PATH = Path("tests/fixtures/evaluation/polish_correction_corpus_v3.json")
+DEFAULT_CACHE_PROBE_ATTEMPTS = 2
 _CASE_STATUSES = frozenset(
     {
         "valid",
@@ -123,6 +124,8 @@ class CaseEvidence:
     false_negatives: int
     elapsed_ms: float
     call_count: int
+    cold_elapsed_ms: float = 0.0
+    warm_elapsed_ms: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -143,6 +146,7 @@ class RuntimeMetadata:
     artifact_revision: str | None = None
     quantization: str | None = None
     hardware_class: str | None = None
+    operating_system: str | None = None
     loaded_memory_bytes: int | None = None
     cold_start: bool | None = None
 
@@ -172,6 +176,8 @@ class BenchmarkObservation:
     corrected_output: str
     status: CaseStatus = "valid"
     call_count: int = 1
+    cold_elapsed_ms: float = 0.0
+    warm_elapsed_ms: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -209,6 +215,10 @@ class BenchmarkReport:
     overall_metrics: CategoryMetrics
     category_metrics: dict[str, CategoryMetrics]
     p95_latency_ms: float = 0.0
+    warm_median_latency_ms: float = 0.0
+    warm_p95_latency_ms: float = 0.0
+    cold_median_latency_ms: float = 0.0
+    cold_p95_latency_ms: float = 0.0
     throughput_chars_per_second: float = 0.0
     case_results: tuple[CaseScore, ...] = ()
     case_statuses: tuple[CaseStatus, ...] = ()
@@ -744,6 +754,16 @@ def summarize_observations(
         for observation in collected
         if observation.valid_response
     )
+    warm_elapsed = sorted(
+        observation.warm_elapsed_ms
+        for observation in collected
+        if observation.valid_response and observation.warm_elapsed_ms > 0
+    )
+    cold_elapsed = sorted(
+        observation.cold_elapsed_ms or observation.elapsed_ms
+        for observation in collected
+        if observation.valid_response
+    )
     midpoint = len(elapsed) // 2
     median_latency_ms = (
         0.0
@@ -753,10 +773,16 @@ def summarize_observations(
         else (elapsed[midpoint - 1] + elapsed[midpoint]) / 2
     )
     p95_latency_ms = _percentile(elapsed, 0.95)
-    total_elapsed_ms = sum(elapsed)
+    total_elapsed_ms = sum(
+        observation.elapsed_ms * max(1, observation.call_count)
+        if not observation.warm_elapsed_ms
+        else observation.cold_elapsed_ms + observation.warm_elapsed_ms
+        for observation in collected
+        if observation.valid_response
+    )
     throughput = (
         sum(
-            len(observation.case.source)
+            len(observation.case.source) * max(1, observation.call_count)
             for observation in collected
             if observation.valid_response
         )
@@ -783,6 +809,10 @@ def summarize_observations(
         ),
         category_metrics=metrics,
         p95_latency_ms=p95_latency_ms,
+        warm_median_latency_ms=_percentile(warm_elapsed, 0.50),
+        warm_p95_latency_ms=_percentile(warm_elapsed, 0.95),
+        cold_median_latency_ms=_percentile(cold_elapsed, 0.50),
+        cold_p95_latency_ms=_percentile(cold_elapsed, 0.95),
         throughput_chars_per_second=throughput,
         case_results=tuple(
             score_case(
@@ -806,6 +836,8 @@ def summarize_observations(
                 false_negatives=observation.finding_score.false_negatives,
                 elapsed_ms=observation.elapsed_ms,
                 call_count=observation.call_count,
+                cold_elapsed_ms=(observation.cold_elapsed_ms or observation.elapsed_ms),
+                warm_elapsed_ms=observation.warm_elapsed_ms,
             )
             for observation in collected
         ),
@@ -824,67 +856,94 @@ def _percentile(sorted_values: list[float], percentile: float) -> float:
 def run_cases(
     client: PromptClient,
     cases: Iterable[BenchmarkCase],
+    *,
+    cache_probe: bool = False,
 ) -> tuple[BenchmarkObservation, ...]:
     """Run an experiment without letting an invalid model response stop it."""
 
+    attempts_per_case = 2 if cache_probe else 1
     observations: list[BenchmarkObservation] = []
     for case in cases:
-        try:
-            response = client.generate(build_prompt(case.source))
-            findings = validate_llm_response(
-                response.raw_response,
-                source_text=case.source,
-                source_name=f"benchmark-{case.case_id}",
+        attempt_statuses: list[CaseStatus] = []
+        attempt_latencies: list[float] = []
+        attempt_scores: list[tuple[FindingScore, str]] = []
+        for _ in range(attempts_per_case):
+            try:
+                response = client.generate(build_prompt(case.source))
+                findings = validate_llm_response(
+                    response.raw_response,
+                    source_text=case.source,
+                    source_name=f"benchmark-{case.case_id}",
+                )
+            except Exception as error:
+                attempt_statuses.append(classify_case_failure(error))
+                attempt_latencies.append(0.0)
+                continue
+
+            if len({finding.id for finding in findings}) != len(findings):
+                attempt_statuses.append("duplicate")
+                attempt_latencies.append(response.elapsed_ms)
+                continue
+
+            try:
+                corrected_output = corrected_output_from_findings(case.source, findings)
+            except (PolisError, TypeError, ValueError) as error:
+                attempt_statuses.append(classify_case_failure(error))
+                attempt_latencies.append(response.elapsed_ms)
+                continue
+
+            attempt_statuses.append("valid_empty" if not findings else "valid")
+            attempt_latencies.append(response.elapsed_ms)
+            attempt_scores.append((score_findings(case, findings), corrected_output))
+
+        if any(status not in {"valid", "valid_empty"} for status in attempt_statuses):
+            first_failure = next(
+                status
+                for status in attempt_statuses
+                if status not in {"valid", "valid_empty"}
             )
-        except Exception as error:
             observations.append(
                 BenchmarkObservation(
                     case=case,
-                    valid_response=False,
+                    # The transport and JSON contract were valid for these two
+                    # statuses, but their edits cannot be safely applied. Keep
+                    # that distinction in the report while safety_eligible still
+                    # rejects their non-valid status.
+                    valid_response=first_failure in {"duplicate", "conflict"},
                     elapsed_ms=0.0,
                     finding_score=FindingScore(0, 0, 0),
                     corrected_output=case.source,
-                    status=classify_case_failure(error),
+                    status=first_failure,
+                    call_count=len(attempt_statuses),
                 )
             )
             continue
 
-        if len({finding.id for finding in findings}) != len(findings):
-            observations.append(
-                BenchmarkObservation(
-                    case=case,
-                    valid_response=True,
-                    elapsed_ms=response.elapsed_ms,
-                    finding_score=score_findings(case, findings),
-                    corrected_output=case.source,
-                    status="duplicate",
-                )
-            )
-            continue
-
-        try:
-            corrected_output = corrected_output_from_findings(case.source, findings)
-        except (PolisError, TypeError, ValueError) as error:
-            observations.append(
-                BenchmarkObservation(
-                    case=case,
-                    valid_response=True,
-                    elapsed_ms=response.elapsed_ms,
-                    finding_score=score_findings(case, findings),
-                    corrected_output=case.source,
-                    status=classify_case_failure(error),
-                )
-            )
-            continue
+        # Success status is guaranteed present when no attempt failed.
+        status = attempt_statuses[0]
+        finding_payload, corrected_output = attempt_scores[0]
+        elapsed_ms = attempt_latencies[0]
+        cold_elapsed_ms = attempt_latencies[0]
+        warm_elapsed_ms = 0.0
+        if (
+            attempts_per_case > 1
+            and len(attempt_statuses) >= DEFAULT_CACHE_PROBE_ATTEMPTS
+        ):
+            elapsed_ms = (attempt_latencies[0] + attempt_latencies[1]) / 2.0
+            cold_elapsed_ms = attempt_latencies[0]
+            warm_elapsed_ms = attempt_latencies[1]
 
         observations.append(
             BenchmarkObservation(
                 case=case,
                 valid_response=True,
-                elapsed_ms=response.elapsed_ms,
-                finding_score=score_findings(case, findings),
+                elapsed_ms=elapsed_ms,
+                finding_score=finding_payload,
                 corrected_output=corrected_output,
-                status="valid_empty" if not findings else "valid",
+                status=status,
+                call_count=len(attempt_statuses),
+                cold_elapsed_ms=cold_elapsed_ms,
+                warm_elapsed_ms=warm_elapsed_ms,
             )
         )
     return tuple(observations)
@@ -907,8 +966,12 @@ def report_as_json(report: BenchmarkReport) -> str:
                 for category, metrics in sorted(report.category_metrics.items())
             },
             "safety_eligible": report.safety_eligible,
+            "cold_median_latency_ms": report.cold_median_latency_ms,
+            "cold_p95_latency_ms": report.cold_p95_latency_ms,
             "median_latency_ms": report.median_latency_ms,
             "p95_latency_ms": report.p95_latency_ms,
+            "warm_median_latency_ms": report.warm_median_latency_ms,
+            "warm_p95_latency_ms": report.warm_p95_latency_ms,
             "throughput_chars_per_second": report.throughput_chars_per_second,
             "negative_cases_changed": report.negative_cases_changed,
             "overall_metrics": {
@@ -931,6 +994,7 @@ def report_as_json(report: BenchmarkReport) -> str:
                 "hardware_class": report.runtime_metadata.hardware_class,
                 "loaded_memory_bytes": report.runtime_metadata.loaded_memory_bytes,
                 "model_identifier": report.runtime_metadata.model_identifier,
+                "operating_system": report.runtime_metadata.operating_system,
                 "quantization": report.runtime_metadata.quantization,
                 "runtime_version": report.runtime_metadata.runtime_version,
             },
@@ -943,6 +1007,8 @@ def report_as_json(report: BenchmarkReport) -> str:
                     "false_positives": item.false_positives,
                     "id": item.case_id,
                     "status": item.status,
+                    "cold_elapsed_ms": item.cold_elapsed_ms,
+                    "warm_elapsed_ms": item.warm_elapsed_ms,
                     "true_positives": item.true_positives,
                     "valid_response": item.valid_response,
                 }
@@ -979,11 +1045,31 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--base-url")
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
+    parser.add_argument(
+        "--cache-probe",
+        action="store_true",
+        help="Run each case twice to expose cold and warm latencies.",
+    )
     parser.add_argument("--artifact-revision")
     parser.add_argument("--quantization")
+    parser.add_argument(
+        "--runtime-version",
+        help="Runtime version when the local endpoint does not expose one.",
+    )
+    parser.add_argument(
+        "--loaded-memory-bytes",
+        type=int,
+        help="Measured loaded-memory value when the local runtime cannot expose it.",
+    )
     parser.add_argument("--hardware-class", default=platform.platform())
+    parser.add_argument("--operating-system", default=platform.platform())
     parser.add_argument("--cold-start", action="store_true")
     arguments = parser.parse_args(argv)
+    if (
+        arguments.loaded_memory_bytes is not None
+        and arguments.loaded_memory_bytes < 0
+    ):
+        parser.error("--loaded-memory-bytes must be non-negative")
     cases = load_cases(arguments.corpus)
     candidate_engines = (
         ("mlx", "ollama")
@@ -1015,13 +1101,31 @@ def main(argv: list[str] | None = None) -> int:
         artifact_revision=arguments.artifact_revision,
         quantization=arguments.quantization,
         hardware_class=arguments.hardware_class,
+        operating_system=arguments.operating_system,
+        runtime_version=(
+            arguments.runtime_version
+            if arguments.runtime_version is not None
+            else runtime_metadata.runtime_version
+        ),
         cold_start=arguments.cold_start,
     )
-    report = summarize_observations(run_cases(client, cases))
+    report = summarize_observations(
+        run_cases(client, cases, cache_probe=arguments.cache_probe)
+    )
+    post_run_metadata = client.preflight()
+    if post_run_metadata.engine != selected_engine:
+        raise RuntimeError("runtime postflight returned an unexpected engine")
     report = replace(
         report,
         corpus_sha256=hashlib.sha256(arguments.corpus.read_bytes()).hexdigest(),
-        runtime_metadata=runtime_metadata,
+        runtime_metadata=replace(
+            runtime_metadata,
+            loaded_memory_bytes=(
+                arguments.loaded_memory_bytes
+                if arguments.loaded_memory_bytes is not None
+                else post_run_metadata.loaded_memory_bytes
+            ),
+        ),
     )
     print(report_as_json(report))
     return 0
