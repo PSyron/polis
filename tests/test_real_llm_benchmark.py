@@ -8,11 +8,19 @@ from urllib.request import Request
 import pytest
 from experiments.real_llm_benchmark.run_benchmark import (
     BenchmarkCase,
+    BenchmarkObservation,
+    FindingScore,
+    GoldFinding,
     OllamaClient,
+    TimedResponse,
     corrected_output_from_findings,
     load_cases,
+    main,
+    report_as_json,
+    run_cases,
     score_case,
     score_findings,
+    summarize_observations,
 )
 
 from polis.llm import validate_llm_response
@@ -188,3 +196,212 @@ def test_finding_score_requires_exact_gold_category_span_and_suggestion() -> Non
     assert score.true_positives == 1
     assert score.false_positives == 1
     assert score.false_negatives == 0
+
+
+def test_summary_reports_category_metrics_and_rejects_negative_change() -> None:
+    inflection = BenchmarkCase(
+        case_id="inflection",
+        source="Rozmawiałem z Jan Nowak.",
+        expected_output="Rozmawiałem z Janem Nowakiem.",
+        tags=("inflection",),
+        verification="llm_planned",
+        tracking_issue=48,
+        expected_findings=(
+            # The concrete offsets are immaterial to aggregation.
+            # They describe the expected replacement in the source string.
+            GoldFinding("inflection", 14, 19, "Nowak", "Nowakiem"),
+        ),
+    )
+    negative = BenchmarkCase(
+        case_id="negative",
+        source="Anna Kowalska przeczytała raport.",
+        expected_output="Anna Kowalska przeczytała raport.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    report = summarize_observations(
+        (
+            BenchmarkObservation(
+                case=inflection,
+                valid_response=True,
+                elapsed_ms=120.0,
+                finding_score=FindingScore(1, 0, 0),
+                corrected_output=inflection.expected_output,
+            ),
+            BenchmarkObservation(
+                case=negative,
+                valid_response=True,
+                elapsed_ms=80.0,
+                finding_score=FindingScore(0, 1, 0),
+                corrected_output="Anna Kowalska przeczytała raport!",
+            ),
+        )
+    )
+
+    assert report.valid_responses == 2
+    assert report.negative_cases_changed == 1
+    assert report.safety_eligible is False
+    assert report.overall_metrics.precision == 0.5
+    assert report.overall_metrics.recall == 1.0
+    assert round(report.overall_metrics.f1, 3) == 0.667
+    assert report.category_metrics["inflection"].f1 == 1.0
+    assert report.category_metrics["inflection"].precision == 1.0
+    assert report.category_metrics["inflection"].recall == 1.0
+
+
+def test_summary_excludes_invalid_responses_from_latency_median() -> None:
+    case = BenchmarkCase(
+        case_id="negative",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    report = summarize_observations(
+        (
+            BenchmarkObservation(
+                case=case,
+                valid_response=False,
+                elapsed_ms=0.0,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output=case.source,
+            ),
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=120.0,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output=case.source,
+            ),
+        )
+    )
+
+    assert report.median_latency_ms == 120.0
+
+
+def test_run_cases_turns_an_invalid_model_response_into_a_safe_observation() -> None:
+    case = BenchmarkCase(
+        case_id="negative",
+        source="Anna Kowalska przeczytała raport.",
+        expected_output="Anna Kowalska przeczytała raport.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    class InvalidClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            assert "Anna Kowalska" in prompt
+            return TimedResponse("not json", 25.0)
+
+    observation = run_cases(InvalidClient(), (case,))[0]
+
+    assert observation.case == case
+    assert observation.valid_response is False
+    assert observation.corrected_output == case.source
+    assert observation.finding_score == FindingScore(0, 0, 0)
+
+
+def test_run_cases_accepts_a_valid_empty_response() -> None:
+    case = BenchmarkCase(
+        case_id="negative_case",
+        source="Anna Kowalska przeczytała raport.",
+        expected_output="Anna Kowalska przeczytała raport.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+
+    class ValidClient:
+        def generate(self, prompt: str) -> TimedResponse:
+            assert "Anna Kowalska" in prompt
+            return TimedResponse('{"schema_version":1,"findings":[]}', 25.0)
+
+    observation = run_cases(ValidClient(), (case,))[0]
+
+    assert observation.valid_response is True
+    assert observation.elapsed_ms == 25.0
+    assert observation.corrected_output == case.source
+
+
+def test_report_as_json_is_a_stable_auditable_summary() -> None:
+    report = summarize_observations(
+        (
+            BenchmarkObservation(
+                case=BenchmarkCase(
+                    case_id="safe",
+                    source="Poprawne zdanie.",
+                    expected_output="Poprawne zdanie.",
+                    tags=("negative",),
+                    verification="negative",
+                    tracking_issue=None,
+                    expected_findings=(),
+                ),
+                valid_response=True,
+                elapsed_ms=7.5,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output="Poprawne zdanie.",
+            ),
+        )
+    )
+
+    payload = json.loads(report_as_json(report))
+
+    assert payload == {
+        "category_metrics": {},
+        "overall_metrics": {
+            "f1": 0.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "true_positives": 0,
+        },
+        "safety_eligible": True,
+        "median_latency_ms": 7.5,
+        "negative_cases_changed": 0,
+        "total_responses": 1,
+        "valid_responses": 1,
+    }
+
+
+def test_main_writes_json_report_without_network(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    case = BenchmarkCase(
+        case_id="safe",
+        source="Poprawne zdanie.",
+        expected_output="Poprawne zdanie.",
+        tags=("negative",),
+        verification="negative",
+        tracking_issue=None,
+        expected_findings=(),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.load_cases",
+        lambda _: (case,),
+    )
+    monkeypatch.setattr(
+        "experiments.real_llm_benchmark.run_benchmark.run_cases",
+        lambda *_: (
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=10.0,
+                finding_score=FindingScore(0, 0, 0),
+                corrected_output=case.source,
+            ),
+        ),
+    )
+
+    assert main(["--model", "local-test", "--corpus", str(CORPUS_PATH)]) == 0
+
+    assert json.loads(capsys.readouterr().out)["safety_eligible"] is True

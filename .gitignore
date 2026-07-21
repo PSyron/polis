@@ -42,6 +42,7 @@ coverage.xml
 junit.xml
 benchmarks/results/
 benchmarks/results.json
+experiments/real_llm_benchmark/results.json
 
 # Local language models and generated corpora
 models/

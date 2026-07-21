@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from polis.core import AnalysisResult, Finding
+from polis.llm import build_prompt, validate_llm_response
 
 _ALLOWED_VERIFICATION = frozenset({"rules", "llm_planned", "negative"})
 _BENCHMARK_VERIFICATION = frozenset({"llm_planned", "negative"})
@@ -68,6 +70,69 @@ class TimedResponse:
 
     raw_response: str
     elapsed_ms: float
+
+
+class PromptClient(Protocol):
+    """Minimal local transport needed by the benchmark runner."""
+
+    def generate(self, prompt: str) -> TimedResponse:
+        """Return one raw response with its elapsed time."""
+
+
+@dataclass(frozen=True)
+class BenchmarkObservation:
+    """A validated model response and its finding-level score for one case."""
+
+    case: BenchmarkCase
+    valid_response: bool
+    elapsed_ms: float
+    finding_score: FindingScore
+    corrected_output: str
+
+
+@dataclass(frozen=True)
+class CategoryMetrics:
+    """Precision, recall, and F1 derived from exact finding matches."""
+
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+
+    @property
+    def precision(self) -> float:
+        denominator = self.true_positives + self.false_positives
+        return self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def recall(self) -> float:
+        denominator = self.true_positives + self.false_negatives
+        return self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def f1(self) -> float:
+        denominator = self.precision + self.recall
+        return 2 * self.precision * self.recall / denominator if denominator else 0.0
+
+
+@dataclass(frozen=True)
+class BenchmarkReport:
+    """Aggregate benchmark evidence, excluding any unmeasured selection threshold."""
+
+    valid_responses: int
+    total_responses: int
+    negative_cases_changed: int
+    median_latency_ms: float
+    overall_metrics: CategoryMetrics
+    category_metrics: dict[str, CategoryMetrics]
+
+    @property
+    def safety_eligible(self) -> bool:
+        """Return whether every response is valid and every negative case is safe."""
+
+        return (
+            self.valid_responses == self.total_responses
+            and not self.negative_cases_changed
+        )
 
 
 @dataclass(frozen=True)
@@ -266,3 +331,176 @@ def score_findings(case: BenchmarkCase, findings: Iterable[Finding]) -> FindingS
         false_positives=len(observed - expected),
         false_negatives=len(expected - observed),
     )
+
+
+def summarize_observations(
+    observations: Iterable[BenchmarkObservation],
+) -> BenchmarkReport:
+    """Aggregate exact findings by expected category and enforce safety basics."""
+
+    collected = tuple(observations)
+    if not collected:
+        raise ValueError("benchmark requires at least one observation")
+
+    metrics: dict[str, CategoryMetrics] = {}
+    for observation in collected:
+        categories = {
+            finding.category for finding in observation.case.expected_findings
+        }
+        for category in categories:
+            current = metrics.get(category, CategoryMetrics(0, 0, 0))
+            expected_count = sum(
+                finding.category == category
+                for finding in observation.case.expected_findings
+            )
+            true_positives = min(
+                observation.finding_score.true_positives,
+                expected_count,
+            )
+            metrics[category] = CategoryMetrics(
+                true_positives=current.true_positives + true_positives,
+                false_positives=current.false_positives,
+                false_negatives=current.false_negatives
+                + max(expected_count - true_positives, 0),
+            )
+
+    negative_cases_changed = sum(
+        observation.case.verification == "negative"
+        and observation.corrected_output != observation.case.expected_output
+        for observation in collected
+    )
+    elapsed = sorted(
+        observation.elapsed_ms
+        for observation in collected
+        if observation.valid_response
+    )
+    midpoint = len(elapsed) // 2
+    median_latency_ms = (
+        0.0
+        if not elapsed
+        else elapsed[midpoint]
+        if len(elapsed) % 2
+        else (elapsed[midpoint - 1] + elapsed[midpoint]) / 2
+    )
+    return BenchmarkReport(
+        valid_responses=sum(observation.valid_response for observation in collected),
+        total_responses=len(collected),
+        negative_cases_changed=negative_cases_changed,
+        median_latency_ms=median_latency_ms,
+        overall_metrics=CategoryMetrics(
+            true_positives=sum(
+                observation.finding_score.true_positives for observation in collected
+            ),
+            false_positives=sum(
+                observation.finding_score.false_positives for observation in collected
+            ),
+            false_negatives=sum(
+                observation.finding_score.false_negatives for observation in collected
+            ),
+        ),
+        category_metrics=metrics,
+    )
+
+
+def run_cases(
+    client: PromptClient,
+    cases: Iterable[BenchmarkCase],
+) -> tuple[BenchmarkObservation, ...]:
+    """Run an experiment without letting an invalid model response stop it."""
+
+    observations: list[BenchmarkObservation] = []
+    for case in cases:
+        try:
+            response = client.generate(build_prompt(case.source))
+            findings = validate_llm_response(
+                response.raw_response,
+                source_text=case.source,
+                source_name=f"benchmark-{case.case_id}",
+            )
+        except (OSError, TimeoutError, TypeError, ValueError, json.JSONDecodeError):
+            observations.append(
+                BenchmarkObservation(
+                    case=case,
+                    valid_response=False,
+                    elapsed_ms=0.0,
+                    finding_score=FindingScore(0, 0, 0),
+                    corrected_output=case.source,
+                )
+            )
+            continue
+
+        observations.append(
+            BenchmarkObservation(
+                case=case,
+                valid_response=True,
+                elapsed_ms=response.elapsed_ms,
+                finding_score=score_findings(case, findings),
+                corrected_output=corrected_output_from_findings(case.source, findings),
+            )
+        )
+    return tuple(observations)
+
+
+def report_as_json(report: BenchmarkReport) -> str:
+    """Serialize aggregate evidence in a deterministic, audit-friendly form."""
+
+    return json.dumps(
+        {
+            "category_metrics": {
+                category: {
+                    "f1": metrics.f1,
+                    "false_negatives": metrics.false_negatives,
+                    "false_positives": metrics.false_positives,
+                    "precision": metrics.precision,
+                    "recall": metrics.recall,
+                    "true_positives": metrics.true_positives,
+                }
+                for category, metrics in sorted(report.category_metrics.items())
+            },
+            "safety_eligible": report.safety_eligible,
+            "median_latency_ms": report.median_latency_ms,
+            "negative_cases_changed": report.negative_cases_changed,
+            "overall_metrics": {
+                "f1": report.overall_metrics.f1,
+                "false_negatives": report.overall_metrics.false_negatives,
+                "false_positives": report.overall_metrics.false_positives,
+                "precision": report.overall_metrics.precision,
+                "recall": report.overall_metrics.recall,
+                "true_positives": report.overall_metrics.true_positives,
+            },
+            "total_responses": report.total_responses,
+            "valid_responses": report.valid_responses,
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Run the local benchmark and print its machine-readable evidence."""
+
+    parser = argparse.ArgumentParser(
+        description="Benchmark a local Ollama model against the Polis E2E corpus."
+    )
+    parser.add_argument("--model", required=True)
+    parser.add_argument(
+        "--corpus",
+        type=Path,
+        default=Path("tests/fixtures/e2e/polish_correction_corpus.json"),
+    )
+    parser.add_argument("--base-url", default="http://127.0.0.1:11434")
+    parser.add_argument("--timeout-seconds", type=float, default=60.0)
+    arguments = parser.parse_args(argv)
+
+    client = OllamaClient(
+        base_url=arguments.base_url,
+        model=arguments.model,
+        timeout_seconds=arguments.timeout_seconds,
+    )
+    report = summarize_observations(run_cases(client, load_cases(arguments.corpus)))
+    print(report_as_json(report))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

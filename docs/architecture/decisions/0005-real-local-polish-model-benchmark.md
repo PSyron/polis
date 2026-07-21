@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-21
 - Owner: Paweł Cyroń
-- Issue: #42
+- Issues: #42, #48
 
 ## Context
 
@@ -26,12 +26,21 @@ memory, corpus `polis_e2e_polish_correction_corpus_v2`, seed 42, temperature
 | Bielik 1.5B v3.0 Instruct | GGUF Q8_0, 1.7 GB | 12/12, empty findings | 0.000 | no changes | 487 ms (v2) |
 | Bielik 4.5B v3.0 Instruct | GGUF Q8_0, 5.1 GB | 11/12 | 0.000 | one invalid finding on a negative case | 1,581 ms |
 | Qwen3 4B | Ollama default, 2.5 GB | invalid on probe | 0.000 | unsafe hallucinated span | 9,440 ms |
+| Bielik Minitron 7B v3.0 Instruct | GGUF Q4_K_M, 4.5 GB on disk / 6.4 GB loaded | 2/12 | 0.000 | ineligible: ten responses failed validation | not used for selection |
 
 Prompt v1 produced 0/12 valid responses for Qwen3 0.6B and Bielik 1.5B.
 Prompt v2 fixed response shape for Bielik but not correction quality. Prompt v3
 explicitly states the correction task; it did not establish a qualifying model.
 Qwen3 4B was additionally probed after the main comparison and returned a
 hallucinated correction whose `original` did not match its cited range.
+
+Issue #48 repeated the full corpus through the versioned CLI benchmark for the
+official Bielik Minitron 7B Q4_K_M artefact. `ollama ps` reported 6.4 GB loaded
+on the same local runtime. Only two of twelve responses passed the strict JSON
+and offset contract; exact gold-finding F1 was 0.000 for agreement, inflection,
+punctuation, and syntax. The runner's latency median deliberately excludes
+invalid responses; because the candidate failed the validity gate, latency is
+not used to support selection.
 
 ## Decision
 
