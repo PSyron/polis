@@ -67,8 +67,48 @@
 | M4-03 | Produce and validate the PyPI distribution | `type:chore`, `area:packaging`, `priority:P0` | M4-01, M4-02 |
 | M4-04 | Publish version 0.1.0 with release notes and documented limitations | `type:chore`, `area:packaging`, `priority:P0` | M4-03 |
 
+## M5 - Hybrid Polish Correction
+
+M5 keeps automatic deterministic corrections separate from reviewable model
+suggestions. ADR-0008 is the policy gate for every behavior change in this
+milestone.
+
+| Key | Issue | Outcome | Depends on |
+| --- | ---: | --- | --- |
+| M5-00 | #65 | Record the hybrid correction architecture and M5 policy | #54 |
+| M5-01 | #55 | Repair real-model benchmark integrity and evidence reporting | #54, #65 |
+| M5-02 | #56 | Build an independent Polish correction corpus v3 | #55 |
+| M5-03 | #57 | Benchmark role-correct specialist prompts for small Polish models | #55, #56 |
+| M5-04 | #58 | Evaluate deterministic inflection candidate generation | #54, #56 |
+| M5-05 | #59 | Implement selected specialist prompt contracts | #57 |
+| M5-06 | #60 | Implement the hybrid correction and suggestion policy | #58, #59 |
+| M5-07 | #61 | Benchmark MLX and GGUF runtimes for the hybrid pipeline | #55, #57, #60 |
+| M5-08 | #62 | Prepare a licensed Polish correction fine-tuning dataset | #56; selected data shapes from #57 |
+| M5-09 | #63 | Benchmark an MLX QLoRA adapter for Bielik 1.5B | #57, #61, #62 |
+| M5-10 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63 |
+| M5-11 | #64 | Add the hybrid sentence and paragraph correction release gate | #43 and all preceding M5 issues |
+
+The primary dependency flow is:
+
+`#54 -> #65 -> #55 -> #56`.
+
+After #56, prompt work (`#57 -> #59`) and morphology work (`#58`) may proceed
+independently. Both join at #60. Runtime evidence then proceeds through #61,
+while #62 prepares fine-tuning data from #56 and the selected #57 data shapes.
+Issues #61 and #62 join at #63. The production adapter #43 follows all of its
+recorded evidence and implementation dependencies, and #64 is the final M5
+release gate.
+
+Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
+is a valid #63 outcome and does not block #43 from using a qualified prompt-only
+configuration.
+
 ## Critical Path
 
 M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 -> M3-02 -> M3-06 -> M4-03 -> M4-04
+
+M5 policy and evidence path:
+
+`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #43 -> #64`
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.

@@ -1,37 +1,59 @@
-# Local LLM quality gates
+# Hybrid correction quality gates
 
-Polis selects a local model only after it passes the versioned E2E corpus. A
-model that is fast, fluent, or merely produces JSON is not selected by itself.
-The gates apply to the exact finding span and replacement, not to a rewritten
-sentence that happens to look plausible.
+ADR-0008 separates automatic deterministic corrections from reviewable model
+suggestions. Each path is measured independently against exact original-text
+edits on a frozen holdout. Fluency, JSON validity, speed, model confidence, or a
+strong aggregate score cannot compensate for a failed path-specific gate.
 
-## Mandatory safety gates
+## Shared safety gates
 
-- **100%** of corpus responses must pass the strict response schema and exact
-  source-span validation.
-- **0** negative cases may be changed or receive a finding. This includes
-  correct inflected names, surnames, and marked but grammatical word order.
-- Requests must remain local after the explicit model download; the runtime
-  endpoint must be loopback-only.
+- Protected hard negatives include correct inflection, names and surnames,
+  marked but grammatical word order, numbers, URLs, quotations, and unaffected
+  formatting.
+- All analyzed text remains local after explicit artifact preparation. A model
+  runtime is direct local inference or uses a numeric loopback endpoint only.
+- Gold answers cannot be embedded in benchmark execution, prompt examples,
+  training records, or corpus-specific lookup branches.
+- Recall, F1, complete-output accuracy, latency, throughput, memory, and calls
+  per case are reported per category even when they are not release gates.
 
-Failure of any safety gate rejects the model regardless of quality metrics.
+Failure of a shared safety or privacy gate rejects the exact source, operation,
+runtime, and artifact configuration under test.
 
-## Per-category quality gates
+## Automatic-correction gates
 
-For `inflection`, `syntax`, and `punctuation`, exact finding precision, recall,
-and F1 must each be at least **0.90**. The benchmark reports an additional
-global precision, recall, and F1, but a strong global score cannot compensate
-for a weak category.
+Automatic eligibility is evaluated per deterministic source, rule or operation
+version, and category:
 
-The 0.90 threshold is a release gate, not a claim that the current baseline
-reaches it. The baselines documented in ADR-0005 are below the gate; they
-demonstrate why no candidate has been selected yet. Any future relaxation
-requires a new ADR with measured risk, a corpus review, and an explicit safety
-analysis.
+- exact edit precision: **1.00**;
+- correction accuracy: **1.00**;
+- protected hard negatives: **0** changed cases.
+
+Passing these metrics does not itself change runtime policy. The exact source
+must also be added to the versioned automatic-correction source policy. Rule
+provenance, engine identity, or confidence alone never grants eligibility.
+
+## Suggestion gates
+
+Model-dependent edits remain suggestion-only for the first hybrid release,
+including finite-candidate selections and verifier-accepted proposals:
+
+- exact edit precision: at least **0.90**;
+- valid structured outcomes: **100%**;
+- protected hard negatives: **0** findings.
+
+Recall is reported for `inflection`, `syntax`, and `punctuation` and guides
+later improvement. Low recall is acceptable for a conservative release; it
+never permits a lower precision, validity, or protected-negative threshold.
 
 ## Selection evidence
 
-The selection issue must link the generated benchmark report, record the exact
-model and quantization, loaded memory observation, runtime version, corpus
-version, and offline smoke result. Only then may the production adapter issue
-proceed.
+Evidence records prompt and schema versions, exact model revision and
+quantization, runtime version, hardware class, operating system, corpus and
+split hashes, loaded memory, cold and warm latency, throughput, model calls,
+and offline verification. Development and holdout results remain separate.
+
+The LanguageTool two-rule subset and every model in ADR-0005 predate these M5
+gates and are not qualified by this document. A production adapter may proceed
+only after its exact prompt, runtime, model or adapter, and source policies pass
+their applicable gates.

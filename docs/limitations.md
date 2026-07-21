@@ -1,10 +1,10 @@
 # Known limitations
 
 - The current runtime covers a small deterministic rule set and a mock local backend path.
-- Local generation integration is available through the mock transport path. A real
-  local model for Polish flexion, syntax, and contextual punctuation is benchmarked
-  in [#42](https://github.com/PSyron/polis/issues/42); its production adapter is
-  tracked separately in [#43](https://github.com/PSyron/polis/issues/43).
+- Local generation integration is available through the mock transport path.
+  No tested local model has qualified for production correction or suggestions;
+  the repaired evidence, specialist prompts, runtime comparison, and production
+  adapter are tracked by M5 and [#43](https://github.com/PSyron/polis/issues/43).
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
@@ -15,6 +15,13 @@
 - The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
   can wait up to its configured timeout, and it only covers reviewed missing
   commas before `że` and `żeby`.
+- The source-built two-rule LanguageTool subset is not a general Polish corrector
+  and has not passed the M5 automatic-correction source-policy gate.
+- The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
+  is an accepted delivery policy, not implemented behavior. Until #60 is
+  complete, automatic correction still uses the current conservative
+  confidence-based deterministic policy and no explicit partial-suggestion
+  outcome exists.
 
 ## Accuracy and policy notes
 
