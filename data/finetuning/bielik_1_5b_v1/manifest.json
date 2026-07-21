@@ -1,0 +1,70 @@
+{
+  "category_counts": {
+    "train": {
+      "inflection": 300,
+      "no_change": 300,
+      "punctuation": 300,
+      "syntax": 300
+    },
+    "validation": {
+      "inflection": 60,
+      "no_change": 60,
+      "punctuation": 60,
+      "syntax": 60
+    }
+  },
+  "corpus_v3_isolation": "passed",
+  "dataset_id": "polis-bielik-1.5b-correction-v1",
+  "files": {
+    "train.jsonl": {
+      "sha256": "9ebe2345c8672bf44aead9016e26901139445f20f00e8699946079d99d300980"
+    },
+    "validation.jsonl": {
+      "sha256": "46d56c84229c178308874dc94008e747a0ca15e6ed5a3b61ddc3c10df6212208"
+    }
+  },
+  "license": "CC0-1.0",
+  "negative_tag_counts": {
+    "train": {
+      "correct-inflection": 40,
+      "correct-punctuation": 100,
+      "marked-word-order": 40,
+      "number": 60,
+      "proper-name": 80,
+      "quotation": 100,
+      "url": 40
+    },
+    "validation": {
+      "correct-inflection": 8,
+      "correct-punctuation": 20,
+      "marked-word-order": 8,
+      "number": 12,
+      "proper-name": 16,
+      "quotation": 20,
+      "url": 8
+    }
+  },
+  "protocol_counts": {
+    "train": {
+      "specialist-candidate-selection": 300,
+      "specialist-corrected-text": 900
+    },
+    "validation": {
+      "specialist-candidate-selection": 60,
+      "specialist-corrected-text": 180
+    }
+  },
+  "record_counts": {
+    "train": 1200,
+    "validation": 240
+  },
+  "review_state_counts": {
+    "train": {
+      "transformation-reviewed": 1200
+    },
+    "validation": {
+      "transformation-reviewed": 240
+    }
+  },
+  "schema_version": 1
+}

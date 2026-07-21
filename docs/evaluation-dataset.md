@@ -1,5 +1,11 @@
 # Polish Evaluation Dataset
 
+Fine-tuning data is maintained separately under
+`data/finetuning/bielik_1_5b_v1`. Corpus v3 remains evaluation-only and its
+records, normalized templates, entities, and expected outputs are prohibited
+from training. See `docs/architecture/finetuning-dataset.md` for the isolation
+contract.
+
 `src/polis/evaluation/datasets/v1/cases.json` is the initial small, versioned
 quality dataset for Polis. It is a reviewable gold set, not a corpus and not a
 claim about production coverage. The validator in `polis.evaluation.dataset`

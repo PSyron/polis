@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added a deterministic CC0 Polish correction fine-tuning bundle with 1,200
+  training and 240 validation records balanced across inflection, syntax,
+  punctuation, and protected no-change examples.
+- Added strict dataset, ChatML, provenance, minimal-edit, split-isolation, and
+  corpus-v3 leakage validation plus reproducible statistics and file hashes.
 - Added the rules-first hybrid suggestion policy with injected specialist task
   routing, finite-candidate selection, bounded corrected-text proposals, and an
   accept/reject verifier.
