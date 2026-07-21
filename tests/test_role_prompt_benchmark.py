@@ -296,11 +296,12 @@ def test_report_as_json_keeps_text_out_of_evidence() -> None:
         ),
     )
 
-    payload = report_as_json(report)
+    payload = json.loads(report_as_json(report))
 
     assert "Ala ma kota" not in payload
     assert "Ala ma kota." not in payload
     assert "runtime" in payload
+    assert payload["calls_per_case"] == 1.0
 
 
 def test_auto_client_selection_for_incompatible_url_is_not_used() -> None:

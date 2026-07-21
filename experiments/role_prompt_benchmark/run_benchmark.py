@@ -1055,6 +1055,11 @@ def report_as_json(
 ) -> str:
     """Serialize benchmark summary without source text leakage."""
 
+    total_call_count = sum(item.call_count for item in report.case_evidence)
+    calls_per_case = (
+        total_call_count / len(report.case_evidence) if report.case_evidence else 0.0
+    )
+
     payload: dict[str, object] = {
         "exact_output_match_rate": report.exact_output_match_rate,
         "exact_edit_match_rate": report.exact_edit_match_rate,
@@ -1074,6 +1079,7 @@ def report_as_json(
         "safety_eligible": report.safety_eligible,
         "valid_responses": report.valid_responses,
         "total_responses": report.total_responses,
+        "calls_per_case": calls_per_case,
         "protocol": report.protocol,
         "corpus_sha256": report.corpus_sha256,
         "focus_metrics": report.focus_metrics,
