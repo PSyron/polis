@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "license": "CC0-1.0",
+  "author": "Paweł Cyroń",
+  "cases": [
+    {
+      "id": "ordinary_noun",
+      "source": "obraz",
+      "start": 0,
+      "end": 5,
+      "surface": "obraz",
+      "candidate_class": "ordinary",
+      "expected_forms": ["obraz", "obrazu", "obrazowi"],
+      "coverage": ["noun"]
+    },
+    {
+      "id": "ordinary_adjective",
+      "source": "stary",
+      "start": 0,
+      "end": 5,
+      "surface": "stary",
+      "candidate_class": "ordinary",
+      "expected_forms": ["stary", "staremu"],
+      "coverage": ["adjective"]
+    },
+    {
+      "id": "first_name_diacritic",
+      "source": "Paweł",
+      "start": 0,
+      "end": 5,
+      "surface": "Paweł",
+      "candidate_class": "first_name",
+      "expected_forms": ["Paweł", "Pawłowi"],
+      "coverage": ["capitalization", "diacritics"]
+    },
+    {
+      "id": "surname_title_case",
+      "source": "Nowak",
+      "start": 0,
+      "end": 5,
+      "surface": "Nowak",
+      "candidate_class": "surname",
+      "expected_forms": ["Nowak", "Nowakiem"],
+      "coverage": ["capitalization"]
+    },
+    {
+      "id": "surname_uppercase",
+      "source": "NOWAK",
+      "start": 0,
+      "end": 5,
+      "surface": "NOWAK",
+      "candidate_class": "surname",
+      "expected_forms": ["NOWAK", "NOWAKIEM"],
+      "coverage": ["capitalization"]
+    },
+    {
+      "id": "indeclinable_name",
+      "source": "Nicole",
+      "start": 0,
+      "end": 6,
+      "surface": "Nicole",
+      "candidate_class": "first_name",
+      "expected_forms": ["Nicole"],
+      "coverage": ["indeclinable"]
+    },
+    {
+      "id": "unknown_token",
+      "source": "Xyzq",
+      "start": 0,
+      "end": 4,
+      "surface": "Xyzq",
+      "candidate_class": "ordinary",
+      "expected_forms": ["Xyzq"],
+      "coverage": ["unknown"]
+    },
+    {
+      "id": "already_inflected_name",
+      "source": "Pawłowi",
+      "start": 0,
+      "end": 7,
+      "surface": "Pawłowi",
+      "candidate_class": "first_name",
+      "expected_forms": ["Pawłowi", "Paweł"],
+      "coverage": ["already-inflected"]
+    },
+    {
+      "id": "ambiguous_duplicate_form",
+      "source": "zamek",
+      "start": 0,
+      "end": 5,
+      "surface": "zamek",
+      "candidate_class": "ordinary",
+      "expected_forms": ["zamek"],
+      "coverage": ["duplicate-form"]
+    }
+  ]
+}

@@ -93,3 +93,19 @@ def test_stdio_bridge_invokes_language_tool_instead_of_corpus_lookup() -> None:
     assert "BRAK_PRZECINKA_ZEBY" in source
     assert "ALLOWLIST = Map.ofEntries" not in source
     assert "Wiem że Ania już wróciła." not in source
+
+
+def test_stdio_bridge_uses_real_polish_morphology_for_candidate_generation() -> None:
+    source = (
+        MODULE_ROOT / "src/main/java/org/polis/languagetool/PolisStdioServer.java"
+    ).read_text(encoding="utf-8")
+
+    assert "org.languagetool.tagging.pl.PolishTagger" in source
+    assert "org.languagetool.synthesis.pl.PolishSynthesizer" in source
+    assert '"synthesize"' in source
+    assert "candidate_id" in source
+    assert "start < 0" in source
+    assert "codePointLength" in source
+    assert "isIntegralNumber" in source
+    assert "expected_output" not in source
+    assert "polish_correction_corpus_v3" not in source

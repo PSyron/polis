@@ -33,3 +33,20 @@ inflection, word order, missing relative-clause/vocative punctuation, or
 spacing edits excluded by the two-rule allowlist. Every one of those missed
 gold edits is counted in the all-gold false-negative total and preserved in the
 per-case JSON report generated with `--json PATH`.
+
+## Inflection candidate generation
+
+Issue #58 measured the same pinned process through its real `PolishTagger` and
+`PolishSynthesizer`. On 24 eligible development edits and 34 eligible holdout
+edits from frozen corpus v3, expected-form recall and unchanged-form coverage
+were both 1.000 in ordinary-word, first-name, and surname classes. Warm p95 was
+2.68 ms on development and 1.75 ms on holdout. The separate candidate run
+measured 566.4 ms cold start, 367,099,904 bytes peak RSS, 54,072,194 bytes of
+runtime artifacts, and 8,821,678 bytes of Polish resources.
+
+The candidate set is deliberately recall-oriented. Mean distinct-form
+ambiguity was 23.5 for ordinary development words and 11.1 for development
+surnames; p95 reached 41 and 16 respectively. A later selector must use context
+without treating any synthesized alternative as a correction. Exact commands,
+authored edge cases, class tables, and licensing consequences are in
+`../../experiments/inflection_candidates/README.md`.

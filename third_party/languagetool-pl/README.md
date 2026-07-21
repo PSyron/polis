@@ -14,7 +14,9 @@ runtime dependency and is excluded from Polis wheels and source distributions.
 
 Other languages, the HTTP server, command-line application, GUI, office and
 browser integrations, n-gram data, and premium services are excluded. The
-runtime emits only `BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY` findings.
+check operation emits only `BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY`
+findings. The separate synthesis operation exposes context-free forms from the
+included Polish tagger and synthesizer; it does not select or apply a form.
 
 ## Toolchain and build
 
@@ -70,6 +72,20 @@ Only `pl-PL` is accepted. The process keeps one `JLanguageTool(new Polish())`
 instance warm between requests. Responses contain genuine LanguageTool 6.8
 rule identifiers, offsets, replacement candidates, and rule metadata.
 
+An explicit synthesis request targets Unicode half-open spans in the same
+source text:
+
+```json
+{"operation":"synthesize","text":"Paweł","language":"pl-PL","spans":[{"start":0,"end":5}]}
+```
+
+Each result preserves `start`, `end`, and `surface`, and returns deduplicated
+records with a stable `ltpl:` ID, optional lemma, form, and sorted
+morphological features. The original surface is always a candidate. Unknown,
+unsupported, and non-alternative spans return only safe available forms plus
+`no-analysis`, `unsupported-pos`, or `no-alternatives`. Candidate records prove
+dictionary synthesis only and make no claim about sentence context.
+
 ## Verification and benchmark
 
 Run static provenance and boundary checks with:
@@ -89,6 +105,10 @@ consult the recorded LanguageTool snapshot. It reports qualified punctuation
 and all-gold metrics, per-case false negatives, hard-negative changes, cold
 startup, warm p50/p95 latency, peak RSS, and runtime disk size. The measured
 baseline and limitations are in `BENCHMARK.md`.
+
+The independent inflection-candidate methodology, corpus measurements, and
+decision are documented in `../../experiments/inflection_candidates/README.md`
+and ADR-0010.
 
 ## Directory map
 

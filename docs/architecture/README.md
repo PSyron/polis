@@ -15,6 +15,7 @@ when the policy changes.
 | [ADR-0007](decisions/0007-vendored-polish-languagetool-module.md) | Accepted | Source-built Polish LanguageTool 6.8 subset for M4 |
 | [ADR-0008](decisions/0008-hybrid-correction-policy.md) | Accepted | Rules-first hybrid correction and suggestion policy for M5 |
 | [ADR-0009](decisions/0009-specialist-prompt-benchmark.md) | Accepted | No specialist prompt protocol qualifies |
+| [ADR-0010](decisions/0010-inflection-candidate-generation.md) | Accepted | LanguageTool supplies finite inflection candidates |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.

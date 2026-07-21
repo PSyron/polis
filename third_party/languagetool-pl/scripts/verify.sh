@@ -61,8 +61,11 @@ for forbidden in ("ALLOWLIST = Map.ofEntries", "Wiem że Ania już wróciła."):
 for required in (
     "org.languagetool.JLanguageTool",
     "org.languagetool.language.Polish",
+    "org.languagetool.tagging.pl.PolishTagger",
+    "org.languagetool.synthesis.pl.PolishSynthesizer",
     "BRAK_PRZECINKA_ZE",
     "BRAK_PRZECINKA_ZEBY",
+    "candidate_id",
 ):
     if required not in server_source:
         raise SystemExit(f"stdio bridge is missing real-engine marker: {required}")
@@ -99,6 +102,8 @@ if jar.is_file() and dependencies.is_dir():
         input=(
             '{"text":"Powiedział że jutro wróci.","language":"pl-PL"}\n'
             '{"text":"Powiedział, że jutro wróci.","language":"pl-PL"}\n'
+            '{"operation":"synthesize","text":"Paweł","language":"pl-PL",'
+            '"spans":[{"start":0,"end":5}]}\n'
         ),
         capture_output=True,
         check=True,
@@ -106,13 +111,28 @@ if jar.is_file() and dependencies.is_dir():
         timeout=30,
     )
     responses = [json.loads(line) for line in runtime.stdout.splitlines()]
-    if len(responses) != 2:
+    if len(responses) != 3:
         raise SystemExit("stdio bridge did not return one response per request")
     rule_ids = {match["rule"]["id"] for match in responses[0]["matches"]}
     if "BRAK_PRZECINKA_ZE" not in rule_ids:
         raise SystemExit("real engine did not find the unseen comma case")
     if responses[1]["matches"] != []:
         raise SystemExit("real engine changed the unseen correct control")
+    synthesis = responses[2]
+    result = synthesis["results"][0]
+    forms = [candidate["form"] for candidate in result["candidates"]]
+    if result["start"] != 0 or result["end"] != 5 or result["surface"] != "Paweł":
+        raise SystemExit("synthesis response did not preserve the original span")
+    if "Paweł" not in forms or "Pawłowi" not in forms:
+        raise SystemExit("real Polish synthesizer did not return required forms")
+    if len(forms) != len(set(forms)):
+        raise SystemExit("synthesis response contains duplicate forms")
+    if not all(
+        candidate["candidate_id"].startswith("ltpl:")
+        and candidate["features"] == sorted(set(candidate["features"]))
+        for candidate in result["candidates"]
+    ):
+        raise SystemExit("synthesis candidates are not stable auditable records")
 
 print("vendored LanguageTool sources, provenance, and runtime boundary verified")
 PY
