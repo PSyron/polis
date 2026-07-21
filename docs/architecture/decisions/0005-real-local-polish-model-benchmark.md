@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-21
 - Owner: Paweł Cyroń
-- Issues: #42, #48
+- Issues: #42, #48, #50
 
 ## Context
 
@@ -41,6 +41,14 @@ and offset contract; exact gold-finding F1 was 0.000 for agreement, inflection,
 punctuation, and syntax. The runner's latency median deliberately excludes
 invalid responses; because the candidate failed the validity gate, latency is
 not used to support selection.
+
+Issue #50 tested a separate corrected-text JSON contract on the expanded
+25-case corpus. Bielik Minitron 7B returned valid one-field JSON for 25/25
+requests, showing that offset generation was not the only blocker. It matched
+only 6/25 gold outputs and changed 8 correct negative cases. Exact output
+matches were 5/17 for inflection-tagged cases and 1/16 for both syntax- and
+punctuation-tagged cases. The candidate fails the mandatory zero-negative
+change safety gate and every per-category quality gate.
 
 ## Decision
 
