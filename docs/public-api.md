@@ -52,11 +52,33 @@ error returns no partial corrected text.
 
 `Analyzer.correct(text)` is the convenience path for a sentence or paragraph.
 It returns `CorrectionResult` with `original_text`, `corrected_text`,
-`applied_findings`, and `skipped_findings`. It automatically applies only
-non-conflicting deterministic rule findings with confidence at least `0.9`.
-It deliberately leaves low-confidence, LLM-generated, and unsuggestable
-findings unapplied; callers can still use `analyze()` and select corrections
-explicitly.
+`applied_findings`, `skipped_findings`, and `suggestion_outcomes`.
+It automatically applies only non-conflicting deterministic rule findings that are
+covered by the calibrated source-policy. Currently that includes:
+
+- `agreement.copula`
+- `spelling.jestes`
+- `spelling.wlasnie`
+- `spelling.zeby`
+- `syntax.comma_space`
+- `syntax.list_space`
+- `syntax.quote_space`
+- `syntax.sentence_space`
+Remaining findings, including model-generated and unsuggestable cases, stay in
+`skipped_findings`.
+
+`suggestion_outcomes` is a versioned telemetry tuple for optional backend
+attempts. For each suggestion-capable operation it records:
+
+- `status`: one of `complete`, `unavailable`, `timed_out`, or `invalid_response`
+- `backend`: stable backend identifier
+- `operation`: operation name used for the suggestion call
+- `suggestions`: number of model-sourced suggestions produced by analysis
+- `operation_version`: suggestion operation contract version
+- `source_policy_version`: source-policy contract version
+
+Model findings are never auto-applied in this method; callers can still use
+`analyze()` and explicit `AnalysisResult.apply()` selection for review workflows.
 
 `AnalyzerConfig` also accepts `language_tool_url` and
 `language_tool_timeout_seconds`. A TOML `[language_tool]` table maps its

@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Final, Self
+from typing import Final, Literal, Self
 
 from .core.models import (
     AnalysisOptions as AnalysisOptions,
@@ -46,6 +46,19 @@ class CorrectionResult:
     corrected_text: str
     applied_findings: tuple[Finding, ...]
     skipped_findings: tuple[Finding, ...]
+    suggestion_outcomes: tuple[SuggestionOutcome, ...]
+
+
+SuggestionStatus = Literal["complete", "unavailable", "timed_out", "invalid_response"]
+
+
+class SuggestionOutcome:
+    status: SuggestionStatus
+    backend: str
+    operation: str
+    suggestions: int
+    operation_version: str
+    source_policy_version: str
 
 
 class Analyzer:

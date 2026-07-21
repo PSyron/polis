@@ -46,7 +46,7 @@ def test_correct_skips_a_conflicting_rule_suggestion(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     text = "Zeby"
-    source = Source(SourceKind.RULE, "test")
+    source = Source(SourceKind.RULE, "spelling.zeby")
     first = Finding.create(
         category=Category.SPELLING,
         severity=Severity.ERROR,

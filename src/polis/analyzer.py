@@ -2,17 +2,23 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Final, Literal
 
 from polis.analysis.pipeline import analyze_text, analyze_text_async
 from polis.core import (
     AnalysisOptions,
     AnalysisResult,
+    AnalysisTimeoutError,
+    BackendUnavailableError,
+    Confidence,
     ConfigurationError,
     Finding,
+    InvalidBackendResponseError,
+    Source,
     SourceKind,
 )
 from polis.core.models import Category
@@ -35,12 +41,98 @@ from polis.rules.languagetool import (
     LocalLanguageToolRule,
     LoopbackLanguageToolHttpTransport,
 )
+from polis.segmentation import segment_sentences
 
 __all__ = [
     "Analyzer",
     "AnalyzerConfig",
     "CorrectionResult",
+    "SuggestionOutcome",
+    "SuggestionStatus",
 ]
+
+
+SuggestionStatus = Literal[
+    "complete",
+    "unavailable",
+    "timed_out",
+    "invalid_response",
+]
+
+_SUGGESTION_OUTCOME_VERSION: Final[str] = "1.0"
+_SUGGESTION_BACKEND_OPERATION: Final[str] = "analysis.correct.suggestions"
+_SUGGESTION_BACKEND_POLICY: Final[str] = "1.0"
+
+
+@dataclass(frozen=True)
+class AutomaticCorrectionPolicy:
+    """One source-policy entry for automatic deterministic correction."""
+
+    source: Source
+    minimum_confidence: Confidence
+    category: Category
+    policy_version: str = "1.0"
+
+
+@dataclass(frozen=True)
+class SuggestionOutcome:
+    """Versioned suggestion-run outcome for optional model-backed operations."""
+
+    status: SuggestionStatus
+    backend: str
+    operation: str
+    suggestions: int
+    operation_version: str = _SUGGESTION_OUTCOME_VERSION
+    source_policy_version: str = _SUGGESTION_BACKEND_POLICY
+
+
+_AUTOMATIC_CORRECTION_POLICY: tuple[AutomaticCorrectionPolicy, ...] = (
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "agreement.copula"),
+        category=Category.AGREEMENT,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "spelling.jestes"),
+        category=Category.SPELLING,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "spelling.wlasnie"),
+        category=Category.SPELLING,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "spelling.zeby"),
+        category=Category.SPELLING,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "syntax.comma_space"),
+        category=Category.PUNCTUATION,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "syntax.list_space"),
+        category=Category.SYNTAX,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "syntax.quote_space"),
+        category=Category.PUNCTUATION,
+        minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "syntax.sentence_space"),
+        category=Category.PUNCTUATION,
+        minimum_confidence=Confidence(0.9),
+    ),
+)
+
+
+_POLICY_BY_SOURCE: Final[dict[Source, AutomaticCorrectionPolicy]] = {
+    entry.source: entry for entry in _AUTOMATIC_CORRECTION_POLICY
+}
 
 
 @dataclass(frozen=True)
@@ -190,6 +282,7 @@ class CorrectionResult:
     corrected_text: str
     applied_findings: tuple[Finding, ...]
     skipped_findings: tuple[Finding, ...]
+    suggestion_outcomes: tuple[SuggestionOutcome, ...]
 
 
 class Analyzer:
@@ -248,22 +341,68 @@ class Analyzer:
         selected: list[Finding] = []
         skipped: list[Finding] = []
         for finding in analysis.issues:
-            is_safe = (
-                finding.source.kind is SourceKind.RULE
-                and finding.suggestion is not None
-                and finding.confidence.value >= 0.9
+            if (
+                finding.suggestion is not None
+                and self._should_apply_automatically(finding)
                 and not any(findings_conflict(finding, item) for item in selected)
-            )
-            if is_safe:
+            ):
                 selected.append(finding)
             else:
                 skipped.append(finding)
+        suggestion_outcomes = self._suggestion_outcomes(text, analysis.options)
         return CorrectionResult(
             original_text=analysis.text,
             corrected_text=analysis.apply(item.id for item in selected),
             applied_findings=tuple(selected),
             skipped_findings=tuple(skipped),
+            suggestion_outcomes=tuple(suggestion_outcomes),
         )
+
+    def _suggestion_outcomes(
+        self, text: str, options: AnalysisOptions
+    ) -> tuple[SuggestionOutcome, ...]:
+        if self._backend is None:
+            return ()
+        status = self._collect_backend_status(text, options=options)
+        analysis = self.analyze(text, options=options)
+        suggestion_count = _count_llm_suggestion_findings(analysis.issues)
+        return (
+            SuggestionOutcome(
+                status=status,
+                backend=self._backend.name,
+                operation=_SUGGESTION_BACKEND_OPERATION,
+                suggestions=suggestion_count,
+            ),
+        )
+
+    def _collect_backend_status(
+        self,
+        text: str,
+        *,
+        options: AnalysisOptions,
+    ) -> SuggestionStatus:
+        del options
+        assert self._backend is not None
+
+        try:
+            _run_llm_backend_segmented(self._backend, text)
+            return "complete"
+        except BackendUnavailableError:
+            return "unavailable"
+        except AnalysisTimeoutError:
+            return "timed_out"
+        except InvalidBackendResponseError:
+            return "invalid_response"
+
+    def _should_apply_automatically(self, finding: Finding) -> bool:
+        policy = _POLICY_BY_SOURCE.get(finding.source)
+        if policy is None:
+            return False
+        if policy.category != finding.category:
+            return False
+        if finding.confidence.value < policy.minimum_confidence.value:
+            return False
+        return True
 
 
 def _make_default_registry(config: AnalyzerConfig) -> DeterministicRuleRegistry:
@@ -299,3 +438,37 @@ def _make_mock_backend() -> MockHeuristicBackend:
         transport=MockHeuristicTransport(),
         name="mock-heuristic",
     )
+
+
+def _run_llm_backend_segmented(
+    backend: object,
+    text: str,
+) -> None:
+    """Run the configured backend across sentence segments and raise on failure."""
+
+    if not hasattr(backend, "generate_findings"):
+        raise TypeError("backend must expose generate_findings")
+
+    async def run() -> None:
+        for fragment in segment_sentences(text):
+            if not fragment.text:
+                continue
+            await backend.generate_findings(
+                fragment.text,
+                policy=None,
+                clock=None,
+                sleep=asyncio.sleep,
+                operation=_SUGGESTION_BACKEND_OPERATION,
+            )
+
+    asyncio.run(run())
+
+
+def _count_llm_suggestion_findings(
+    findings: tuple[Finding, ...],
+) -> int:
+    count = 0
+    for finding in findings:
+        if finding.source.kind is SourceKind.LLM and finding.suggestion is not None:
+            count += 1
+    return count

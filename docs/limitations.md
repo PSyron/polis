@@ -18,10 +18,9 @@
 - The source-built two-rule LanguageTool subset is not a general Polish corrector
   and has not passed the M5 automatic-correction source-policy gate.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
-  is an accepted delivery policy, not implemented behavior. Until #60 is
-  complete, automatic correction still uses the current conservative
-  confidence-based deterministic policy and no explicit partial-suggestion
-  outcome exists.
+  is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
+  now applies a versioned source-policy for deterministic rules and exposes
+  optional suggestion outcomes for backend visibility.
 
 ## Accuracy and policy notes
 
