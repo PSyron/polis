@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Literal, cast
 
@@ -452,3 +453,100 @@ def test_run_protocol_matrix_includes_runtime_metadata() -> None:
     payload = cast(dict[str, object], matrix["development/specialist"])
     runtime_payload = cast(dict[str, object], payload["runtime"])
     assert runtime_payload["model_identifier"] == "bielik-1.5b"
+
+
+def test_main_runs_all_protocols_on_all_splits(
+    monkeypatch: MonkeyPatch,
+    capsys: CaptureFixture[str],
+) -> None:
+    dev_case = _make_case(
+        case_id="dev-1",
+        source="Ala ma kota.",
+        expected_output="Ala ma kota.",
+        tags=("syntax",),
+        verification="positive",
+        split="development",
+        focus="syntax",
+    )
+    holdout_case = _make_case(
+        case_id="holdout-1",
+        source="Jan z Jadwiga.",
+        expected_output="Jan z Jadwigą.",
+        tags=("inflection", "name"),
+        verification="positive",
+        split="holdout",
+        focus="inflection",
+    )
+
+    def fake_load_cases(
+        path: Path, *, split: str = "development"
+    ) -> tuple[RoleBenchmarkCase, ...]:
+        if split == "development":
+            return (dev_case,)
+        if split == "holdout":
+            return (holdout_case,)
+        raise ValueError(f"unexpected split: {split!r}")
+
+    def fake_generate(self: object, request: object) -> TimedResponse:
+        return TimedResponse('{"corrected_text":"Ala ma kota."}', 5.0)
+
+    class FakeClient:
+        def __init__(self) -> None:
+            self.preflight_calls = 0
+
+        def preflight(self) -> RuntimeMetadata:
+            self.preflight_calls += 1
+            return RuntimeMetadata(
+                engine="mlx",
+                model_identifier="mlx-test-model",
+                runtime_version="0.0.0",
+            )
+
+        def generate(self, request: object) -> TimedResponse:
+            return fake_generate(self, request)
+
+    class FakeBuilder:
+        def __call__(self, *args: object, **kwargs: object) -> FakeClient:
+            return FakeClient()
+
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark.load_cases", fake_load_cases
+    )
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark._build_client", FakeBuilder()
+    )
+
+    assert (
+        main(
+            [
+                "--model",
+                "mlx-test-model",
+                "--protocol",
+                "all",
+                "--split",
+                "all",
+                "--engine",
+                "mlx",
+                "--base-url",
+                "http://127.0.0.1:8080",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+    protocols = {
+        "finding",
+        "one_field",
+        "specialist",
+        "candidate",
+        "proposal",
+    }
+
+    assert payload["development"].keys() >= protocols
+    assert payload["holdout"].keys() >= protocols
+    assert set(payload["development"].keys()) == protocols
+    assert set(payload["holdout"].keys()) == protocols
+    for protocol_payload in payload["development"].values():
+        protocol_payload = cast(dict[str, object], protocol_payload)
+        assert protocol_payload["protocol"] in protocols
+        assert protocol_payload["corpus_sha256"] is not None
