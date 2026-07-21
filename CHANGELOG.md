@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Benchmarked a pinned Bielik 1.5B MLX QLoRA adapter on the 16 GB Apple Silicon
+  target and rejected it after frozen holdout failures in response validity,
+  protected-negative safety, and edit precision; adapter weights remain local.
 - Added a deterministic CC0 Polish correction fine-tuning bundle with 1,200
   training and 240 validation records balanced across inflection, syntax,
   punctuation, and protected no-change examples.

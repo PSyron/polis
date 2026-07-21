@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-bielik-1.5b-qlora-v1",
+  "base_model": {
+    "identifier": "speakleash/Bielik-1.5B-v3.0-Instruct-MLX-8bit",
+    "revision": "a67fe1c442b12685cf2d1c32d02359d9e52c8ddd",
+    "weights_sha256": "4439362cc0cf36925d1769b51b81bb5a9b44c7eaa81be35768c9e89a5c560560",
+    "quantization": "8-bit"
+  },
+  "runtime": {
+    "mlx_lm_version": "0.31.3",
+    "mlx_version": "0.32.0",
+    "python_version": "3.13.12"
+  },
+  "dataset": {
+    "train_sha256": "9ebe2345c8672bf44aead9016e26901139445f20f00e8699946079d99d300980",
+    "validation_sha256": "46d56c84229c178308874dc94008e747a0ca15e6ed5a3b61ddc3c10df6212208",
+    "corpus_v3_sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2"
+  },
+  "training": {
+    "seed": 42,
+    "fine_tune_type": "lora",
+    "optimizer": "adam",
+    "mask_prompt": true,
+    "num_layers": 8,
+    "batch_size": 1,
+    "grad_accumulation_steps": 4,
+    "iters": 300,
+    "learning_rate": 0.00001,
+    "max_seq_length": 512,
+    "steps_per_report": 10,
+    "steps_per_eval": 50,
+    "val_batches": 30,
+    "save_every": 100,
+    "grad_checkpoint": false,
+    "lora_parameters": {
+      "rank": 8,
+      "dropout": 0.0,
+      "scale": 16.0
+    }
+  },
+  "generation": {
+    "seed": 42,
+    "temperature": 0.0,
+    "top_p": 0.95,
+    "max_tokens": 64
+  },
+  "selection": {
+    "minimum_edit_precision": 0.9,
+    "required_valid_response_rate": 1.0,
+    "maximum_negative_changes": 0,
+    "maximum_training_swap_delta_bytes": 67108864,
+    "minimum_validation_f1_delta": 0.1,
+    "minimum_complete_output_delta": 0.0
+  }
+}

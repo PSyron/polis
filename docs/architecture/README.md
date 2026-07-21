@@ -16,6 +16,7 @@ when the policy changes.
 | [ADR-0008](decisions/0008-hybrid-correction-policy.md) | Accepted | Rules-first hybrid correction and suggestion policy for M5 |
 | [ADR-0009](decisions/0009-specialist-prompt-benchmark.md) | Accepted | No specialist prompt protocol qualifies |
 | [ADR-0010](decisions/0010-inflection-candidate-generation.md) | Accepted | LanguageTool supplies finite inflection candidates |
+| [ADR-0011](decisions/0011-reject-bielik-1.5b-qlora.md) | Accepted | Bielik 1.5B QLoRA is rejected for the production backend |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.
