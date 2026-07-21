@@ -93,10 +93,13 @@ from every future training asset.
 
 The corpus declares four strata with 60 cases each: inflection, syntax,
 punctuation, and protected hard negatives. Each stratum has 20 development and
-40 intended holdout cases. These split labels reserve the final assignment,
-but the top-level `holdout_state` remains `unfrozen-candidates` while any case
-has `pending-human-review` status. Pending candidates are not evaluation gold,
-cannot enter a benchmark or quality gate, and cannot be used for training.
+40 holdout cases. After all 240 cases completed owner review, the top-level
+`holdout_state` was set to `frozen` before the first quality-gate run. Pending
+candidates are not evaluation gold, cannot enter a benchmark or quality gate,
+and cannot be used for training.
+Before that transition, any `pending-human-review` case required the corpus to
+remain `unfrozen-candidates`; this state is still enforced for future corpus
+versions under review.
 
 Every case records CC0-1.0 provenance, a review object, exact proper-name
 entity spans, canonical entity identifiers, a derived normalized sentence

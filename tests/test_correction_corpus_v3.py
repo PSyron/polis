@@ -59,7 +59,7 @@ def test_v3_corpus_has_exact_stratum_and_intended_split_balance() -> None:
 
     assert corpus.schema_version == 3
     assert corpus.id == "polis_polish_correction_corpus_v3"
-    assert corpus.holdout_state == "unfrozen-candidates"
+    assert corpus.holdout_state == "frozen"
     assert len(corpus.cases) == 240
     for stratum in ("inflection", "syntax", "punctuation", "hard_negative"):
         cases = [case for case in corpus.cases if case.stratum == stratum]
@@ -675,7 +675,7 @@ def test_validator_rejects_overlapping_or_wrong_unicode_edits() -> None:
         validate_correction_corpus(raw)
 
 
-def test_only_reviewed_development_candidates_are_available_for_benchmark() -> None:
+def test_frozen_corpus_separates_benchmark_and_quality_gate_cases() -> None:
     corpus = load_correction_corpus_json(JSON_CORPUS)
 
     benchmark = select_cases_for_purpose(corpus, purpose="benchmark")
@@ -688,8 +688,10 @@ def test_only_reviewed_development_candidates_are_available_for_benchmark() -> N
         "hard_negative",
     }
     assert {case.split for case in benchmark} == {"development"}
-    with pytest.raises(CorpusUsageError, match="frozen holdout"):
-        select_cases_for_purpose(corpus, purpose="quality_gate")
+    quality_gate = select_cases_for_purpose(corpus, purpose="quality_gate")
+
+    assert len(quality_gate) == 160
+    assert {case.split for case in quality_gate} == {"holdout"}
     with pytest.raises(CorpusUsageError, match="training"):
         select_cases_for_purpose(corpus, purpose="training")
 

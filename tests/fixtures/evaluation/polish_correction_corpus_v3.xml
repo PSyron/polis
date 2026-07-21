@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<corpus schema_version="3" id="polis_polish_correction_corpus_v3" language="pl-PL" holdout_state="unfrozen-candidates">
+<corpus schema_version="3" id="polis_polish_correction_corpus_v3" language="pl-PL" holdout_state="frozen">
   <provenance source="Polis project draft" license="CC0-1.0" created="2026-07-21" method="Model-drafted synthetic candidate under accepted issue #56 clarification" notes="Not gold data; requires case-by-case human review by Paweł Cyroń." />
   <review_policy candidate_status="pending-human-review" approval_status="human-reviewed" required_reviewer="Paweł Cyroń" checklist_version="corpus-v3-review-v1" training_use="prohibited" />
   <cases>

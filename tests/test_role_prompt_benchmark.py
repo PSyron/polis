@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Literal, cast
+from urllib.request import Request
 
 import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
 from experiments.role_prompt_benchmark.run_benchmark import (
+    OllamaClient,
     ProtocolName,
     ProtocolRequest,
     RoleBenchmarkCase,
@@ -26,7 +28,43 @@ from experiments.role_prompt_benchmark.run_benchmark import (
     summarize_observations,
 )
 
-from polis.evaluation.correction_corpus import CorpusEdit, CorpusUsageError
+from polis.evaluation.correction_corpus import CorpusEdit
+
+
+def test_ollama_preflight_records_loaded_model_memory(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    class FakeResponse:
+        def __init__(self, payload: object) -> None:
+            self.payload = payload
+
+        def __enter__(self) -> FakeResponse:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps(self.payload).encode("utf-8")
+
+    def fake_urlopen(request: Request, *, timeout: float) -> FakeResponse:
+        assert timeout == 10.0
+        if request.full_url.endswith("/api/version"):
+            return FakeResponse({"version": "0.20.7"})
+        if request.full_url.endswith("/api/tags"):
+            return FakeResponse({"models": [{"name": "qwen3:1.7b"}]})
+        assert request.full_url.endswith("/api/ps")
+        return FakeResponse(
+            {"models": [{"name": "qwen3:1.7b", "size_vram": 2_355_771_424}]}
+        )
+
+    monkeypatch.setattr(
+        "experiments.role_prompt_benchmark.run_benchmark.urlopen", fake_urlopen
+    )
+
+    metadata = OllamaClient("http://127.0.0.1:11434", "qwen3:1.7b", 10.0).preflight()
+
+    assert metadata.loaded_memory_bytes == 2_355_771_424
 
 
 class _HealthyClient:
@@ -133,8 +171,10 @@ def test_load_cases_rejects_invalid_corpus_schema(tmp_path: Path) -> None:
 
 
 def test_load_cases_loads_split_all() -> None:
-    with pytest.raises(CorpusUsageError, match="frozen holdout"):
-        load_cases(CORPUS_PATH, split="all")
+    cases = load_cases(CORPUS_PATH, split="all")
+
+    assert len(cases) == 240
+    assert {case.split for case in cases} == {"development", "holdout"}
 
 
 def test_run_cases_validates_schema_and_records_exact_match() -> None:
@@ -281,6 +321,28 @@ def test_run_cases_marks_invalid_schema_as_failed() -> None:
     assert observation.valid_response is False
     assert observation.status == "invalid_schema"
     assert observation.corrected_output == case.source
+
+
+def test_candidate_protocol_does_not_build_candidates_from_gold_edits() -> None:
+    case = _make_case(
+        case_id="candidate_no_gold_leakage",
+        source="Widzę Jan.",
+        expected_output="Widzę Jana.",
+        tags=("inflection",),
+        verification="positive",
+        focus="inflection",
+        edits=((6, 9, "Jan", "Jana", ""),),
+    )
+
+    class NoCallClient:
+        def generate(self, request: object) -> TimedResponse:
+            raise AssertionError("gold edits must not become model candidates")
+
+    observation = run_cases(NoCallClient(), "candidate", (case,))[0]
+
+    assert observation.status == "unsupported"
+    assert observation.call_count == 0
+    assert observation.valid_response is False
 
 
 def test_summarize_observations_tracks_negative_case_changes() -> None:
@@ -455,15 +517,26 @@ def test_main_returns_zero_and_prints_report(
     )
 
     class FakeClient:
+        def __init__(self) -> None:
+            self.preflight_calls = 0
+
         def preflight(self) -> RuntimeMetadata:
-            return RuntimeMetadata("ollama", "local-test", "0.20.7")
+            self.preflight_calls += 1
+            return RuntimeMetadata(
+                "ollama",
+                "local-test",
+                "0.20.7",
+                loaded_memory_bytes=1_024 * self.preflight_calls,
+            )
 
         def generate(self, request: object) -> TimedResponse:
             return TimedResponse('{"corrected_text":"Ala ma kota."}', 1.0)
 
+    fake_client = FakeClient()
+
     class FakeBuilder:
         def __call__(self, *args: object, **kwargs: object) -> FakeClient:
-            return FakeClient()
+            return fake_client
 
     monkeypatch.setattr(
         "experiments.role_prompt_benchmark.run_benchmark._build_client",
@@ -483,8 +556,10 @@ def test_main_returns_zero_and_prints_report(
         )
         == 0
     )
-    output = capsys.readouterr().out
-    assert "safe" in output
+    payload = json.loads(capsys.readouterr().out)
+    assert fake_client.preflight_calls == 2
+    assert payload["runtime"]["loaded_memory_bytes"] == 2_048
+    assert any(case["id"] == "safe" for case in payload["cases"])
 
 
 def test_default_runtime_engine_prefers_mlx_on_darwin() -> None:

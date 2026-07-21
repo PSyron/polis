@@ -2,7 +2,7 @@
   "schema_version": 3,
   "id": "polis_polish_correction_corpus_v3",
   "language": "pl-PL",
-  "holdout_state": "unfrozen-candidates",
+  "holdout_state": "frozen",
   "provenance": {
     "source": "Polis project draft",
     "license": "CC0-1.0",

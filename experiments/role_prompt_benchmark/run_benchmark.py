@@ -7,7 +7,6 @@ import hashlib
 import json
 import math
 import platform
-import re
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
@@ -34,17 +33,14 @@ from polis.llm import (
     validate_llm_response,
 )
 from polis.llm.corrected_text import (
-    FiniteCandidate,
-    build_inflection_candidate_prompt_request,
+    PromptRequest as CorrectedPromptRequest,
+)
+from polis.llm.corrected_text import (
     build_proposal_verifier_prompt_request,
     build_specialist_corrected_text_prompt_request,
     derive_text_edits,
-    validate_candidate_selection_response,
     validate_corrected_text_response,
     validate_verifier_response,
-)
-from polis.llm.corrected_text import (
-    PromptRequest as CorrectedPromptRequest,
 )
 
 DEFAULT_CORPUS_PATH = Path("tests/fixtures/evaluation/polish_correction_corpus_v3.json")
@@ -331,7 +327,14 @@ class OllamaClient:
         installed = _get_json(
             f"{self.base_url.rstrip('/')}/api/tags", self.timeout_seconds
         )
-        if not isinstance(version, dict) or not isinstance(installed, dict):
+        processes = _get_json(
+            f"{self.base_url.rstrip('/')}/api/ps", self.timeout_seconds
+        )
+        if (
+            not isinstance(version, dict)
+            or not isinstance(installed, dict)
+            or not isinstance(processes, dict)
+        ):
             raise ValueError("Ollama health response must be an object")
 
         runtime_version = version.get("version")
@@ -339,16 +342,36 @@ class OllamaClient:
             raise ValueError("Ollama version must be a string")
 
         installed_models = installed.get("models")
+        process_models = processes.get("models")
+        if not isinstance(process_models, list):
+            raise ValueError("Ollama process response must contain models")
         if not isinstance(installed_models, list) or not any(
             isinstance(item, dict) and item.get("name") == self.model
             for item in installed_models
         ):
             raise OSError("requested Ollama model is unavailable")
 
+        selected = next(
+            (
+                item
+                for item in process_models
+                if isinstance(item, dict) and item.get("name") == self.model
+            ),
+            None,
+        )
+        loaded_memory = (
+            None
+            if selected is None
+            else selected.get("size_vram", selected.get("size"))
+        )
+        if isinstance(loaded_memory, bool) or not isinstance(loaded_memory, int):
+            loaded_memory = None
+
         return RuntimeMetadata(
             engine="ollama",
             model_identifier=self.model,
             runtime_version=runtime_version,
+            loaded_memory_bytes=loaded_memory,
         )
 
 
@@ -614,36 +637,18 @@ def select_healthy_client(
     raise RuntimeError("no healthy local runtime is available")
 
 
-def _find_case_candidates(case: RoleBenchmarkCase) -> tuple[FiniteCandidate, ...]:
-    candidates: list[FiniteCandidate] = []
-    for index, edit in enumerate(case.edits):
-        candidates.append(
-            FiniteCandidate(
-                candidate_id=f"{case.case_id}_edit_{index:02d}",
-                start=edit.start,
-                end=edit.end,
-                form=edit.suggestion,
-            )
-        )
+def _postflight_runtime_metadata(
+    client: RuntimeClient, metadata: RuntimeMetadata
+) -> RuntimeMetadata:
+    """Refresh runtime evidence after inference has loaded the model."""
 
-    if candidates:
-        return tuple(candidates)
-
-    match = re.search(r"\S", case.source)
-    if match is None:
-        raise ValueError("case source must not be empty")
-    start = match.start()
-    end = start + 1
-    if end > len(case.source):
-        raise ValueError("case source too short")
-    return (
-        FiniteCandidate(
-            candidate_id=f"{case.case_id}_noop",
-            start=start,
-            end=end,
-            form=case.source[start:end],
-        ),
-    )
+    postflight = client.preflight()
+    if (
+        postflight.engine != metadata.engine
+        or postflight.model_identifier != metadata.model_identifier
+    ):
+        raise RuntimeError("runtime postflight returned unexpected metadata")
+    return replace(metadata, loaded_memory_bytes=postflight.loaded_memory_bytes)
 
 
 def _apply_corrected_findings(
@@ -672,9 +677,8 @@ def _build_request(protocol: ProtocolName, case: RoleBenchmarkCase) -> ProtocolR
         )
 
     if protocol == "candidate":
-        candidates = _find_case_candidates(case)
-        return build_inflection_candidate_prompt_request(
-            case.source, candidates=candidates
+        raise ValueError(
+            "unsupported candidate protocol without independent candidates from #58"
         )
 
     if protocol == "proposal":
@@ -735,34 +739,8 @@ def _run_case_for_protocol(
         return corrected, call_count, elapsed_ms
 
     if protocol == "candidate":
-        request = _build_request(protocol, case)
-        response = client.generate(request)
-        call_count += 1
-        elapsed_ms += response.elapsed_ms
-        candidate_ids = tuple(item.candidate_id for item in _find_case_candidates(case))
-        selected = validate_candidate_selection_response(
-            response.raw_response,
-            candidate_ids=candidate_ids,
-        )
-        if selected is None:
-            return case.source, call_count, elapsed_ms
-        candidates = _find_case_candidates(case)
-        selected_candidate = next(
-            (
-                candidate
-                for candidate in candidates
-                if candidate.candidate_id == selected
-            ),
-            None,
-        )
-        if selected_candidate is None:
-            raise ValueError("selected candidate_id is unknown")
-        return (
-            case.source[: selected_candidate.start]
-            + selected_candidate.form
-            + case.source[selected_candidate.end :],
-            call_count,
-            elapsed_ms,
+        raise ValueError(
+            "unsupported candidate protocol without independent candidates from #58"
         )
 
     if protocol == "proposal":
@@ -1386,9 +1364,9 @@ def main(argv: list[str] | None = None) -> int:
         protocol = selected_protocols[0]
         split_matrix: dict[str, object] = {}
         for split_name, cases in cases_by_split:
-            report = summarize_observations(
-                run_cases(client, protocol, cases, repetitions=repetitions)
-            )
+            observations = run_cases(client, protocol, cases, repetitions=repetitions)
+            runtime_metadata = _postflight_runtime_metadata(client, runtime_metadata)
+            report = summarize_observations(observations)
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,
@@ -1409,9 +1387,9 @@ def main(argv: list[str] | None = None) -> int:
         split_name, cases = cases_by_split[0]
         protocol_payload: dict[str, object] = {}
         for protocol in selected_protocols:
-            report = summarize_observations(
-                run_cases(client, protocol, cases, repetitions=repetitions)
-            )
+            observations = run_cases(client, protocol, cases, repetitions=repetitions)
+            runtime_metadata = _postflight_runtime_metadata(client, runtime_metadata)
+            report = summarize_observations(observations)
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,
@@ -1425,9 +1403,9 @@ def main(argv: list[str] | None = None) -> int:
     for split_name, cases in cases_by_split:
         split_payload = {}
         for protocol in selected_protocols:
-            report = summarize_observations(
-                run_cases(client, protocol, cases, repetitions=repetitions)
-            )
+            observations = run_cases(client, protocol, cases, repetitions=repetitions)
+            runtime_metadata = _postflight_runtime_metadata(client, runtime_metadata)
+            report = summarize_observations(observations)
             report = replace(
                 report,
                 corpus_sha256=corpus_sha256,
