@@ -75,6 +75,15 @@ evaluation gold labels or release thresholds. This dataset supplies the later
 quality work with independently reviewed expected findings without conflating
 that experiment with analyzer accuracy.
 
+## E2E LLM correction corpus
+
+`tests/fixtures/e2e/polish_correction_corpus.json` and its XML counterpart are
+also project-authored, synthetic Polish examples released as CC0-1.0. The
+LLM-planned records cover exact minimal corrections; the negative records are
+hard safety checks for correct names, surnames, punctuation, and grammatical
+marked word order. JSON is the source used by the local-model benchmark, while
+the XML fixture is kept equivalent for interchange and regression testing.
+
 ## Validation
 
 Run the fast integrity checks with:

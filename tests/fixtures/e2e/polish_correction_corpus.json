@@ -197,6 +197,113 @@
       "tags": ["negative", "punctuation", "subordinate_clause"],
       "expected_findings": [],
       "verification": "negative"
+    },
+    {
+      "id": "combined_maria_nowak",
+      "input": "Maria powiedziała że chce żeby jutro spotkać się z Jan Nowak.",
+      "expected_output": "Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 17, "end": 17, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 25, "end": 25, "original": "", "suggestion": ","}, {"category": "syntax", "start": 26, "end": 48, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkała"}, {"category": "inflection", "start": 51, "end": 60, "original": "Jan Nowak", "suggestion": "Janem Nowakiem"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_anna_zielinski",
+      "input": "Anna przyznała że chce żeby jutro spotkać się z Piotr Zieliński.",
+      "expected_output": "Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 14, "end": 14, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 22, "end": 22, "original": "", "suggestion": ","}, {"category": "syntax", "start": 23, "end": 45, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkała"}, {"category": "inflection", "start": 48, "end": 63, "original": "Piotr Zieliński", "suggestion": "Piotrem Zielińskim"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_jan_kowalska",
+      "input": "Jan wyjaśnił że chce żeby jutro spotkać się z Anna Kowalska.",
+      "expected_output": "Jan wyjaśnił, że chce, żeby jutro się spotkał z Anną Kowalską.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 12, "end": 12, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 20, "end": 20, "original": "", "suggestion": ","}, {"category": "syntax", "start": 21, "end": 43, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkał"}, {"category": "inflection", "start": 46, "end": 59, "original": "Anna Kowalska", "suggestion": "Anną Kowalską"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_tomasz_nowicka",
+      "input": "Tomasz napisał że chce żeby jutro spotkać się z Marta Nowicka.",
+      "expected_output": "Tomasz napisał, że chce, żeby jutro się spotkał z Martą Nowicką.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 14, "end": 14, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 22, "end": 22, "original": "", "suggestion": ","}, {"category": "syntax", "start": 23, "end": 45, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkał"}, {"category": "inflection", "start": 48, "end": 61, "original": "Marta Nowicka", "suggestion": "Martą Nowicką"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_ewa_wisniewski",
+      "input": "Ewa dodała że chce żeby jutro spotkać się z Adam Wiśniewski.",
+      "expected_output": "Ewa dodała, że chce, żeby jutro się spotkała z Adamem Wiśniewskim.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 10, "end": 10, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 18, "end": 18, "original": "", "suggestion": ","}, {"category": "syntax", "start": 19, "end": 41, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkała"}, {"category": "inflection", "start": 44, "end": 59, "original": "Adam Wiśniewski", "suggestion": "Adamem Wiśniewskim"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_krzysztof_nowak",
+      "input": "Krzysztof uznał że chce żeby jutro spotkać się z Julia Nowak.",
+      "expected_output": "Krzysztof uznał, że chce, żeby jutro się spotkał z Julią Nowak.",
+      "description": "Fleksja imienia, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 15, "end": 15, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 23, "end": 23, "original": "", "suggestion": ","}, {"category": "syntax", "start": 24, "end": 46, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkał"}, {"category": "inflection", "start": 49, "end": 60, "original": "Julia Nowak", "suggestion": "Julią Nowak"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_ola_kwiatkowski",
+      "input": "Ola wspomniała że chce żeby jutro spotkać się z Michał Kwiatkowski.",
+      "expected_output": "Ola wspomniała, że chce, żeby jutro się spotkała z Michałem Kwiatkowskim.",
+      "description": "Fleksja nazwiska, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 14, "end": 14, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 22, "end": 22, "original": "", "suggestion": ","}, {"category": "syntax", "start": 23, "end": 45, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkała"}, {"category": "inflection", "start": 48, "end": 66, "original": "Michał Kwiatkowski", "suggestion": "Michałem Kwiatkowskim"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "combined_pawel_wojcik",
+      "input": "Paweł zaznaczył że chce żeby jutro spotkać się z Katarzyna Wójcik.",
+      "expected_output": "Paweł zaznaczył, że chce, żeby jutro się spotkał z Katarzyną Wójcik.",
+      "description": "Fleksja imienia, forma osobowa zdania podrzędnego i przecinki.",
+      "tags": ["inflection", "syntax", "punctuation", "name", "surname", "subordinate_clause"],
+      "expected_findings": [{"category": "punctuation", "start": 15, "end": 15, "original": "", "suggestion": ","}, {"category": "punctuation", "start": 23, "end": 23, "original": "", "suggestion": ","}, {"category": "syntax", "start": 24, "end": 46, "original": "żeby jutro spotkać się", "suggestion": "żeby jutro się spotkał"}, {"category": "inflection", "start": 49, "end": 65, "original": "Katarzyna Wójcik", "suggestion": "Katarzyną Wójcik"}],
+      "verification": "llm_planned", "tracking_issue": 49
+    },
+    {
+      "id": "negative_combined_maria_nowak",
+      "input": "Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.",
+      "expected_output": "Maria powiedziała, że chce, żeby jutro się spotkała z Janem Nowakiem.",
+      "description": "Poprawna fleksja nazwiska i interpunkcja zdania podrzędnego.",
+      "tags": ["negative", "inflection", "syntax", "punctuation", "name", "surname"], "expected_findings": [], "verification": "negative"
+    },
+    {
+      "id": "negative_combined_anna_zielinski",
+      "input": "Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.",
+      "expected_output": "Anna przyznała, że chce, żeby jutro się spotkała z Piotrem Zielińskim.",
+      "description": "Poprawna fleksja nazwiska i interpunkcja zdania podrzędnego.",
+      "tags": ["negative", "inflection", "syntax", "punctuation", "name", "surname"], "expected_findings": [], "verification": "negative"
+    },
+    {
+      "id": "negative_marked_order_kowalska",
+      "input": "Ten list wczoraj napisała Anna Kowalska.",
+      "expected_output": "Ten list wczoraj napisała Anna Kowalska.",
+      "description": "Poprawny nacechowany szyk z nazwiskiem żeńskim.",
+      "tags": ["negative", "syntax", "word_order", "name", "surname"], "expected_findings": [], "verification": "negative"
+    },
+    {
+      "id": "negative_marked_order_nowak",
+      "input": "Dopiero jutro z Janem Nowakiem spotka się Maria.",
+      "expected_output": "Dopiero jutro z Janem Nowakiem spotka się Maria.",
+      "description": "Poprawny nacechowany szyk i odmiana nazwiska.",
+      "tags": ["negative", "syntax", "word_order", "name", "surname", "inflection"], "expected_findings": [], "verification": "negative"
+    },
+    {
+      "id": "negative_subordinate_kowalska",
+      "input": "Kiedy wróci Anna Kowalska, zaczniemy spotkanie.",
+      "expected_output": "Kiedy wróci Anna Kowalska, zaczniemy spotkanie.",
+      "description": "Poprawna interpunkcja zdania podrzędnego z nazwiskiem.",
+      "tags": ["negative", "syntax", "punctuation", "name", "surname", "subordinate_clause"], "expected_findings": [], "verification": "negative"
     }
   ]
 }
