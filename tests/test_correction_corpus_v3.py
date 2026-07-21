@@ -78,6 +78,212 @@ def test_all_candidates_have_cc0_provenance_and_pending_review() -> None:
     assert all(case.review.reviewed_at is None for case in corpus.cases)
 
 
+def test_every_candidate_has_case_specific_review_text() -> None:
+    raw = _raw_corpus()
+
+    for case in raw["cases"]:
+        description = case["description"].casefold()
+        assert "pending independent review" not in description, case["id"]
+        assert "pending review of protected phenomenon" not in description, case["id"]
+        for edit in case["edits"]:
+            rationale = edit["rationale"].casefold()
+            assert "pending review" not in rationale, case["id"]
+
+
+def test_audited_inflection_cases_are_objective_and_correctly_classified() -> None:
+    raw = _raw_corpus()
+    cases = {case["id"]: case for case in raw["cases"]}
+
+    assert cases["inflection_005"]["input"] == "Jutro podziękuję Paweł za pomoc."
+    assert cases["inflection_005"]["expected_output"] == (
+        "Jutro podziękuję Pawłowi za pomoc."
+    )
+    assert cases["inflection_017"]["input"] == "Jutro przekażę Agnieszka wiadomość."
+    assert cases["inflection_017"]["expected_output"] == (
+        "Jutro przekażę Agnieszce wiadomość."
+    )
+    assert cases["inflection_049"]["input"] == "Pożycz mi ten książkę."
+    assert cases["inflection_049"]["expected_output"] == "Pożycz mi tę książkę."
+
+    government = cases["inflection_041"]
+    assert government["tags"] == ["inflection", "case", "government"]
+    assert {edit["category"] for edit in government["edits"]} == {"inflection"}
+
+    preposition_government = cases["inflection_052"]
+    assert preposition_government["tags"] == ["inflection", "case", "government"]
+    assert {edit["category"] for edit in preposition_government["edits"]} == {
+        "inflection"
+    }
+
+
+def test_inflected_entity_surfaces_use_canonical_nominative_identities() -> None:
+    corpus = load_correction_corpus_json(JSON_CORPUS)
+    cases = {case.id: case for case in corpus.cases}
+    expected = {
+        "inflection_001": "jan_nowak",
+        "inflection_003": "piotr_zielinski",
+        "inflection_006": "tomasz_wisniewski",
+        "inflection_007": "ewa_nowicka",
+        "inflection_009": "aleksandra_kaminska",
+        "inflection_010": "krzysztof_dabrowski",
+        "inflection_012": "robert_krol",
+        "inflection_014": "adam_lis",
+        "inflection_015": "joanna_szymanska",
+        "inflection_016": "marek_wozniak",
+        "inflection_018": "lukasz_kaczmarek",
+        "inflection_019": "barbara_piotrowska",
+        "inflection_020": "andrzej_grabowski",
+        "inflection_022": "wojciech_jablonski",
+        "inflection_024": "mateusz_nowak",
+        "inflection_025": "zofia_kozlowska",
+        "inflection_026": "szymon_jankowski",
+        "inflection_027": "anna_gorska",
+        "inflection_028": "jakub_michalski",
+        "inflection_029": "olga_pawlowska",
+        "inflection_030": "damian_walczak",
+        "inflection_032": "rafal_baran",
+        "inflection_033": "elzbieta_rutkowska",
+        "inflection_034": "grzegorz_sobczak",
+        "inflection_036": "przemyslaw_zalewski",
+        "inflection_054": "warszawa",
+    }
+
+    for case_id, entity_id in expected.items():
+        assert cases[case_id].entity_ids == (entity_id,)
+
+
+def test_audited_syntax_and_punctuation_cases_are_unambiguous() -> None:
+    raw = _raw_corpus()
+    cases = {case["id"]: case for case in raw["cases"]}
+
+    replacements = {
+        "syntax_002": "Tęsknię za moim bratem.",
+        "syntax_004": "Przyglądamy się nowemu projektowi.",
+        "syntax_005": "Zależy mi na wynikach badań.",
+        "syntax_013": "Potrzebuję ołówka do szkicowania.",
+        "syntax_023": "Dziecko bało się burzy.",
+        "syntax_041": "Nauczyciel poprosił, żeby uczniowie zapisali odpowiedź.",
+        "syntax_044": "Żaden z kierowców nie zatrzymał się przy znaku.",
+        "syntax_045": "Nie wiadomo, kto przyniósł paczkę.",
+        "syntax_046": "Gdy dotarliśmy, gospodarze już przygotowali kolację.",
+        "syntax_047": "Zapytała, czy możemy zacząć.",
+        "syntax_048": "To jest książka, którą poleciła mi bibliotekarka.",
+        "syntax_049": "Nie wiem, komu mam przekazać paczkę.",
+    }
+    for case_id, expected_output in replacements.items():
+        assert cases[case_id]["expected_output"] == expected_output
+
+    assert cases["syntax_056"]["tags"][-1] == "exception_connector"
+    assert cases["syntax_057"]["tags"][-1] == "missing_correlative"
+    assert cases["syntax_060"]["tags"][-1] == "finite_verb"
+    assert cases["punctuation_030"]["expected_output"].startswith(
+        "Kasiu, podaj, proszę, sól."
+    )
+    assert cases["punctuation_025"]["description"] == (
+        "Separates the vocative “Leno” and the parenthetical politeness marker "
+        "“proszę” with the required commas."
+    )
+    assert cases["punctuation_030"]["description"] == (
+        "Separates the vocative “Kasiu” and encloses the parenthetical "
+        "politeness marker “proszę” with commas."
+    )
+    assert cases["punctuation_030"]["entity_ids"] == ["kasia"]
+    assert cases["punctuation_043"]["expected_output"] == (
+        "Co ważne, musimy sprawdzić datę."
+    )
+    assert cases["punctuation_048"]["expected_output"] == (
+        "Szczerze mówiąc, wracamy przed nocą."
+    )
+
+    specific_rule_cases = {
+        *(f"punctuation_{number:03d}" for number in range(13, 25)),
+        *(f"punctuation_{number:03d}" for number in range(55, 61)),
+    }
+    for case_id in specific_rule_cases:
+        for edit in cases[case_id]["edits"]:
+            assert "punctuation construction" not in edit["rationale"].casefold()
+
+
+def test_audited_hard_negatives_remove_gender_and_norm_ambiguity() -> None:
+    raw = _raw_corpus()
+    cases = {case["id"]: case for case in raw["cases"]}
+
+    assert "surname" in cases["hard_negative_021"]["tags"]
+    assert cases["hard_negative_024"]["input"] == "To fotografia pani Carmen Miller."
+    assert cases["hard_negative_025"]["input"] == (
+        "Podziękowano pani Lee Chen za występ."
+    )
+    assert cases["hard_negative_026"]["input"] == (
+        "Zaprosiliśmy panią Dominique na debatę."
+    )
+    assert cases["hard_negative_054"]["input"] == "Na osi zaznaczono punkt −3."
+    assert "locative" not in cases["hard_negative_030"]["description"].casefold()
+
+
+def test_hard_negative_entities_use_canonical_nominative_identities() -> None:
+    corpus = load_correction_corpus_json(JSON_CORPUS)
+    cases = {case.id: case for case in corpus.cases}
+    expected = {
+        "hard_negative_002": "piotr_nowak",
+        "hard_negative_004": "pawel_wisniewski",
+        "hard_negative_005": "zofia_lewandowska",
+        "hard_negative_007": "joanna_dabrowska",
+        "hard_negative_008": "bartosz_ostrowski",
+        "hard_negative_009": "ewa_szymanska",
+        "hard_negative_011": "kaczmarek",
+        "hard_negative_012": "piotrowska",
+        "hard_negative_013": "grabowski",
+        "hard_negative_014": "jablonski",
+        "hard_negative_015": "kozlowska",
+        "hard_negative_016": "jankowski",
+        "hard_negative_018": "michalski",
+        "hard_negative_019": "pawlowska",
+        "hard_negative_020": "walczak",
+        "hard_negative_030": "wroclaw",
+    }
+
+    for case_id, entity_id in expected.items():
+        assert cases[case_id].entity_ids == (entity_id,)
+
+
+def test_hard_negative_descriptions_do_not_flatten_paragraphs_or_nest_quotes() -> None:
+    raw = _raw_corpus()
+    cases = {case["id"]: case for case in raw["cases"]}
+
+    for number in (10, 20, 30, 40, 50, 55, 56, 57, 58, 59, 60):
+        case = cases[f"hard_negative_{number:03d}"]
+        assert "\n" not in case["description"]
+        assert "without any correction" not in case["description"]
+    for number in range(37, 43):
+        description = cases[f"hard_negative_{number:03d}"]["description"]
+        assert description.count("“") <= 1
+        assert description.count("”") <= 1
+    for number in range(49, 55):
+        assert (
+            "valid url or number"
+            not in cases[f"hard_negative_{number:03d}"]["description"].casefold()
+        )
+    assert (
+        "marked word order" not in cases["hard_negative_034"]["description"].casefold()
+    )
+
+
+def test_audited_proper_name_cases_use_distinct_canonical_identities() -> None:
+    corpus = load_correction_corpus_json(JSON_CORPUS)
+    cases = {case.id: case for case in corpus.cases}
+
+    expected = {
+        "punctuation_004": "helena",
+        "punctuation_025": "lena",
+        "syntax_022": "norbert",
+        "punctuation_027": "filip",
+        "syntax_043": "klara",
+        "punctuation_038": "igor",
+    }
+    for case_id, entity_id in expected.items():
+        assert cases[case_id].entity_ids == (entity_id,)
+
+
 def test_positive_edits_use_unicode_offsets_and_reconstruct_expected_output() -> None:
     corpus = load_correction_corpus_json(JSON_CORPUS)
 
@@ -621,9 +827,9 @@ def test_training_isolation_rejects_corrected_inflection_of_evaluation_name(
 @pytest.mark.parametrize(
     ("source", "surface"),
     (
-        ("W notatce wspomniano Alicji Dudek.", "Alicji Dudek"),
-        ("Do protokołu wpisano Natalię Zając.", "Natalię Zając"),
-        ("Na spotkanie zaproszono Katarzynę Wróbel.", "Katarzynę Wróbel"),
+        ("W notatce wspomniano Mateusza Nowaka.", "Mateusza Nowaka"),
+        ("Do protokołu wpisano Zofii Kozłowskiej.", "Zofii Kozłowskiej"),
+        ("Rozmawiałem z Szymonem Jankowskim.", "Szymonem Jankowskim"),
     ),
 )
 def test_training_isolation_uses_expected_holdout_entity_aliases(
