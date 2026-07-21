@@ -41,6 +41,13 @@ class AnalyzerConfig:
     def from_toml(cls, path: str | Path) -> Self: ...
 
 
+class CorrectionResult:
+    original_text: str
+    corrected_text: str
+    applied_findings: tuple[Finding, ...]
+    skipped_findings: tuple[Finding, ...]
+
+
 class Analyzer:
     def __init__(self, config: AnalyzerConfig) -> None: ...
 
@@ -54,6 +61,8 @@ class Analyzer:
     async def analyze_async(
         self, text: str, *, options: AnalysisOptions | None = None
     ) -> AnalysisResult: ...
+
+    def correct(self, text: str) -> CorrectionResult: ...
 
 
 def analysis_result_to_json(result: AnalysisResult) -> str: ...

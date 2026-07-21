@@ -42,6 +42,16 @@ applies compatible replacements right-to-left in original-text coordinates. An
 empty selection returns the source text. The operation is atomic: a selection
 error returns no partial corrected text.
 
+## Conservative correction
+
+`Analyzer.correct(text)` is the convenience path for a sentence or paragraph.
+It returns `CorrectionResult` with `original_text`, `corrected_text`,
+`applied_findings`, and `skipped_findings`. It automatically applies only
+non-conflicting deterministic rule findings with confidence at least `0.9`.
+It deliberately leaves low-confidence, LLM-generated, and unsuggestable
+findings unapplied; callers can still use `analyze()` and select corrections
+explicitly.
+
 The analyzer API above is implemented by a thin runtime in `polis` and remains
 small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`
 model and the checked examples prove bidirectional assignment compatibility

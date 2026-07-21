@@ -12,8 +12,11 @@ from polis.core import (
     AnalysisOptions,
     AnalysisResult,
     ConfigurationError,
+    Finding,
+    SourceKind,
 )
 from polis.core.models import Category
+from polis.correction import findings_conflict
 from polis.llm.adapter import MockHeuristicBackend, MockHeuristicTransport
 from polis.rules import (
     AgreementCopulaRule,
@@ -30,6 +33,7 @@ from polis.rules import (
 __all__ = [
     "Analyzer",
     "AnalyzerConfig",
+    "CorrectionResult",
 ]
 
 
@@ -135,6 +139,16 @@ class AnalyzerConfig:
         return cls.from_toml(path)
 
 
+@dataclass(frozen=True)
+class CorrectionResult:
+    """Conservative correction outcome for one sentence or paragraph."""
+
+    original_text: str
+    corrected_text: str
+    applied_findings: tuple[Finding, ...]
+    skipped_findings: tuple[Finding, ...]
+
+
 class Analyzer:
     """Thin runtime analyzer with deterministic rules and optional mock backend."""
 
@@ -183,6 +197,30 @@ class Analyzer:
             options=resolved_options,
         )
         return AnalysisResult(text=text, issues=findings, options=resolved_options)
+
+    def correct(self, text: str) -> CorrectionResult:
+        """Apply only high-confidence, non-conflicting deterministic corrections."""
+
+        analysis = self.analyze(text)
+        selected: list[Finding] = []
+        skipped: list[Finding] = []
+        for finding in analysis.issues:
+            is_safe = (
+                finding.source.kind is SourceKind.RULE
+                and finding.suggestion is not None
+                and finding.confidence.value >= 0.9
+                and not any(findings_conflict(finding, item) for item in selected)
+            )
+            if is_safe:
+                selected.append(finding)
+            else:
+                skipped.append(finding)
+        return CorrectionResult(
+            original_text=analysis.text,
+            corrected_text=analysis.apply(item.id for item in selected),
+            applied_findings=tuple(selected),
+            skipped_findings=tuple(skipped),
+        )
 
 
 def _make_default_registry() -> DeterministicRuleRegistry:

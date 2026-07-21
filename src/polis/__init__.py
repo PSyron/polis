@@ -2,7 +2,7 @@
 
 from importlib.metadata import version
 
-from polis.analyzer import Analyzer, AnalyzerConfig
+from polis.analyzer import Analyzer, AnalyzerConfig, CorrectionResult
 from polis.core import (
     ANALYSIS_SCHEMA_VERSION,
     AnalysisOptions,
@@ -32,6 +32,7 @@ __all__ = [
     "ANALYSIS_SCHEMA_VERSION",
     "Analyzer",
     "AnalyzerConfig",
+    "CorrectionResult",
     "AnalysisOptions",
     "AnalysisResult",
     "Category",

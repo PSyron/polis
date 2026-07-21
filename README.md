@@ -4,6 +4,22 @@ Polis is an offline Python library for analysing Polish text and proposing
 minimal, structured corrections. It provides deterministic analysis and a thin
 CLI wrapper for manual and scripted use while the LLM-backed backend is developed.
 
+## Conservative correction
+
+`Analyzer.correct()` accepts either one sentence or a multi-sentence paragraph.
+It applies only high-confidence, non-conflicting deterministic suggestions and
+returns both the original and corrected text with applied and skipped findings.
+
+```python
+from polis import Analyzer, AnalyzerConfig
+
+result = Analyzer(AnalyzerConfig()).correct("Zeby jutro,powiem o tym.")
+assert result.corrected_text == "Żeby jutro, powiem o tym."
+```
+
+The method does not rewrite prose, send text over the network, or apply
+low-confidence and model-generated suggestions automatically.
+
 ## Development setup
 
 The distribution is named `polis-nlp`; its Python import namespace is `polis`.

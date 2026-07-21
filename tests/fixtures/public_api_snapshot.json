@@ -13,6 +13,7 @@
     "Category",
     "Confidence",
     "CorrectionConflictError",
+    "CorrectionResult",
     "CorrectionSelectionError",
     "ConfigurationError",
     "Finding",
