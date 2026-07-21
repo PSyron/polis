@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-21
 - Owner: Paweł Cyroń
-- Issues: #42, #48, #50
+- Issues: #42, #48, #50, #51
 
 ## Context
 
@@ -27,6 +27,7 @@ memory, corpus `polis_e2e_polish_correction_corpus_v2`, seed 42, temperature
 | Bielik 4.5B v3.0 Instruct | GGUF Q8_0, 5.1 GB | 11/12 | 0.000 | one invalid finding on a negative case | 1,581 ms |
 | Qwen3 4B | Ollama default, 2.5 GB | invalid on probe | 0.000 | unsafe hallucinated span | 9,440 ms |
 | Bielik Minitron 7B v3.0 Instruct | GGUF Q4_K_M, 4.5 GB on disk / 6.4 GB loaded | 2/12 | 0.000 | ineligible: ten responses failed validation | not used for selection |
+| Bielik 11B v3.0 Instruct | GGUF Q4_K_M, 6.7 GB on disk / 8.9 GB loaded | 10/25 with finding contract | 0.000 | no negative changes, but invalid responses make it ineligible | 1,391 ms for valid finding responses |
 
 Prompt v1 produced 0/12 valid responses for Qwen3 0.6B and Bielik 1.5B.
 Prompt v2 fixed response shape for Bielik but not correction quality. Prompt v3
@@ -50,6 +51,22 @@ matches were 5/17 for inflection-tagged cases and 1/16 for both syntax- and
 punctuation-tagged cases. The candidate fails the mandatory zero-negative
 change safety gate and every per-category quality gate.
 
+Issue #51 evaluated the larger Bielik 11B Q4_K_M candidate on the same
+25-case corpus. The strict finding contract produced only 10/25 valid
+responses and no exact gold findings, so its exact finding F1 was 0.000. The
+median of valid finding responses was 1,391 ms; invalid responses are excluded
+from that latency statistic.
+
+A Polish specialist workflow then asked three separate corrected-text
+questions about inflection, syntax, and punctuation and accepted a correction
+only after deterministic validation and consensus. It produced a valid
+consensus for 19/25 cases, matched 15/25 complete expected outputs, and changed
+0/10 negative cases. Exact output coverage was 7/17 inflection-tagged cases,
+7/16 syntax-tagged cases, and 8/16 punctuation-tagged cases. Controlled
+specialist requests took approximately four to seven seconds each. This is a
+large improvement over the single finding prompt, but it still fails the 100%
+validity gate and remains far below the 0.90 per-category release gates.
+
 ## Decision
 
 No real local model is selected for automatic correction in this release.
@@ -58,6 +75,10 @@ evidence of contextual correction capability.
 
 Issue #43 must not introduce a production real-model adapter until a candidate
 meets explicit per-category quality gates on an expanded benchmark.
+
+The next evaluation may combine a deterministic Polish rule engine with a
+smaller local model, but that hybrid must receive its own benchmark and
+architecture decision before it becomes a production dependency.
 
 ## Consequences
 

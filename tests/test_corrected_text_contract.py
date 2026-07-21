@@ -3,9 +3,23 @@ from __future__ import annotations
 import pytest
 
 from polis.llm.corrected_text import (
+    build_specialist_corrected_text_prompt,
     derive_text_edits,
     validate_corrected_text_response,
 )
+
+
+def test_specialist_prompt_uses_polish_focus_and_isolates_input_as_data() -> None:
+    prompt = build_specialist_corrected_text_prompt(
+        "Maria powiedziała że wróci.", focus="punctuation"
+    )
+
+    assert "Jesteś" in prompt
+    assert "interpunkcję" in prompt
+    assert "Przykład" in prompt
+    assert "<TEKST_START>" in prompt
+    assert "<TEKST_END>" in prompt
+    assert '{"corrected_text"' in prompt
 
 
 def test_validates_exact_corrected_text_json_contract() -> None:

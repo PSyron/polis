@@ -6,6 +6,23 @@ import json
 import re
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+from typing import Literal
+
+SpecialistFocus = Literal["inflection", "syntax", "punctuation"]
+
+_FOCUS_INSTRUCTIONS: dict[SpecialistFocus, str] = {
+    "inflection": "odmianę imion, nazwisk i wyrazów",
+    "syntax": "składnię oraz zgodę form osobowych",
+    "punctuation": "interpunkcję",
+}
+_FOCUS_EXAMPLES: dict[SpecialistFocus, tuple[str, str]] = {
+    "inflection": ("Rozmawiałem z Janem Nowak.", "Rozmawiałem z Janem Nowakiem."),
+    "syntax": (
+        "Chcę żeby jutro spotkać się z Anią.",
+        "Chcę, żeby jutro spotkać się z Anią.",
+    ),
+    "punctuation": ("Wiem że Ania wróciła.", "Wiem, że Ania wróciła."),
+}
 
 
 @dataclass(frozen=True)
@@ -16,6 +33,34 @@ class TextEdit:
     end: int
     original: str
     suggestion: str
+
+
+def build_specialist_corrected_text_prompt(text: str, *, focus: SpecialistFocus) -> str:
+    """Build one narrow Polish correction request with input delimited as data."""
+
+    if not isinstance(text, str):
+        raise TypeError("text must be a string")
+    try:
+        instruction = _FOCUS_INSTRUCTIONS[focus]
+        example_input, example_output = _FOCUS_EXAMPLES[focus]
+    except KeyError as error:
+        raise ValueError("focus must be inflection, syntax, or punctuation") from error
+    return "\n".join(
+        (
+            "Jesteś konserwatywnym korektorem języka polskiego działającym lokalnie.",
+            f"Sprawdź wyłącznie {instruction}.",
+            "Zachowaj poprawne nazwy własne, sens, styl i poprawny nacechowany szyk.",
+            "Jeżeli nie ma bezpiecznej minimalnej poprawki, zwróć tekst bez zmian.",
+            "Przykład:",
+            f"wejście: {example_input}",
+            "wynik: "
+            f'{{"corrected_text":{json.dumps(example_output, ensure_ascii=False)}}}',
+            'Zwróć wyłącznie JSON dokładnie w postaci {"corrected_text":"..."}.',
+            "<TEKST_START>",
+            text,
+            "<TEKST_END>",
+        )
+    )
 
 
 def validate_corrected_text_response(raw: str, *, source_text: str) -> str:
@@ -61,4 +106,10 @@ def derive_text_edits(source_text: str, corrected_text: str) -> tuple[TextEdit, 
     )
 
 
-__all__ = ["TextEdit", "derive_text_edits", "validate_corrected_text_response"]
+__all__ = [
+    "SpecialistFocus",
+    "TextEdit",
+    "build_specialist_corrected_text_prompt",
+    "derive_text_edits",
+    "validate_corrected_text_response",
+]
