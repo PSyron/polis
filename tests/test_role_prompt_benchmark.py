@@ -13,15 +13,34 @@ from experiments.role_prompt_benchmark.run_benchmark import (
     RoleBenchmarkReport,
     RuntimeMetadata,
     TimedResponse,
+    _default_runtime_engine,
     _infer_focus,
     load_cases,
     main,
     report_as_json,
     run_cases,
+    run_protocol_matrix,
+    select_healthy_client,
     summarize_observations,
 )
 
 from polis.evaluation.correction_corpus import CorpusEdit, CorpusUsageError
+
+
+class _HealthyClient:
+    def __init__(self, *, engine: str, model: str) -> None:
+        self._metadata = RuntimeMetadata(engine, model, "0.1.0")
+        self.preflight_calls = 0
+        self.generate_calls = 0
+
+    def preflight(self) -> RuntimeMetadata:
+        self.preflight_calls += 1
+        return self._metadata
+
+    def generate(self, request: object) -> TimedResponse:
+        self.generate_calls += 1
+        return TimedResponse('{"corrected_text":"Ala ma kota."}', 1.0)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = (
@@ -356,3 +375,44 @@ def test_main_returns_zero_and_prints_report(
     )
     output = capsys.readouterr().out
     assert "safe" in output
+
+
+def test_default_runtime_engine_prefers_mlx_on_darwin() -> None:
+    assert _default_runtime_engine("auto") in {"mlx", "ollama"}
+
+
+def test_select_healthy_client_picks_the_first_configured_service() -> None:
+    candidates = (
+        ("ollama", _HealthyClient(engine="ollama", model="local-ollama")),
+        ("mlx", _HealthyClient(engine="mlx", model="local-mlx")),
+    )
+    selected_name, selected = select_healthy_client("auto", candidates)
+    assert selected_name == "ollama"
+    assert selected and cast(_HealthyClient, selected).preflight_calls == 1
+
+
+def test_run_protocol_matrix_includes_runtime_metadata() -> None:
+    cases = (
+        _make_case(
+            case_id="m1",
+            source="Ala ma kota.",
+            expected_output="Ala ma kota.",
+            tags=("syntax",),
+            verification="positive",
+            split="development",
+            focus="syntax",
+        ),
+    )
+
+    client = _HealthyClient(engine="mlx", model="bielik-1.5b")
+    matrix = run_protocol_matrix(
+        client,
+        ("specialist",),
+        (("development", cases),),
+        include_cases=True,
+    )
+
+    assert "development/specialist" in matrix
+    payload = cast(dict[str, object], matrix["development/specialist"])
+    runtime_payload = cast(dict[str, object], payload["runtime"])
+    assert runtime_payload["model_identifier"] == "bielik-1.5b"
