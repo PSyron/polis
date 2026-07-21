@@ -84,12 +84,93 @@ hard safety checks for correct names, surnames, punctuation, and grammatical
 marked word order. JSON is the source used by the local-model benchmark, while
 the XML fixture is kept equivalent for interchange and regression testing.
 
+## Polish correction corpus v3 candidates
+
+`tests/fixtures/evaluation/polish_correction_corpus_v3.json` is the canonical
+schema-v3 candidate set. Its XML counterpart is an equivalent interchange
+representation. It is physically separate from the rule-only E2E fixture and
+from every future training asset.
+
+The corpus declares four strata with 60 cases each: inflection, syntax,
+punctuation, and protected hard negatives. Each stratum has 20 development and
+40 intended holdout cases. These split labels reserve the final assignment,
+but the top-level `holdout_state` remains `unfrozen-candidates` while any case
+has `pending-human-review` status. Pending candidates are not evaluation gold,
+cannot enter a benchmark or quality gate, and cannot be used for training.
+
+Every case records CC0-1.0 provenance, a review object, exact proper-name
+entity spans, canonical entity identifiers, a derived normalized sentence
+template, exact Unicode edits, and either a positive expected output or one
+named protected phenomenon. A template is deterministically rebuilt from the
+input by replacing spans from the controlled entity-surface catalog with
+`<entity>`, applying Unicode NFC case folding and whitespace normalization, and
+replacing URLs and numbers with fixed markers. Every detectable catalog surface
+must be spanned. Declension variants of one person map to one canonical
+identifier; arbitrary capitalized words, template markers, identifiers, and
+omitted spans are rejected.
+
+The validator rejects duplicate input, cross-split entity or
+normalized-template leakage,
+duplicate or near-identical template families in either split, including short
+siblings separated by one token edit, invalid offsets, overlaps, reconstruction
+errors, and JSON/XML drift.
+
+Training isolation uses a closed record contract rather than the finite corpus
+surface catalog. Each record must provide exact, ordered spans for every
+deterministically detected name-shaped token group. Detection recognizes
+title-case and all-capital forms and joins adjacent name-shaped tokens. Known
+evaluation aliases are derived from each corpus entity surface and from
+corrections inside that surface; they are recognized case-insensitively at
+every sentence position, including a single initial token. Entity comparison
+applies deterministic Unicode normalization and conservative Polish
+case-ending normalization, so casing, erroneous corpus forms, and their
+expected corrected forms retain one isolation identity. Templates are rebuilt
+from the supplied, verified spans, which makes an unseen name in a reserved
+sentence topology a collision. The evaluation corpus itself remains prohibited
+as training data.
+
+One deterministic ambiguity remains: a single sentence-initial capitalized
+token that is not a known corpus alias is treated as ordinary sentence casing.
+It may therefore be an unknown one-word proper name. Callers must provide a
+span when they know that semantic fact, but the offline shape detector cannot
+infer it from capitalization alone. Adjacent capitalized tokens and
+unambiguous name-shaped tokens elsewhere are still mandatory.
+
+Human review follows
+[`evaluation-corpus-v3-review-checklist.md`](evaluation-corpus-v3-review-checklist.md).
+Only Paweł Cyroń may change a case to `human-reviewed`. Development cases may
+become available for benchmark experiments individually after approval.
+Benchmark selection never exposes the intended holdout. Holdout cases remain
+available only through the explicit quality-gate path after all cases are
+approved and the holdout is frozen.
+
+### Leakage and change control
+
+Prompt examples and fine-tuning records must not reuse an evaluation input,
+entity combination, or normalized template. Run the training-isolation
+validator against closed-contract records before accepting any such asset. A
+record with missing, extra, overlapping, out-of-order, or text-mismatched entity
+spans is invalid. Do not copy candidates from v3 into a training directory,
+even after review.
+
+Before the first holdout run, approve every case, regenerate XML, set the state
+to `frozen`, record the canonical JSON digest, and run all integrity checks.
+After a frozen holdout has been scored, corrections require a new schema or
+corpus version. This change control prevents benchmark-driven repair and keeps
+reported evidence reproducible.
+
 ## Validation
 
 Run the fast integrity checks with:
 
 ```console
 uv run --locked --extra dev pytest tests/test_evaluation_dataset.py -v
+```
+
+Corpus-v3 candidate integrity is checked separately with:
+
+```console
+uv run --locked --extra dev pytest tests/test_correction_corpus_v3.py -v
 ```
 
 The standard-library validator is also available to callers as

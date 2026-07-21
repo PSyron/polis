@@ -1,8 +1,16 @@
 # Real local LLM benchmark
 
-This experiment measures a model against the versioned E2E corpus before it can
-be selected for the optional correction backend. It is not part of fast CI and
-does not make a model a production dependency.
+This experiment measures a model against approved records from correction
+corpus v3 before it can be selected for the optional correction backend. It is
+not part of fast CI and does not make a model a production dependency.
+
+The committed v3 records initially have `pending-human-review` status and an
+unfrozen holdout. Corpus approval is checked before runtime preflight, and the
+runner fails before inference while no development case has been approved. It
+never accepts pending candidates and never exposes holdout cases; the frozen
+holdout belongs exclusively to the quality-gate path. The evaluation corpus is
+prohibited as training data. The legacy v2 E2E fixture remains available only
+when passed explicitly for reproducibility of historical runs.
 
 ## Preconditions
 

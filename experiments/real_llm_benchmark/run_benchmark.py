@@ -17,6 +17,10 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from polis.core import AnalysisResult, Finding, PolisError
+from polis.evaluation.correction_corpus import (
+    load_correction_corpus_json,
+    select_cases_for_purpose,
+)
 from polis.llm import build_prompt, validate_llm_response
 
 _ALLOWED_VERIFICATION = frozenset({"rules", "llm_planned", "negative"})
@@ -24,6 +28,7 @@ _BENCHMARK_VERIFICATION = frozenset({"llm_planned", "negative"})
 _LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 _OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434"
 _OPENAI_COMPAT_BASE_URL = "http://127.0.0.1:8080"
+DEFAULT_CORPUS_PATH = Path("tests/fixtures/evaluation/polish_correction_corpus_v3.json")
 _CASE_STATUSES = frozenset(
     {
         "valid",
@@ -498,11 +503,37 @@ def select_healthy_client(
 
 
 def load_cases(path: Path) -> tuple[BenchmarkCase, ...]:
-    """Load the planned-LLM and no-change cases from corpus v2."""
+    """Load reviewed benchmark cases from v3, with legacy v2 compatibility."""
 
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict) or not isinstance(raw.get("cases"), list):
         raise ValueError("benchmark corpus must contain a cases list")
+    if raw.get("schema_version") == 3:
+        corpus = load_correction_corpus_json(path)
+        approved = select_cases_for_purpose(corpus, purpose="benchmark")
+        return tuple(
+            BenchmarkCase(
+                case_id=case.id,
+                source=case.input,
+                expected_output=case.expected_output,
+                tags=case.tags,
+                verification=(
+                    "negative" if case.stratum == "hard_negative" else "llm_planned"
+                ),
+                tracking_issue=56,
+                expected_findings=tuple(
+                    GoldFinding(
+                        category=edit.category,
+                        start=edit.start,
+                        end=edit.end,
+                        original=edit.original,
+                        suggestion=edit.suggestion,
+                    )
+                    for edit in case.edits
+                ),
+            )
+            for case in approved
+        )
 
     cases: list[BenchmarkCase] = []
     for item in raw["cases"]:
@@ -935,7 +966,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--corpus",
         type=Path,
-        default=Path("tests/fixtures/e2e/polish_correction_corpus.json"),
+        default=DEFAULT_CORPUS_PATH,
     )
     parser.add_argument(
         "--engine",
@@ -953,6 +984,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--hardware-class", default=platform.platform())
     parser.add_argument("--cold-start", action="store_true")
     arguments = parser.parse_args(argv)
+    cases = load_cases(arguments.corpus)
     candidate_engines = (
         ("mlx", "ollama")
         if arguments.engine == "auto" and platform.system() == "Darwin"
@@ -985,7 +1017,6 @@ def main(argv: list[str] | None = None) -> int:
         hardware_class=arguments.hardware_class,
         cold_start=arguments.cold_start,
     )
-    cases = load_cases(arguments.corpus)
     report = summarize_observations(run_cases(client, cases))
     report = replace(
         report,
