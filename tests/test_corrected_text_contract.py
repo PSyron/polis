@@ -46,6 +46,8 @@ def test_specialist_request_keeps_text_as_input_data_and_tracks_prompt_version()
             "Maria powiedziała że wróci.", focus="punctuation"
         ).prompt_hash
     )
+    assert request.max_input_chars == 8_192
+    assert request.max_output_chars == 2_048
 
 
 def test_candidate_request_only_contains_candidate_ids_and_delimited_input() -> None:
@@ -97,6 +99,22 @@ def test_compatibility_prompt_view_contains_expected_sections() -> None:
     assert '{"corrected_text"' in prompt
 
 
+def test_requests_reject_excessive_input_length() -> None:
+    too_long = "a" * 8_193
+
+    with pytest.raises(ValueError, match="exceeds maximum allowed input size"):
+        build_specialist_corrected_text_prompt_request(too_long, focus="syntax")
+    with pytest.raises(ValueError, match="exceeds maximum allowed input size"):
+        build_inflection_candidate_prompt_request(
+            too_long,
+            candidates=(FiniteCandidate("c1", 0, 1, "a"),),
+        )
+    with pytest.raises(ValueError, match="exceeds maximum allowed input size"):
+        build_proposal_verifier_prompt_request(too_long, "ok")
+    with pytest.raises(ValueError, match="exceeds maximum allowed output size"):
+        build_proposal_verifier_prompt_request("ok", too_long)
+
+
 def test_validate_corrected_text_response_requires_exact_schema() -> None:
     corrected = validate_corrected_text_response(
         '{"corrected_text":"Żeby jutro, powiem o tym."}',
@@ -113,6 +131,17 @@ def test_validate_corrected_text_response_requires_exact_schema() -> None:
         validate_corrected_text_response(
             '{"corrected_text":"Poprawne zdanie.","note":"extra"}',
             source_text="Poprawne zdanie.",
+        )
+
+
+def test_validate_corrected_text_response_rejects_oversized_output() -> None:
+    oversized = "a" * 2_049
+    source = "Ala ma kota"
+
+    with pytest.raises(ValueError, match="maximum allowed output size"):
+        validate_corrected_text_response(
+            f'{{"corrected_text":"{oversized}"}}',
+            source_text=source,
         )
 
 

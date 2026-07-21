@@ -30,6 +30,7 @@ _INPUT_JSON_START: Final[str] = "<INPUT_JSON_START>"
 _INPUT_JSON_END: Final[str] = "</INPUT_JSON_END>"
 _MAX_TEXT_CHARS: Final[int] = 8_192
 _DEFAULT_MAX_OUTPUT_CHARS: Final[int] = 2_048
+_MAX_OUTPUT_CHARS: Final[int] = _DEFAULT_MAX_OUTPUT_CHARS
 
 _CHAT_ROLE_SYSTEM: Final[str] = "system"
 _CHAT_ROLE_USER: Final[str] = "user"
@@ -97,6 +98,7 @@ class PromptRequest:
     response_schema_version: int
     generation: dict[str, int | float]
     prompt_hash: str
+    max_input_chars: int = _MAX_TEXT_CHARS
     max_output_chars: int = _DEFAULT_MAX_OUTPUT_CHARS
 
 
@@ -128,6 +130,8 @@ def build_specialist_corrected_text_prompt_request(
     """Build a versioned, role-separated corrected-text specialist prompt."""
 
     _require_text(text, "text")
+    if len(text) > _MAX_TEXT_CHARS:
+        raise ValueError("text exceeds maximum allowed input size")
     example_input, example_output = _require_focus(focus)
 
     system_content = "\n".join(
@@ -181,6 +185,8 @@ def build_inflection_candidate_prompt_request(
     """
 
     _require_text(text, "text")
+    if len(text) > _MAX_TEXT_CHARS:
+        raise ValueError("text exceeds maximum allowed input size")
     candidate_list = tuple(candidates)
     if not candidate_list:
         raise ValueError("candidate selection requires at least one candidate")
@@ -234,6 +240,10 @@ def build_proposal_verifier_prompt_request(
 
     _require_text(source_text, "source_text")
     _require_text(proposal_text, "proposal_text")
+    if len(source_text) > _MAX_TEXT_CHARS:
+        raise ValueError("source_text exceeds maximum allowed input size")
+    if len(proposal_text) > _MAX_OUTPUT_CHARS:
+        raise ValueError("proposal_text exceeds maximum allowed output size")
 
     system_content = "\n".join(
         (
@@ -407,11 +417,13 @@ def _validate_text_diff(
     *,
     max_span_count: int,
 ) -> None:
+    if len(source_text) > _MAX_TEXT_CHARS:
+        raise ValueError("source_text exceeds maximum allowed input size")
+    if len(corrected_text) > _MAX_OUTPUT_CHARS:
+        raise ValueError("corrected_text exceeds maximum allowed output size")
+
     if source_text == corrected_text:
         return
-
-    if len(corrected_text) > _MAX_TEXT_CHARS:
-        raise ValueError("corrected_text exceeds maximum allowed output size")
 
     if not _shares_token(source_text, corrected_text):
         raise ValueError("corrected_text must preserve source content")

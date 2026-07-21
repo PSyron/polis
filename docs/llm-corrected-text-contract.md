@@ -9,6 +9,9 @@ text application.
 - Input text and candidate data are always treated as data inside explicit
   delimiters, not as free prompt instructions.
 - Prompts use separate system and user messages.
+- Prompt requests include explicit operational limits:
+  - maximum input text size: `8192` characters,
+  - maximum output text size: `2048` characters.
 - Response schemas are versioned and strictly validated.
 - No model output that is not valid JSON for the requested schema is accepted.
 - Private text is kept out of exception diagnostics.
@@ -67,6 +70,13 @@ Failure modes:
 `derive_text_edits(source_text, corrected_text)` converts model output into
 deterministic non-overlapping byte/Unicode spans. It rejects overlapping,
 excessive rewrite spans, and edits touching protected name-like tokens.
+
+## Failure surface for extensions
+
+Specialist prompt builders and validators are intentionally conservative.
+Invalid outputs are mapped to controlled validation errors before callers can apply
+any text changes. If you add a new backend, keep the same contracts and the same
+size checks so backend choice stays a runtime concern and not a protocol concern.
 
 These operations remain separate from the general LLM backend contract and are used
 only by the specialist path.
