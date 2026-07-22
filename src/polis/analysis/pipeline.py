@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Protocol, cast
+from typing import cast
 
 from polis.analysis import normalize_findings
 from polis.core import (
@@ -15,36 +15,20 @@ from polis.core import (
     InvalidBackendResponseError,
     PolisError,
 )
-from polis.core.protocols import RuleRegistry
+from polis.core.protocols import LocalFindingBackend, MonotonicClock, RuleRegistry
 from polis.segmentation import Sentence, segment_sentences
 
 OperationSleep = Callable[[float], Awaitable[None]]
-
-
-class _LLMBackend(Protocol):
-    """Minimal LLM backend interface used by the analysis pipeline."""
-
-    name: str
-
-    async def generate_findings(
-        self,
-        text: str,
-        *,
-        policy: object | None = None,
-        clock: object | None = None,
-        sleep: OperationSleep | None = None,
-        operation: str = "analysis.llm.generate",
-    ) -> tuple[Finding, ...]: ...
 
 
 async def analyze_text_async(
     text: str,
     *,
     registry: RuleRegistry,
-    local_backend: _LLMBackend | None,
+    local_backend: LocalFindingBackend | None,
     options: AnalysisOptions | None = None,
     backend_policy: object | None = None,
-    backend_clock: object | None = None,
+    backend_clock: MonotonicClock | None = None,
     backend_sleep: OperationSleep = asyncio.sleep,
     segmenter: Callable[[str], tuple[Sentence, ...]] = segment_sentences,
     ignore_backend_failures: bool = False,
@@ -108,10 +92,10 @@ def analyze_text(
     text: str,
     *,
     registry: RuleRegistry,
-    local_backend: _LLMBackend | None,
+    local_backend: LocalFindingBackend | None,
     options: AnalysisOptions | None = None,
     backend_policy: object | None = None,
-    backend_clock: object | None = None,
+    backend_clock: MonotonicClock | None = None,
     backend_sleep: OperationSleep = asyncio.sleep,
     segmenter: Callable[[str], tuple[Sentence, ...]] = segment_sentences,
     ignore_backend_failures: bool = False,
@@ -187,7 +171,6 @@ def _canonical_backend_error(
 
 
 __all__ = [
-    "_LLMBackend",
     "analyze_text",
     "analyze_text_async",
     "_translate_fragment_offset",

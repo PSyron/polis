@@ -61,22 +61,23 @@ prefer stable source identifiers.
 
 ## Add a custom local backend
 
-For local-generation sources used in the pipeline, implement an object with:
+For local finding sources used in the pipeline, implement
+`polis.core.LocalFindingBackend` with:
 
 - `name` attribute
-- `generate_findings(text, policy=None, clock=None, sleep=None, operation=...)`
+- `generate_findings(text, policy=None, clock=None, sleep=..., operation=...)`
 
 Returning an empty tuple is a valid backend behavior.
 
 ```python
 import asyncio
+from collections.abc import Awaitable, Callable
 from polis.analysis.pipeline import analyze_text_async
-from polis.core import AnalysisOptions
-from polis.core import Finding
+from polis.core import AnalysisOptions, Finding, LocalFindingBackend, MonotonicClock
 from polis.rules import DeterministicRuleRegistry
 
 
-class PassThroughBackend:
+class PassThroughBackend(LocalFindingBackend):
     name = "noop"
 
     async def generate_findings(
@@ -84,8 +85,8 @@ class PassThroughBackend:
         text: str,
         *,
         policy: object | None = None,
-        clock: object | None = None,
-        sleep: object | None = None,
+        clock: MonotonicClock | None = None,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         operation: str = "analysis.llm.generate",
     ) -> tuple[Finding, ...]:
         del text, policy, clock, sleep, operation

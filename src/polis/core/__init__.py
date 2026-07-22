@@ -22,6 +22,7 @@ from polis.core.models import (
 from polis.core.protocols import (
     AnalysisOrchestrator,
     DeterministicAnalyzer,
+    LocalFindingBackend,
     LocalGenerationBackend,
     MonotonicClock,
     Rule,
@@ -42,6 +43,7 @@ __all__ = [
     "Confidence",
     "DeterministicAnalyzer",
     "Finding",
+    "LocalFindingBackend",
     "LocalGenerationBackend",
     "MonotonicClock",
     "Rule",
