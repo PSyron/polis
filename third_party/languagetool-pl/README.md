@@ -1,7 +1,7 @@
 # Vendored Polish LanguageTool Module
 
 This directory contains an isolated, source-based LanguageTool 6.8 derivative
-for the two Polish punctuation rules qualified by Polis. It adds no Python
+for the five Polish punctuation rules qualified by Polis. It adds no Python
 runtime dependency and is excluded from Polis wheels and source distributions.
 
 ## Included scope
@@ -14,9 +14,11 @@ runtime dependency and is excluded from Polis wheels and source distributions.
 
 Other languages, the HTTP server, command-line application, GUI, office and
 browser integrations, n-gram data, and premium services are excluded. The
-check operation emits only `BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY`
-findings. The separate synthesis operation exposes context-free forms from the
-included Polish tagger and synthesizer; it does not select or apply a form.
+check operation emits only `BRAK_PRZECINKA_KTORY`,
+`BRAK_PRZECINKA_SPOJNIK_PROSTY`, `BRAK_PRZECINKA_ZE`,
+`BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` findings. The separate
+synthesis operation exposes context-free forms from the included Polish tagger
+and synthesizer; it does not select or apply a form.
 
 ## Toolchain and build
 
@@ -71,6 +73,13 @@ object. Each request has this shape:
 Only `pl-PL` is accepted. The process keeps one `JLanguageTool(new Polish())`
 instance warm between requests. Responses contain genuine LanguageTool 6.8
 rule identifiers, offsets, replacement candidates, and rule metadata.
+
+The explicit `inspect` operation returns unfiltered upstream matches for local
+evaluation only. It does not change the default `check` allowlist:
+
+```json
+{"operation":"inspect","text":"To jest testt.","language":"pl-PL"}
+```
 
 An explicit synthesis request targets Unicode half-open spans in the same
 source text:

@@ -96,5 +96,5 @@ def test_hybrid_policy_is_linked_without_claiming_qualification() -> None:
     assert "ADR-0008" in limitations
     assert "No tested local model has qualified" in limitations
     assert (
-        "two-rule LanguageTool subset is not a general Polish corrector" in limitations
+        "five-rule LanguageTool subset is not a general Polish corrector" in limitations
     )

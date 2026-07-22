@@ -13,7 +13,15 @@ import time
 from pathlib import Path
 from typing import Any, Protocol
 
-_ALLOWED_RULE_IDS = frozenset({"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"})
+_ALLOWED_RULE_IDS = frozenset(
+    {
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+        "WOLACZ_BEZ_PRZECINKA",
+    }
+)
 _TOOL = "LanguageTool"
 _VERSION = "6.8"
 

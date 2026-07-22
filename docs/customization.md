@@ -135,9 +135,10 @@ timeout_seconds = 1.0
 
 The endpoint must use plain HTTP, an explicit port, and literal `127.0.0.0/8`
 or `::1`; hostnames, credentials, paths, queries, proxies, redirects, other
-versions, and remote services are rejected. The adapter keeps only two reviewed
-Polish comma rules. Its confidence is deliberately below the automatic
-correction threshold, so callers review and explicitly select its findings.
+versions, and remote services are rejected. The adapter keeps only five
+explicitly reviewed Polish comma rule IDs. Source-policy version `1.1`
+automatically applies their non-conflicting comma insertions; every other
+LanguageTool rule remains filtered out.
 
 The call is synchronous and may wait for `timeout_seconds`, including through
 `analyze_async()`. If the optional server is unavailable or returns invalid

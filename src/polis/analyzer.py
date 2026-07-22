@@ -62,7 +62,7 @@ SuggestionStatus = Literal[
 
 _SUGGESTION_OUTCOME_VERSION: Final[str] = "1.0"
 _SUGGESTION_BACKEND_OPERATION: Final[str] = "analysis.correct.suggestions"
-_SUGGESTION_BACKEND_POLICY: Final[str] = "1.0"
+_SOURCE_POLICY_VERSION: Final[str] = "1.1"
 
 
 @dataclass(frozen=True)
@@ -86,7 +86,7 @@ class SuggestionOutcome:
     model_calls: int
     protocol_versions: tuple[str, ...] = ()
     operation_version: str = _SUGGESTION_OUTCOME_VERSION
-    source_policy_version: str = _SUGGESTION_BACKEND_POLICY
+    source_policy_version: str = _SOURCE_POLICY_VERSION
 
 
 _AUTOMATIC_CORRECTION_POLICY: tuple[AutomaticCorrectionPolicy, ...] = (
@@ -129,6 +129,12 @@ _AUTOMATIC_CORRECTION_POLICY: tuple[AutomaticCorrectionPolicy, ...] = (
         source=Source(SourceKind.RULE, "syntax.sentence_space"),
         category=Category.PUNCTUATION,
         minimum_confidence=Confidence(0.9),
+    ),
+    AutomaticCorrectionPolicy(
+        source=Source(SourceKind.RULE, "languagetool.pl"),
+        category=Category.PUNCTUATION,
+        minimum_confidence=Confidence(0.85),
+        policy_version="1.1",
     ),
 )
 

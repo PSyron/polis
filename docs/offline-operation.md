@@ -45,9 +45,11 @@ timeout_seconds = 1.0
 Omit the entire section to disable the adapter. Configuration does not start or
 download the server. Before sending analyzed text, Polis makes a fixed-text
 preflight request and requires server name `LanguageTool` and version `6.8`.
-Only reviewed comma findings from `BRAK_PRZECINKA_ZE` and
-`BRAK_PRZECINKA_ZEBY` are retained. A local sidecar failure produces no
-optional findings and does not discard findings from in-process rules.
+Only reviewed comma findings from `BRAK_PRZECINKA_KTORY`,
+`BRAK_PRZECINKA_SPOJNIK_PROSTY`, `BRAK_PRZECINKA_ZE`,
+`BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` are retained. A local
+sidecar failure produces no optional findings and does not discard findings
+from in-process rules.
 
 ## Supported configuration limits
 
@@ -70,4 +72,4 @@ POLIS_LT_OFFLINE=1 ./scripts/build.sh
 ```
 
 The stdio process does not bind a port. It loads the checked-in Polish 6.8
-rules and resources and returns only the two corpus-qualified comma rule IDs.
+rules and resources and returns only the five corpus-qualified comma rule IDs.

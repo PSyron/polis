@@ -84,15 +84,19 @@ mechanism and return deterministic findings with stable IDs.
 
 `LocalLanguageToolRule` is registered only when `[language_tool]` is configured.
 It accepts a separately installed local LanguageTool 6.8 server and maps only
-`BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY` to minimal comma insertions with
-source `rule:languagetool.pl` and confidence `0.85`.
+`BRAK_PRZECINKA_KTORY`, `BRAK_PRZECINKA_SPOJNIK_PROSTY`,
+`BRAK_PRZECINKA_ZE`, `BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` to
+minimal comma insertions with source `rule:languagetool.pl` and confidence
+`0.85`. Source-policy version `1.1` permits these findings to be applied
+automatically when they do not conflict.
 
 The rule converts Java UTF-16 offsets to Python code-point offsets, minimizes
 wide replacements, rejects ambiguous alternatives and conflicting findings,
-and drops every unknown rule or non-comma change. Its reviewed corpus result is
-18 true-positive insertions, zero false positives, six missed punctuation edits,
-and no findings on 10 correct hard negatives. General LanguageTool spelling,
-grammar, style, and morphology findings are intentionally excluded.
+and drops every unknown rule or non-comma change. The four-rule #70 selection
+(three newly exposed IDs plus the already enabled `BRAK_PRZECINKA_ZE`) retained
+precision `1.00` with 5 true-positive edits and no protected-negative changes
+on its 142-sentence holdout. General LanguageTool spelling, grammar, style, and
+morphology findings are intentionally excluded.
 
 ## Analysis normalization
 

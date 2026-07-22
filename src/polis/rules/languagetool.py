@@ -34,7 +34,15 @@ _EXPECTED_VERSION = "6.8"
 _LANGUAGE = "pl-PL"
 _PROBE_TEXT = "To jest test."
 _MAX_RESPONSE_BYTES = 1_048_576
-_ALLOWLIST = frozenset({"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"})
+_ALLOWLIST = frozenset(
+    {
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+        "WOLACZ_BEZ_PRZECINKA",
+    }
+)
 _SOURCE = Source(SourceKind.RULE, "languagetool.pl")
 
 

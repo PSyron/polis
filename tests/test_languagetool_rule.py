@@ -60,6 +60,41 @@ def _rule(transport: FakeTransport) -> LocalLanguageToolRule:
     )
 
 
+def test_rule_allowlist_contains_exactly_qualified_identifiers() -> None:
+    assert languagetool_module._ALLOWLIST == {
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+        "WOLACZ_BEZ_PRZECINKA",
+    }
+
+
+@pytest.mark.parametrize(
+    "rule_id",
+    [
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "WOLACZ_BEZ_PRZECINKA",
+    ],
+)
+def test_rule_maps_each_qualified_identifier_to_a_comma_finding(
+    rule_id: str,
+) -> None:
+    transport = FakeTransport(
+        [
+            _response(text_length=0, replacement=""),
+            _response(rule_id=rule_id),
+        ]
+    )
+
+    findings = _rule(transport).find("Wiem że wróciła.", options=AnalysisOptions())
+
+    assert len(findings) == 1
+    assert (findings[0].start, findings[0].end, findings[0].suggestion) == (4, 4, ",")
+
+
 @pytest.mark.parametrize(
     "url",
     [

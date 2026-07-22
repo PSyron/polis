@@ -13,10 +13,10 @@
   only 0.571 syntax precision and 0.160 syntax recall on development. Bielik
   1.5B and Qwen3 0.6B produced no exact syntax edits. No configuration
   qualified, and corpus-v3 holdout remains unopened for this experiment.
-- Issue #70 qualified four additional LanguageTool punctuation rule IDs on
-  sentences at precision 1.00 and recall 0.038 on its one-shot holdout. They
-  remain research evidence until a separate source-policy change enables them;
-  the production `check` operation still exposes only its existing two rules.
+- Issue #70 qualified four LanguageTool punctuation rule IDs on sentences at
+  precision 1.00 and recall 0.038 on its one-shot holdout. Source-policy version
+  1.1 enables the three newly exposed IDs alongside the two existing IDs. This
+  remains narrow punctuation coverage and does not correct syntax or inflection.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
@@ -25,9 +25,9 @@
   6.8 process and Java runtime. The measured local installation plus OpenJDK was
   about 733 MB, with about 630 MiB RSS after startup.
 - The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
-  can wait up to its configured timeout, and it only covers reviewed missing
-  commas before `że` and `żeby`.
-- The source-built two-rule LanguageTool subset is not a general Polish corrector
+  can wait up to its configured timeout, and it only covers five reviewed
+  missing-comma rule IDs.
+- The source-built five-rule LanguageTool subset is not a general Polish corrector
   and has not passed the M5 automatic-correction source-policy gate.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`

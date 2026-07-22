@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -91,6 +92,9 @@ def test_stdio_bridge_invokes_language_tool_instead_of_corpus_lookup() -> None:
     assert "org.languagetool.language.Polish" in source
     assert "BRAK_PRZECINKA_ZE" in source
     assert "BRAK_PRZECINKA_ZEBY" in source
+    assert "BRAK_PRZECINKA_KTORY" in source
+    assert "BRAK_PRZECINKA_SPOJNIK_PROSTY" in source
+    assert "WOLACZ_BEZ_PRZECINKA" in source
     assert "ALLOWLIST = Map.ofEntries" not in source
     assert "Wiem że Ania już wróciła." not in source
 
@@ -120,3 +124,20 @@ def test_stdio_bridge_keeps_unfiltered_inspection_separate_from_check() -> None:
     assert 'response.put("operation", INSPECT_OPERATION)' in source
     assert "includeUnqualifiedRules" in source
     assert "ALLOWED_RULE_IDS.contains(ruleId)" in source
+
+
+def test_stdio_bridge_allowlist_contains_exactly_qualified_sentence_rules() -> None:
+    source = (
+        MODULE_ROOT / "src/main/java/org/polis/languagetool/PolisStdioServer.java"
+    ).read_text(encoding="utf-8")
+    declaration = source.split(
+        "private static final Set<String> ALLOWED_RULE_IDS = Set.of(", 1
+    )[1].split(");", 1)[0]
+
+    assert set(re.findall(r'"([A-Z_]+)"', declaration)) == {
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+        "WOLACZ_BEZ_PRZECINKA",
+    }

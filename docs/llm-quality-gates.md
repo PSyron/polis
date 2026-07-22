@@ -53,7 +53,8 @@ quantization, runtime version, hardware class, operating system, corpus and
 split hashes, loaded memory, cold and warm latency, throughput, model calls,
 and offline verification. Development and holdout results remain separate.
 
-The LanguageTool two-rule subset and every model in ADR-0005 predate these M5
-gates and are not qualified by this document. A production adapter may proceed
-only after its exact prompt, runtime, model or adapter, and source policies pass
-their applicable gates.
+The original LanguageTool two-rule subset and every model in ADR-0005 predate
+these M5 gates. ADR-0014 later qualified four exact LanguageTool rule IDs and
+source-policy version `1.1` integrates the resulting five-ID allowlist. A model
+adapter may proceed only after its exact prompt, runtime, model, and source
+policies pass their applicable gates.

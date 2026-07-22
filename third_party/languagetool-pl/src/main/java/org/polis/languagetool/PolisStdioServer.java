@@ -53,8 +53,11 @@ public final class PolisStdioServer {
     );
     private static final Set<String> SUPPORTED_POS = Set.of("subst", "adj");
     private static final Set<String> ALLOWED_RULE_IDS = Set.of(
+            "BRAK_PRZECINKA_KTORY",
+            "BRAK_PRZECINKA_SPOJNIK_PROSTY",
             "BRAK_PRZECINKA_ZE",
-            "BRAK_PRZECINKA_ZEBY"
+            "BRAK_PRZECINKA_ZEBY",
+            "WOLACZ_BEZ_PRZECINKA"
     );
     private static final ObjectMapper JSON = new ObjectMapper();
 

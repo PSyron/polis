@@ -67,6 +67,7 @@ covered by the calibrated source-policy. Currently that includes:
 - `syntax.list_space`
 - `syntax.quote_space`
 - `syntax.sentence_space`
+- `languagetool.pl` (only the five explicit rule IDs documented below)
 Remaining findings, including model-generated and unsuggestable cases, stay in
 `skipped_findings`.
 
@@ -81,6 +82,10 @@ attempts. For each suggestion-capable operation it records:
 - `protocol_versions`: ordered specialist operation/version identifiers used
 - `operation_version`: suggestion operation contract version
 - `source_policy_version`: source-policy contract version
+
+Source-policy version `1.1` adds automatic application of the explicitly
+qualified `languagetool.pl` comma insertions. It does not authorize other
+LanguageTool rules or category-wide correction.
 
 Model findings are never auto-applied in this method; callers can still use
 `CorrectionResult.apply_suggestions(finding_ids)` to explicitly select entries

@@ -136,6 +136,7 @@ def test_suggestion_outcomes_present_when_backend_is_enabled_and_complete() -> N
     assert outcome.suggestions >= 1
     assert outcome.operation == "analysis.correct.suggestions"
     assert outcome.model_calls == 1
+    assert outcome.source_policy_version == "1.1"
 
 
 @pytest.mark.parametrize(

@@ -37,18 +37,18 @@ production source-policy update:
 - `BRAK_PRZECINKA_ZE`
 - `WOLACZ_BEZ_PRZECINKA`
 
-Keep the production allowlist unchanged in #70. Enabling the rules requires a
-focused implementation issue with regression tests and explicit source-policy
-versioning. Do not generalize qualification to LanguageTool categories or to
-other rules.
+Issue #70 kept the production allowlist unchanged. Issue #72 subsequently
+integrated the selection as source-policy version `1.1`, with sentence
+regression tests and the exact five-ID runtime allowlist (the selected
+`BRAK_PRZECINKA_ZE` was already one of the two existing IDs). Do not generalize
+qualification to LanguageTool categories or to other rules.
 
 ## Consequences
 
 - Deterministic punctuation can gain safe but narrow sentence coverage.
 - The result does not qualify a compact model and does not solve syntax or
   contextual inflection.
-- #43 remains fail-closed until the qualified rules are integrated and the
-  residual sentence path meets its gates.
+- #43 remains fail-closed until the residual sentence path meets its gates.
 - #71 remains the next independent deterministic investigation for contextual
   inflection.
 - Paragraph behavior is not evidenced by this decision.

@@ -92,7 +92,7 @@ def test_sidecar_failure_preserves_builtin_findings(
     assert any(str(finding.source) == "rule:spelling.zeby" for finding in result.issues)
 
 
-def test_language_tool_suggestion_is_not_automatically_applied(
+def test_qualified_language_tool_sentence_rule_is_automatically_applied(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     FakeHttpTransport.failure = None
@@ -103,6 +103,7 @@ def test_language_tool_suggestion_is_not_automatically_applied(
 
     result = analyzer.correct("Wiem że wróciła.")
 
-    assert result.corrected_text == "Wiem że wróciła."
-    assert len(result.skipped_findings) == 1
-    assert str(result.skipped_findings[0].source) == "rule:languagetool.pl"
+    assert result.corrected_text == "Wiem, że wróciła."
+    assert len(result.applied_findings) == 1
+    assert result.skipped_findings == ()
+    assert str(result.applied_findings[0].source) == "rule:languagetool.pl"

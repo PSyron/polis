@@ -12,6 +12,13 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
 RUNNER = MODULE_ROOT / "scripts" / "run_stdio.sh"
+QUALIFIED_RULE_IDS = {
+    "BRAK_PRZECINKA_KTORY",
+    "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+    "BRAK_PRZECINKA_ZE",
+    "BRAK_PRZECINKA_ZEBY",
+    "WOLACZ_BEZ_PRZECINKA",
+}
 
 
 def _check(text: str, *, operation: str | None = None) -> dict[str, Any]:
@@ -40,10 +47,7 @@ def test_vendored_engine_finds_upstream_rule_on_unseen_sentence() -> None:
     matches = payload["matches"]
     assert isinstance(matches, list)
     assert matches
-    assert {match["rule"]["id"] for match in matches} <= {
-        "BRAK_PRZECINKA_ZE",
-        "BRAK_PRZECINKA_ZEBY",
-    }
+    assert {match["rule"]["id"] for match in matches} <= QUALIFIED_RULE_IDS
     assert any(match["rule"]["id"] == "BRAK_PRZECINKA_ZE" for match in matches)
 
 
@@ -54,6 +58,44 @@ def test_vendored_engine_keeps_unseen_correct_sentence_clean() -> None:
 
     payload = _check("Powiedział, że jutro wróci.")
     assert payload["matches"] == []
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    ("sentence", "rule_id"),
+    [
+        ("Helena która mieszka obok przyniosła ciasto.", "BRAK_PRZECINKA_KTORY"),
+        ("Było późno ale nikt nie wychodził.", "BRAK_PRZECINKA_SPOJNIK_PROSTY"),
+        ("Wiem że jutro wrócisz.", "BRAK_PRZECINKA_ZE"),
+        ("Leno proszę zamknij okno.", "WOLACZ_BEZ_PRZECINKA"),
+    ],
+)
+def test_vendored_engine_exposes_each_newly_qualified_sentence_rule(
+    sentence: str, rule_id: str
+) -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    payload = _check(sentence)
+
+    assert rule_id in {match["rule"]["id"] for match in payload["matches"]}
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "Po spotkaniu wróciłem razem z Anną Kowalską.",
+        "Spotkanie zaczyna się o 8.30 w sali 204.",
+        "Dokumentacja jest dostępna pod adresem https://example.org/docs.",
+        "Powiedziała: „Wrócę przed ósmą”.",
+    ],
+)
+def test_vendored_engine_keeps_protected_sentences_clean(sentence: str) -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    assert _check(sentence)["matches"] == []
 
 
 @pytest.mark.slow
@@ -107,5 +149,5 @@ def test_inspection_exposes_unfiltered_rules_without_broadening_check() -> None:
     checked_ids = {match["rule"]["id"] for match in checked["matches"]}
 
     assert inspected["operation"] == "inspect"
-    assert inspected_ids - {"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"}
-    assert checked_ids <= {"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"}
+    assert inspected_ids - QUALIFIED_RULE_IDS
+    assert checked_ids <= QUALIFIED_RULE_IDS
