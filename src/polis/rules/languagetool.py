@@ -5,6 +5,7 @@ from __future__ import annotations
 import ipaddress
 import json
 import math
+import re
 import threading
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -44,6 +45,18 @@ _ALLOWLIST = frozenset(
     }
 )
 _SOURCE = Source(SourceKind.RULE, "languagetool.pl")
+_RELATIVE_PAIR = re.compile(
+    r"^(?P<subject>[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+) "
+    r"(?P<relative>która mieszka obok) "
+    r"(?P<matrix_verb>[a-ząćęłńóśźż]+ła) "
+    r"[a-ząćęłńóśźż]+(?: [a-ząćęłńóśźż]+)*[.!?]$"
+)
+_VOCATIVE_PAIR = re.compile(
+    r"^(?P<vocative>[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+) "
+    r"(?P<politeness>proszę) (?P<imperative>[a-ząćęłńóśźż]+) "
+    r"[a-ząćęłńóśźż]+(?: [a-ząćęłńóśźż]+)*[.!?]$"
+)
+_QUALIFIED_POLITENESS_IMPERATIVES = frozenset({"zamknij", "zadzwoń"})
 
 
 class LanguageToolTransport(Protocol):
@@ -206,11 +219,14 @@ def _parse_allowlisted_findings(
     if not isinstance(raw_matches, list):
         raise ValueError("LanguageTool response must contain a matches list")
     findings: list[Finding] = []
+    seen_finding_ids: set[str] = set()
+    paired_groups: set[tuple[str, str]] = set()
     for raw_match in raw_matches:
         if not isinstance(raw_match, dict):
             raise ValueError("LanguageTool match must be an object")
         rule = raw_match.get("rule")
-        if not isinstance(rule, dict) or rule.get("id") not in _ALLOWLIST:
+        rule_id = rule.get("id") if isinstance(rule, dict) else None
+        if not isinstance(rule_id, str) or rule_id not in _ALLOWLIST:
             continue
         offset = _integer(raw_match.get("offset"), "offset")
         length = _integer(raw_match.get("length"), "length")
@@ -234,21 +250,72 @@ def _parse_allowlisted_findings(
         edit_start, edit_end, edit_original, suggestion = normalized.pop()
         if edit_start != edit_end or edit_original != "" or suggestion != ",":
             continue
-        findings.append(
-            Finding.create(
-                category=Category.PUNCTUATION,
-                severity=Severity.SUGGESTION,
-                message="Brak przecinka przed spójnikiem podrzędnym.",
-                explanation="Reguła wskazuje bezpieczną minimalną wstawkę przecinka.",
-                original="",
-                suggestion=",",
-                start=edit_start,
-                end=edit_end,
-                confidence=Confidence(0.85),
-                source=_SOURCE,
-            )
+        opening = _comma_finding(
+            edit_start,
+            message="Brak przecinka przed spójnikiem podrzędnym.",
+            explanation="Reguła wskazuje bezpieczną minimalną wstawkę przecinka.",
         )
-    return tuple(sorted(findings, key=lambda item: (item.start, item.end, item.id)))
+        if opening.id not in seen_finding_ids:
+            findings.append(opening)
+            seen_finding_ids.add(opening.id)
+        paired_position = _paired_comma_position(text, rule_id, edit_start)
+        if paired_position is not None:
+            closing = _comma_finding(
+                paired_position,
+                message="Brak przecinka zamykającego wtrąconą konstrukcję.",
+                explanation=(
+                    "Wąska reguła pary wskazuje bezpieczną drugą wstawkę przecinka."
+                ),
+            )
+            if closing.id not in seen_finding_ids:
+                findings.append(closing)
+                seen_finding_ids.add(closing.id)
+            paired_groups.add((opening.id, closing.id))
+    filtered = _drop_conflicting_findings(tuple(findings))
+    filtered_ids = {finding.id for finding in filtered}
+    incomplete_pair_ids = {
+        finding_id
+        for pair in paired_groups
+        if not set(pair) <= filtered_ids
+        for finding_id in pair
+    }
+    return tuple(
+        sorted(
+            (finding for finding in filtered if finding.id not in incomplete_pair_ids),
+            key=lambda item: (item.start, item.end, item.id),
+        )
+    )
+
+
+def _paired_comma_position(text: str, rule_id: str, opening: int) -> int | None:
+    if rule_id == "BRAK_PRZECINKA_KTORY":
+        match = _RELATIVE_PAIR.fullmatch(text)
+        if match is not None and opening == match.end("subject"):
+            return match.end("relative")
+    if rule_id == "WOLACZ_BEZ_PRZECINKA":
+        match = _VOCATIVE_PAIR.fullmatch(text)
+        if (
+            match is not None
+            and opening == match.end("vocative")
+            and match.group("imperative") in _QUALIFIED_POLITENESS_IMPERATIVES
+        ):
+            return match.end("politeness")
+    return None
+
+
+def _comma_finding(position: int, *, message: str, explanation: str) -> Finding:
+    return Finding.create(
+        category=Category.PUNCTUATION,
+        severity=Severity.SUGGESTION,
+        message=message,
+        explanation=explanation,
+        original="",
+        suggestion=",",
+        start=position,
+        end=position,
+        confidence=Confidence(0.85),
+        source=_SOURCE,
+    )
 
 
 def _minimal_edit(

@@ -307,3 +307,40 @@ def test_real_vendored_analyzer_preserves_source_policy_channels() -> None:
     assert inflection.apply_suggestions((finding.id,)) == (
         "Rozmawiałem z Janem Nowakiem po przerwie."
     )
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    ("source", "expected", "offsets"),
+    (
+        (
+            "Helena która mieszka obok przyniosła ciasto.",
+            "Helena, która mieszka obok, przyniosła ciasto.",
+            ((6, 6), (25, 25)),
+        ),
+        (
+            "Leno proszę zamknij okno.",
+            "Leno, proszę, zamknij okno.",
+            ((4, 4), (11, 11)),
+        ),
+    ),
+)
+def test_real_vendored_analyzer_completes_reviewed_paired_commas(
+    source: str, expected: str, offsets: tuple[tuple[int, int], ...]
+) -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    with Analyzer(
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=os.fspath(RUNNER.resolve()),
+            vendored_language_tool_timeout_seconds=30.0,
+        )
+    ) as analyzer:
+        result = analyzer.correct(source)
+
+    assert result.corrected_text == expected
+    assert tuple((item.start, item.end) for item in result.applied_findings) == offsets
+    assert {str(item.source) for item in result.applied_findings} == {
+        "rule:languagetool.pl"
+    }

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Completed both commas for the two narrowly reviewed relative-clause and
+  parenthetical-vocative sentence shapes without broadening the qualified
+  LanguageTool source channel.
 - Added the #77 sentence-only vendored LanguageTool stdio mode, which reuses one
   persistent local process for qualified punctuation and reviewable contextual
   inflection. It has explicit lifecycle control, bounded privacy-safe failures,

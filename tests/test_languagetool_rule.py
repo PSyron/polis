@@ -8,7 +8,7 @@ from urllib.request import ProxyHandler, Request
 import pytest
 
 import polis.rules.languagetool as languagetool_module
-from polis import AnalysisOptions, Category
+from polis import AnalysisOptions, AnalysisResult, Category
 from polis.rules.languagetool import (
     LanguageToolRuleConfig,
     LocalLanguageToolRule,
@@ -130,6 +130,270 @@ def test_rule_normalizes_allowlisted_wide_replacement_to_comma_insertion() -> No
     )
     assert finding.confidence.value == 0.85
     assert str(finding.source) == "rule:languagetool.pl"
+
+
+@pytest.mark.parametrize(
+    ("text", "payload", "expected_edits", "expected_output"),
+    (
+        (
+            "Helena która mieszka obok przyniosła ciasto.",
+            _response(
+                text_length=len("Helena która"),
+                rule_id="BRAK_PRZECINKA_KTORY",
+                replacement="Helena, która",
+            ),
+            ((6, 6, ","), (25, 25, ",")),
+            "Helena, która mieszka obok, przyniosła ciasto.",
+        ),
+        (
+            "Leno proszę zamknij okno.",
+            _response(
+                text_offset=4,
+                text_length=len(" proszę"),
+                rule_id="WOLACZ_BEZ_PRZECINKA",
+                replacement=", proszę",
+            ),
+            ((4, 4, ","), (11, 11, ",")),
+            "Leno, proszę, zamknij okno.",
+        ),
+    ),
+)
+def test_rule_completes_reviewed_paired_comma_corrections(
+    text: str,
+    payload: Mapping[str, object],
+    expected_edits: tuple[tuple[int, int, str], ...],
+    expected_output: str,
+) -> None:
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert (
+        tuple((finding.start, finding.end, finding.suggestion) for finding in findings)
+        == expected_edits
+    )
+    assert {str(finding.source) for finding in findings} == {"rule:languagetool.pl"}
+    result = AnalysisResult(text, findings)
+    assert result.apply(tuple(finding.id for finding in findings)) == expected_output
+
+
+def test_rule_deduplicates_repeated_opening_without_orphaning_closing_comma() -> None:
+    text = "Helena która mieszka obok przyniosła ciasto."
+    response = _response(
+        text_length=len("Helena która"),
+        rule_id="BRAK_PRZECINKA_KTORY",
+        replacement="Helena, która",
+    )
+    matches = response["matches"]
+    assert isinstance(matches, list)
+    match = matches[0]
+    payload = {
+        "software": {"name": "LanguageTool", "version": "6.8"},
+        "matches": [match, match],
+    }
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [
+        (6, 6),
+        (25, 25),
+    ]
+    result = AnalysisResult(text, findings)
+    assert result.apply(tuple(item.id for item in findings)) == (
+        "Helena, która mieszka obok, przyniosła ciasto."
+    )
+
+
+def test_rule_deduplicates_same_opening_from_different_allowlisted_rules() -> None:
+    text = "Helena która mieszka obok przyniosła ciasto."
+    response = _response(
+        text_length=len("Helena która"),
+        rule_id="BRAK_PRZECINKA_KTORY",
+        replacement="Helena, która",
+    )
+    matches = response["matches"]
+    assert isinstance(matches, list)
+    duplicate = dict(matches[0])
+    duplicate["rule"] = {"id": "BRAK_PRZECINKA_ZE"}
+    payload = {
+        "software": {"name": "LanguageTool", "version": "6.8"},
+        "matches": [matches[0], duplicate],
+    }
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [
+        (6, 6),
+        (25, 25),
+    ]
+
+
+def test_rule_deduplicates_existing_finding_at_synthesized_closing_boundary() -> None:
+    text = "Helena która mieszka obok przyniosła ciasto."
+    response = _response(
+        text_length=len("Helena która"),
+        rule_id="BRAK_PRZECINKA_KTORY",
+        replacement="Helena, która",
+    )
+    matches = response["matches"]
+    assert isinstance(matches, list)
+    closing = {
+        "offset": 25,
+        "length": 0,
+        "replacements": [{"value": ","}],
+        "rule": {"id": "BRAK_PRZECINKA_ZE"},
+    }
+    payload = {
+        "software": {"name": "LanguageTool", "version": "6.8"},
+        "matches": [matches[0], closing],
+    }
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [
+        (6, 6),
+        (25, 25),
+    ]
+
+
+def test_rule_drops_complete_pair_when_one_boundary_conflicts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    text = "Helena która mieszka obok przyniosła ciasto."
+    response = _response(
+        text_length=len("Helena która"),
+        rule_id="BRAK_PRZECINKA_KTORY",
+        replacement="Helena, która",
+    )
+    matches = response["matches"]
+    assert isinstance(matches, list)
+    opening = matches[0]
+    competing = {
+        "offset": 0,
+        "length": 0,
+        "replacements": [{"value": ","}],
+        "rule": {"id": "BRAK_PRZECINKA_ZE"},
+    }
+    payload = {
+        "software": {"name": "LanguageTool", "version": "6.8"},
+        "matches": [opening, competing],
+    }
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+    monkeypatch.setattr(
+        languagetool_module,
+        "findings_conflict",
+        lambda first, second: {first.start, second.start} == {0, 6},
+    )
+
+    assert _rule(transport).find(text, options=AnalysisOptions()) == ()
+
+
+@pytest.mark.parametrize(
+    "text",
+    (
+        "Helena, która mieszka obok, przyniosła ciasto.",
+        "Leno, proszę, zamknij okno.",
+        "Maria, która mieszka w Krakowie, jutro przyjedzie.",
+        "Liczba 12,5 i adres https://example.org pozostają bez zmian.",
+        "Powiedziała: „Leno, proszę, zamknij okno”.",
+    ),
+)
+def test_rule_does_not_synthesize_paired_commas_without_qualified_match(
+    text: str,
+) -> None:
+    transport = FakeTransport(
+        [
+            _response(text_length=0, replacement=""),
+            {"software": {"name": "LanguageTool", "version": "6.8"}, "matches": []},
+        ]
+    )
+
+    assert _rule(transport).find(text, options=AnalysisOptions()) == ()
+
+
+@pytest.mark.parametrize(
+    ("text", "payload", "expected_opening"),
+    (
+        (
+            "Helena która pracuje obok przyniosła ciasto.",
+            _response(
+                text_length=len("Helena która"),
+                rule_id="BRAK_PRZECINKA_KTORY",
+                replacement="Helena, która",
+            ),
+            6,
+        ),
+        (
+            "Helena która mieszka obok i pracuje zdalnie.",
+            _response(
+                text_length=len("Helena która"),
+                rule_id="BRAK_PRZECINKA_KTORY",
+                replacement="Helena, która",
+            ),
+            6,
+        ),
+        (
+            "Helena która mieszka obok przynosi ciasto.",
+            _response(
+                text_length=len("Helena która"),
+                rule_id="BRAK_PRZECINKA_KTORY",
+                replacement="Helena, która",
+            ),
+            6,
+        ),
+        (
+            "Leno proszę o zamknięcie okna.",
+            _response(
+                text_offset=4,
+                text_length=len(" proszę"),
+                rule_id="WOLACZ_BEZ_PRZECINKA",
+                replacement=", proszę",
+            ),
+            4,
+        ),
+        (
+            "Leno proszę pana o ciszę.",
+            _response(
+                text_offset=4,
+                text_length=len(" proszę"),
+                rule_id="WOLACZ_BEZ_PRZECINKA",
+                replacement=", proszę",
+            ),
+            4,
+        ),
+    ),
+)
+def test_rule_abstains_from_unreviewed_paired_comma_shapes(
+    text: str, payload: Mapping[str, object], expected_opening: int
+) -> None:
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [
+        (expected_opening, expected_opening)
+    ]
+
+
+def test_rule_completes_previously_reviewed_vocative_shape() -> None:
+    text = "Anno proszę zadzwoń wieczorem."
+    payload = _response(
+        text_offset=4,
+        text_length=len(" proszę"),
+        rule_id="WOLACZ_BEZ_PRZECINKA",
+        replacement=", proszę",
+    )
+    transport = FakeTransport([_response(text_length=0, replacement=""), payload])
+
+    findings = _rule(transport).find(text, options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [
+        (4, 4),
+        (11, 11),
+    ]
 
 
 def test_rule_converts_utf16_offsets_after_emoji() -> None:
@@ -315,7 +579,7 @@ def test_http_opener_has_no_proxy_and_rejects_redirects(
     )
 
 
-def test_conflicting_allowlisted_matches_are_all_dropped() -> None:
+def test_identical_allowlisted_findings_are_deduplicated_across_rule_ids() -> None:
     payload = _response()
     matches = payload["matches"]
     assert isinstance(matches, list)
@@ -329,4 +593,6 @@ def test_conflicting_allowlisted_matches_are_all_dropped() -> None:
     )
     transport = FakeTransport([_response(text_length=0, replacement=""), payload])
 
-    assert _rule(transport).find("Wiem że wróciła.", options=AnalysisOptions()) == ()
+    findings = _rule(transport).find("Wiem że wróciła.", options=AnalysisOptions())
+
+    assert [(finding.start, finding.end) for finding in findings] == [(4, 4)]
