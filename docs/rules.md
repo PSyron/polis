@@ -111,6 +111,18 @@ precision `1.00` with 5 true-positive edits and no protected-negative changes
 on its 142-sentence holdout. General LanguageTool spelling, grammar, style, and
 morphology findings are intentionally excluded.
 
+For two reviewed paired-comma constructions, an accepted opening finding may
+also produce its closing comma. Relative-clause completion requires the exact
+lexical anchor `Name która mieszka obok`, followed by a separate feminine
+past-tense matrix predicate. Parenthetical completion requires `Name proszę`,
+followed by one of the previously reviewed imperative anchors `zamknij` or
+`zadzwoń`. Both shapes must occupy one complete sentence and require the
+matching qualified LanguageTool rule; neither runs as a standalone corpus
+lookup. Other relative clauses, parentheticals, quotations, URLs, numbers, and
+multi-sentence shapes abstain until separately qualified. Both insertions keep
+the original Unicode half-open offsets and the `rule:languagetool.pl`
+source-policy channel.
+
 ## Contextual inflection suggestion rule
 
 `ContextualInflectionRule` implements the four evidence kinds frozen by
