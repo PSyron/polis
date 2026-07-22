@@ -38,6 +38,12 @@ from polis.rules import (
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
 )
+from polis.rules.contextual_inflection import (
+    ContextMorphologyTransport,
+    ContextualInflectionRule,
+    ContextualInflectionRuleConfig,
+    StdioContextMorphologyTransport,
+)
 from polis.rules.languagetool import (
     LanguageToolRuleConfig,
     LocalLanguageToolRule,
@@ -153,6 +159,8 @@ class AnalyzerConfig:
     use_local_heuristic_backend: bool = False
     language_tool_url: str | None = None
     language_tool_timeout_seconds: float = 1.0
+    contextual_inflection_stdio_path: str | None = None
+    contextual_inflection_timeout_seconds: float = 1.0
 
     def __post_init__(self) -> None:
         if self.language_tool_url is not None:
@@ -160,6 +168,11 @@ class AnalyzerConfig:
                 base_url=self.language_tool_url,
                 timeout_seconds=self.language_tool_timeout_seconds,
             )
+        ContextualInflectionRuleConfig(
+            timeout_seconds=self.contextual_inflection_timeout_seconds
+        )
+        if self.contextual_inflection_stdio_path is not None:
+            StdioContextMorphologyTransport(Path(self.contextual_inflection_stdio_path))
 
     @classmethod
     def from_toml(cls, path: str | Path) -> AnalyzerConfig:
@@ -261,6 +274,32 @@ class AnalyzerConfig:
                 context={"path": str(path_obj)},
             )
         language_tool_timeout = language_tool.get("timeout_seconds", 1.0)
+        contextual_present = "contextual_inflection" in raw
+        contextual = raw.get("contextual_inflection", {})
+        if not isinstance(contextual, Mapping):
+            raise ConfigurationError(
+                "'contextual_inflection' section must be a table",
+                code="configuration.invalid_file",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        contextual_path = contextual.get("stdio_path")
+        if contextual_present and contextual_path is None:
+            raise ConfigurationError(
+                "'contextual_inflection.stdio_path' is required when the "
+                "section is present",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        if contextual_path is not None and not isinstance(contextual_path, str):
+            raise ConfigurationError(
+                "'contextual_inflection.stdio_path' must be a string",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        contextual_timeout = contextual.get("timeout_seconds", 1.0)
 
         try:
             return cls(
@@ -269,10 +308,13 @@ class AnalyzerConfig:
                 use_local_heuristic_backend=use_local,
                 language_tool_url=language_tool_url,
                 language_tool_timeout_seconds=float(language_tool_timeout),
+                contextual_inflection_stdio_path=contextual_path,
+                contextual_inflection_timeout_seconds=float(contextual_timeout),
             )
         except (TypeError, ValueError) as exc:
             raise ConfigurationError(
-                "invalid analysis or LanguageTool configuration",
+                "invalid analysis, LanguageTool, or contextual inflection "
+                "configuration",
                 code="configuration.invalid_value",
                 retryable=False,
                 context={"path": str(path_obj)},
@@ -325,6 +367,7 @@ class Analyzer:
         config: AnalyzerConfig,
         *,
         specialist_engine: HybridSuggestionEngine | None = None,
+        contextual_inflection_transport: ContextMorphologyTransport | None = None,
     ) -> None:
         if not isinstance(config, AnalyzerConfig):
             raise TypeError("config must be AnalyzerConfig")
@@ -333,7 +376,7 @@ class Analyzer:
         ):
             raise TypeError("specialist_engine must be a HybridSuggestionEngine")
         self._config = config
-        self._registry = _make_default_registry(config)
+        self._registry = _make_default_registry(config, contextual_inflection_transport)
         self._backend = (
             _make_mock_backend() if config.use_local_heuristic_backend else None
         )
@@ -501,7 +544,17 @@ class Analyzer:
         return True
 
 
-def _make_default_registry(config: AnalyzerConfig) -> DeterministicRuleRegistry:
+def _make_default_registry(
+    config: AnalyzerConfig,
+    contextual_inflection_transport: ContextMorphologyTransport | None = None,
+) -> DeterministicRuleRegistry:
+    if (
+        contextual_inflection_transport is None
+        and config.contextual_inflection_stdio_path is not None
+    ):
+        contextual_inflection_transport = StdioContextMorphologyTransport(
+            Path(config.contextual_inflection_stdio_path)
+        )
     registrations = [
         RuleRegistration(rule=AgreementCopulaRule()),
         RuleRegistration(rule=SpellingJestesRule()),
@@ -524,6 +577,18 @@ def _make_default_registry(config: AnalyzerConfig) -> DeterministicRuleRegistry:
                     transport=LoopbackLanguageToolHttpTransport(rule_config),
                 ),
                 categories=frozenset({Category.PUNCTUATION}),
+            )
+        )
+    if contextual_inflection_transport is not None:
+        registrations.append(
+            RuleRegistration(
+                rule=ContextualInflectionRule(
+                    config=ContextualInflectionRuleConfig(
+                        timeout_seconds=config.contextual_inflection_timeout_seconds
+                    ),
+                    transport=contextual_inflection_transport,
+                ),
+                categories=frozenset({Category.INFLECTION}),
             )
         )
     return DeterministicRuleRegistry(registrations)

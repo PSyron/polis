@@ -9,6 +9,8 @@ from typing import Any
 
 import pytest
 
+from polis import Analyzer, AnalyzerConfig, Category
+
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
 RUNNER = MODULE_ROOT / "scripts" / "run_stdio.sh"
@@ -182,3 +184,67 @@ def test_context_synthesis_preserves_tags_without_changing_synthesis_contract() 
     )
     assert existing["operation"] == "synthesize"
     assert all("tags" not in candidate for candidate in existing_candidates)
+
+
+@pytest.mark.slow
+def test_analyzer_uses_real_context_synthesis_as_reviewable_sentence_suggestion() -> (
+    None
+):
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+    analyzer = Analyzer(
+        AnalyzerConfig(
+            contextual_inflection_stdio_path=os.fspath(RUNNER.resolve()),
+            contextual_inflection_timeout_seconds=30.0,
+        )
+    )
+    source = "Rozmawiałem z Janem Nowak po przerwie."
+
+    result = analyzer.correct(source)
+
+    finding = next(
+        item for item in result.skipped_findings if item.category is Category.INFLECTION
+    )
+    assert result.corrected_text == source
+    assert finding.suggestion == "Nowakiem"
+    assert result.apply_suggestions((finding.id,)) == (
+        "Rozmawiałem z Janem Nowakiem po przerwie."
+    )
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    ("source", "expected_suggestions"),
+    [
+        ("Wróciła bez ciepła kurtka.", {"ciepłej", "kurtki"}),
+        (
+            "Przyglądam się czerwonego samochodu.",
+            {"czerwonemu", "samochodowi"},
+        ),
+        ("Rozmawiałem z Janem Nowakiem po przerwie.", set()),
+        ("Wróciła bez ciepłej kurtki.", set()),
+        ("Przyglądam się czerwonemu samochodowi.", set()),
+        ("Przyglądała się stary obraz.", set()),
+        ("Jutro podziękuję Paweł za pomoc.", set()),
+        ("Wersja 2.0 z https://example.org jest opisana jako „stabilna”.", set()),
+    ],
+)
+def test_analyzer_preserves_frozen_contextual_inflection_behaviour(
+    source: str, expected_suggestions: set[str]
+) -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+    analyzer = Analyzer(
+        AnalyzerConfig(
+            contextual_inflection_stdio_path=os.fspath(RUNNER.resolve()),
+            contextual_inflection_timeout_seconds=30.0,
+        )
+    )
+
+    result = analyzer.analyze(source)
+
+    assert {
+        item.suggestion
+        for item in result.issues
+        if item.category is Category.INFLECTION
+    } == expected_suggestions

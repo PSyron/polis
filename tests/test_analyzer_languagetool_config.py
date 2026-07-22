@@ -78,6 +78,28 @@ def test_present_section_requires_base_url(tmp_path: Path) -> None:
         AnalyzerConfig.from_toml(path)
 
 
+def test_contextual_inflection_section_requires_absolute_executable(
+    tmp_path: Path,
+) -> None:
+    runner = tmp_path / "run_stdio.sh"
+    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    runner.chmod(0o700)
+    config = AnalyzerConfig.from_toml(
+        _config_file(
+            tmp_path,
+            "[contextual_inflection]\n"
+            f'stdio_path = "{runner}"\n'
+            "timeout_seconds = 2.5\n",
+        )
+    )
+
+    assert config.contextual_inflection_stdio_path == str(runner)
+    assert config.contextual_inflection_timeout_seconds == 2.5
+
+    with pytest.raises(ConfigurationError, match="stdio_path"):
+        AnalyzerConfig.from_toml(_config_file(tmp_path, "[contextual_inflection]\n"))
+
+
 def test_sidecar_failure_preserves_builtin_findings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

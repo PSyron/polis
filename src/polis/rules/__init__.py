@@ -7,6 +7,12 @@ from dataclasses import dataclass
 
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source
 from polis.rules.agreement import AgreementCopulaRule
+from polis.rules.contextual_inflection import (
+    ContextMorphologyTransport,
+    ContextualInflectionRule,
+    ContextualInflectionRuleConfig,
+    StdioContextMorphologyTransport,
+)
 from polis.rules.languagetool import (
     LanguageToolRuleConfig,
     LanguageToolTransport,
@@ -163,6 +169,9 @@ def _normalize_registrations(
 
 __all__ = [
     "DeterministicRuleRegistry",
+    "ContextMorphologyTransport",
+    "ContextualInflectionRule",
+    "ContextualInflectionRuleConfig",
     "DuplicateFindingError",
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
@@ -171,6 +180,7 @@ __all__ = [
     "LocalLanguageToolRule",
     "LoopbackLanguageToolHttpTransport",
     "SpellingJestesRule",
+    "StdioContextMorphologyTransport",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

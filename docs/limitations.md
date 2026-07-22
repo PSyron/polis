@@ -17,10 +17,11 @@
   precision 1.00 and recall 0.038 on its one-shot holdout. Source-policy version
   1.1 enables the three newly exposed IDs alongside the two existing IDs. This
   remains narrow punctuation coverage and does not correct syntax or inflection.
-- Issue #71 qualified a sentence-only contextual inflection router at precision
-  1.00 and supported recall 0.667 on its one-shot holdout. It is not yet wired
-  into the analyzer; first-name ambiguity, verbal agreement, most government
-  relations, and all paragraph behavior remain unsupported.
+- The sentence-only contextual inflection router reached precision 1.00 and
+  supported recall 0.667 on its one-shot holdout and is available through an
+  optional local stdio configuration. It is suggestion-only; first-name
+  ambiguity, verbal agreement, most government relations, and all paragraph
+  behavior remain unsupported.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

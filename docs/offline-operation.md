@@ -51,6 +51,21 @@ Only reviewed comma findings from `BRAK_PRZECINKA_KTORY`,
 sidecar failure produces no optional findings and does not discard findings
 from in-process rules.
 
+The optional contextual inflection path uses the source-built stdio runner
+directly:
+
+```toml
+[contextual_inflection]
+stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+The path must be absolute and executable. Each call starts that local process,
+uses the tag-preserving `synthesize_context` operation, and closes it after the
+sentence response. Failures produce no inflection suggestion. Suggestions are
+never automatically applied. Multi-sentence input is outside this rule's scope
+and causes no contextual morphology process call.
+
 ## Supported configuration limits
 
 This verification does not start or validate separately installed runtimes.

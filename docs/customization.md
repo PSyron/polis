@@ -144,3 +144,30 @@ The call is synchronous and may wait for `timeout_seconds`, including through
 `analyze_async()`. If the optional server is unavailable or returns invalid
 data, analysis continues with the built-in rules and no LanguageTool findings.
 Removing `[language_tool]` fully removes the adapter from the analyzer registry.
+
+## Enable contextual inflection suggestions
+
+Build the pinned local module, then point Polis at its absolute stdio runner:
+
+```toml
+[contextual_inflection]
+stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+The executable is invoked directly without a shell and receives one sentence
+through stdin. It returns only finite local candidates. Qualified surname and
+narrow government findings remain reviewable: `correct()` does not apply them,
+and callers must select their IDs through `apply_suggestions()`. Omission of
+the section disables all contextual morphology I/O. Multi-sentence input also
+skips this rule without starting the process.
+
+The same configuration works with the sentence-oriented CLI example:
+
+```console
+python -m polis.cli --config examples/polis.toml analyze --json \
+  "Rozmawiałem z Janem Nowak po przerwie."
+```
+
+The JSON output contains a reviewable `Nowakiem` suggestion. The CLI does not
+apply it unless its finding ID is passed explicitly with `--apply`.

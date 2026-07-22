@@ -43,6 +43,10 @@ correction requires a separate policy decision even though the measured edits
 met precision 1.00, because name inflection is sensitive and target coverage is
 narrow.
 
+Issue #73 implements that optional suggestion path through an injected local
+morphology transport and explicit stdio configuration. It does not change
+automatic source-policy `1.1`.
+
 After deterministic punctuation (#72) and contextual inflection are integrated,
 a narrowly scoped residual syntax run with the smallest previously credible
 MLX model is justified. A broad model matrix is not: #69 already established

@@ -98,6 +98,22 @@ precision `1.00` with 5 true-positive edits and no protected-negative changes
 on its 142-sentence holdout. General LanguageTool spelling, grammar, style, and
 morphology findings are intentionally excluded.
 
+## Contextual inflection suggestion rule
+
+`ContextualInflectionRule` implements the four evidence kinds frozen by
+ADR-0015: adjacent-name agreement, genitive after `bez`, dative after
+`przygląd… się`, and dative after `podzięk…`. It calls an injected
+`ContextMorphologyTransport`, validates every complete tag and content-derived
+`ltpl:` candidate ID, and emits only a unique finite form. Ambiguity,
+unsupported morphology, conflicts, malformed responses, and transport failures
+return no finding. Input containing zero or multiple sentences is rejected
+before the local transport is called.
+
+Findings use `Category.INFLECTION`, source
+`rule:languagetool.contextual_inflection`, confidence `0.95`, and original
+Unicode `[start, end)` offsets. They are suggestion-only and excluded from
+automatic source-policy `1.1`.
+
 ## Analysis normalization
 
 Normalization is performed in `polis.analysis` by the following deterministic

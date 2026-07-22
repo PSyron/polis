@@ -110,6 +110,23 @@ selected or enabled by this API.
 `base_url` and `timeout_seconds` keys to those fields. Omission disables all
 LanguageTool I/O and registration.
 
+`AnalyzerConfig` also accepts `contextual_inflection_stdio_path` and
+`contextual_inflection_timeout_seconds`. The matching TOML section is:
+
+```toml
+[contextual_inflection]
+stdio_path = "/absolute/path/to/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+The path must reference an absolute executable. The optional rule emits
+`Category.INFLECTION` findings from source-local evidence and finite
+`synthesize_context` candidates. These findings are returned in
+`skipped_findings`; callers may apply selected IDs with `apply_suggestions()`.
+The rule abstains without I/O unless the input contains exactly one sentence.
+For tests or embedding, callers can instead inject a `ContextMorphologyTransport`
+with `Analyzer(config, contextual_inflection_transport=transport)`.
+
 The analyzer API above is implemented by a thin runtime in `polis` and remains
 small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`
 model and the checked examples prove bidirectional assignment compatibility
