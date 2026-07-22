@@ -95,6 +95,11 @@ unsupported, and non-alternative spans return only safe available forms plus
 `no-analysis`, `unsupported-pos`, or `no-alternatives`. Candidate records prove
 dictionary synthesis only and make no claim about sentence context.
 
+The experiment-only `synthesize_context` operation accepts the same spans and
+adds a sorted `tags` array with complete upstream morphological tags to each
+candidate. Its candidate ID covers both the visible merged features and tags.
+The default `synthesize` shape and IDs remain unchanged.
+
 ## Verification and benchmark
 
 Run static provenance and boundary checks with:

@@ -1,0 +1,2089 @@
+{
+  "case_evidence": [
+    {
+      "candidate_ids": [
+        "ltpl:d1f8a7886e230bd7aa3568bb8d89140757f9b3fc9b3bf938493819130a66118f"
+      ],
+      "case_id": "inflection_001",
+      "elapsed_ms": 568.2604579487815,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "15d048757ce1726921d8c57518c3f6b2bb838d7e976ce5280a7e4af9f745e169",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [
+        "ltpl:806a0498ee471c7a67716f94ccc2dd172439c111398546da579a6677b42c5899"
+      ],
+      "case_id": "inflection_002",
+      "elapsed_ms": 3.940333961509168,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "7a9f10d6a5faddd51acda2a0d7c364c1c71ae52f0b431db132518753dec2abac",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_003",
+      "elapsed_ms": 3.8424169179052114,
+      "evidence_count": 2,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:33ff0a4b041de4b748e58255aa1ce869a413fa4af38d1fa743e47cd9199c5e69"
+      ],
+      "case_id": "inflection_004",
+      "elapsed_ms": 1.5879999846220016,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "7c675543ddc48dbd75a4f528d737ab5473a295aa2eeb143839b458fbc9ab2ca1",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_005",
+      "elapsed_ms": 2.0444999681785703,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:e5739b8be4c66d871fe4553ceea9bb2d6574e905e279ad1da0b4a18f3ecdadee"
+      ],
+      "case_id": "inflection_006",
+      "elapsed_ms": 2.3293750127777457,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "695a91a1585f2796f29e0ba95a91b2f492fba485ab27faf1843b067256018f04",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_007",
+      "elapsed_ms": 2.3494999622926116,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_008",
+      "elapsed_ms": 2.2342499578371644,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:472f760d0a92aecb649880d04a5029f51e435ee21f84241cf61436c92c7c7a0b"
+      ],
+      "case_id": "inflection_009",
+      "elapsed_ms": 1.6462920466437936,
+      "evidence_count": 2,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "f0ebeb4d75185b917c854f0114b02e00f776c52e0463f8df8de058402b45f3c8",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_011",
+      "elapsed_ms": 3.8070420268923044,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:005ee5067da41a6a9356e637aa7ecade1fbdb864df2b77b6ff0ad5f5386cc374"
+      ],
+      "case_id": "inflection_012",
+      "elapsed_ms": 2.0166250178590417,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "514819eb5ab5b71e762695acf2690cc92e70c1aa25d2ffb3545625f72749492b",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [
+        "ltpl:01516ca4158a51879e8b5c192a7eb54d0fee08981604190afda518159e1fe12d",
+        "ltpl:d385f55a541040ed97db32c103da93de3e6b15709436a76c639a9782bcf8b6d7"
+      ],
+      "case_id": "inflection_013",
+      "elapsed_ms": 2.468792023137212,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "bez_government"
+      ],
+      "outcome_hash": "0298e02817ce9f5a6c1421bf68eea1821869a0c8d71e851433e1ec14783e63c1",
+      "proposal_count": 2
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_014",
+      "elapsed_ms": 1.630165963433683,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:8bfd00c6260ad7a04d9eaceffcbd19b837e733a323bdfdbcc2a954b271250c54"
+      ],
+      "case_id": "inflection_015",
+      "elapsed_ms": 1.0758750140666962,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "surname_agreement"
+      ],
+      "outcome_hash": "e0f14511d34b1028c17303939f6d2c39e1a9a552f6a67735b2cc5a6613659162",
+      "proposal_count": 1
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_016",
+      "elapsed_ms": 2.2065420635044575,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "inflection_037",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:f4a4fa9ccece99d0241e4bfc750015ce91ecb1f5f27cdc87354b13b66e39c2ab",
+        "ltpl:4f856c93b353703ae497241cdd418d840405e33db814a5b371572b394a44b506"
+      ],
+      "case_id": "inflection_041",
+      "elapsed_ms": 1.9651249749585986,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "reflexive_dative"
+      ],
+      "outcome_hash": "aeaa3ea5496590b1df1698c9683528822df7c73aa25db36ffd6f2fec9dbc0956",
+      "proposal_count": 2
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_001",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_002",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_003",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [
+        "ltpl:8fc4477f2fceba4f7163005fcc5e0db5d7901f49564b678735fd530fab335a21",
+        "ltpl:360ae4a2d7ccf30b6112f4f513fbf0f1b8d22a21ea9006095c0ca1a0e262fad7"
+      ],
+      "case_id": "syntax_004",
+      "elapsed_ms": 2.407583990134299,
+      "evidence_count": 1,
+      "evidence_kinds": [
+        "reflexive_dative"
+      ],
+      "outcome_hash": "f9935d17b11a08edf22bf6b1bda410e104009ca80135cde58ccfbd7f88248477",
+      "proposal_count": 2
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_005",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_006",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_007",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_008",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_009",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_011",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_012",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_013",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_014",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_021",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_025",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_041",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_045",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "syntax_057",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_001",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_002",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_003",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_004",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_013",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_014",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_019",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_025",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_026",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_031",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_032",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_037",
+      "elapsed_ms": 0.4355830606073141,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_038",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_043",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_044",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_049",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_055",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "punctuation_056",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_001",
+      "elapsed_ms": 1.8243330996483564,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_002",
+      "elapsed_ms": 1.9634580239653587,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_003",
+      "elapsed_ms": 1.1592500377446413,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_011",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_012",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_013",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_021",
+      "elapsed_ms": 0.32929203007370234,
+      "evidence_count": 1,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_022",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_027",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_028",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_029",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_037",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_038",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_043",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_044",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    },
+    {
+      "candidate_ids": [],
+      "case_id": "hard_negative_049",
+      "elapsed_ms": 0.0,
+      "evidence_count": 0,
+      "evidence_kinds": [],
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposal_count": 0
+    }
+  ],
+  "configuration_sha256": "8b5af09fc6cb780067387eb75ce27e2f33bbe4b4f74938a2d323065520ed5d05",
+  "decision": {
+    "qualified": true
+  },
+  "environment": {
+    "bridge_sha256": "ae66d166edd9cfcd40acf2956adb4881596b4e41d239d5c6e79c1d3ff4353dd5",
+    "language_tool_version": "6.8",
+    "runtime_disk_bytes": 54073873,
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6"
+  },
+  "experiment_id": "polis-contextual-inflection-routing-v1",
+  "holdout": {
+    "case_evidence": [
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_017",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [
+          "ltpl:65e6a14dfd132d8baadf0b587732a02f4740f6115f57dc0520cdb6ef8df309b2"
+        ],
+        "case_id": "inflection_018",
+        "elapsed_ms": 554.3140000663698,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "ae4e0ecba83d3ca8c9c79e35d0770fb39083b3328b154df1d73f0ec37b43514a",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_019",
+        "elapsed_ms": 4.015124985016882,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_021",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [
+          "ltpl:beca11d05b590119060be2af78bbd7b5fbb008324a893e8ed7bedc4dbc0e2506"
+        ],
+        "case_id": "inflection_022",
+        "elapsed_ms": 2.882292028516531,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "c9a1c8fb0b57cc128e90a61be4c0c6892d191b74e0d826e1254db060154abcb0",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_023",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [
+          "ltpl:efd25bd0582d439d829ce488485f2e97cc0673bc1e368c5ea73f2eed997c1cca"
+        ],
+        "case_id": "inflection_024",
+        "elapsed_ms": 2.1227080142125487,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "923c7bc614ca1145ba5008cdc3758a406e20e3d8936de9ec2c1b304c3284adaa",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_025",
+        "elapsed_ms": 4.04650007840246,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [
+          "ltpl:6071d26cb3822d9c38ee8536d27d2a65515c085e344ada7577ce17fba2a0ee28"
+        ],
+        "case_id": "inflection_026",
+        "elapsed_ms": 1.409208052791655,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "5289fb3735f9ea79549b84c360514055fb5ad04130485b71a8bc4d4304026ad6",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [
+          "ltpl:35c55f38f800b3d0d386f1ff8837ed641d0fe110039121b75d8b9ccd11d7ea0e"
+        ],
+        "case_id": "inflection_027",
+        "elapsed_ms": 2.195709035731852,
+        "evidence_count": 2,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "26178b68b15d747a3eb593b213ea1eaf11316575ea57c2e1a3f128c759cd1f35",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [
+          "ltpl:b94a3fd1938885f5069eb5fc13e623d8141a794ea19a9c2daf7d1d63d6cc62ab"
+        ],
+        "case_id": "inflection_028",
+        "elapsed_ms": 1.3729579513892531,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "e861da18b0fa627dad40579f60d70ab560c85971ef70bf8532ffe5ec33584860",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [
+          "ltpl:8dad0bcb6a554da3e0562db5875f34bf08a503149be02534fed9d5fefcfb2800"
+        ],
+        "case_id": "inflection_029",
+        "elapsed_ms": 1.818541088141501,
+        "evidence_count": 2,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "f27dee8fcc65b84540e51d511b1e3388efe3723e8fc36e2bbd48a8f3f1c28263",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [
+          "ltpl:d56407c0f2c9801c1ee9cd2715e270779d27dcb3a8ac6518dd36c6a63ab375f0"
+        ],
+        "case_id": "inflection_031",
+        "elapsed_ms": 1.3406670186668634,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "11e7a2e2e995fd21ca842e12900e70abb448d77fd7351e73362be9b75595fbc0",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [
+          "ltpl:c1b984dbfcf915f525022fd9d401a3591681fe9919f2253e3baf746e9d25667d"
+        ],
+        "case_id": "inflection_032",
+        "elapsed_ms": 1.9219170790165663,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "d9690834360373a0644e1499207c3a5919fc97118e92be3dd1ecf9c2a6f54e5a",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_033",
+        "elapsed_ms": 1.9359999569132924,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [
+          "ltpl:6f2da45622a1bd3cb6f6434f65932d195438f527e3dc2c76bb7c418c1c41ce53"
+        ],
+        "case_id": "inflection_034",
+        "elapsed_ms": 1.5165419317781925,
+        "evidence_count": 1,
+        "evidence_kinds": [
+          "surname_agreement"
+        ],
+        "outcome_hash": "1647cedc3cbe25e8a6eb0302cca8f7ffcc7d6a11c9b808f6887dc877ed7c7676",
+        "proposal_count": 1
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_035",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_036",
+        "elapsed_ms": 2.345166984014213,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_038",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_039",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_042",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_043",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_044",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_045",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_046",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_047",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_048",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_049",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_051",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_052",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_053",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_054",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_055",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_056",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_057",
+        "elapsed_ms": 0.8560410933569074,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_058",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "inflection_059",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_015",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_016",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_017",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_018",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_019",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_022",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_023",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_024",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_026",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_027",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_028",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_029",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_031",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_032",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_033",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_034",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_035",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_036",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_037",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_038",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_039",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_042",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_043",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_044",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_046",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_047",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_048",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_049",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_051",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_052",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_053",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_054",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_055",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_056",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_058",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "syntax_059",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_005",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_006",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_007",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_008",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_009",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_011",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_012",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_015",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_016",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_017",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_018",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_021",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_022",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_023",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_024",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_027",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_028",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_029",
+        "elapsed_ms": 2.0692499820142984,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_033",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_034",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_035",
+        "elapsed_ms": 1.3785830233246088,
+        "evidence_count": 2,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_036",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_039",
+        "elapsed_ms": 0.7069580024108291,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_041",
+        "elapsed_ms": 1.0822080075740814,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_042",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_045",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_046",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_047",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_048",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_051",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_052",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_053",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_054",
+        "elapsed_ms": 1.3565419940277934,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_057",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_058",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "punctuation_059",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_004",
+        "elapsed_ms": 1.6554580070078373,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_005",
+        "elapsed_ms": 2.1137091098353267,
+        "evidence_count": 3,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_006",
+        "elapsed_ms": 1.380832982249558,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_007",
+        "elapsed_ms": 1.7036659410223365,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_008",
+        "elapsed_ms": 1.6195420175790787,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_009",
+        "elapsed_ms": 1.4117909595370293,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_014",
+        "elapsed_ms": 1.1293749557808042,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_015",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_016",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_017",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_018",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_019",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_023",
+        "elapsed_ms": 0.6313750054687262,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_024",
+        "elapsed_ms": 4.1889159474521875,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_025",
+        "elapsed_ms": 7.4884999776259065,
+        "evidence_count": 1,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_026",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_031",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_032",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_033",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_034",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_035",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_036",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_039",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_041",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_042",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_045",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_046",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_047",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_048",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_051",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_052",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_053",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      },
+      {
+        "candidate_ids": [],
+        "case_id": "hard_negative_054",
+        "elapsed_ms": 0.0,
+        "evidence_count": 0,
+        "evidence_kinds": [],
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposal_count": 0
+      }
+    ],
+    "summary": {
+      "all_inflection_gold_edits": 45,
+      "cases_with_evidence": 30,
+      "classes": {
+        "first_name": {
+          "false_negative_edits": 0,
+          "false_positive_edits": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        },
+        "ordinary": {
+          "false_negative_edits": 1,
+          "false_positive_edits": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        },
+        "surname": {
+          "false_negative_edits": 4,
+          "false_positive_edits": 0,
+          "precision": 1.0,
+          "recall": 0.7142857142857143,
+          "true_positive_edits": 10
+        }
+      },
+      "detected_inflection_gold_edits": 15,
+      "evidence_count": 35,
+      "exact_output_matches": 43,
+      "false_negative_edits": 5,
+      "false_positive_edits": 0,
+      "invalid_output_cases": 0,
+      "peak_rss_bytes": 326877184,
+      "precision": 1.0,
+      "proposed_edits": 10,
+      "protected_negative_suggestions": 0,
+      "recall": 0.6666666666666666,
+      "target_detection_recall": 0.3333333333333333,
+      "total_cases": 142,
+      "true_positive_edits": 10,
+      "warm_median_ms": 1.6554580070078373,
+      "warm_p95_ms": 4.1889159474521875
+    }
+  },
+  "router_sha256": "6a332664414258f87994fc754b17b4ff7d56dd4d8a9b842bfe4aeb55184b7ea0",
+  "schema_version": 1,
+  "summary": {
+    "all_inflection_gold_edits": 20,
+    "cases_with_evidence": 22,
+    "classes": {
+      "first_name": {
+        "false_negative_edits": 1,
+        "false_positive_edits": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "true_positive_edits": 0
+      },
+      "ordinary": {
+        "false_negative_edits": 2,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "recall": 0.75,
+        "true_positive_edits": 6
+      },
+      "surname": {
+        "false_negative_edits": 5,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "recall": 0.5833333333333334,
+        "true_positive_edits": 7
+      }
+    },
+    "detected_inflection_gold_edits": 19,
+    "evidence_count": 24,
+    "exact_output_matches": 26,
+    "false_negative_edits": 8,
+    "false_positive_edits": 0,
+    "invalid_output_cases": 0,
+    "peak_rss_bytes": 339886080,
+    "precision": 1.0,
+    "proposed_edits": 13,
+    "protected_negative_suggestions": 0,
+    "recall": 0.6190476190476191,
+    "target_detection_recall": 0.95,
+    "total_cases": 69,
+    "true_positive_edits": 13,
+    "warm_median_ms": 2.0166250178590417,
+    "warm_p95_ms": 3.8424169179052114
+  }
+}

@@ -21,10 +21,17 @@ QUALIFIED_RULE_IDS = {
 }
 
 
-def _check(text: str, *, operation: str | None = None) -> dict[str, Any]:
+def _check(
+    text: str,
+    *,
+    operation: str | None = None,
+    spans: list[dict[str, int]] | None = None,
+) -> dict[str, Any]:
     request: dict[str, object] = {"text": text, "language": "pl-PL"}
     if operation is not None:
         request["operation"] = operation
+    if spans is not None:
+        request["spans"] = spans
     process = subprocess.run(
         [os.fspath(RUNNER)],
         input=json.dumps(request),
@@ -151,3 +158,27 @@ def test_inspection_exposes_unfiltered_rules_without_broadening_check() -> None:
     assert inspected["operation"] == "inspect"
     assert inspected_ids - QUALIFIED_RULE_IDS
     assert checked_ids <= QUALIFIED_RULE_IDS
+
+
+@pytest.mark.slow
+def test_context_synthesis_preserves_tags_without_changing_synthesis_contract() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    spans = [{"start": 0, "end": 5}]
+    contextual = _check("Paweł", operation="synthesize_context", spans=spans)
+    existing = _check("Paweł", operation="synthesize", spans=spans)
+    contextual_candidates = contextual["results"][0]["candidates"]
+    existing_candidates = existing["results"][0]["candidates"]
+
+    assert contextual["operation"] == "synthesize_context"
+    assert all(
+        candidate["tags"] == sorted(set(candidate["tags"]))
+        for candidate in contextual_candidates
+    )
+    assert any(
+        candidate["form"] == "Pawłowi" and "subst:sg:dat:m1" in candidate["tags"]
+        for candidate in contextual_candidates
+    )
+    assert existing["operation"] == "synthesize"
+    assert all("tags" not in candidate for candidate in existing_candidates)

@@ -18,6 +18,9 @@ when the policy changes.
 | [ADR-0010](decisions/0010-inflection-candidate-generation.md) | Accepted | LanguageTool supplies finite inflection candidates |
 | [ADR-0011](decisions/0011-reject-bielik-1.5b-qlora.md) | Accepted | Bielik 1.5B QLoRA is rejected for the production backend |
 | [ADR-0012](decisions/0012-reject-constrained-qwen35-2b.md) | Accepted | Constrained Qwen3.5 2B is rejected for the production backend |
+| [ADR-0013](decisions/0013-reject-sentence-category-routing.md) | Accepted | Current sentence category-routing model matrix is rejected |
+| [ADR-0014](decisions/0014-qualify-broader-polish-languagetool-rules.md) | Accepted | Four broader Polish LanguageTool sentence rules qualify |
+| [ADR-0015](decisions/0015-qualify-contextual-inflection-routing.md) | Accepted | Deterministic contextual inflection routing qualifies as a suggestion source |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.

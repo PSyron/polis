@@ -141,3 +141,14 @@ def test_stdio_bridge_allowlist_contains_exactly_qualified_sentence_rules() -> N
         "BRAK_PRZECINKA_ZEBY",
         "WOLACZ_BEZ_PRZECINKA",
     }
+
+
+def test_context_synthesis_is_separate_and_preserves_complete_tags() -> None:
+    source = (
+        MODULE_ROOT / "src/main/java/org/polis/languagetool/PolisStdioServer.java"
+    ).read_text(encoding="utf-8")
+
+    assert 'CONTEXT_SYNTHESIZE_OPERATION = "synthesize_context"' in source
+    assert "candidate.tags().add(tag)" in source
+    assert 'result.putArray("tags")' in source
+    assert "stableCandidateId(span, candidate, includeTags)" in source

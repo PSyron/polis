@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-contextual-inflection-routing-v1",
+  "language_tool": {
+    "version": "6.8",
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6"
+  },
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2",
+    "sentence_only": true
+  },
+  "evidence": {
+    "kinds": [
+      "bez_government",
+      "gratitude_dative",
+      "reflexive_dative",
+      "surname_agreement"
+    ],
+    "government": {
+      "bez": "gen",
+      "podziek_prefix": "dat",
+      "przyglad_sie_prefix": "dat"
+    },
+    "maximum_phrase_tokens": 2
+  },
+  "gates": {
+    "minimum_edit_precision": 0.9,
+    "minimum_supported_recall": 0.25,
+    "maximum_protected_negative_suggestions": 0,
+    "maximum_warm_p95_ms": 50.0
+  }
+}

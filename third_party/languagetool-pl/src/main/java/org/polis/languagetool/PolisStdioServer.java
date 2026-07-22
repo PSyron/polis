@@ -46,6 +46,7 @@ public final class PolisStdioServer {
     private static final String CHECK_OPERATION = "check";
     private static final String INSPECT_OPERATION = "inspect";
     private static final String SYNTHESIZE_OPERATION = "synthesize";
+    private static final String CONTEXT_SYNTHESIZE_OPERATION = "synthesize_context";
     private static final String TAGS_RESOURCE = "/pl/polish_tags.txt";
     private static final Locale POLISH_LOCALE = Locale.forLanguageTag("pl-PL");
     private static final Pattern TOKEN_PATTERN = Pattern.compile(
@@ -81,8 +82,12 @@ public final class PolisStdioServer {
                 }
                 final Request request = parseRequest(line);
                 final ObjectNode response;
-                if (SYNTHESIZE_OPERATION.equals(request.operation())) {
-                    response = synthesize(request);
+                if (SYNTHESIZE_OPERATION.equals(request.operation())
+                        || CONTEXT_SYNTHESIZE_OPERATION.equals(request.operation())) {
+                    response = synthesize(
+                            request,
+                            CONTEXT_SYNTHESIZE_OPERATION.equals(request.operation())
+                    );
                 } else {
                     response = check(
                             languageTool,
@@ -119,9 +124,10 @@ public final class PolisStdioServer {
                 : operationNode.textValue();
         if (!CHECK_OPERATION.equals(operation)
                 && !INSPECT_OPERATION.equals(operation)
-                && !SYNTHESIZE_OPERATION.equals(operation)) {
+                && !SYNTHESIZE_OPERATION.equals(operation)
+                && !CONTEXT_SYNTHESIZE_OPERATION.equals(operation)) {
             throw new IllegalArgumentException(
-                    "operation must be check, inspect, or synthesize"
+                    "operation must be check, inspect, synthesize, or synthesize_context"
             );
         }
         final String text = textNode.textValue();
@@ -194,18 +200,24 @@ public final class PolisStdioServer {
         return response;
     }
 
-    private static ObjectNode synthesize(final Request request) throws Exception {
+    private static ObjectNode synthesize(
+            final Request request,
+            final boolean includeTags
+    ) throws Exception {
         final ObjectNode response = JSON.createObjectNode();
-        response.put("operation", SYNTHESIZE_OPERATION);
+        response.put("operation", request.operation());
         response.put("language", POLISH_LANGUAGE);
         final ArrayNode results = response.putArray("results");
         for (Span span : request.spans()) {
-            results.add(synthesizeSpan(span));
+            results.add(synthesizeSpan(span, includeTags));
         }
         return response;
     }
 
-    private static ObjectNode synthesizeSpan(final Span span) throws Exception {
+    private static ObjectNode synthesizeSpan(
+            final Span span,
+            final boolean includeTags
+    ) throws Exception {
         final List<AnalyzedTokenReadings> tagged = MorphologyResources.TAGGER.tag(
                 List.of(span.surface())
         );
@@ -244,7 +256,13 @@ public final class PolisStdioServer {
                         continue;
                     }
                     final String form = preserveCapitalization(span.surface(), rawForm);
-                    addCandidate(accumulated, lemma, form, featuresFromTag(targetTag));
+                    addCandidate(
+                            accumulated,
+                            lemma,
+                            form,
+                            featuresFromTag(targetTag),
+                            targetTag
+                    );
                 }
             }
         }
@@ -256,7 +274,8 @@ public final class PolisStdioServer {
                     accumulated,
                     null,
                     span.surface(),
-                    new TreeSet<>(Set.of("unchanged"))
+                    new TreeSet<>(Set.of("unchanged")),
+                    "unchanged"
             );
         }
 
@@ -287,7 +306,7 @@ public final class PolisStdioServer {
         final ArrayNode candidates = result.putArray("candidates");
         accumulated.values().stream()
                 .sorted(Comparator.comparing(CandidateAccumulator::form))
-                .forEach(candidate -> candidates.add(toJson(span, candidate)));
+                .forEach(candidate -> candidates.add(toJson(span, candidate, includeTags)));
         return result;
     }
 
@@ -295,16 +314,20 @@ public final class PolisStdioServer {
             final Map<String, CandidateAccumulator> accumulated,
             final String lemma,
             final String form,
-            final TreeSet<String> features
+            final TreeSet<String> features,
+            final String tag
     ) {
         final CandidateAccumulator candidate = accumulated.computeIfAbsent(
                 form,
-                ignored -> new CandidateAccumulator(new TreeSet<>(), form, new TreeSet<>())
+                ignored -> new CandidateAccumulator(
+                        new TreeSet<>(), form, new TreeSet<>(), new TreeSet<>()
+                )
         );
         if (lemma != null) {
             candidate.lemmas().add(lemma);
         }
         candidate.features().addAll(features);
+        candidate.tags().add(tag);
     }
 
     private static TreeSet<String> featuresFromTag(final String tag) {
@@ -335,10 +358,11 @@ public final class PolisStdioServer {
 
     private static ObjectNode toJson(
             final Span span,
-            final CandidateAccumulator candidate
+            final CandidateAccumulator candidate,
+            final boolean includeTags
     ) {
         final ObjectNode result = JSON.createObjectNode();
-        result.put("candidate_id", stableCandidateId(span, candidate));
+        result.put("candidate_id", stableCandidateId(span, candidate, includeTags));
         result.put("start", span.start());
         result.put("end", span.end());
         final String lemma = unambiguousLemma(candidate);
@@ -350,19 +374,27 @@ public final class PolisStdioServer {
         result.put("form", candidate.form());
         final ArrayNode features = result.putArray("features");
         candidate.features().forEach(features::add);
+        if (includeTags) {
+            final ArrayNode tags = result.putArray("tags");
+            candidate.tags().forEach(tags::add);
+        }
         return result;
     }
 
     private static String stableCandidateId(
             final Span span,
-            final CandidateAccumulator candidate
+            final CandidateAccumulator candidate,
+            final boolean includeTags
     ) {
         final String lemma = unambiguousLemma(candidate);
         final String signature = span.start()
                 + "\u0000" + span.end()
                 + "\u0000" + (lemma == null ? "" : lemma)
                 + "\u0000" + candidate.form()
-                + "\u0000" + String.join("\u0000", candidate.features());
+                + "\u0000" + String.join("\u0000", candidate.features())
+                + (includeTags
+                        ? "\u0000" + String.join("\u0000", candidate.tags())
+                        : "");
         try {
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return "ltpl:" + HexFormat.of().formatHex(
@@ -427,7 +459,8 @@ public final class PolisStdioServer {
     private record CandidateAccumulator(
             TreeSet<String> lemmas,
             String form,
-            TreeSet<String> features
+            TreeSet<String> features,
+            TreeSet<String> tags
     ) {
     }
 }
