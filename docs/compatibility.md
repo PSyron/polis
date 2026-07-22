@@ -16,8 +16,9 @@ No optional model runtime is required for core deterministic checks.
 
 - Compatibility assertions are checked in `.github/workflows/fast-ci.yml` (Linux x86_64,
   macOS arm64, Windows x86_64) on each push and PR.
-- For each release block, we verify the compatibility fixture and quality gates by
-  running `uv run --locked --extra dev python scripts/verify_prerelease_candidate.py`.
+- For each release block, we verify the compatibility fixture and quality gates with
+  the complete, version-specific command in `docs/prerelease-candidate.md`; every
+  identity argument and the release-only PyPI check are mandatory.
 - Any required API/schema change must update `tests/fixtures/public_api_snapshot.json`
   and include migration notes before release.
 
@@ -44,6 +45,11 @@ a release blocker. A skip is acceptable only where the table assigns the same ch
 to another required job, such as POSIX executable-bit verification on Linux/macOS.
 
 ## Public API compatibility policy
+
+Release versions follow `docs/release-lifecycle.md`: `pyproject.toml` is
+authoritative, development uses `<version>.dev0`, candidates advance as `rcN`, and
+stable tags are `v<version>`. The release manifest binds that identity to the exact
+artifact, notes, and changelog bytes. Historical tagged evidence is immutable.
 
 - **Patch**: fixes, documentation-only updates, test additions, and bug fixes with no behavior-breaking effect on stable public symbols.
 - **Minor**: additive public symbols, additive enum values, safer validation messages, and new optional features.

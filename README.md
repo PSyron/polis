@@ -136,7 +136,8 @@ Unicode offset rules, validation failures, and schema compatibility. The
 [compatibility and semver policy](docs/compatibility.md).
 [privacy and dependency audit](docs/privacy-audit.md) documents release-gate evidence.
 [Prerelease candidate checklist](docs/prerelease-candidate.md) documents the release-gate
-verification path.
+verification path, while the [release identity lifecycle](docs/release-lifecycle.md)
+defines version progression, immutable evidence, and artifact digest checks.
 The [protocol boundary](docs/architecture/protocols.md) documents how richer
 orchestrators and adapter variants should be wired around the stable contracts.
 [Changelog](CHANGELOG.md) tracks release history and [release notes](docs/release-notes/0.1.0.md)

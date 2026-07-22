@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added a disabled-by-default local LanguageTool 6.8 punctuation layer with a
+  strict loopback endpoint policy and a reviewed two-rule allowlist.
+- Added source-policy `1.1`, which automatically applies comma insertions from
+  five explicitly qualified Polish LanguageTool rule IDs, plus optional,
+  reviewable contextual inflection suggestions through the pinned local
+  LanguageTool stdio module.
 - Added the #77 sentence-only vendored LanguageTool stdio mode, which reuses one
   persistent local process for qualified punctuation and reviewable contextual
   inflection. It has explicit lifecycle control, bounded privacy-safe failures,
@@ -44,8 +50,6 @@
   pass clean installation smoke tests from both wheel and sdist.
 - No runtime dependencies were introduced; production distribution remains
   dependency-light.
-- Added a disabled-by-default local LanguageTool 6.8 punctuation layer with a
-  strict loopback endpoint policy and a reviewed two-rule allowlist.
 
 ### Known limitations
 
