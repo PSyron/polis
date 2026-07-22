@@ -61,7 +61,8 @@ prefer stable source identifiers.
 
 ## Add a custom local backend
 
-For local-generation sources used in the pipeline, implement an object with:
+For validated local findings used in the pipeline, implement
+`polis.core.LocalFindingBackend` with:
 
 - `name` attribute
 - `generate_findings(text, policy=None, clock=None, sleep=None, operation=...)`
@@ -70,10 +71,14 @@ Returning an empty tuple is a valid backend behavior.
 
 ```python
 import asyncio
+from collections.abc import Awaitable, Callable
 from polis.analysis.pipeline import analyze_text_async
-from polis.core import AnalysisOptions
-from polis.core import Finding
+from polis.core import AnalysisOptions, Finding, LocalFindingBackend
 from polis.rules import DeterministicRuleRegistry
+
+
+async def sleep(seconds: float) -> None:
+    await asyncio.sleep(seconds)
 
 
 class PassThroughBackend:
@@ -85,18 +90,21 @@ class PassThroughBackend:
         *,
         policy: object | None = None,
         clock: object | None = None,
-        sleep: object | None = None,
+        sleep: Callable[[float], Awaitable[None]] = sleep,
         operation: str = "analysis.llm.generate",
     ) -> tuple[Finding, ...]:
         del text, policy, clock, sleep, operation
         return ()
 
 
+backend: LocalFindingBackend = PassThroughBackend()
+
+
 async def run_analysis() -> None:
     result = await analyze_text_async(
         "To jest tekst.",
         registry=DeterministicRuleRegistry(()),
-        local_backend=PassThroughBackend(),
+        local_backend=backend,
         options=AnalysisOptions(),
     )
     assert isinstance(result, tuple)
@@ -104,8 +112,19 @@ async def run_analysis() -> None:
 asyncio.run(run_analysis())
 ```
 
-For validated structured backend responses, prefer `polis.llm.adapter.MockHeuristicBackend`
-plus a dedicated transport implementation.
+For raw local prompt generation, implement the separate
+`polis.core.LocalGenerationBackend.generate(prompt) -> str` contract. A
+pipeline-facing adapter may compose that raw generator with prompt construction,
+retry settings, and strict response validation. `MockHeuristicBackend` is the
+reference implementation of both contracts and can be paired with a dedicated
+local transport.
+
+`analyze_text()` and `analyze_text_async()` are atomic by default: a controlled
+backend failure raises without returning deterministic-only partial findings.
+The `ignore_backend_failures=True` option is an explicit pipeline fallback for
+callers that select it. `Analyzer.correct()` uses its separately documented
+optional-suggestion fallback and records the outcome; strict `Analyzer.analyze()`
+does not silently fall back.
 
 ## Add a specialist suggestion backend
 

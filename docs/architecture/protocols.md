@@ -24,10 +24,12 @@ a rule does not select other rules or make cross-rule failure decisions.
 
 ## RuleRegistry
 
-`RuleRegistry` exposes the configured rule entries as an immutable tuple in a
-fixed deterministic order. Its lifecycle is configuration before an analysis
-call and read-only use during the call. It does not execute rules, deduplicate
-findings, or silently omit a failing configured rule.
+`RuleRegistry` executes its configured entries through `find(text, *, options)`
+in a fixed deterministic order. Its lifecycle is configuration before an
+analysis call and read-only use during the call. The registry owns category
+selection, registered-source validation, duplicate finding detection, and the
+ordered tuple of deterministic findings. It does not call local generation,
+merge local-backend findings, or silently omit a failing configured rule.
 
 ## LocalGenerationBackend
 
@@ -50,6 +52,22 @@ explicit limits. A future runtime adapter must apply its native chat template
 to those messages instead of flattening them. Neither request shape contains a
 runtime or model name, and adding specialist orchestration does not silently
 reinterpret the existing flat finding contract.
+
+## LocalFindingBackend
+
+`LocalFindingBackend` is the pipeline-facing, asynchronous boundary for one
+already-segmented text fragment. It exposes a safe stable `name` and
+`generate_findings(...) -> tuple[Finding, ...]`. Its implementation may compose
+a `LocalGenerationBackend`, prompt construction, deterministic retry settings,
+and strict raw-response validation, but those responsibilities do not change
+the raw backend contract above.
+
+The analysis pipeline owns segmentation, fragment iteration, translation to
+original-text offsets, deterministic merging, and canonical public error
+context. A parsed-finding backend must either return one complete validated
+tuple or raise a controlled backend error. It does not return partial findings
+after a failed fragment, perform correction fallback, select a model server, or
+authorize network access.
 
 Issue #60 adds `HybridSuggestionEngine` in `polis.analysis.hybrid`. It consumes
 an injected deterministic task router and specialist backend, never a model or
@@ -78,6 +96,14 @@ error hierarchy.
 No partial `AnalysisResult` is returned. When any configured deterministic
 component or local backend fails, the future implementation raises the relevant
 controlled error rather than returning a result that conceals missing work.
+
+The current synchronous and asynchronous analysis paths apply this same atomic
+contract to finding tuples before constructing `AnalysisResult`. Optional
+correction is separate and explicit: `Analyzer.correct()` and
+`Analyzer.correct_async()` may catch a controlled suggestion-backend failure,
+rerun deterministic analysis, and record the fallback status in
+`SuggestionOutcome`. That behavior does not weaken strict `analyze()` or
+`analyze_async()` calls.
 
 Retry policy is intentionally not a protocol yet. There is no implemented
 retry behavior or complete runtime exception hierarchy to parameterize, and a

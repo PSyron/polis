@@ -14,7 +14,14 @@ def main() -> int:
     """Return mypy's status for the protocol conformance examples."""
 
     completed = subprocess.run(
-        [sys.executable, "-m", "mypy", "--strict", str(EXAMPLES)],
+        [
+            sys.executable,
+            "-m",
+            "mypy",
+            "--strict",
+            "--follow-imports=normal",
+            str(EXAMPLES),
+        ],
         cwd=ROOT,
         check=False,
     )

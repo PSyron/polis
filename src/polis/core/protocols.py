@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from collections.abc import Awaitable, Callable
+from typing import Any, Protocol, runtime_checkable
 
 from polis.core.models import AnalysisOptions, AnalysisResult, Finding, Source
 
@@ -45,15 +46,15 @@ class Rule(Protocol):
 
 @runtime_checkable
 class RuleRegistry(Protocol):
-    """Provide the fixed ordered rule entries for one analyzer lifecycle.
+    """Execute the fixed ordered rule entries for one analyzer lifecycle.
 
-    The registry is configured before analysis begins and exposes an immutable
-    tuple, so callers cannot mutate its membership while a call is running.
-    It does not execute rules or merge their output.
+    The registry is configured before analysis begins. It owns rule selection,
+    deterministic execution order, and validation of registered rule output.
+    It does not call local generation or merge local-backend findings.
     """
 
-    def rules(self) -> tuple[Rule, ...]:
-        """Return the configured rules in their deterministic evaluation order."""
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        """Return validated findings from the selected registered rules."""
 
 
 @runtime_checkable
@@ -72,6 +73,32 @@ class LocalGenerationBackend(Protocol):
 
     async def generate(self, prompt: str) -> str:
         """Return one raw local-generation response for the supplied prompt."""
+
+
+@runtime_checkable
+class LocalFindingBackend(Protocol):
+    """Asynchronously return validated findings for one text fragment.
+
+    This composed boundary remains separate from raw local generation. Its
+    implementation owns prompt construction, raw-response validation, and any
+    implementation-specific retry policy. The analysis pipeline owns fragment
+    iteration, offset translation, and canonical public error context.
+    """
+
+    @property
+    def name(self) -> str:
+        """Return the safe stable backend identifier used in error context."""
+
+    async def generate_findings(
+        self,
+        text: str,
+        *,
+        policy: Any = None,
+        clock: MonotonicClock | None = None,
+        sleep: Callable[[float], Awaitable[None]] = ...,
+        operation: str = "analysis.llm.generate",
+    ) -> tuple[Finding, ...]:
+        """Return validated fragment-local findings or raise a controlled error."""
 
 
 @runtime_checkable
