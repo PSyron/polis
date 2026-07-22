@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import json
+import os
 import sys
+import tomllib
 from collections.abc import Mapping
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 import pytest
 
 from polis import Analyzer, AnalyzerConfig, ConfigurationError
+from polis.rules.languagetool_stdio import LocalLanguageToolStdioSession
 
 ROOT = Path(__file__).resolve().parents[1]
 FAKE_STDIO_SERVER = ROOT / "tests" / "fixtures" / "fake_languagetool_stdio.py"
@@ -44,6 +48,32 @@ def _config_file(tmp_path: Path, body: str) -> Path:
     path = tmp_path / "polis.toml"
     path.write_text(body, encoding="utf-8")
     return path
+
+
+def _toml_string(value: str | os.PathLike[str]) -> str:
+    return json.dumps(os.fspath(value), ensure_ascii=False)
+
+
+def _replace_owned_session(
+    monkeypatch: pytest.MonkeyPatch, session: LocalLanguageToolStdioSession
+) -> None:
+    def create_session(
+        _executable: Path, *, timeout_seconds: float
+    ) -> LocalLanguageToolStdioSession:
+        assert timeout_seconds > 0
+        return session
+
+    monkeypatch.setattr(
+        LocalLanguageToolStdioSession, "from_executable", create_session
+    )
+
+
+def test_toml_path_fixture_preserves_windows_backslashes() -> None:
+    path = PureWindowsPath("C:/Users/Paweł/LanguageTool/run_stdio.cmd")
+
+    parsed = tomllib.loads(f"stdio_path = {_toml_string(path)}\n")
+
+    assert parsed["stdio_path"] == os.fspath(path)
 
 
 def test_omitted_section_disables_languagetool() -> None:
@@ -85,14 +115,12 @@ def test_present_section_requires_base_url(tmp_path: Path) -> None:
 def test_contextual_inflection_section_requires_absolute_executable(
     tmp_path: Path,
 ) -> None:
-    runner = tmp_path / "run_stdio.sh"
-    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-    runner.chmod(0o700)
+    runner = Path(sys.executable).resolve()
     config = AnalyzerConfig.from_toml(
         _config_file(
             tmp_path,
             "[contextual_inflection]\n"
-            f'stdio_path = "{runner}"\n'
+            f"stdio_path = {_toml_string(runner)}\n"
             "timeout_seconds = 2.5\n",
         )
     )
@@ -138,15 +166,13 @@ def test_qualified_language_tool_sentence_rule_is_automatically_applied(
 def test_vendored_stdio_configuration_requires_absolute_executable(
     tmp_path: Path,
 ) -> None:
-    runner = tmp_path / "run_stdio.sh"
-    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-    runner.chmod(0o700)
+    runner = Path(sys.executable).resolve()
 
     config = AnalyzerConfig.from_toml(
         _config_file(
             tmp_path,
             "[vendored_language_tool]\n"
-            f'stdio_path = "{runner}"\n'
+            f"stdio_path = {_toml_string(runner)}\n"
             "timeout_seconds = 2.0\n",
         )
     )
@@ -173,10 +199,8 @@ def test_invalid_vendored_stdio_configuration_is_controlled(
         AnalyzerConfig.from_toml(_config_file(tmp_path, body))
 
 
-def test_vendored_stdio_mode_rejects_competing_transports(tmp_path: Path) -> None:
-    runner = tmp_path / "run_stdio.sh"
-    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-    runner.chmod(0o700)
+def test_vendored_stdio_mode_rejects_competing_transports() -> None:
+    runner = Path(sys.executable).resolve()
 
     with pytest.raises(ValueError, match="mutually exclusive"):
         AnalyzerConfig(
@@ -190,24 +214,17 @@ def test_vendored_stdio_mode_rejects_competing_transports(tmp_path: Path) -> Non
         )
 
 
-def _fake_stdio_executable(tmp_path: Path) -> Path:
-    runner = tmp_path / "fake-languagetool"
-    runner.write_text(
-        f"#!{sys.executable}\n" + FAKE_STDIO_SERVER.read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
-    runner.chmod(0o700)
-    return runner
-
-
 def test_vendored_session_serves_automatic_and_reviewable_sentence_sources(
-    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    runner = _fake_stdio_executable(tmp_path)
+    session = LocalLanguageToolStdioSession(
+        (sys.executable, str(FAKE_STDIO_SERVER)), timeout_seconds=1.0
+    )
+    _replace_owned_session(monkeypatch, session)
 
     with Analyzer(
         AnalyzerConfig(
-            vendored_language_tool_stdio_path=str(runner),
+            vendored_language_tool_stdio_path=str(Path(sys.executable).resolve()),
             vendored_language_tool_timeout_seconds=1.0,
         )
     ) as analyzer:
@@ -257,10 +274,10 @@ def test_analyzer_does_not_close_injected_transports() -> None:
     assert transport.closed is False
 
 
-def test_owned_vendored_analyzer_rejects_use_after_close(tmp_path: Path) -> None:
+def test_owned_vendored_analyzer_rejects_use_after_close() -> None:
     analyzer = Analyzer(
         AnalyzerConfig(
-            vendored_language_tool_stdio_path=str(_fake_stdio_executable(tmp_path)),
+            vendored_language_tool_stdio_path=str(Path(sys.executable).resolve()),
         )
     )
 
@@ -271,14 +288,17 @@ def test_owned_vendored_analyzer_rejects_use_after_close(tmp_path: Path) -> None
 
 
 def test_unavailable_vendored_process_preserves_builtin_findings(
-    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    runner = tmp_path / "unavailable-languagetool"
-    runner.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
-    runner.chmod(0o700)
+    session = LocalLanguageToolStdioSession(
+        (sys.executable, "-c", "raise SystemExit(1)"), timeout_seconds=1.0
+    )
+    _replace_owned_session(monkeypatch, session)
 
     with Analyzer(
-        AnalyzerConfig(vendored_language_tool_stdio_path=str(runner))
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=str(Path(sys.executable).resolve())
+        )
     ) as analyzer:
         result = analyzer.analyze("Zeby wrócić.")
 

@@ -44,6 +44,21 @@ def test_session_serves_context_synthesis(fake_command: tuple[str, ...]) -> None
     assert payload["results"][0]["surface"] == "Paweł"
 
 
+def test_fake_server_forces_utf8_when_parent_stdio_is_cp1252(
+    fake_command: tuple[str, ...], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("PYTHONIOENCODING", "cp1252")
+
+    with LocalLanguageToolStdioSession(fake_command, timeout_seconds=1.0) as session:
+        payload = session.synthesize_context(
+            "Paweł",
+            spans=((0, 5),),
+            timeout_seconds=1.0,
+        )
+
+    assert payload["results"][0]["surface"] == "Paweł"
+
+
 def test_session_serializes_concurrent_requests(fake_command: tuple[str, ...]) -> None:
     with LocalLanguageToolStdioSession(fake_command, timeout_seconds=1.0) as session:
         with ThreadPoolExecutor(max_workers=4) as pool:

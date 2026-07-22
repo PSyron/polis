@@ -5,6 +5,8 @@ import json
 import os
 import sys
 import time
+from io import TextIOWrapper
+from typing import cast
 
 
 def _write(payload: object) -> None:
@@ -55,6 +57,9 @@ def _candidate(
 
 
 def main() -> None:
+    # The stdio protocol is UTF-8 even when Windows inherits a legacy console codec.
+    cast(TextIOWrapper, sys.stdin).reconfigure(encoding="utf-8")
+    cast(TextIOWrapper, sys.stdout).reconfigure(encoding="utf-8")
     request_sequence = 0
     for line in sys.stdin:
         request_sequence += 1

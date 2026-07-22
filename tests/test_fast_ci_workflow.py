@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -8,6 +10,20 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate_fast_ci_workflow.py"
 WORKFLOW = ROOT / ".github/workflows/fast-ci.yml"
 LICENSE_REVIEW = ROOT / "docs/development/dependency-licenses.md"
+COMPATIBILITY_POLICY = ROOT / "docs/compatibility.md"
+DISTRIBUTION_VERIFICATION = ROOT / "docs/distribution-verification.md"
+BYTE_STABLE_TEXT_PATHS = (
+    "experiments/languagetool_stdio_session/config.json",
+    "experiments/languagetool_stdio_session/run_benchmark.py",
+    "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "third_party/languagetool-pl/manifest.json",
+    "third_party/languagetool-pl/scripts/run_stdio.sh",
+    "third_party/languagetool-pl/src/main/java/org/polis/languagetool/PolisStdioServer.java",
+)
+BYTE_EXACT_UPSTREAM_PATHS = (
+    "third_party/languagetool-pl/LICENSE-LGPL-2.1.txt",
+    "third_party/languagetool-pl/sources/languagetool-core/pom.xml",
+)
 
 
 def run_validator(workflow: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -205,3 +221,110 @@ class ModelCase(unittest.TestCase):
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "1 passed, 2 deselected" in result.stdout
+
+
+def test_byte_stable_text_uses_effective_text_and_lf_attributes() -> None:
+    result = subprocess.run(
+        ["git", "check-attr", "text", "eol", "--", *BYTE_STABLE_TEXT_PATHS],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == [
+        f"{path}: {attribute}: {value}"
+        for path in BYTE_STABLE_TEXT_PATHS
+        for attribute, value in (("text", "auto"), ("eol", "lf"))
+    ]
+
+
+def _run_git(*args: str, cwd: Path) -> None:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=cwd,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_crlf_configured_checkout_preserves_declared_bytes_and_hashes(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    checkout = tmp_path / "checkout"
+    source.mkdir()
+    paths = (*BYTE_STABLE_TEXT_PATHS, *BYTE_EXACT_UPSTREAM_PATHS)
+    for relative_path in (".gitattributes", *paths):
+        target = source / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative_path, target)
+
+    _run_git("init", "--quiet", cwd=source)
+    _run_git("config", "user.email", "ci@example.invalid", cwd=source)
+    _run_git("config", "user.name", "Fast CI regression", cwd=source)
+    _run_git("config", "core.autocrlf", "false", cwd=source)
+    _run_git("add", ".", cwd=source)
+    _run_git("commit", "--quiet", "-m", "fixture", cwd=source)
+
+    _run_git(
+        "-c",
+        "core.autocrlf=true",
+        "-c",
+        "core.eol=crlf",
+        "clone",
+        "--quiet",
+        "--no-local",
+        str(source),
+        str(checkout),
+        cwd=tmp_path,
+    )
+
+    for relative_path in paths:
+        expected = (source / relative_path).read_bytes()
+        actual = (checkout / relative_path).read_bytes()
+        assert actual == expected, relative_path
+        assert hashlib.sha256(actual).digest() == hashlib.sha256(expected).digest()
+
+
+def test_platform_specific_release_checks_have_versioned_owners() -> None:
+    compatibility = COMPATIBILITY_POLICY.read_text(encoding="utf-8")
+    distribution = DISTRIBUTION_VERIFICATION.read_text(encoding="utf-8")
+
+    assert "Platform verification profile 1.0" in compatibility
+    assert "`tests/test_cli.py`" in compatibility
+    assert "`tests/test_languagetool_vendor_artifacts.py`" in compatibility
+    assert "POSIX executable bits" in compatibility
+    assert "macOS network-denial evidence" in compatibility
+    assert "separate release-gate verification" in compatibility
+    assert "`PYTHONIOENCODING=cp1252`" in distribution
+    assert "`tests/test_release_distribution_installation.py`" in distribution
+    assert "platform-native line endings" in distribution
+    assert "python scripts/verify_distribution_install.py --dist dist" in distribution
+
+
+def test_vendored_upstream_text_is_exempt_from_checkout_normalization() -> None:
+    result = subprocess.run(
+        [
+            "git",
+            "check-attr",
+            "text",
+            "eol",
+            "--",
+            *BYTE_EXACT_UPSTREAM_PATHS,
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == [
+        f"{path}: {attribute}: unset"
+        for path in BYTE_EXACT_UPSTREAM_PATHS
+        for attribute in ("text", "eol")
+    ]
