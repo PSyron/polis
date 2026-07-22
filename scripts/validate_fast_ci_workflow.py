@@ -38,6 +38,8 @@ REQUIRED_SNIPPETS = (
     "version: 0.11.2",
     "enable-cache: true",
     "cache-dependency-glob: uv.lock",
+    "fetch-depth: 0",
+    "fetch-tags: true",
     "Fast suite deliberately excludes slow, model, benchmark, and release work.",
 )
 

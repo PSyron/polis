@@ -42,6 +42,13 @@ def test_fast_ci_contract_is_valid() -> None:
     assert result.stdout == "fast CI workflow contract is valid\n"
 
 
+def test_fast_ci_contract_requires_full_tag_history_for_release_evidence() -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "fetch-depth: 0" in workflow
+    assert "fetch-tags: true" in workflow
+
+
 def test_fast_ci_contract_rejects_a_missing_required_matrix_entry(
     tmp_path: Path,
 ) -> None:
