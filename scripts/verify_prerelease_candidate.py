@@ -41,8 +41,20 @@ def main() -> None:
         default=Path("dist"),
         help="Artifact directory",
     )
+    parser.add_argument(
+        "--source-commit",
+        required=True,
+        help="Immutable commit SHA bound to the build-once release manifest",
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=None,
+        help="Output path for the build-once release manifest",
+    )
     args = parser.parse_args()
     dist = args.dist
+    manifest = args.manifest or dist / "release-manifest.json"
 
     _run(
         [
@@ -56,6 +68,7 @@ def main() -> None:
             "not slow and not model",
         ]
     )
+
     _run(["uv", "run", "--locked", "--extra", "dev", "ruff", "check", "."])
     _run(
         [
@@ -110,8 +123,28 @@ def main() -> None:
         ]
     )
 
+    _run(
+        [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "dev",
+            "python",
+            "scripts/release_identity.py",
+            "manifest",
+            "--source-commit",
+            args.source_commit,
+            "--dist",
+            str(dist),
+            "--output",
+            str(manifest),
+        ]
+    )
+
     wheel, sdist = _collect_artifacts(dist)
     _print_hashes(wheel, sdist)
+    print(f"publish only the manifest artifact set: {manifest}")
 
 
 if __name__ == "__main__":
