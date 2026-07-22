@@ -24,10 +24,11 @@ a rule does not select other rules or make cross-rule failure decisions.
 
 ## RuleRegistry
 
-`RuleRegistry` exposes the configured rule entries as an immutable tuple in a
-fixed deterministic order. Its lifecycle is configuration before an analysis
-call and read-only use during the call. It does not execute rules, deduplicate
-findings, or silently omit a failing configured rule.
+`RuleRegistry` executes the configured rules in deterministic order for one
+analysis call. Its lifecycle is configuration before an analysis call and
+read-only use during the call. It owns category selection and validates the
+output of registered rules; it does not call local generation or merge
+local-backend findings.
 
 ## LocalGenerationBackend
 
@@ -58,6 +59,21 @@ once into original paragraph offsets. Unchanged output stops after one call,
 changed output receives one accept/reject verifier call, and every resulting
 finding is suggestion-only. Optional failures return explicit safe status while
 the analyzer retains deterministic findings and source-policy corrections.
+
+## LocalFindingBackend
+
+`LocalFindingBackend` is the separate composed local boundary used by the
+analysis pipeline. It accepts a text fragment and returns validated,
+fragment-local findings. Its implementation owns prompt construction,
+raw-response validation, and validation of an implementation-specific retry
+policy. The pipeline owns fragment iteration, forwarding the injected clock and
+sleep callable, translation to original-text offsets, and canonical public
+error context.
+
+It does not replace `LocalGenerationBackend`: that protocol remains the raw
+prompt-to-response boundary. Keeping both contracts separate lets adapters
+expose only the operation their consumer needs without coupling core to a
+specific model server or retry-policy implementation.
 
 ## MonotonicClock
 
