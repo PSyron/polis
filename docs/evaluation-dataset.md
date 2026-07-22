@@ -188,6 +188,45 @@ Corpus-v3 candidate integrity is checked separately with:
 uv run --locked --extra dev pytest tests/test_correction_corpus_v3.py -v
 ```
 
+## Independent sentence safety corpus v1
+
+`tests/fixtures/evaluation/polish_correction_safety_corpus_v1.json` and its XML
+counterpart are the new issue #114 corpus
+`polis_polish_correction_safety_corpus_v1`. It contains 240 newly authored,
+synthetic Polish CC0-1.0 candidates: 60 each for inflection, syntax,
+punctuation, and protected hard negatives, with 20 development and 40 holdout
+cases per stratum.
+
+The entity catalog, inputs, normalized templates, entity combinations, and
+near-duplicate families are checked for independence from corpus v3, all
+fine-tuning records, prompt examples, and E2E fixtures. This corpus does not
+supersede corpus v3 and does not provide the majority-coverage work tracked by
+#85. Corpus-v3 files, results, and digests remain unchanged.
+
+The committed state is `frozen` after Paweł Cyroń completed owner review of all
+240 cases on 2026-07-22. Development selection exposes only the 80 development
+cases; normal development code cannot load holdout gold. Quality-gate selection
+is the only path that exposes the 160 holdout cases. Training use is always
+prohibited.
+
+Owner review follows
+[`evaluation-safety-corpus-v1-review-checklist.md`](evaluation-safety-corpus-v1-review-checklist.md).
+Only Paweł Cyroń may record `human-reviewed`. The frozen canonical JSON SHA-256
+digest is
+`2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982`.
+The separate `.approval.json` manifest binds that attribution and the
+`all-cases` approval scope to the digest of the unfrozen candidate; the
+generator cannot create owner-review metadata on its own. Before writing JSON
+or XML, it checks corpus v3, fine-tuning data, prompt examples, and both E2E
+representations for leakage.
+Issue #114 performs no gate access and produces no holdout score.
+
+Run the candidate integrity and leakage checks with:
+
+```console
+uv run --locked --extra dev pytest tests/test_safety_corpus.py -v
+```
+
 The standard-library validator is also available to callers as
 `polis.evaluation.validate_dataset(raw)` and `polis.evaluation.load_dataset()`.
 It validates untrusted candidate JSON before it is accepted as a project asset.

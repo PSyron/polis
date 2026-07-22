@@ -1,0 +1,10 @@
+{
+  "corpus_id": "polis_polish_correction_safety_corpus_v1",
+  "approval_scope": "all-cases",
+  "approved_case_count": 240,
+  "candidate_digest": "1798d73d1a9ccc8d7626af1dbc5233ff33b226299c4fa824cd5bc7607a8ec396",
+  "frozen_digest": "2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982",
+  "reviewer": "Paweł Cyroń",
+  "reviewed_at": "2026-07-22",
+  "checklist_version": "safety-corpus-review-v1"
+}
