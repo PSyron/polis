@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-sentence-category-routing-v1",
+  "sentence_only": true,
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2"
+  },
+  "models": [
+    {
+      "name": "qwen3-1.7b-mlx-4bit",
+      "engine": "mlx",
+      "identifier": "mlx-community/Qwen3-1.7B-4bit",
+      "revision": "3b1b1768f8f8cf8351c712464f906e86c2b8269e",
+      "license": "Apache-2.0",
+      "artifact_size_bytes": 984013244
+    },
+    {
+      "name": "bielik-1.5b-mlx-8bit",
+      "engine": "mlx",
+      "identifier": "speakleash/Bielik-1.5B-v3.0-Instruct-MLX-8bit",
+      "revision": "a67fe1c442b12685cf2d1c32d02359d9e52c8ddd",
+      "license": "Apache-2.0",
+      "artifact_size_bytes": 1700957959
+    },
+    {
+      "name": "qwen3-0.6b-ollama",
+      "engine": "ollama",
+      "identifier": "qwen3:0.6b",
+      "revision": "sha256-7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "license": "Apache-2.0",
+      "artifact_size_bytes": 522640096
+    }
+  ],
+  "selection": {
+    "required_valid_response_rate": 1.0,
+    "maximum_negative_changes": 0,
+    "minimum_edit_precision": 0.9,
+    "minimum_focus_recall": 0.25,
+    "supported_focuses": ["syntax", "punctuation"],
+    "maximum_calls_per_sentence": 2,
+    "maximum_warm_p95_latency_ms": 2000.0,
+    "maximum_loaded_memory_bytes": 4294967296,
+    "maximum_swap_delta_bytes": 67108864
+  }
+}

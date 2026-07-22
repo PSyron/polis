@@ -1,0 +1,4187 @@
+{
+  "configuration_sha256": "48f1fb835116d1ed3ad59ba5b6d913090b333ea67ce0378693a0e05121be85f5",
+  "decision": {
+    "eligible_models": [],
+    "reasons": [
+      "qwen3-1.7b-mlx-4bit: structured-response gate failed",
+      "qwen3-1.7b-mlx-4bit: edit-precision gate failed",
+      "qwen3-1.7b-mlx-4bit: syntax recall gate failed",
+      "qwen3-1.7b-mlx-4bit: punctuation recall gate failed",
+      "bielik-1.5b-mlx-8bit: structured-response gate failed",
+      "bielik-1.5b-mlx-8bit: syntax recall gate failed",
+      "bielik-1.5b-mlx-8bit: punctuation recall gate failed",
+      "qwen3-0.6b-ollama: structured-response gate failed",
+      "qwen3-0.6b-ollama: edit-precision gate failed",
+      "qwen3-0.6b-ollama: syntax recall gate failed",
+      "qwen3-0.6b-ollama: punctuation recall gate failed"
+    ],
+    "selected": null
+  },
+  "environment": {
+    "runs": [
+      {
+        "hardware": "arm64",
+        "model_identifier": "mlx-community/Qwen3-1.7B-4bit",
+        "model_revision": "3b1b1768f8f8cf8351c712464f906e86c2b8269e",
+        "operating_system": "macOS-15.3.1-arm64-arm-64bit-Mach-O",
+        "runtime_engine": "mlx",
+        "runtime_version": null
+      },
+      {
+        "hardware": "arm64",
+        "model_identifier": "speakleash/Bielik-1.5B-v3.0-Instruct-MLX-8bit",
+        "model_revision": "a67fe1c442b12685cf2d1c32d02359d9e52c8ddd",
+        "operating_system": "macOS-15.3.1-arm64-arm-64bit-Mach-O",
+        "runtime_engine": "mlx",
+        "runtime_version": null
+      },
+      {
+        "hardware": "arm64",
+        "model_identifier": "qwen3:0.6b",
+        "model_revision": "sha256-7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+        "operating_system": "macOS-15.3.1-arm64-arm-64bit-Mach-O",
+        "runtime_engine": "ollama",
+        "runtime_version": "0.20.7"
+      }
+    ]
+  },
+  "experiment_id": "polis-sentence-category-routing-v1",
+  "holdout": null,
+  "models": [
+    {
+      "case_evidence": [
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 916.2382920039818,
+          "outcome_hash": "cd0c45c131dd812a99491bb247d5834e785c0b9b28197a67125abbc432d83629",
+          "protected_negative": false,
+          "source_char_count": 46,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.937832989729941,
+          "outcome_hash": "e5f4bde7cbd850ddae10363d07e7768adac8c4731939cbe689e3edaa76bd608e",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 6.160082994028926,
+          "outcome_hash": "864da26af9eb25a9ac8db066e821972f7d72746c0a1adc969cd3a8328910b3f0",
+          "protected_negative": false,
+          "source_char_count": 53,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.793708027340472,
+          "outcome_hash": "f9beb97fe7d7dd5fcc7e412393f6d57ee8a349c824aa01cb2243fa0e1ea66e48",
+          "protected_negative": false,
+          "source_char_count": 59,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.625250003300607,
+          "outcome_hash": "995bcae038c34a6fea4256a60e1040e89807eb38679bf732bcb50a3ab83365a1",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.959999932907522,
+          "outcome_hash": "8d30d3ad3d91047db0ab5f40bdcc8a5265ccf9cb5cae6c9b20165704abf3d827",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.402792081236839,
+          "outcome_hash": "d41d80aed57af3317163ad7f7c088be913edb2b012b12732b756465681d08b76",
+          "protected_negative": false,
+          "source_char_count": 55,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.589500022120774,
+          "outcome_hash": "1e6ea03db1b9d0e9d2c67561fea374f0c5704484161c096599c6244c08c434c5",
+          "protected_negative": false,
+          "source_char_count": 61,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.348874954506755,
+          "outcome_hash": "d0392bda019a424486b1a40d4f589ff87dc64813ebd8b49f6cd66191775b32c7",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.565249964594841,
+          "outcome_hash": "f2629b0361cda19d5e0245dc9c80af57cdd44b97e5f65130bacfe906ca914752",
+          "protected_negative": false,
+          "source_char_count": 28,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.243332961574197,
+          "outcome_hash": "1f7fd59d195f05d6136cd3b3a117bd53bc93e4d5f5168f4079d6bcf160066048",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.1424170592799783,
+          "outcome_hash": "440afd58fde327156041b0cfb9e100db305139b6eae7951eeff772ee5958b3ab",
+          "protected_negative": false,
+          "source_char_count": 26,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.016583970747888,
+          "outcome_hash": "c0cff38aa6ce308dfb1b72eaed8a06e4c821011db7949ff704e089d98d75dfa8",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_015",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.156167036853731,
+          "outcome_hash": "0696d0d328d80d4d8d32c876b1cf1f6a0e0a93dd033a8567fd799827133ccb0c",
+          "protected_negative": false,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_016",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.733249963261187,
+          "outcome_hash": "2c6c397f5a6af4eb15c119fe012ce27058328f485ea1cd13e10c297eb7d7f78b",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.26254200283438,
+          "outcome_hash": "a97344e8c4cd8a438b118666250c58156ea2dc984b3f5a17c4a1e296bc9981d8",
+          "protected_negative": false,
+          "source_char_count": 21,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.1023339834064245,
+          "outcome_hash": "8e5b35bebfeb9526a435c4cba8419f68e2bd7c43ada43f53a504fd80cbf66a4f",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1194.264916004613,
+          "outcome_hash": "77e44e3683ba187e9b53d588e89ee41d12ae167edccbe1a5470258f214a1c371",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 412.01125003863126,
+          "outcome_hash": "62198af726e2a6ddec4bcd817c88f75bf06d4b7d94b85db1a93ac8ad49a98623",
+          "protected_negative": false,
+          "source_char_count": 24,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 430.83387496881187,
+          "outcome_hash": "31959776288c33ad901fd1480c2c3bbcf583c1386b9b16e2a8e97993ca78d923",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 415.8389170188457,
+          "outcome_hash": "50c2fbf5908957ed8867a2ac9dd8e088f1efc4891d2443f8a0142513fe6df580",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 397.65304210595787,
+          "outcome_hash": "1ccf414b68a2ef3144a9661ec7f89c3283cf055be0595d1d4778674e1fe3b755",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 2,
+          "call_count": 2,
+          "case_id": "syntax_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 2
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 844.1001250175759,
+          "outcome_hash": "c4e5889abff0b1a586036c68b5fcfd9f78d5761d032a2825db5c0a088dec4adc",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 472.5789580261335,
+          "outcome_hash": "6a36f0886d8221a53ddc3d073e6496f398e1ed539ce223e5a17c40df5ba4be7f",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 432.24300094880164,
+          "outcome_hash": "03089f38eb591ae602a955efe78f95749d61436f5f1753a169a936ccf75ae0bf",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 500.92341599520296,
+          "outcome_hash": "36018d953319e2cb0451df0a10a70f4db85c9e3692418345d9fec953eb28eca0",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 483.9933330658823,
+          "outcome_hash": "7f60cac57f013c8e874df80c64b87259d62c74cfd780728c1ad13a87224e1bcf",
+          "protected_negative": false,
+          "source_char_count": 45,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 375.38766697980464,
+          "outcome_hash": "4c0b2416d6271fdb2318c632626e07f53f1824793150687ecfe6de16aaa39451",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 446.17295800708234,
+          "outcome_hash": "bfe701775fe358a47a2ac14db9a1d537d8451a2223cdce412012726ec3903c08",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "syntax",
+          "latency_ms": 688.6182918678969,
+          "outcome_hash": "bdcdd10ff79a85871eb2b909f401f99b6a42ee54a188aec0c4514ee1b7d83c26",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 686.196623952128,
+          "outcome_hash": "601f7460967ab1005ec9411a3b6551e9283b419315236193c5bef27f36b8abca",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 726.4093740377575,
+          "outcome_hash": "7df2126d7b4419f05796bb33b7465ec3fb62e093e24225accc191005c5bf21b0",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 746.8917089281604,
+          "outcome_hash": "3059400f41b5fcfb7aac356761b9d36f104992826e887d448374158e418f0352",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_045",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 448.831167886965,
+          "outcome_hash": "31bc3847e67f66685895ebdc644210f468521ca47c6a623bb6e32db23710480f",
+          "protected_negative": false,
+          "source_char_count": 35,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_057",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 804.3146671261638,
+          "outcome_hash": "ced2b7c2bbcea0d894c4f88a3509b29a6e02659d1cc5dcd74dc26f2eb80ab2ce",
+          "protected_negative": false,
+          "source_char_count": 52,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 0,
+          "case_id": "punctuation_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 1,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 3.5305829951539636,
+          "outcome_hash": "7935c82328108da38055fafe390d445aa2587af7bd7256add05f3226a63202bb",
+          "protected_negative": false,
+          "source_char_count": 22,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.0163749577477574,
+          "outcome_hash": "c0c62e3961be3eee602089b833ffbcece1555cbca691edce597af9f1a1c8447a",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.0007500424981117,
+          "outcome_hash": "e5ef02a300dec85ed4635e70de18804b5dd0ef28ff538bbbb2487185ba108d9b",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.054166980087757,
+          "outcome_hash": "9aab029f410bbeb805caa06dafcc69266adf03b864b781d33df5f95ed7024948",
+          "protected_negative": false,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.5802500313147902,
+          "outcome_hash": "458b4ed50db5e7b5e3932321e5d9bcc6c50838964bf96887200e3d5fa050294e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 1.7371249850839376,
+          "outcome_hash": "56a7d460ba6e524b522d54ba6c10592c8343208be907104c4b02391a18a919a9",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_019",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 1.6339999856427312,
+          "outcome_hash": "2fcec0a008e4dd7ba767a0dd8eb598031df70e7f1ac642e16c6ad2856f004786",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 1.9299580017104745,
+          "outcome_hash": "a76c7ee06a8582d508f12f258a99918893d87a244123dce495a297eb826e69f6",
+          "protected_negative": false,
+          "source_char_count": 25,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_026",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.0273750415071845,
+          "outcome_hash": "e0f523144bd8c2a42b282e0e1cc76a75c0f1fdc93d40366141f5708102800af6",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_031",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 1.9514160230755806,
+          "outcome_hash": "ff3d49c964439b0fcd373278ec357374b9cedf002c7c8f9df5e4c180e53fe928",
+          "protected_negative": false,
+          "source_char_count": 42,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_032",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 1.8010420026257634,
+          "outcome_hash": "d75f461ea6a2dc2a9d1781511130dd9759f29cc01916bd9b6a7d332d0d00d06c",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 1.6478750621899962,
+          "outcome_hash": "9ba29a0bf3552995b8d9ef266a495a86a153d5e13872642386b28761ffe19f34",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 2.0002080127596855,
+          "outcome_hash": "da5917d94ffa39dca43d14a9dbd65a3851054004478f314e24aa1858dd58eaeb",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 1.6687080496922135,
+          "outcome_hash": "e3612c68f2a4d5885ddfc42e98c2b862f6f7943150544b95bcbd3b90b5e6f1ce",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.110250061377883,
+          "outcome_hash": "07ad45ec4594241ee611b563c1259f60ea6f01a62f24963f5488544e4b60be52",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.137916977517307,
+          "outcome_hash": "d4aedebddce18e7718ce4977598f8be723b762155bc2c388d64775fe787d2b0e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_055",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.723374986089766,
+          "outcome_hash": "8bb40181fef6519f1465a84225610d0c63164dccb4d9cb95fd330f071927495d",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_056",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.1882079308852553,
+          "outcome_hash": "5823fa2581e15e0d16e293f07df33188ed225d844e72542fb940597d6250d88a",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.368458081036806,
+          "outcome_hash": "7417af577c3d08a1f98007c25249bb9b530f9fa4e1c9b9305d78f456a42ae14a",
+          "protected_negative": true,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.403834067285061,
+          "outcome_hash": "14a0cd627899c93ba8fa2a2267104d83223b06f8f586de3b918385a34afef258",
+          "protected_negative": true,
+          "source_char_count": 48,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.158708986826241,
+          "outcome_hash": "29ea48ea21e1079d52c71dcae08f3485486456dd146583fc8f9871afff2a3dbc",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.2217079531401396,
+          "outcome_hash": "2e977e94f7b7f1ae4afce20b2d29f2c98123bfdfcecdac7c84f8a0df8ada902d",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.422416931949556,
+          "outcome_hash": "6a4b0545e1796497799ae324a3da840356516fdf8b6b9bbe6649f7425bf63ea8",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.202000003308058,
+          "outcome_hash": "0c266e6e0bfa3ad5e8569beb5eaa25ead009c82270d243216e2bf9937bcad95f",
+          "protected_negative": true,
+          "source_char_count": 35,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.796957920305431,
+          "outcome_hash": "af8844de3540c9bf70972727fef9e064dcc566fce1aa5c2cc5cf72bba3b89efd",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_022",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.258499967865646,
+          "outcome_hash": "70da3ad38810a8f661be821e59b797cc4fc72d21ffc496942ca12792cbee705a",
+          "protected_negative": true,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_027",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.013625042513013,
+          "outcome_hash": "3974095d8aca62c3a2c8f767aa04bdc443e1b8850bf294bc902099051c1c6abe",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_028",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.223209012299776,
+          "outcome_hash": "28e0a425ef0d50231cc8429a9e6078a640d91770238723e810028bd5cc94152f",
+          "protected_negative": true,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_029",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.188459038734436,
+          "outcome_hash": "6885a7965406f3ec8c5cccfee41134fea6121334d8e9239c9715ae88ea3a20a5",
+          "protected_negative": true,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "punctuation",
+          "latency_ms": 5.051249987445772,
+          "outcome_hash": "4413b3cb4daa0ea956989dc664d39497758a85311895078302f5e274b5b27969",
+          "protected_negative": true,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.6448749704286456,
+          "outcome_hash": "b355cafcdf02c3b14be14e3ccf3c5856093e8d4fd5cc985ad26ca9be87b82309",
+          "protected_negative": true,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.129291999153793,
+          "outcome_hash": "503235563c78f6da3a677f627bc1d479b93fdbca06db50010bf069a1ffd22d73",
+          "protected_negative": true,
+          "source_char_count": 40,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.616999903693795,
+          "outcome_hash": "48f177adcfd3b5173b8b2458000a0bc9873c690c56bf1e51a64ab04926258445",
+          "protected_negative": true,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.1404579747468233,
+          "outcome_hash": "2dec2da5a98679b027ecbe235dc9eeda43e55d82a02b5a955b3b4d0afc6b53da",
+          "protected_negative": true,
+          "source_char_count": 64,
+          "status": "valid",
+          "valid_response": true
+        }
+      ],
+      "channel_metrics": {
+        "deterministic_inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "deterministic_punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "model_syntax": {
+          "edit_precision": 0.5714285714285714,
+          "edit_recall": 0.16,
+          "false_negative_edits": 21,
+          "false_positive_edits": 3,
+          "true_positive_edits": 4
+        }
+      },
+      "exact_output_matches": 19,
+      "false_negative_edits": 66,
+      "false_positive_edits": 3,
+      "focus_metrics": {
+        "inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "syntax": {
+          "edit_precision": 0.5714285714285714,
+          "edit_recall": 0.16,
+          "false_negative_edits": 21,
+          "false_positive_edits": 3,
+          "true_positive_edits": 4
+        }
+      },
+      "loaded_memory_bytes": 1312456704,
+      "maximum_call_count": 2,
+      "mean_call_count": 0.34782608695652173,
+      "median_latency_ms": 3.243332961574197,
+      "model": "qwen3-1.7b-mlx-4bit",
+      "negative_cases": 16,
+      "negative_changes": 0,
+      "process_rss_bytes": 1312456704,
+      "split": "development",
+      "swap_delta_bytes": 0,
+      "total_cases": 69,
+      "true_positive_edits": 5,
+      "valid_responses": 68,
+      "warm_p95_latency_ms": 746.8917089281604
+    },
+    {
+      "case_evidence": [
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 914.7973330691457,
+          "outcome_hash": "cd0c45c131dd812a99491bb247d5834e785c0b9b28197a67125abbc432d83629",
+          "protected_negative": false,
+          "source_char_count": 46,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.7278749300166965,
+          "outcome_hash": "e5f4bde7cbd850ddae10363d07e7768adac8c4731939cbe689e3edaa76bd608e",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 6.103542051278055,
+          "outcome_hash": "864da26af9eb25a9ac8db066e821972f7d72746c0a1adc969cd3a8328910b3f0",
+          "protected_negative": false,
+          "source_char_count": 53,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.697790998965502,
+          "outcome_hash": "f9beb97fe7d7dd5fcc7e412393f6d57ee8a349c824aa01cb2243fa0e1ea66e48",
+          "protected_negative": false,
+          "source_char_count": 59,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.5470000002533197,
+          "outcome_hash": "995bcae038c34a6fea4256a60e1040e89807eb38679bf732bcb50a3ab83365a1",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.546707961708307,
+          "outcome_hash": "8d30d3ad3d91047db0ab5f40bdcc8a5265ccf9cb5cae6c9b20165704abf3d827",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.217125009745359,
+          "outcome_hash": "d41d80aed57af3317163ad7f7c088be913edb2b012b12732b756465681d08b76",
+          "protected_negative": false,
+          "source_char_count": 55,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.46416693739593,
+          "outcome_hash": "1e6ea03db1b9d0e9d2c67561fea374f0c5704484161c096599c6244c08c434c5",
+          "protected_negative": false,
+          "source_char_count": 61,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.427416017279029,
+          "outcome_hash": "d0392bda019a424486b1a40d4f589ff87dc64813ebd8b49f6cd66191775b32c7",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.6357080098241568,
+          "outcome_hash": "f2629b0361cda19d5e0245dc9c80af57cdd44b97e5f65130bacfe906ca914752",
+          "protected_negative": false,
+          "source_char_count": 28,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.3628330565989017,
+          "outcome_hash": "1f7fd59d195f05d6136cd3b3a117bd53bc93e4d5f5168f4079d6bcf160066048",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.8294579135254025,
+          "outcome_hash": "440afd58fde327156041b0cfb9e100db305139b6eae7951eeff772ee5958b3ab",
+          "protected_negative": false,
+          "source_char_count": 26,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.11166699975729,
+          "outcome_hash": "c0cff38aa6ce308dfb1b72eaed8a06e4c821011db7949ff704e089d98d75dfa8",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_015",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.516583004966378,
+          "outcome_hash": "0696d0d328d80d4d8d32c876b1cf1f6a0e0a93dd033a8567fd799827133ccb0c",
+          "protected_negative": false,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_016",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.082958050072193,
+          "outcome_hash": "2c6c397f5a6af4eb15c119fe012ce27058328f485ea1cd13e10c297eb7d7f78b",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 2.4459579726681113,
+          "outcome_hash": "a97344e8c4cd8a438b118666250c58156ea2dc984b3f5a17c4a1e296bc9981d8",
+          "protected_negative": false,
+          "source_char_count": 21,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 2.8018340235576034,
+          "outcome_hash": "8e5b35bebfeb9526a435c4cba8419f68e2bd7c43ada43f53a504fd80cbf66a4f",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1110.2718740003183,
+          "outcome_hash": "58a631116db3e834c3f8b9ba5aeb6a45ce5e0d1f2cf1fd4a630dc1baecf4d6c1",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 1076.0596670443192,
+          "outcome_hash": "2b11fca56035e97fbb6a2fa437f10ff8d47edb60a3e6cec748e4c7736a60b93b",
+          "protected_negative": false,
+          "source_char_count": 24,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 619.4487920729443,
+          "outcome_hash": "31959776288c33ad901fd1480c2c3bbcf583c1386b9b16e2a8e97993ca78d923",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 1075.6350428564474,
+          "outcome_hash": "a28cbb7bf02c438e226d59cd059a101547111a8750873130e4016c2338b1b78c",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 533.8275829562917,
+          "outcome_hash": "1ccf414b68a2ef3144a9661ec7f89c3283cf055be0595d1d4778674e1fe3b755",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 1055.2061669295654,
+          "outcome_hash": "af7450027c7ffdb2b3d1a97a8612f2daa4a3570c686852312f159c47747fd835",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 576.4853339642286,
+          "outcome_hash": "6a36f0886d8221a53ddc3d073e6496f398e1ed539ce223e5a17c40df5ba4be7f",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1037.8953329054639,
+          "outcome_hash": "96fc4cbc171fa00dadbc9da30043ad80ca6ca23f82cd56227fb9ba87f18c7d06",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 525.1853750087321,
+          "outcome_hash": "36018d953319e2cb0451df0a10a70f4db85c9e3692418345d9fec953eb28eca0",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 574.373250012286,
+          "outcome_hash": "7f60cac57f013c8e874df80c64b87259d62c74cfd780728c1ad13a87224e1bcf",
+          "protected_negative": false,
+          "source_char_count": 45,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 554.7343750949949,
+          "outcome_hash": "4c0b2416d6271fdb2318c632626e07f53f1824793150687ecfe6de16aaa39451",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1007.8588749747723,
+          "outcome_hash": "5d4712d40663506a63672f45fb7f12a1b0557a6ff6c99e560ec147a8182dcded",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "syntax",
+          "latency_ms": 2445.1959170401096,
+          "outcome_hash": "6b219762a2f5953ba3767bb40cab75fc20c6e554b253a0c91d72005b990a4f2b",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 535.0587499560788,
+          "outcome_hash": "432e969483ee99793eb065ae396470a25480892061dff64389629bc73f7c6daa",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 953.7523749750108,
+          "outcome_hash": "d362b6f49af8559ff468ac053232d35c70748665d47a6de7cfdc69ab3aca6362",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1024.776125093922,
+          "outcome_hash": "bba0765b9d9d97600659ed3ebf863a0837afafae6e34efc6483db94f7a6b63a6",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 2,
+          "case_id": "syntax_045",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 975.2852090168744,
+          "outcome_hash": "0a80e73456b398d2773ddbcaf5082302e4ce6aaaafe35fff989bd61cc4d5ad78",
+          "protected_negative": false,
+          "source_char_count": 35,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_057",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 639.9517910322174,
+          "outcome_hash": "0c9de2aa45b9d068c28cc5b41ad6edd4345190672eefcb1aea7ffb5f76acbe32",
+          "protected_negative": false,
+          "source_char_count": 52,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 0,
+          "case_id": "punctuation_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 1,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 5.810083006508648,
+          "outcome_hash": "7935c82328108da38055fafe390d445aa2587af7bd7256add05f3226a63202bb",
+          "protected_negative": false,
+          "source_char_count": 22,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 3.2660000724717975,
+          "outcome_hash": "c0c62e3961be3eee602089b833ffbcece1555cbca691edce597af9f1a1c8447a",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.9663749737665057,
+          "outcome_hash": "e5ef02a300dec85ed4635e70de18804b5dd0ef28ff538bbbb2487185ba108d9b",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 3.265916951932013,
+          "outcome_hash": "9aab029f410bbeb805caa06dafcc69266adf03b864b781d33df5f95ed7024948",
+          "protected_negative": false,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 3.7201669765636325,
+          "outcome_hash": "458b4ed50db5e7b5e3932321e5d9bcc6c50838964bf96887200e3d5fa050294e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.696832991205156,
+          "outcome_hash": "56a7d460ba6e524b522d54ba6c10592c8343208be907104c4b02391a18a919a9",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_019",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.7124170446768403,
+          "outcome_hash": "2fcec0a008e4dd7ba767a0dd8eb598031df70e7f1ac642e16c6ad2856f004786",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.467125072143972,
+          "outcome_hash": "a76c7ee06a8582d508f12f258a99918893d87a244123dce495a297eb826e69f6",
+          "protected_negative": false,
+          "source_char_count": 25,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_026",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 3.3812910551205277,
+          "outcome_hash": "e0f523144bd8c2a42b282e0e1cc76a75c0f1fdc93d40366141f5708102800af6",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_031",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.835791907273233,
+          "outcome_hash": "ff3d49c964439b0fcd373278ec357374b9cedf002c7c8f9df5e4c180e53fe928",
+          "protected_negative": false,
+          "source_char_count": 42,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_032",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.4419999681413174,
+          "outcome_hash": "d75f461ea6a2dc2a9d1781511130dd9759f29cc01916bd9b6a7d332d0d00d06c",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 2.6612499495968223,
+          "outcome_hash": "9ba29a0bf3552995b8d9ef266a495a86a153d5e13872642386b28761ffe19f34",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 2.772166975773871,
+          "outcome_hash": "da5917d94ffa39dca43d14a9dbd65a3851054004478f314e24aa1858dd58eaeb",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 3.870875108987093,
+          "outcome_hash": "e3612c68f2a4d5885ddfc42e98c2b862f6f7943150544b95bcbd3b90b5e6f1ce",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.569249947555363,
+          "outcome_hash": "07ad45ec4594241ee611b563c1259f60ea6f01a62f24963f5488544e4b60be52",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.6136660017073154,
+          "outcome_hash": "d4aedebddce18e7718ce4977598f8be723b762155bc2c388d64775fe787d2b0e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_055",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.9351250268518925,
+          "outcome_hash": "8bb40181fef6519f1465a84225610d0c63164dccb4d9cb95fd330f071927495d",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_056",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.674542018212378,
+          "outcome_hash": "5823fa2581e15e0d16e293f07df33188ed225d844e72542fb940597d6250d88a",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 4.155457951128483,
+          "outcome_hash": "7417af577c3d08a1f98007c25249bb9b530f9fa4e1c9b9305d78f456a42ae14a",
+          "protected_negative": true,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.0852919444441795,
+          "outcome_hash": "14a0cd627899c93ba8fa2a2267104d83223b06f8f586de3b918385a34afef258",
+          "protected_negative": true,
+          "source_char_count": 48,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.5020840112119913,
+          "outcome_hash": "29ea48ea21e1079d52c71dcae08f3485486456dd146583fc8f9871afff2a3dbc",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.5815420085564256,
+          "outcome_hash": "2e977e94f7b7f1ae4afce20b2d29f2c98123bfdfcecdac7c84f8a0df8ada902d",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.362082992680371,
+          "outcome_hash": "6a4b0545e1796497799ae324a3da840356516fdf8b6b9bbe6649f7425bf63ea8",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.926125074736774,
+          "outcome_hash": "0c266e6e0bfa3ad5e8569beb5eaa25ead009c82270d243216e2bf9937bcad95f",
+          "protected_negative": true,
+          "source_char_count": 35,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 4.169665975496173,
+          "outcome_hash": "af8844de3540c9bf70972727fef9e064dcc566fce1aa5c2cc5cf72bba3b89efd",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_022",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 4.187042010016739,
+          "outcome_hash": "70da3ad38810a8f661be821e59b797cc4fc72d21ffc496942ca12792cbee705a",
+          "protected_negative": true,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_027",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.494041924364865,
+          "outcome_hash": "3974095d8aca62c3a2c8f767aa04bdc443e1b8850bf294bc902099051c1c6abe",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_028",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.878624993376434,
+          "outcome_hash": "28e0a425ef0d50231cc8429a9e6078a640d91770238723e810028bd5cc94152f",
+          "protected_negative": true,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_029",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 3.02041694521904,
+          "outcome_hash": "6885a7965406f3ec8c5cccfee41134fea6121334d8e9239c9715ae88ea3a20a5",
+          "protected_negative": true,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "punctuation",
+          "latency_ms": 5.254333955235779,
+          "outcome_hash": "4413b3cb4daa0ea956989dc664d39497758a85311895078302f5e274b5b27969",
+          "protected_negative": true,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 3.1477499287575483,
+          "outcome_hash": "b355cafcdf02c3b14be14e3ccf3c5856093e8d4fd5cc985ad26ca9be87b82309",
+          "protected_negative": true,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 3.3839589450508356,
+          "outcome_hash": "503235563c78f6da3a677f627bc1d479b93fdbca06db50010bf069a1ffd22d73",
+          "protected_negative": true,
+          "source_char_count": 40,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 3.2726660137996078,
+          "outcome_hash": "48f177adcfd3b5173b8b2458000a0bc9873c690c56bf1e51a64ab04926258445",
+          "protected_negative": true,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.9766670195385814,
+          "outcome_hash": "2dec2da5a98679b027ecbe235dc9eeda43e55d82a02b5a955b3b4d0afc6b53da",
+          "protected_negative": true,
+          "source_char_count": 64,
+          "status": "valid",
+          "valid_response": true
+        }
+      ],
+      "channel_metrics": {
+        "deterministic_inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "deterministic_punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "model_syntax": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        }
+      },
+      "exact_output_matches": 17,
+      "false_negative_edits": 70,
+      "false_positive_edits": 0,
+      "focus_metrics": {
+        "inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "syntax": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        }
+      },
+      "loaded_memory_bytes": 1908981760,
+      "maximum_call_count": 2,
+      "mean_call_count": 0.391304347826087,
+      "median_latency_ms": 3.7201669765636325,
+      "model": "bielik-1.5b-mlx-8bit",
+      "negative_cases": 16,
+      "negative_changes": 0,
+      "process_rss_bytes": 1908981760,
+      "split": "development",
+      "swap_delta_bytes": 0,
+      "total_cases": 69,
+      "true_positive_edits": 1,
+      "valid_responses": 58,
+      "warm_p95_latency_ms": 1075.6350428564474
+    },
+    {
+      "case_evidence": [
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 922.1124580362812,
+          "outcome_hash": "cd0c45c131dd812a99491bb247d5834e785c0b9b28197a67125abbc432d83629",
+          "protected_negative": false,
+          "source_char_count": 46,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 6.719541968777776,
+          "outcome_hash": "e5f4bde7cbd850ddae10363d07e7768adac8c4731939cbe689e3edaa76bd608e",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 6.029249983839691,
+          "outcome_hash": "864da26af9eb25a9ac8db066e821972f7d72746c0a1adc969cd3a8328910b3f0",
+          "protected_negative": false,
+          "source_char_count": 53,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 5.873834015801549,
+          "outcome_hash": "f9beb97fe7d7dd5fcc7e412393f6d57ee8a349c824aa01cb2243fa0e1ea66e48",
+          "protected_negative": false,
+          "source_char_count": 59,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.9417920634150505,
+          "outcome_hash": "995bcae038c34a6fea4256a60e1040e89807eb38679bf732bcb50a3ab83365a1",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.106541979126632,
+          "outcome_hash": "8d30d3ad3d91047db0ab5f40bdcc8a5265ccf9cb5cae6c9b20165704abf3d827",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.529000027105212,
+          "outcome_hash": "d41d80aed57af3317163ad7f7c088be913edb2b012b12732b756465681d08b76",
+          "protected_negative": false,
+          "source_char_count": 55,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.503917065449059,
+          "outcome_hash": "1e6ea03db1b9d0e9d2c67561fea374f0c5704484161c096599c6244c08c434c5",
+          "protected_negative": false,
+          "source_char_count": 61,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.943458014167845,
+          "outcome_hash": "d0392bda019a424486b1a40d4f589ff87dc64813ebd8b49f6cd66191775b32c7",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.7703330162912607,
+          "outcome_hash": "f2629b0361cda19d5e0245dc9c80af57cdd44b97e5f65130bacfe906ca914752",
+          "protected_negative": false,
+          "source_char_count": 28,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.717583022080362,
+          "outcome_hash": "1f7fd59d195f05d6136cd3b3a117bd53bc93e4d5f5168f4079d6bcf160066048",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 3.2040419755503535,
+          "outcome_hash": "440afd58fde327156041b0cfb9e100db305139b6eae7951eeff772ee5958b3ab",
+          "protected_negative": false,
+          "source_char_count": 26,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.298457944765687,
+          "outcome_hash": "c0cff38aa6ce308dfb1b72eaed8a06e4c821011db7949ff704e089d98d75dfa8",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_015",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 4.228040925227106,
+          "outcome_hash": "0696d0d328d80d4d8d32c876b1cf1f6a0e0a93dd033a8567fd799827133ccb0c",
+          "protected_negative": false,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_016",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.3659160835668445,
+          "outcome_hash": "2c6c397f5a6af4eb15c119fe012ce27058328f485ea1cd13e10c297eb7d7f78b",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "inflection",
+          "latency_ms": 3.4391660010442138,
+          "outcome_hash": "a97344e8c4cd8a438b118666250c58156ea2dc984b3f5a17c4a1e296bc9981d8",
+          "protected_negative": false,
+          "source_char_count": 21,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "inflection_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "inflection",
+          "latency_ms": 2.4878750555217266,
+          "outcome_hash": "8e5b35bebfeb9526a435c4cba8419f68e2bd7c43ada43f53a504fd80cbf66a4f",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1675.5355009809136,
+          "outcome_hash": "c7176732545fc03118ba5d39c563e18df3efa80fadb64f4417abd04ca872b3f1",
+          "protected_negative": false,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 885.1099158637226,
+          "outcome_hash": "62198af726e2a6ddec4bcd817c88f75bf06d4b7d94b85db1a93ac8ad49a98623",
+          "protected_negative": false,
+          "source_char_count": 24,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 292.60791605338454,
+          "outcome_hash": "31959776288c33ad901fd1480c2c3bbcf583c1386b9b16e2a8e97993ca78d923",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 3,
+          "call_count": 2,
+          "case_id": "syntax_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 3
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 1021.9660000875592,
+          "outcome_hash": "968d1419239e2b5ac4c38ab631ecf76d00e8f8957da2d6e37a144a9459b2fec0",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_005",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 869.453958934173,
+          "outcome_hash": "1ccf414b68a2ef3144a9661ec7f89c3283cf055be0595d1d4778674e1fe3b755",
+          "protected_negative": false,
+          "source_char_count": 27,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_006",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "syntax",
+          "latency_ms": 1493.1055010529235,
+          "outcome_hash": "2387d3171f8a21fe73e6d04e63fe2fccfce408ac207f9073426d381f70025d19",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "invalid_response",
+          "valid_response": false
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_007",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 302.6870421599597,
+          "outcome_hash": "6a36f0886d8221a53ddc3d073e6496f398e1ed539ce223e5a17c40df5ba4be7f",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_008",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 275.400249985978,
+          "outcome_hash": "03089f38eb591ae602a955efe78f95749d61436f5f1753a169a936ccf75ae0bf",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_009",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 317.9019580129534,
+          "outcome_hash": "36018d953319e2cb0451df0a10a70f4db85c9e3692418345d9fec953eb28eca0",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 309.03083400335163,
+          "outcome_hash": "44e4457756c279d70a1e19f9496f1121d691ee3223450c3af705f6bc4b3240a1",
+          "protected_negative": false,
+          "source_char_count": 45,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 253.53908305987716,
+          "outcome_hash": "4c0b2416d6271fdb2318c632626e07f53f1824793150687ecfe6de16aaa39451",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 282.9633340006694,
+          "outcome_hash": "bfe701775fe358a47a2ac14db9a1d537d8451a2223cdce412012726ec3903c08",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "syntax",
+          "latency_ms": 274.7160829603672,
+          "outcome_hash": "d0e7f5c650852ef04672df4dff1f6b63a1027333325de8fb0a4e8c16f8105cba",
+          "protected_negative": false,
+          "source_char_count": 39,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 259.56595898605883,
+          "outcome_hash": "432e969483ee99793eb065ae396470a25480892061dff64389629bc73f7c6daa",
+          "protected_negative": false,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 295.1177079230547,
+          "outcome_hash": "24d8c7a10915a593d88866655cf475c1a8fbe8ef970e3f186f74ac27dc12f9d6",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 2,
+          "case_id": "syntax_041",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 1
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 1076.3292079791427,
+          "outcome_hash": "3059400f41b5fcfb7aac356761b9d36f104992826e887d448374158e418f0352",
+          "protected_negative": false,
+          "source_char_count": 54,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_045",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 904.935541911982,
+          "outcome_hash": "31bc3847e67f66685895ebdc644210f468521ca47c6a623bb6e32db23710480f",
+          "protected_negative": false,
+          "source_char_count": 35,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 1,
+          "case_id": "syntax_057",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "syntax",
+          "latency_ms": 342.5418740371242,
+          "outcome_hash": "0c9de2aa45b9d068c28cc5b41ad6edd4345190672eefcb1aea7ffb5f76acbe32",
+          "protected_negative": false,
+          "source_char_count": 52,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 1,
+          "call_count": 0,
+          "case_id": "punctuation_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 1,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 14.948125113733113,
+          "outcome_hash": "7935c82328108da38055fafe390d445aa2587af7bd7256add05f3226a63202bb",
+          "protected_negative": false,
+          "source_char_count": 22,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 6.285291980020702,
+          "outcome_hash": "c0c62e3961be3eee602089b833ffbcece1555cbca691edce597af9f1a1c8447a",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 4.153292044065893,
+          "outcome_hash": "e5ef02a300dec85ed4635e70de18804b5dd0ef28ff538bbbb2487185ba108d9b",
+          "protected_negative": false,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_004",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 3.6665830994024873,
+          "outcome_hash": "9aab029f410bbeb805caa06dafcc69266adf03b864b781d33df5f95ed7024948",
+          "protected_negative": false,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 4.939666949212551,
+          "outcome_hash": "458b4ed50db5e7b5e3932321e5d9bcc6c50838964bf96887200e3d5fa050294e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_014",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.970583038404584,
+          "outcome_hash": "56a7d460ba6e524b522d54ba6c10592c8343208be907104c4b02391a18a919a9",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_019",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.9334169812500477,
+          "outcome_hash": "2fcec0a008e4dd7ba767a0dd8eb598031df70e7f1ac642e16c6ad2856f004786",
+          "protected_negative": false,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_025",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.657208009622991,
+          "outcome_hash": "a76c7ee06a8582d508f12f258a99918893d87a244123dce495a297eb826e69f6",
+          "protected_negative": false,
+          "source_char_count": 25,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_026",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.986416919156909,
+          "outcome_hash": "e0f523144bd8c2a42b282e0e1cc76a75c0f1fdc93d40366141f5708102800af6",
+          "protected_negative": false,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_031",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.604709006845951,
+          "outcome_hash": "ff3d49c964439b0fcd373278ec357374b9cedf002c7c8f9df5e4c180e53fe928",
+          "protected_negative": false,
+          "source_char_count": 42,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_032",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.1203330252319574,
+          "outcome_hash": "d75f461ea6a2dc2a9d1781511130dd9759f29cc01916bd9b6a7d332d0d00d06c",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 2.0525000290945172,
+          "outcome_hash": "9ba29a0bf3552995b8d9ef266a495a86a153d5e13872642386b28761ffe19f34",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 3,
+          "focus": "punctuation",
+          "latency_ms": 2.322124899365008,
+          "outcome_hash": "da5917d94ffa39dca43d14a9dbd65a3851054004478f314e24aa1858dd58eaeb",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.0189579809084535,
+          "outcome_hash": "e3612c68f2a4d5885ddfc42e98c2b862f6f7943150544b95bcbd3b90b5e6f1ce",
+          "protected_negative": false,
+          "source_char_count": 31,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.0340410992503166,
+          "outcome_hash": "07ad45ec4594241ee611b563c1259f60ea6f01a62f24963f5488544e4b60be52",
+          "protected_negative": false,
+          "source_char_count": 43,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 2,
+          "focus": "punctuation",
+          "latency_ms": 2.062292071059346,
+          "outcome_hash": "d4aedebddce18e7718ce4977598f8be723b762155bc2c388d64775fe787d2b0e",
+          "protected_negative": false,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_055",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.434832975268364,
+          "outcome_hash": "8bb40181fef6519f1465a84225610d0c63164dccb4d9cb95fd330f071927495d",
+          "protected_negative": false,
+          "source_char_count": 30,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "punctuation_056",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": false,
+          "expected_edit_count": 1,
+          "focus": "punctuation",
+          "latency_ms": 2.1044170716777444,
+          "outcome_hash": "5823fa2581e15e0d16e293f07df33188ed225d844e72542fb940597d6250d88a",
+          "protected_negative": false,
+          "source_char_count": 34,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_001",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.2083750227466226,
+          "outcome_hash": "7417af577c3d08a1f98007c25249bb9b530f9fa4e1c9b9305d78f456a42ae14a",
+          "protected_negative": true,
+          "source_char_count": 44,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_002",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.8554169218987226,
+          "outcome_hash": "14a0cd627899c93ba8fa2a2267104d83223b06f8f586de3b918385a34afef258",
+          "protected_negative": true,
+          "source_char_count": 48,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_003",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.8729580333456397,
+          "outcome_hash": "29ea48ea21e1079d52c71dcae08f3485486456dd146583fc8f9871afff2a3dbc",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_011",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.6882909694686532,
+          "outcome_hash": "2e977e94f7b7f1ae4afce20b2d29f2c98123bfdfcecdac7c84f8a0df8ada902d",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_012",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.8321669194847345,
+          "outcome_hash": "6a4b0545e1796497799ae324a3da840356516fdf8b6b9bbe6649f7425bf63ea8",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_013",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.6352080274373293,
+          "outcome_hash": "0c266e6e0bfa3ad5e8569beb5eaa25ead009c82270d243216e2bf9937bcad95f",
+          "protected_negative": true,
+          "source_char_count": 35,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_021",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.8627919489517808,
+          "outcome_hash": "af8844de3540c9bf70972727fef9e064dcc566fce1aa5c2cc5cf72bba3b89efd",
+          "protected_negative": true,
+          "source_char_count": 29,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_022",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 2.150750020518899,
+          "outcome_hash": "70da3ad38810a8f661be821e59b797cc4fc72d21ffc496942ca12792cbee705a",
+          "protected_negative": true,
+          "source_char_count": 33,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_027",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.868042047135532,
+          "outcome_hash": "3974095d8aca62c3a2c8f767aa04bdc443e1b8850bf294bc902099051c1c6abe",
+          "protected_negative": true,
+          "source_char_count": 37,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_028",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.678791013546288,
+          "outcome_hash": "28e0a425ef0d50231cc8429a9e6078a640d91770238723e810028bd5cc94152f",
+          "protected_negative": true,
+          "source_char_count": 38,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_029",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 1.8200828926637769,
+          "outcome_hash": "6885a7965406f3ec8c5cccfee41134fea6121334d8e9239c9715ae88ea3a20a5",
+          "protected_negative": true,
+          "source_char_count": 41,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_037",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "punctuation",
+          "latency_ms": 2.1803340641781688,
+          "outcome_hash": "4413b3cb4daa0ea956989dc664d39497758a85311895078302f5e274b5b27969",
+          "protected_negative": true,
+          "source_char_count": 32,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_038",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "inflection",
+          "latency_ms": 1.8786659929901361,
+          "outcome_hash": "b355cafcdf02c3b14be14e3ccf3c5856093e8d4fd5cc985ad26ca9be87b82309",
+          "protected_negative": true,
+          "source_char_count": 36,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_043",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 1.6469999682158232,
+          "outcome_hash": "503235563c78f6da3a677f627bc1d479b93fdbca06db50010bf069a1ffd22d73",
+          "protected_negative": true,
+          "source_char_count": 40,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_044",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 2.1002499852329493,
+          "outcome_hash": "48f177adcfd3b5173b8b2458000a0bc9873c690c56bf1e51a64ab04926258445",
+          "protected_negative": true,
+          "source_char_count": 56,
+          "status": "valid",
+          "valid_response": true
+        },
+        {
+          "actual_edit_count": 0,
+          "call_count": 0,
+          "case_id": "hard_negative_049",
+          "channel_edit_counts": {
+            "deterministic_inflection": 0,
+            "deterministic_punctuation": 0,
+            "model_syntax": 0
+          },
+          "exact_output_match": true,
+          "expected_edit_count": 0,
+          "focus": "syntax",
+          "latency_ms": 1.8777500372380018,
+          "outcome_hash": "2dec2da5a98679b027ecbe235dc9eeda43e55d82a02b5a955b3b4d0afc6b53da",
+          "protected_negative": true,
+          "source_char_count": 64,
+          "status": "valid",
+          "valid_response": true
+        }
+      ],
+      "channel_metrics": {
+        "deterministic_inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "deterministic_punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "model_syntax": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 25,
+          "false_positive_edits": 5,
+          "true_positive_edits": 0
+        }
+      },
+      "exact_output_matches": 17,
+      "false_negative_edits": 70,
+      "false_positive_edits": 5,
+      "focus_metrics": {
+        "inflection": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "true_positive_edits": 0
+        },
+        "punctuation": {
+          "edit_precision": 1.0,
+          "edit_recall": 0.038461538461538464,
+          "false_negative_edits": 25,
+          "false_positive_edits": 0,
+          "true_positive_edits": 1
+        },
+        "syntax": {
+          "edit_precision": 0.0,
+          "edit_recall": 0.0,
+          "false_negative_edits": 25,
+          "false_positive_edits": 5,
+          "true_positive_edits": 0
+        }
+      },
+      "loaded_memory_bytes": 789521440,
+      "maximum_call_count": 2,
+      "mean_call_count": 0.30434782608695654,
+      "median_latency_ms": 3.6665830994024873,
+      "model": "qwen3-0.6b-ollama",
+      "negative_cases": 16,
+      "negative_changes": 0,
+      "process_rss_bytes": 0,
+      "split": "development",
+      "swap_delta_bytes": 0,
+      "total_cases": 69,
+      "true_positive_edits": 1,
+      "valid_responses": 68,
+      "warm_p95_latency_ms": 1021.9660000875592
+    }
+  ],
+  "schema_version": 1
+}

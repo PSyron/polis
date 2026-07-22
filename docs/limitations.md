@@ -8,6 +8,11 @@
 - The #60 specialist engine and router boundary are implemented and tested with
   injected fakes. No default router identifies residual syntax or inflection
   work, and no real specialist backend is configured until later M5 selection.
+- The sentence-only category router from #69 is experimental and is not wired
+  into the default analyzer. Its best configuration, Qwen3 1.7B MLX, reached
+  only 0.571 syntax precision and 0.160 syntax recall on development. Bielik
+  1.5B and Qwen3 0.6B produced no exact syntax edits. No configuration
+  qualified, and corpus-v3 holdout remains unopened for this experiment.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
