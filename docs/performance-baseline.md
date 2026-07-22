@@ -81,3 +81,32 @@ The frozen gates were warm p95 at most 500 ms, combined RSS at most 1 GiB,
 zero swap growth, zero sockets, one process, and repeatable findings for all 69
 cases. This sentence-only local transport qualified. It does not establish
 paragraph quality or broad Polish grammar coverage.
+
+## Clean-wheel sentence development evidence (#76)
+
+The installed-package evaluator ran 69 development sentences twice through
+`analyze()`, `correct()`, and explicit suggestion selection using one persistent
+vendored process. The fresh performance and quality gates qualify development.
+They did not establish release readiness; the subsequent one-shot holdout
+failed an independent correction-quality gate.
+
+| Gate | Development result |
+| --- | ---: |
+| Warm in-process p95 `<= 100 ms` | passed; exact value in report |
+| Warm end-to-end p95 `<= 500 ms` | passed; exact value in report |
+| Combined peak RSS `<= 1 GiB` | passed; exact value in report |
+| Process starts `== 1` | measured `1` |
+| Network access denied and sockets `== 0` | `0` |
+| Swap growth `== 0 bytes` | `0 bytes` |
+| Model calls `== 0` | `0` |
+| Stable repetitions `>= 2` | `2` |
+
+The runner and its Java child executed inside a macOS sandbox that denies all
+network operations; socket sampling independently observed zero sockets. All
+performance, memory, offline, and stability thresholds passed. Exact cold,
+warm p50/p95, throughput, and RSS measurements are in the privacy-safe
+`experiments/sentence_release_gate/report.json`, which is generated after and
+excluded from the audited distributions. Holdout performance also passed: warm
+in-process p95 was `8.491 ms`, warm end-to-end p95 `8.676 ms`, combined peak RSS
+`429,572,096 bytes`, and sockets, swap growth, and model calls were zero. The
+holdout still failed automatic full-correction accuracy and is consumed.

@@ -119,6 +119,18 @@ freezes the sentence-only installed-package gate before any paragraph claim.
 Issue #64 is the broader paragraph release gate and #66 is the final owner
 verification.
 
+The fresh #76 development run after #78 now qualifies without changing the
+gates: automatic precision and full-correction accuracy are `1.00` (`6 TP`,
+`0 FP`), reviewable precision is `1.00` (`18 TP`, `0 FP`), and all protected,
+offline, process, memory, and stability checks pass. The closed development
+report was frozen before the one-shot holdout.
+
+The holdout is now consumed and did not qualify: automatic exact-edit
+precision remained `1.00` (`5 TP`, `0 FP`), but one of five automatically
+changed cases was incomplete, yielding full-correction accuracy `0.80`. The
+threshold remains `1.00`; the result must not be tuned against or rerun. #76
+remains open and does not unblock the paragraph release gate.
+
 Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
 is a valid #63 outcome, but #43 cannot proceed until another exact configuration
 passes the accepted suggestion gates.

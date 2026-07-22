@@ -48,6 +48,20 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     assert not any("tests/typecheck/" in name for name in sdist_names)
     assert not any("third_party/languagetool-pl" in name for name in wheel_names)
     assert not any("third_party/languagetool-pl" in name for name in sdist_names)
+    assert not any("polish_correction_corpus_v3" in name for name in wheel_names)
+    assert not any("polish_correction_corpus_v3" in name for name in sdist_names)
+    assert not any(
+        name.endswith("/experiments/sentence_release_gate/report.json")
+        for name in sdist_names
+    )
+    assert not any(
+        name.endswith((".jar", ".gguf", ".safetensors"))
+        for name in (*wheel_names, *sdist_names)
+    )
+    assert not any(
+        "target/dependency" in name or "/.cache/" in name
+        for name in (*wheel_names, *sdist_names)
+    )
     assert any(name.endswith("/src/polis/__init__.py") for name in sdist_names)
     assert any(name.endswith("/tests/test_public_models.py") for name in sdist_names)
     assert any(

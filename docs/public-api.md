@@ -153,6 +153,12 @@ reviewable. Analyzer-owned sessions are terminated by `Analyzer.close()` or
 context-manager exit. Transports injected by callers remain caller-owned and
 are not closed by the analyzer.
 
+`Analyzer.language_tool_process_start_count` is a read-only diagnostic for the
+analyzer-owned vendored stdio session. It is `0` before the lazy local process
+starts (and when no owned session is configured), and remains `1` while the
+qualified persistent-session contract is respected. The sentence release gate
+records this measured value; it does not infer a successful start from config.
+
 The analyzer API above is implemented by a thin runtime in `polis` and remains
 small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`
 model and the checked examples prove bidirectional assignment compatibility

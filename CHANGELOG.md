@@ -5,6 +5,16 @@
 - Completed both commas for the two narrowly reviewed relative-clause and
   parenthetical-vocative sentence shapes without broadening the qualified
   LanguageTool source channel.
+- Added a privacy-safe installed-wheel sentence release evaluator with exact
+  automatic/reviewable scoring, split-safe corpus access, cryptographic freeze,
+  one-shot holdout protection, offline artifact audit, fallback checks, and
+  latency/loaded-and-peak-RSS evidence and enforced network denial. After the
+  paired-comma fix, development qualified with `6/6` exact automatic edits and
+  `18/18` exact reviewable edits; its report was cryptographically frozen. The
+  one-shot holdout retained precision `1.00` but rejected sentence qualification
+  because automatic full-correction accuracy was `0.80`, below `1.00`.
+  Reservation is guarded by native sandbox/resource/socket preflight and follows
+  every reversible install, smoke, fallback, and runner setup step.
 - Added the #77 sentence-only vendored LanguageTool stdio mode, which reuses one
   persistent local process for qualified punctuation and reviewable contextual
   inflection. It has explicit lifecycle control, bounded privacy-safe failures,

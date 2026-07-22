@@ -48,7 +48,16 @@ required-version = "==0.11.2"
 packages = ["src/polis"]
 
 [tool.hatch.build.targets.sdist]
-exclude = ["/tests/typecheck", "/third_party/languagetool-pl"]
+exclude = [
+  "/docs/superpowers",
+  "/experiments/sentence_release_gate/frozen_gate.json",
+  "/experiments/sentence_release_gate/holdout.started",
+  "/experiments/sentence_release_gate/report.json",
+  "/tests/typecheck",
+  "/tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+  "/tests/fixtures/evaluation/polish_correction_corpus_v3.xml",
+  "/third_party/languagetool-pl",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

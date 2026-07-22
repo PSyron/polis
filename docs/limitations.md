@@ -53,6 +53,12 @@
   Only those qualified comma findings are automatic under
   source-policy `1.1`; contextual inflection is reviewable, and paragraph
   behavior has not passed an M5 release gate.
+- The installed sentence development gate is qualified in #76 with automatic
+  exact-edit precision and full-correction accuracy `1.00`. Its closed report is
+  frozen. The one-shot holdout gate failed: exact-edit precision stayed `1.00`,
+  but automatic full-correction accuracy was `0.80` instead of `1.00`. The
+  consumed holdout cannot be rerun or used for tuning. Sentence and paragraph
+  correction remain unqualified for release.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
   and `correct_async()` share one orchestration path, apply a versioned

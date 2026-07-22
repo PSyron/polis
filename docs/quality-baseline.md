@@ -77,3 +77,17 @@ Known limitations:
 
 - `llm` source is currently deterministic and returns no additional structured findings for this seed dataset.
 - `syntax` and `spelling` coverage is intentionally minimal and should be expanded in later roadmap items to raise recall.
+
+## Installed sentence development gate (#76)
+
+The fresh clean-wheel, sentence-only corpus-v3 development run on 2026-07-22
+qualified. Automatic findings achieved exact-edit precision `1.00` (`6 TP`,
+`0 FP`) and full-correction accuracy `1.00`; reviewable findings achieved
+precision `1.00` (`18 TP`, `0 FP`). Neither channel produced a protected-hard-
+negative violation. The privacy-safe report and its executable inputs are
+frozen. The authorized 142-sentence holdout retained automatic precision `1.00`
+(`5 TP`, `0 FP`) and reviewable precision `1.00` (`10 TP`, `0 FP`) with no
+protected-negative violations. It nevertheless failed because automatic
+full-correction accuracy was `0.80`, below the frozen `1.00` gate. The holdout
+is consumed and cannot be rerun or used for tuning. See
+`experiments/sentence_release_gate/report.json` for the measured evidence.

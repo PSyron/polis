@@ -1,0 +1,17 @@
+{
+  "configuration_sha256": "4817100d3437b2235ea2af6855bac7d6b3982f3b3eabd7a313b9485308251d53",
+  "corpus_json_sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2",
+  "corpus_xml_sha256": "32d99cf82609ff43c034f008c64dbb1b3c19f04fb77ef89c834ff433ccf59e3c",
+  "development_report_sha256": "343326a10fd47091b584c3ec1458b74b9da780a7eda5609eeb09e0e0e8a9a625",
+  "evaluator_sha256": "f71b2d80d0728798482199f9996d8c083115447f413822e9aa2cceaa70cce30b",
+  "gate_sha256": "da2e94b00cc62196e5bb71e4efd48df36bdd86fa41120caa6e2fe4009a53c6a7",
+  "installed_runner_sha256": "bf8356bc94e6ab42a9ad32d5196a8f2b19cc1141b58679ed00c049a3a000d8fd",
+  "language_tool_artifact_sha256": "6959bbebad93c028552c21bae4d2524a0c08d09c1753c9a3fdf646ec1d645421",
+  "language_tool_bridge_sha256": "c946c3ddfab36e45dab1716ca66ccfd61d0a6bfaa14b2e69926cb1b3da964c3d",
+  "language_tool_dependencies_sha256": "de97bed1193abbed914ef23dd99757204aa3bcef29d3cfa8f1ea485178566a99",
+  "language_tool_manifest_sha256": "d5871e8173addb96cc93e2f8ce6833737f08a20c4fc47e99596b4d82b8f3f6e8",
+  "language_tool_runner_sha256": "32b2d9bccdfccd1efc94939530de70f05040295861509b72b8b91752435b2fca",
+  "sdist_sha256": "416905b126a61746a8a3cc22ac79ea128a6850ea2a98c36175cf5df56a72a04d",
+  "source_policy_sha256": "fc55ae8dc87978ff385abe764a703b0a3e5124272f3937ea9ac6e7880406ee08",
+  "wheel_sha256": "fd1249e79342f8c29b9c780e2d4d4a9ecfa80fa95ee75e0762b06751e767119d"
+}
