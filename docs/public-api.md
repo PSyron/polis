@@ -135,6 +135,24 @@ The rule abstains without I/O unless the input contains exactly one sentence.
 For tests or embedding, callers can instead inject a `ContextMorphologyTransport`
 with `Analyzer(config, contextual_inflection_transport=transport)`.
 
+The preferred shared configuration uses
+`AnalyzerConfig.vendored_language_tool_stdio_path` and
+`AnalyzerConfig.vendored_language_tool_timeout_seconds`, mapped from:
+
+```toml
+[vendored_language_tool]
+stdio_path = "/absolute/path/to/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+This sentence-only mode creates one persistent local stdio session implementing
+both LanguageTool check and contextual synthesis. It is mutually exclusive with
+`[language_tool]` and `[contextual_inflection]`. It starts lazily, performs no
+download, preserves source-policy `1.1`, and leaves contextual inflection
+reviewable. Analyzer-owned sessions are terminated by `Analyzer.close()` or
+context-manager exit. Transports injected by callers remain caller-owned and
+are not closed by the analyzer.
+
 The analyzer API above is implemented by a thin runtime in `polis` and remains
 small by design. `polis.core` and `polis` directly re-export the same `AnalysisResult`
 model and the checked examples prove bidirectional assignment compatibility

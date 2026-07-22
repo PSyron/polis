@@ -39,14 +39,20 @@
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
   intentionally conservative.
-- Optional LanguageTool support requires a separately installed LanguageTool
-  6.8 process and Java runtime. The measured local installation plus OpenJDK was
-  about 733 MB, with about 630 MiB RSS after startup.
+- The preferred sentence-only LanguageTool path requires OpenJDK and an explicit
+  local build of the pinned vendored 6.8 subset. It reuses one persistent stdio
+  JVM; the #77 benchmark measured 441,483,264 bytes combined Python and Java RSS,
+  938.60 ms cold startup, and 5.08 ms warm p95. Java artifacts are not included
+  in wheel or sdist, and Polis does not download them.
+- The older optional HTTP mode still requires a separately started LanguageTool
+  6.8 process on loopback. The two modes cannot be enabled together.
 - The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
   can wait up to its configured timeout, and it only covers five reviewed
   missing-comma rule IDs.
-- The source-built five-rule LanguageTool subset is not a general Polish corrector
-  and has not passed the M5 automatic-correction source-policy gate.
+- The source-built five-rule LanguageTool subset is not a general Polish corrector.
+  Only those qualified comma findings are automatic under
+  source-policy `1.1`; contextual inflection is reviewable, and paragraph
+  behavior has not passed an M5 release gate.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
   and `correct_async()` share one orchestration path, apply a versioned

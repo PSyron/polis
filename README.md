@@ -24,6 +24,42 @@ event-loop applications. Optional specialist suggestions, when explicitly
 injected, remain in `skipped_findings` and report a versioned outcome with their
 actual one-call/two-call budget; no real specialist model is enabled by default.
 
+## Vendored LanguageTool sentence path
+
+For the currently supported sentence-only LanguageTool path, first build the
+pinned Polish subset explicitly; Polis does not download Java, dependencies, or
+artifacts at runtime:
+
+```console
+cd third_party/languagetool-pl
+./scripts/build.sh
+```
+
+Configure the resulting absolute executable path:
+
+```toml
+[vendored_language_tool]
+stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+Use the analyzer as a context manager so its one persistent local child process
+is stopped deterministically:
+
+```python
+from polis import Analyzer
+
+with Analyzer.from_config("polis.toml") as analyzer:
+    result = analyzer.correct("Wiem że wróciła.")
+
+assert result.corrected_text == "Wiem, że wróciła."
+```
+
+`Analyzer.close()` provides the equivalent explicit shutdown. Source-policy
+`1.1` automatically applies only the five qualified comma rules. Contextual
+inflection remains reviewable and requires `apply_suggestions()`. Removing
+`[vendored_language_tool]` disables this process-backed path completely.
+
 ## Development setup
 
 The distribution is named `polis-nlp`; its Python import namespace is `polis`.

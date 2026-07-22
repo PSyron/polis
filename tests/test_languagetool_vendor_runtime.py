@@ -10,6 +10,7 @@ from typing import Any
 import pytest
 
 from polis import Analyzer, AnalyzerConfig, Category
+from polis.rules.languagetool_stdio import LocalLanguageToolStdioSession
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
@@ -248,3 +249,61 @@ def test_analyzer_preserves_frozen_contextual_inflection_behaviour(
         for item in result.issues
         if item.category is Category.INFLECTION
     } == expected_suggestions
+
+
+@pytest.mark.slow
+def test_real_persistent_session_reuses_one_jvm_for_both_operations() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    with LocalLanguageToolStdioSession.from_executable(
+        RUNNER.resolve(), timeout_seconds=30.0
+    ) as session:
+        checked = session.check(
+            "Wiem że jutro wróci.",
+            language="pl-PL",
+            timeout_seconds=30.0,
+        )
+        process_id = session.process_id
+        synthesized = session.synthesize_context(
+            "Rozmawiałem z Janem Nowak po przerwie.",
+            spans=((14, 19), (20, 25)),
+            timeout_seconds=30.0,
+        )
+
+        assert process_id is not None
+        assert session.process_id == process_id
+        assert session.process_start_count == 1
+        assert checked["software"] == {"name": "LanguageTool", "version": "6.8"}
+        assert synthesized["operation"] == "synthesize_context"
+
+    assert session.process_id is None
+
+
+@pytest.mark.slow
+def test_real_vendored_analyzer_preserves_source_policy_channels() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    with Analyzer(
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=os.fspath(RUNNER.resolve()),
+            vendored_language_tool_timeout_seconds=30.0,
+        )
+    ) as analyzer:
+        punctuation = analyzer.correct("Wiem że jutro wróci.")
+        inflection = analyzer.correct("Rozmawiałem z Janem Nowak po przerwie.")
+
+    assert punctuation.corrected_text == "Wiem, że jutro wróci."
+    assert {str(item.source) for item in punctuation.applied_findings} == {
+        "rule:languagetool.pl"
+    }
+    assert inflection.corrected_text == inflection.original_text
+    finding = next(
+        item
+        for item in inflection.skipped_findings
+        if str(item.source) == "rule:languagetool.contextual_inflection"
+    )
+    assert inflection.apply_suggestions((finding.id,)) == (
+        "Rozmawiałem z Janem Nowakiem po przerwie."
+    )

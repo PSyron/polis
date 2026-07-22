@@ -48,9 +48,11 @@ from polis.rules.contextual_inflection import (
 )
 from polis.rules.languagetool import (
     LanguageToolRuleConfig,
+    LanguageToolTransport,
     LocalLanguageToolRule,
     LoopbackLanguageToolHttpTransport,
 )
+from polis.rules.languagetool_stdio import LocalLanguageToolStdioSession
 
 __all__ = [
     "Analyzer",
@@ -163,6 +165,8 @@ class AnalyzerConfig:
     language_tool_timeout_seconds: float = 1.0
     contextual_inflection_stdio_path: str | None = None
     contextual_inflection_timeout_seconds: float = 1.0
+    vendored_language_tool_stdio_path: str | None = None
+    vendored_language_tool_timeout_seconds: float = 2.0
 
     def __post_init__(self) -> None:
         if self.language_tool_url is not None:
@@ -175,6 +179,20 @@ class AnalyzerConfig:
         )
         if self.contextual_inflection_stdio_path is not None:
             StdioContextMorphologyTransport(Path(self.contextual_inflection_stdio_path))
+        ContextualInflectionRuleConfig(
+            timeout_seconds=self.vendored_language_tool_timeout_seconds
+        )
+        if self.vendored_language_tool_stdio_path is not None:
+            StdioContextMorphologyTransport(
+                Path(self.vendored_language_tool_stdio_path)
+            )
+            if (
+                self.language_tool_url is not None
+                or self.contextual_inflection_stdio_path is not None
+            ):
+                raise ValueError(
+                    "vendored LanguageTool stdio mode is mutually exclusive"
+                )
 
     @classmethod
     def from_toml(cls, path: str | Path) -> AnalyzerConfig:
@@ -302,6 +320,32 @@ class AnalyzerConfig:
                 context={"path": str(path_obj)},
             )
         contextual_timeout = contextual.get("timeout_seconds", 1.0)
+        vendored_present = "vendored_language_tool" in raw
+        vendored = raw.get("vendored_language_tool", {})
+        if not isinstance(vendored, Mapping):
+            raise ConfigurationError(
+                "'vendored_language_tool' section must be a table",
+                code="configuration.invalid_file",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        vendored_path = vendored.get("stdio_path")
+        if vendored_present and vendored_path is None:
+            raise ConfigurationError(
+                "'vendored_language_tool.stdio_path' is required when the "
+                "section is present",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        if vendored_path is not None and not isinstance(vendored_path, str):
+            raise ConfigurationError(
+                "'vendored_language_tool.stdio_path' must be a string",
+                code="configuration.invalid_value",
+                retryable=False,
+                context={"path": str(path_obj)},
+            )
+        vendored_timeout = vendored.get("timeout_seconds", 2.0)
 
         try:
             return cls(
@@ -312,11 +356,13 @@ class AnalyzerConfig:
                 language_tool_timeout_seconds=float(language_tool_timeout),
                 contextual_inflection_stdio_path=contextual_path,
                 contextual_inflection_timeout_seconds=float(contextual_timeout),
+                vendored_language_tool_stdio_path=vendored_path,
+                vendored_language_tool_timeout_seconds=float(vendored_timeout),
             )
         except (TypeError, ValueError) as exc:
             raise ConfigurationError(
-                "invalid analysis, LanguageTool, or contextual inflection "
-                "configuration",
+                "invalid analysis, LanguageTool, contextual inflection, or "
+                "vendored stdio configuration",
                 code="configuration.invalid_value",
                 retryable=False,
                 context={"path": str(path_obj)},
@@ -369,6 +415,7 @@ class Analyzer:
         config: AnalyzerConfig,
         *,
         specialist_engine: HybridSuggestionEngine | None = None,
+        language_tool_transport: LanguageToolTransport | None = None,
         contextual_inflection_transport: ContextMorphologyTransport | None = None,
     ) -> None:
         if not isinstance(config, AnalyzerConfig):
@@ -378,7 +425,28 @@ class Analyzer:
         ):
             raise TypeError("specialist_engine must be a HybridSuggestionEngine")
         self._config = config
-        self._registry = _make_default_registry(config, contextual_inflection_transport)
+        self._owned_language_tool_session: LocalLanguageToolStdioSession | None = None
+        self._closed = False
+        if config.vendored_language_tool_stdio_path is not None:
+            if (
+                language_tool_transport is not None
+                or contextual_inflection_transport is not None
+            ):
+                raise ValueError(
+                    "vendored LanguageTool config cannot replace injected transports"
+                )
+            session = LocalLanguageToolStdioSession.from_executable(
+                Path(config.vendored_language_tool_stdio_path),
+                timeout_seconds=config.vendored_language_tool_timeout_seconds,
+            )
+            self._owned_language_tool_session = session
+            language_tool_transport = session
+            contextual_inflection_transport = session
+        self._registry = _make_default_registry(
+            config,
+            language_tool_transport,
+            contextual_inflection_transport,
+        )
         self._backend = (
             _make_mock_backend() if config.use_local_heuristic_backend else None
         )
@@ -394,6 +462,7 @@ class Analyzer:
         *,
         options: AnalysisOptions | None = None,
     ) -> AnalysisResult:
+        self._ensure_open()
         resolved_options = options or AnalysisOptions(
             categories=self._config.categories,
             minimum_confidence=self._config.minimum_confidence,
@@ -409,6 +478,7 @@ class Analyzer:
     async def analyze_async(
         self, text: str, *, options: AnalysisOptions | None = None
     ) -> AnalysisResult:
+        self._ensure_open()
         resolved_options = options or AnalysisOptions(
             categories=self._config.categories,
             minimum_confidence=self._config.minimum_confidence,
@@ -429,6 +499,7 @@ class Analyzer:
     async def correct_async(self, text: str) -> CorrectionResult:
         """Asynchronously return the same conservative correction outcome."""
 
+        self._ensure_open()
         options = AnalysisOptions(
             categories=self._config.categories,
             minimum_confidence=self._config.minimum_confidence,
@@ -535,6 +606,26 @@ class Analyzer:
         )
         return analysis, (outcome,)
 
+    def close(self) -> None:
+        """Close the analyzer-owned local session, if configured."""
+
+        session = self._owned_language_tool_session
+        if session is None:
+            return
+        session.close()
+        self._closed = True
+
+    def __enter__(self) -> Analyzer:
+        self._ensure_open()
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
+
+    def _ensure_open(self) -> None:
+        if self._closed:
+            raise RuntimeError("Analyzer-owned LanguageTool session is closed")
+
     def _should_apply_automatically(self, finding: Finding) -> bool:
         policy = _POLICY_BY_SOURCE.get(finding.source)
         if policy is None:
@@ -548,6 +639,7 @@ class Analyzer:
 
 def _make_default_registry(
     config: AnalyzerConfig,
+    language_tool_transport: LanguageToolTransport | None = None,
     contextual_inflection_transport: ContextMorphologyTransport | None = None,
 ) -> DeterministicRuleRegistry:
     if (
@@ -569,16 +661,23 @@ def _make_default_registry(
         RuleRegistration(rule=SyntaxQuoteSpacingRule()),
         RuleRegistration(rule=SyntaxSentenceSpacingRule()),
     ]
-    if config.language_tool_url is not None:
-        rule_config = LanguageToolRuleConfig(
-            base_url=config.language_tool_url,
-            timeout_seconds=config.language_tool_timeout_seconds,
+    if config.language_tool_url is not None or language_tool_transport is not None:
+        timeout_seconds = (
+            config.vendored_language_tool_timeout_seconds
+            if config.vendored_language_tool_stdio_path is not None
+            else config.language_tool_timeout_seconds
         )
+        rule_config = LanguageToolRuleConfig(
+            base_url=config.language_tool_url or "http://127.0.0.1:1",
+            timeout_seconds=timeout_seconds,
+        )
+        if language_tool_transport is None:
+            language_tool_transport = LoopbackLanguageToolHttpTransport(rule_config)
         registrations.append(
             RuleRegistration(
                 rule=LocalLanguageToolRule(
                     config=rule_config,
-                    transport=LoopbackLanguageToolHttpTransport(rule_config),
+                    transport=language_tool_transport,
                 ),
                 categories=frozenset({Category.PUNCTUATION}),
             )
@@ -588,7 +687,11 @@ def _make_default_registry(
             RuleRegistration(
                 rule=ContextualInflectionRule(
                     config=ContextualInflectionRuleConfig(
-                        timeout_seconds=config.contextual_inflection_timeout_seconds
+                        timeout_seconds=(
+                            config.vendored_language_tool_timeout_seconds
+                            if config.vendored_language_tool_stdio_path is not None
+                            else config.contextual_inflection_timeout_seconds
+                        )
                     ),
                     transport=contextual_inflection_transport,
                 ),

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import sys
 from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
 
 from polis import Analyzer, AnalyzerConfig, ConfigurationError
+
+ROOT = Path(__file__).resolve().parents[1]
+FAKE_STDIO_SERVER = ROOT / "tests" / "fixtures" / "fake_languagetool_stdio.py"
 
 
 class FakeHttpTransport:
@@ -129,3 +133,153 @@ def test_qualified_language_tool_sentence_rule_is_automatically_applied(
     assert len(result.applied_findings) == 1
     assert result.skipped_findings == ()
     assert str(result.applied_findings[0].source) == "rule:languagetool.pl"
+
+
+def test_vendored_stdio_configuration_requires_absolute_executable(
+    tmp_path: Path,
+) -> None:
+    runner = tmp_path / "run_stdio.sh"
+    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    runner.chmod(0o700)
+
+    config = AnalyzerConfig.from_toml(
+        _config_file(
+            tmp_path,
+            "[vendored_language_tool]\n"
+            f'stdio_path = "{runner}"\n'
+            "timeout_seconds = 2.0\n",
+        )
+    )
+
+    assert config.vendored_language_tool_stdio_path == str(runner)
+    assert config.vendored_language_tool_timeout_seconds == 2.0
+
+
+@pytest.mark.parametrize(
+    "body",
+    (
+        "[vendored_language_tool]\n",
+        '[vendored_language_tool]\nstdio_path = "relative/run_stdio.sh"\n',
+        "[vendored_language_tool]\nstdio_path = 7\n",
+        '[vendored_language_tool]\nstdio_path = "/missing/run_stdio.sh"\n',
+        '[vendored_language_tool]\nstdio_path = "/bin/sh"\ntimeout_seconds = 0\n',
+    ),
+)
+def test_invalid_vendored_stdio_configuration_is_controlled(
+    tmp_path: Path,
+    body: str,
+) -> None:
+    with pytest.raises(ConfigurationError, match="vendored|stdio|configuration"):
+        AnalyzerConfig.from_toml(_config_file(tmp_path, body))
+
+
+def test_vendored_stdio_mode_rejects_competing_transports(tmp_path: Path) -> None:
+    runner = tmp_path / "run_stdio.sh"
+    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    runner.chmod(0o700)
+
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        AnalyzerConfig(
+            language_tool_url="http://127.0.0.1:8081",
+            vendored_language_tool_stdio_path=str(runner),
+        )
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        AnalyzerConfig(
+            contextual_inflection_stdio_path=str(runner),
+            vendored_language_tool_stdio_path=str(runner),
+        )
+
+
+def _fake_stdio_executable(tmp_path: Path) -> Path:
+    runner = tmp_path / "fake-languagetool"
+    runner.write_text(
+        f"#!{sys.executable}\n" + FAKE_STDIO_SERVER.read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    runner.chmod(0o700)
+    return runner
+
+
+def test_vendored_session_serves_automatic_and_reviewable_sentence_sources(
+    tmp_path: Path,
+) -> None:
+    runner = _fake_stdio_executable(tmp_path)
+
+    with Analyzer(
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=str(runner),
+            vendored_language_tool_timeout_seconds=1.0,
+        )
+    ) as analyzer:
+        punctuation = analyzer.correct("Wiem że wróciła.")
+        inflection = analyzer.correct("Rozmawiałem z Janem Nowak po przerwie.")
+
+    assert punctuation.corrected_text == "Wiem, że wróciła."
+    assert str(punctuation.applied_findings[0].source) == "rule:languagetool.pl"
+    assert inflection.corrected_text == inflection.original_text
+    inflection_finding = next(
+        finding
+        for finding in inflection.skipped_findings
+        if str(finding.source) == "rule:languagetool.contextual_inflection"
+    )
+    assert inflection_finding.suggestion == "Nowakiem"
+    assert inflection.apply_suggestions((inflection_finding.id,)) == (
+        "Rozmawiałem z Janem Nowakiem po przerwie."
+    )
+
+
+class CallerOwnedSharedTransport(FakeHttpTransport):
+    closed = False
+
+    def synthesize_context(
+        self,
+        text: str,
+        *,
+        spans: tuple[tuple[int, int], ...],
+        timeout_seconds: float,
+    ) -> Mapping[str, object]:
+        return {"operation": "synthesize_context", "language": "pl-PL", "results": []}
+
+    def close(self) -> None:
+        self.closed = True
+
+
+def test_analyzer_does_not_close_injected_transports() -> None:
+    transport = CallerOwnedSharedTransport(None)
+    analyzer = Analyzer(
+        AnalyzerConfig(),
+        language_tool_transport=transport,
+        contextual_inflection_transport=transport,
+    )
+
+    analyzer.close()
+
+    assert transport.closed is False
+
+
+def test_owned_vendored_analyzer_rejects_use_after_close(tmp_path: Path) -> None:
+    analyzer = Analyzer(
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=str(_fake_stdio_executable(tmp_path)),
+        )
+    )
+
+    analyzer.close()
+
+    with pytest.raises(RuntimeError, match="closed"):
+        analyzer.analyze("To jest zdanie.")
+
+
+def test_unavailable_vendored_process_preserves_builtin_findings(
+    tmp_path: Path,
+) -> None:
+    runner = tmp_path / "unavailable-languagetool"
+    runner.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+    runner.chmod(0o700)
+
+    with Analyzer(
+        AnalyzerConfig(vendored_language_tool_stdio_path=str(runner))
+    ) as analyzer:
+        result = analyzer.analyze("Zeby wrócić.")
+
+    assert any(str(finding.source) == "rule:spelling.zeby" for finding in result.issues)

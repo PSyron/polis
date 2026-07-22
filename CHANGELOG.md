@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added the #77 sentence-only vendored LanguageTool stdio mode, which reuses one
+  persistent local process for qualified punctuation and reviewable contextual
+  inflection. It has explicit lifecycle control, bounded privacy-safe failures,
+  no network sockets, and no implicit artifact download.
 - Added two deterministic, sentence-only residual syntax sources for three
   narrow missing-`się` and missing-`tym` constructions. They remain reviewable
   because the one-shot holdout contained no eligible examples and therefore

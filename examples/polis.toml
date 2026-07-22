@@ -1,10 +1,10 @@
-# Optional deterministic comma corrections from a loopback LanguageTool server.
-[language_tool]
-base_url = "http://127.0.0.1:8081"
-timeout_seconds = 1.0
-
-# Optional reviewable contextual inflection suggestions for one sentence.
-# Replace this placeholder with the absolute path to the locally built runner.
-[contextual_inflection]
+# Preferred sentence-only path: one persistent vendored LanguageTool process
+# shared by qualified comma correction and reviewable contextual inflection.
+# Build third_party/languagetool-pl explicitly before using this configuration.
+[vendored_language_tool]
 stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
 timeout_seconds = 2.0
+
+# The legacy [language_tool] HTTP and [contextual_inflection] per-call stdio
+# modes remain documented alternatives. Do not combine either with the
+# [vendored_language_tool] section.

@@ -122,9 +122,40 @@ protected by the engine. The default analyzer injects neither component and
 makes no specialist calls. A custom adapter must remain local, must not download
 artifacts implicitly, and must preserve request roles and native chat templating.
 
-## Enable the reviewed LanguageTool layer
+## Enable the vendored sentence layer
 
-LanguageTool is optional and disabled by default. Run a separately installed
+The preferred sentence-only configuration shares one persistent local process
+between the five reviewed comma rules and contextual inflection candidate
+generation. Build the pinned subset explicitly first; Polis does not download
+or update Java artifacts:
+
+```console
+cd third_party/languagetool-pl
+./scripts/build.sh
+```
+
+Then use the absolute executable path:
+
+```toml
+[vendored_language_tool]
+stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+Construct the analyzer with `Analyzer.from_config(...)` and close it through a
+`with` block or `Analyzer.close()`. Repeated sentence calls reuse one JVM.
+Source-policy `1.1` automatically applies only qualified punctuation findings;
+contextual inflection findings stay reviewable and require explicit
+`apply_suggestions()` selection. The path, timeout, malformed response, and
+process failures are bounded and preserve built-in deterministic findings.
+
+Removing `[vendored_language_tool]` disables the shared process. The configured
+path must be absolute and executable. This section is mutually exclusive with
+the legacy `[language_tool]` and `[contextual_inflection]` modes below.
+
+## Enable the reviewed LanguageTool HTTP layer
+
+This compatibility mode is optional and disabled by default. Run a separately installed
 LanguageTool 6.8 server on numeric loopback and add:
 
 ```toml
@@ -145,7 +176,7 @@ The call is synchronous and may wait for `timeout_seconds`, including through
 data, analysis continues with the built-in rules and no LanguageTool findings.
 Removing `[language_tool]` fully removes the adapter from the analyzer registry.
 
-## Enable contextual inflection suggestions
+## Enable per-call contextual inflection suggestions
 
 Build the pinned local module, then point Polis at its absolute stdio runner:
 
@@ -156,7 +187,8 @@ timeout_seconds = 2.0
 ```
 
 The executable is invoked directly without a shell and receives one sentence
-through stdin. It returns only finite local candidates. Qualified surname and
+through stdin in a new process for each eligible call. It returns only finite
+local candidates. Qualified surname and
 narrow government findings remain reviewable: `correct()` does not apply them,
 and callers must select their IDs through `apply_suggestions()`. Omission of
 the section disables all contextual morphology I/O. Multi-sentence input also

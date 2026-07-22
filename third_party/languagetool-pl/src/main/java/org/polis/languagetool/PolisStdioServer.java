@@ -95,6 +95,9 @@ public final class PolisStdioServer {
                             INSPECT_OPERATION.equals(request.operation())
                     );
                 }
+                if (request.requestId() != null) {
+                    response.put("request_id", request.requestId());
+                }
                 output.write(JSON.writeValueAsString(response));
                 output.newLine();
                 output.flush();
@@ -118,6 +121,17 @@ public final class PolisStdioServer {
         if (!POLISH_LANGUAGE.equals(language.textValue())) {
             throw new IllegalArgumentException("only pl-PL is supported");
         }
+        final JsonNode requestIdNode = payload.get("request_id");
+        final Long requestId;
+        if (requestIdNode == null) {
+            requestId = null;
+        } else if (!requestIdNode.isIntegralNumber()
+                || !requestIdNode.canConvertToLong()
+                || requestIdNode.longValue() <= 0) {
+            throw new IllegalArgumentException("request_id must be a positive integer");
+        } else {
+            requestId = requestIdNode.longValue();
+        }
         final JsonNode operationNode = payload.get("operation");
         final String operation = operationNode == null
                 ? CHECK_OPERATION
@@ -132,7 +146,7 @@ public final class PolisStdioServer {
         }
         final String text = textNode.textValue();
         if (CHECK_OPERATION.equals(operation) || INSPECT_OPERATION.equals(operation)) {
-            return new Request(operation, text, List.of());
+            return new Request(requestId, operation, text, List.of());
         }
         final JsonNode spansNode = payload.get("spans");
         if (spansNode == null || !spansNode.isArray() || spansNode.isEmpty()) {
@@ -162,7 +176,7 @@ public final class PolisStdioServer {
             }
             spans.add(new Span(start, end, surface));
         }
-        return new Request(operation, text, List.copyOf(spans));
+        return new Request(requestId, operation, text, List.copyOf(spans));
     }
 
     private static String substringByCodePoints(
@@ -450,7 +464,12 @@ public final class PolisStdioServer {
         }
     }
 
-    private record Request(String operation, String text, List<Span> spans) {
+    private record Request(
+            Long requestId,
+            String operation,
+            String text,
+            List<Span> spans
+    ) {
     }
 
     private record Span(int start, int end, String surface) {

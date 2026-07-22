@@ -1,0 +1,658 @@
+{
+  "case_evidence": [
+    {
+      "case_id": "inflection_001",
+      "finding_count": 1,
+      "finding_hash": "0a1b61187539d96be41325c0146aacff6e5bdf91cfd9ea0c86c60d8fb85fe412",
+      "input_character_count": 46,
+      "median_ms": 4.0057500009424984,
+      "p95_ms": 4.306207993067801,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_002",
+      "finding_count": 1,
+      "finding_hash": "b9eda3d6c2fd6d480242d10a9c1454f1d7a6d9b0095a6992c31f193674d984a9",
+      "input_character_count": 34,
+      "median_ms": 3.7804580060765147,
+      "p95_ms": 4.2290830751881,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_003",
+      "finding_count": 1,
+      "finding_hash": "ac0b70aaffb801cc31917b714c57f8d0bb9bb5780001d397bf62268719a7b380",
+      "input_character_count": 53,
+      "median_ms": 5.023562524002045,
+      "p95_ms": 6.207042024470866,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_004",
+      "finding_count": 1,
+      "finding_hash": "b3dcc1766a2bbfcfd32edc68d85a4d8bd8610864b1282f477805f554ebb46812",
+      "input_character_count": 59,
+      "median_ms": 4.457791510503739,
+      "p95_ms": 5.508999922312796,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_005",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 32,
+      "median_ms": 3.8314374978654087,
+      "p95_ms": 3.8659999845549464,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_006",
+      "finding_count": 1,
+      "finding_hash": "07995c1dc517f2df5ab88f3a9228bfbc4e6c8ff73afc657774331964eb964eb4",
+      "input_character_count": 41,
+      "median_ms": 3.7953334976918995,
+      "p95_ms": 4.096582997590303,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_007",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 55,
+      "median_ms": 4.192458523903042,
+      "p95_ms": 4.227124969474971,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_008",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 61,
+      "median_ms": 4.065625485964119,
+      "p95_ms": 4.3036669958382845,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_009",
+      "finding_count": 1,
+      "finding_hash": "67b10f148234b40ff45077a7f0df5989ec2399406ca7845d00395d632600fa41",
+      "input_character_count": 54,
+      "median_ms": 3.774229495320469,
+      "p95_ms": 3.80679196678102,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_011",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 28,
+      "median_ms": 4.279228509403765,
+      "p95_ms": 4.632541094906628,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_012",
+      "finding_count": 1,
+      "finding_hash": "670a0f506c02024365cc7a148dacae2e6016b4fde8058579c9b8189b25125b32",
+      "input_character_count": 30,
+      "median_ms": 5.359020491596311,
+      "p95_ms": 6.772040971554816,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_013",
+      "finding_count": 2,
+      "finding_hash": "778bcdb65f5dbfd4171c9dd87237e254ba0583ac9182a5b6dd5b70a5c0cc7770",
+      "input_character_count": 26,
+      "median_ms": 4.387791501358151,
+      "p95_ms": 4.924333072267473,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_014",
+      "finding_count": 1,
+      "finding_hash": "3bfdcd41d89a95ca5c6545e7afc598ba72b254e70f9a99d4a0ef70bf6de6904f",
+      "input_character_count": 27,
+      "median_ms": 4.420499957632273,
+      "p95_ms": 5.202165921218693,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_015",
+      "finding_count": 1,
+      "finding_hash": "827f7ac050e0bf2ce885db016c589f83e4b378208c692981dce3001876d6d548",
+      "input_character_count": 56,
+      "median_ms": 4.358687496278435,
+      "p95_ms": 5.08216698653996,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_016",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 29,
+      "median_ms": 5.139041517395526,
+      "p95_ms": 5.923541029915214,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_037",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 21,
+      "median_ms": 2.4739165091887116,
+      "p95_ms": 2.6131250197067857,
+      "repeatable": true
+    },
+    {
+      "case_id": "inflection_041",
+      "finding_count": 2,
+      "finding_hash": "75399edf3b25c52ebc2ffbb1a01d409b80cf4ee78292c6601c05f1e8c49943b7",
+      "input_character_count": 36,
+      "median_ms": 4.2754579917527735,
+      "p95_ms": 4.906540969386697,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_001",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 32,
+      "median_ms": 3.046999976504594,
+      "p95_ms": 3.30550002399832,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_002",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 24,
+      "median_ms": 2.8180204681120813,
+      "p95_ms": 3.288874984718859,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_003",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 34,
+      "median_ms": 2.5825209449976683,
+      "p95_ms": 2.8324578888714314,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_004",
+      "finding_count": 2,
+      "finding_hash": "e4b57ec711e6dac2f8dcc60418d55dcf5fb57d6f991d04dfb0f2ef719c21293e",
+      "input_character_count": 29,
+      "median_ms": 3.9338539936579764,
+      "p95_ms": 4.2577499989420176,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_005",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 27,
+      "median_ms": 2.4195624864660203,
+      "p95_ms": 2.5546670658513904,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_006",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 41,
+      "median_ms": 2.2635209606960416,
+      "p95_ms": 2.5192078901454806,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_007",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 38,
+      "median_ms": 2.567624964285642,
+      "p95_ms": 2.9747500084340572,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_008",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 33,
+      "median_ms": 2.4534579715691507,
+      "p95_ms": 2.4805410066619515,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_009",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 39,
+      "median_ms": 2.2556045441888273,
+      "p95_ms": 2.3936250945553184,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_011",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 45,
+      "median_ms": 2.713187481276691,
+      "p95_ms": 3.1706669833511114,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_012",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 34,
+      "median_ms": 2.768020494841039,
+      "p95_ms": 3.1845830380916595,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_013",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 33,
+      "median_ms": 2.3269164958037436,
+      "p95_ms": 2.720499993301928,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_014",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 39,
+      "median_ms": 2.948353940155357,
+      "p95_ms": 3.99366591591388,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_021",
+      "finding_count": 1,
+      "finding_hash": "afe94da6867b4d0c5bdced30956acbe6791e2583cdb7c5400f3b872246291e5d",
+      "input_character_count": 29,
+      "median_ms": 2.9563330463133752,
+      "p95_ms": 3.5542910918593407,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_025",
+      "finding_count": 1,
+      "finding_hash": "c3cbb23d38ef3c3aca1e927e4aafcc0e4a605c54230f72540c239f37dc4a6d87",
+      "input_character_count": 43,
+      "median_ms": 4.214895539917052,
+      "p95_ms": 5.575207993388176,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_041",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 54,
+      "median_ms": 2.897520433180034,
+      "p95_ms": 3.2809999538585544,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_045",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 35,
+      "median_ms": 2.9686459456570446,
+      "p95_ms": 3.73945792671293,
+      "repeatable": true
+    },
+    {
+      "case_id": "syntax_057",
+      "finding_count": 1,
+      "finding_hash": "8448b0db19633a21352d81ef061f3c9764e9880b86f9255f61dfa99feafb1bea",
+      "input_character_count": 52,
+      "median_ms": 2.951500006020069,
+      "p95_ms": 3.3092499943450093,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_001",
+      "finding_count": 1,
+      "finding_hash": "db392e56a3d70c655c37621bf2b6c35fdc75931b7b9a90e2377660df9917cc27",
+      "input_character_count": 22,
+      "median_ms": 2.623666950967163,
+      "p95_ms": 3.001792007125914,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_002",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 43,
+      "median_ms": 2.884187502786517,
+      "p95_ms": 3.2910839654505253,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_003",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 38,
+      "median_ms": 2.5301665300503373,
+      "p95_ms": 2.9771249974146485,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_004",
+      "finding_count": 1,
+      "finding_hash": "39759fbe2b681ff6406e6fa6312e6685bd74603376fb4acd44e882cbf75962e8",
+      "input_character_count": 44,
+      "median_ms": 3.2841459615156054,
+      "p95_ms": 3.7933329585939646,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_013",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 33,
+      "median_ms": 2.9575624503195286,
+      "p95_ms": 3.4189169527962804,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_014",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 34,
+      "median_ms": 2.4087290512397885,
+      "p95_ms": 2.6832500007003546,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_019",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 41,
+      "median_ms": 3.120395529549569,
+      "p95_ms": 3.2484160037711263,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_025",
+      "finding_count": 1,
+      "finding_hash": "db392e56a3d70c655c37621bf2b6c35fdc75931b7b9a90e2377660df9917cc27",
+      "input_character_count": 25,
+      "median_ms": 2.8075415175408125,
+      "p95_ms": 3.075249958783388,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_026",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 36,
+      "median_ms": 3.2928124419413507,
+      "p95_ms": 4.234915948472917,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_031",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 42,
+      "median_ms": 3.1919999746605754,
+      "p95_ms": 4.048374947160482,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_032",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 31,
+      "median_ms": 2.483354532159865,
+      "p95_ms": 2.556834020651877,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_037",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 31,
+      "median_ms": 2.712166984565556,
+      "p95_ms": 2.869624993763864,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_038",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 34,
+      "median_ms": 2.1943749743513763,
+      "p95_ms": 2.267792006023228,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_043",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 31,
+      "median_ms": 2.234208513982594,
+      "p95_ms": 2.380833961069584,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_044",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 43,
+      "median_ms": 2.874020952731371,
+      "p95_ms": 3.5020000068470836,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_049",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 33,
+      "median_ms": 2.376916410867125,
+      "p95_ms": 2.5927498936653137,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_055",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 30,
+      "median_ms": 2.293583005666733,
+      "p95_ms": 2.3874579928815365,
+      "repeatable": true
+    },
+    {
+      "case_id": "punctuation_056",
+      "finding_count": 1,
+      "finding_hash": "9b8b8076834a43645acd0c272ff1bd77366a81b6e8b20014615e3e1145ff4b29",
+      "input_character_count": 34,
+      "median_ms": 2.770187973510474,
+      "p95_ms": 2.8669589664787054,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_001",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 44,
+      "median_ms": 3.761083004064858,
+      "p95_ms": 4.0056660072878,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_002",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 48,
+      "median_ms": 4.1123335249722,
+      "p95_ms": 4.613833036273718,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_003",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 29,
+      "median_ms": 2.914083015639335,
+      "p95_ms": 3.242249949835241,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_011",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 37,
+      "median_ms": 2.0856665214523673,
+      "p95_ms": 2.237666049040854,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_012",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 37,
+      "median_ms": 2.4598540039733052,
+      "p95_ms": 2.94775003567338,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_013",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 35,
+      "median_ms": 2.3592499201186,
+      "p95_ms": 2.4932079249992967,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_021",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 29,
+      "median_ms": 2.0267085055820644,
+      "p95_ms": 2.300000051036477,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_022",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 33,
+      "median_ms": 2.470146049745381,
+      "p95_ms": 2.961292047984898,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_027",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 37,
+      "median_ms": 2.0360624766908586,
+      "p95_ms": 2.3505419958382845,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_028",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 38,
+      "median_ms": 2.168603939935565,
+      "p95_ms": 2.418832969851792,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_029",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 41,
+      "median_ms": 1.934583531692624,
+      "p95_ms": 2.2553750313818455,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_037",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 32,
+      "median_ms": 2.0818335469812155,
+      "p95_ms": 2.553125028498471,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_038",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 36,
+      "median_ms": 1.974479528144002,
+      "p95_ms": 2.3543339921161532,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_043",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 40,
+      "median_ms": 1.7363340593874454,
+      "p95_ms": 2.0990840857848525,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_044",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 56,
+      "median_ms": 2.307416405528784,
+      "p95_ms": 2.985874889418483,
+      "repeatable": true
+    },
+    {
+      "case_id": "hard_negative_049",
+      "finding_count": 0,
+      "finding_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_character_count": 64,
+      "median_ms": 2.204500022344291,
+      "p95_ms": 2.5683750864118338,
+      "repeatable": true
+    }
+  ],
+  "configuration_sha256": "8af2d99df0fb03a4a9306eab031d7780996dda08261cf754963f4735903e4130",
+  "decision": {
+    "qualified": true
+  },
+  "environment": {
+    "artifact_sha256": "6959bbebad93c028552c21bae4d2524a0c08d09c1753c9a3fdf646ec1d645421",
+    "dependencies_sha256": "de97bed1193abbed914ef23dd99757204aa3bcef29d3cfa8f1ea485178566a99",
+    "language_tool_upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6",
+    "language_tool_version": "6.8",
+    "machine": "arm64",
+    "platform": "macOS-15.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.13.12",
+    "runner_sha256": "32b2d9bccdfccd1efc94939530de70f05040295861509b72b8b91752435b2fca"
+  },
+  "experiment_id": "polis-languagetool-stdio-session-v1",
+  "schema_version": 1,
+  "summary": {
+    "cases_per_second": 327.9782727976462,
+    "characters_per_second": 12406.134666693573,
+    "cold_first_request_ms": 938.598999986425,
+    "combined_rss_bytes": 441483264,
+    "java_rss_bytes": 374996992,
+    "measured_samples": 138,
+    "process_start_count": 1,
+    "python_rss_bytes": 66486272,
+    "repeatable_case_count": 69,
+    "socket_count": 0,
+    "swap_delta_bytes": 0,
+    "total_cases": 69,
+    "warm_median_ms": 2.781729446724057,
+    "warm_p50_ms": 2.7749589644372463,
+    "warm_p95_ms": 5.08216698653996
+  }
+}

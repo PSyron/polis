@@ -35,7 +35,27 @@ class CorrectionConflictError(CorrectionSelectionError): ...
 
 
 class AnalyzerConfig:
-    def __init__(self) -> None: ...
+    categories: frozenset[Category] | None
+    minimum_confidence: float
+    use_local_heuristic_backend: bool
+    language_tool_url: str | None
+    language_tool_timeout_seconds: float
+    contextual_inflection_stdio_path: str | None
+    contextual_inflection_timeout_seconds: float
+    vendored_language_tool_stdio_path: str | None
+    vendored_language_tool_timeout_seconds: float
+    def __init__(
+        self,
+        categories: frozenset[Category] | None = None,
+        minimum_confidence: float = 0.0,
+        use_local_heuristic_backend: bool = False,
+        language_tool_url: str | None = None,
+        language_tool_timeout_seconds: float = 1.0,
+        contextual_inflection_stdio_path: str | None = None,
+        contextual_inflection_timeout_seconds: float = 1.0,
+        vendored_language_tool_stdio_path: str | None = None,
+        vendored_language_tool_timeout_seconds: float = 2.0,
+    ) -> None: ...
 
     @classmethod
     def from_toml(cls, path: str | Path) -> Self: ...
@@ -70,6 +90,8 @@ class Analyzer:
         config: AnalyzerConfig,
         *,
         specialist_engine: object | None = None,
+        language_tool_transport: object | None = None,
+        contextual_inflection_transport: object | None = None,
     ) -> None: ...
 
     @classmethod
@@ -85,6 +107,9 @@ class Analyzer:
 
     def correct(self, text: str) -> CorrectionResult: ...
     async def correct_async(self, text: str) -> CorrectionResult: ...
+    def close(self) -> None: ...
+    def __enter__(self) -> Self: ...
+    def __exit__(self, *args: object) -> None: ...
 
 
 def analysis_result_to_json(result: AnalysisResult) -> str: ...

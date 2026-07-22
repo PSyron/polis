@@ -55,3 +55,29 @@ remaining deterministic.
 
 The benchmark and artifacts are intentionally kept lightweight for fast local checks and
 are suitable for full-system baseline updates before release.
+
+## Persistent vendored LanguageTool sentence baseline (#77)
+
+Date: `2026-07-22`. The source-only benchmark used the 69 corpus-v3 development
+sentence cases, one warmup pass, and two measured passes on
+`macOS-15.3.1-arm64` with Python 3.13.12 and the pinned LanguageTool 6.8 subset.
+The report is
+`experiments/languagetool_stdio_session/report.json`; it contains identifiers,
+hashes, counts, and measurements but no analyzed text.
+
+| Metric | Measured result |
+| --- | ---: |
+| Cold first request | `938.60 ms` |
+| Warm p50 | `2.77 ms` |
+| Warm p95 | `5.08 ms` |
+| Throughput | `327.98` cases/second |
+| Combined Python + Java RSS | `441,483,264 bytes` |
+| Process starts | `1` |
+| Network sockets | `0` (zero network sockets) |
+| Swap growth | `0 bytes` |
+| Repeatable cases | `69 / 69` |
+
+The frozen gates were warm p95 at most 500 ms, combined RSS at most 1 GiB,
+zero swap growth, zero sockets, one process, and repeatable findings for all 69
+cases. This sentence-only local transport qualified. It does not establish
+paragraph quality or broad Polish grammar coverage.

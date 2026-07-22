@@ -12,6 +12,9 @@ This project is designed to run analysis without external network access.
 - Optional LanguageTool support connects only to a separately started
   LanguageTool 6.8 server on a numeric loopback address. It never uses a public
   LanguageTool API, DNS name, proxy, or redirect.
+- The preferred vendored LanguageTool mode directly starts one persistent local
+  stdio child from an explicit absolute path. It opens no socket and performs no
+  implicit download or update.
 - Dependency installation uses locked `uv` files from the repository.
 
 ## Verification command
@@ -31,7 +34,36 @@ use causes the test to fail before analysis starts.
 - Analyzer succeeds with config-based local mock backend enabled.
 - No private input text is logged by these checks.
 
-## Optional local LanguageTool
+## Preferred vendored LanguageTool sentence path
+
+Build the pinned subset during explicit dependency preparation:
+
+```console
+cd third_party/languagetool-pl
+./scripts/build.sh
+```
+
+Then configure one sentence-only stdio session:
+
+```toml
+[vendored_language_tool]
+stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_stdio.sh"
+timeout_seconds = 2.0
+```
+
+The analyzer starts the process lazily and reuses it for qualified punctuation
+checks and contextual synthesis. Close analyzer-owned processes with a context
+manager or `Analyzer.close()`. Source-policy `1.1` keeps qualified comma
+insertions automatic and contextual inflection reviewable. A missing executable,
+timeout, malformed or oversized response, broken pipe, or stopped process fails
+closed without removing built-in deterministic findings or placing analyzed
+text in an error.
+
+The runner binds no port and opens no network socket. Removing
+`[vendored_language_tool]` disables the process. Do not combine this section
+with either legacy mode below.
+
+## Optional loopback LanguageTool compatibility mode
 
 Start a separately installed LanguageTool 6.8 server bound to loopback, then
 enable it explicitly:
@@ -51,8 +83,8 @@ Only reviewed comma findings from `BRAK_PRZECINKA_KTORY`,
 sidecar failure produces no optional findings and does not discard findings
 from in-process rules.
 
-The optional contextual inflection path uses the source-built stdio runner
-directly:
+The legacy contextual inflection path uses the source-built stdio runner
+directly, but starts a process per eligible sentence:
 
 ```toml
 [contextual_inflection]

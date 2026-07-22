@@ -19,6 +19,7 @@ from polis.rules.languagetool import (
     LocalLanguageToolRule,
     LoopbackLanguageToolHttpTransport,
 )
+from polis.rules.languagetool_stdio import LocalLanguageToolStdioSession
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingWlasnieRule,
@@ -180,6 +181,7 @@ __all__ = [
     "LanguageToolRuleConfig",
     "LanguageToolTransport",
     "LocalLanguageToolRule",
+    "LocalLanguageToolStdioSession",
     "LoopbackLanguageToolHttpTransport",
     "SpellingJestesRule",
     "StdioContextMorphologyTransport",
