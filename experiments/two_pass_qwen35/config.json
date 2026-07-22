@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-qwen35-2b-two-pass-v1",
+  "model": {
+    "identifier": "qwen3.5:2b-mxfp8",
+    "digest": "3a4a00dbfb1dd2c9e4cb2052bd61c37ee45e9b7a71a022bc4101d29e868c9e30",
+    "license": "Apache-2.0",
+    "artifact_size_bytes": 3117471137
+  },
+  "runtime": {
+    "engine": "Ollama",
+    "version": "0.20.7"
+  },
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2"
+  },
+  "prompt_variants": [
+    {
+      "name": "strict",
+      "prompt_hash": "159fc7d80bcd106f2ac7b3fd2a25522a3feb14cccf125a0800e7f15a0c7a5805"
+    },
+    {
+      "name": "checklist",
+      "prompt_hash": "3837e1814a9263730c2c46179ffc6d1feebd6a3f731c84953fb7926706a15db6"
+    },
+    {
+      "name": "counterexample",
+      "prompt_hash": "dc65176ae67eab225c24a36b580d21935de020a4ebb76ea1b54015c4ac625390"
+    }
+  ],
+  "operation_prompt_hashes": {
+    "inflection_candidate": "9b1fb3d19e35965d82cd978ee5d892315d3f73fd439ba11b746273d2c0891bc1",
+    "syntax_correction": "e3ec179a45ec54d68aca0e51e0c9df54655271c2fe4fc307fef5720cbd15d407",
+    "punctuation_correction": "0970d9dddb6829f5cc3187c67be6774165c87bb240ce911dcca6febe4712d394"
+  },
+  "selection": {
+    "required_valid_response_rate": 1.0,
+    "maximum_negative_changes": 0,
+    "minimum_edit_precision": 0.9,
+    "minimum_focus_recall": 0.25,
+    "maximum_calls_per_case": 2,
+    "maximum_warm_p95_latency_ms": 2000.0,
+    "maximum_loaded_memory_bytes": 4294967296,
+    "maximum_swap_delta_bytes": 67108864
+  }
+}

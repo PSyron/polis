@@ -16,10 +16,14 @@ from polis.llm.contracts import (
     validate_llm_response,
 )
 from polis.llm.corrected_text import (
+    DiagnosticPromptVariant,
+    DiagnosticRoute,
     FiniteCandidate,
     PromptRequest,
     SpecialistFocus,
     TextEdit,
+    build_diagnostic_prompt_request,
+    build_evidence_bound_corrected_text_prompt_request,
     build_inflection_candidate_prompt_request,
     build_proposal_verifier_prompt_request,
     build_specialist_corrected_text_prompt,
@@ -27,6 +31,8 @@ from polis.llm.corrected_text import (
     derive_text_edits,
     validate_candidate_selection_response,
     validate_corrected_text_response,
+    validate_diagnostic_response,
+    validate_evidence_bound_corrected_text_response,
     validate_verifier_response,
 )
 
@@ -42,10 +48,14 @@ __all__ = [
     "MockHeuristicBackend",
     "MockHeuristicTransport",
     "create_default_local_backend",
+    "DiagnosticPromptVariant",
+    "DiagnosticRoute",
     "FiniteCandidate",
     "PromptRequest",
     "SpecialistFocus",
     "TextEdit",
+    "build_diagnostic_prompt_request",
+    "build_evidence_bound_corrected_text_prompt_request",
     "build_inflection_candidate_prompt_request",
     "build_proposal_verifier_prompt_request",
     "build_specialist_corrected_text_prompt",
@@ -53,5 +63,7 @@ __all__ = [
     "derive_text_edits",
     "validate_candidate_selection_response",
     "validate_corrected_text_response",
+    "validate_diagnostic_response",
+    "validate_evidence_bound_corrected_text_response",
     "validate_verifier_response",
 ]

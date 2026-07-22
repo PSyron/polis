@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added and benchmarked a closed two-pass diagnostic and evidence-bound
+  Qwen3.5 2B protocol; rejected all three development variants for zero exact
+  recall, with no frozen-holdout run or production backend activation.
+- Added privacy-safe local benchmark evidence for prompt hashes, finite
+  LanguageTool candidates, per-focus edit quality, call counts, latency,
+  throughput, loaded memory, process RSS, and swap growth.
 - Benchmarked a pinned Bielik 1.5B MLX QLoRA adapter on the 16 GB Apple Silicon
   target and rejected it after frozen holdout failures in response validity,
   protected-negative safety, and edit precision; adapter weights remain local.

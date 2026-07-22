@@ -17,6 +17,7 @@ when the policy changes.
 | [ADR-0009](decisions/0009-specialist-prompt-benchmark.md) | Accepted | No specialist prompt protocol qualifies |
 | [ADR-0010](decisions/0010-inflection-candidate-generation.md) | Accepted | LanguageTool supplies finite inflection candidates |
 | [ADR-0011](decisions/0011-reject-bielik-1.5b-qlora.md) | Accepted | Bielik 1.5B QLoRA is rejected for the production backend |
+| [ADR-0012](decisions/0012-reject-constrained-qwen35-2b.md) | Accepted | Constrained Qwen3.5 2B is rejected for the production backend |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.
