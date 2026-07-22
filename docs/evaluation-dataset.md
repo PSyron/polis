@@ -12,6 +12,12 @@ claim about production coverage. The validator in `polis.evaluation.dataset`
 accepts only schema version 1 and rejects unknown fields so changes to the
 contract require an explicit schema version.
 
+Evaluation reports identify the actual loaded source, rather than assuming the
+default path. They hash the validated dataset as UTF-8 canonical JSON with
+sorted object keys and no insignificant whitespace. Formatting-only changes
+therefore retain the same SHA-256, while any canonical content change,
+including provenance, produces a new digest.
+
 ## Schema and interpretation
 
 The dataset object has `schema_version`, a stable `id`, dataset `provenance`,
