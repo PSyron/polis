@@ -730,6 +730,7 @@ def generate(output: Path) -> None:
     (output / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 
@@ -1056,7 +1057,9 @@ def _compact(value: object) -> str:
 
 def _write_jsonl(path: Path, records: list[dict[str, object]]) -> None:
     path.write_text(
-        "".join(_compact(record) + "\n" for record in records), encoding="utf-8"
+        "".join(_compact(record) + "\n" for record in records),
+        encoding="utf-8",
+        newline="\n",
     )
 
 
