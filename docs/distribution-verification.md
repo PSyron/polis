@@ -5,7 +5,9 @@ PyPI-ready distribution artifacts.
 
 ## Release artifact generation
 
-From a clean `main` checkout:
+For exploratory local packaging, the commands below remain useful. A release
+candidate instead follows `docs/prerelease-candidate.md`, which must build exactly
+once and freeze `dist/release-manifest.json`:
 
 ```console
 python -m build --no-isolation --outdir dist
@@ -66,16 +68,29 @@ is executed for each environment in CI/milestone release workflow.
 
 ## Publication checklist output
 
-Keep command outputs, wheel/sdist names, and SHA-256 checksums with the release notes.
-Use:
+Do not calculate an unrelated second set of publication hashes. Keep the frozen
+manifest and all verifier output with the release notes. To upload only the two paths
+listed by `artifacts[].filename` in `dist/release-manifest.json`, do not use a
+`dist/*` wildcard, rebuild, rename, or modify them.
+
+For example, the `0.2.0rc1` upload command names the frozen files explicitly:
 
 ```console
-python - <<'PY'
-import hashlib
-from pathlib import Path
-
-for name in sorted(Path('dist').glob('*')):
-    digest = hashlib.sha256(name.read_bytes()).hexdigest()
-    print(f"{name.name} {digest}")
-PY
+python -m twine upload \
+  dist/polis_nlp-0.2.0rc1-py3-none-any.whl \
+  dist/polis_nlp-0.2.0rc1.tar.gz
 ```
+
+Run the uploader from the controlled release environment; it is intentionally not a
+runtime or project development dependency.
+
+After PyPI reports the release, verify its exact filenames and SHA-256 digests:
+
+```console
+python scripts/release_identity.py verify-published \
+  --manifest dist/release-manifest.json
+```
+
+The post-publication command is intentionally network-backed and release-only. A
+missing, extra, or digest-mismatched PyPI file is a blocker; preserve the failed
+evidence and do not replace assets or move the tag.
