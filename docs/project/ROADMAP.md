@@ -8,6 +8,9 @@
 - Each issue produces one independently verifiable outcome and one focused commit during the single-contributor phase.
 - Every issue requires one milestone plus one `type:*`, one `area:*`, and one `priority:*` label.
 - A blocked issue receives `status:blocked` and a comment naming the unresolved dependency.
+- Use native GitHub `blocked_by` links when available; repeat the dependency in
+  the issue body so the delivery order remains explicit if native links are
+  unavailable or not exported.
 - Quality thresholds are derived from the measured baseline, not selected in advance.
 
 ## M0 - Foundation and Decisions
@@ -95,10 +98,26 @@ milestone.
 | M5-12e | #74 | Qualify a Qwen3 1.7B MLX residual syntax route for sentences | #59, #60, #61, #69, #72, #73 |
 | M5-12f | #75 | Add high-precision residual syntax rules for sentences | #60, #65, #69, #74 |
 | M5-12g | #77 | Integrate one persistent vendored LanguageTool stdio session for sentences | #54, #60, #70, #71, #72, #73 |
-| M5-12h | #76 | Add the installed-package sentence correction release gate | #55, #56, #60, #61, #65, #70, #71, #72, #73, #74, #75, #77 |
-| M5-13 | #43 | Add a qualified production local model backend | #55, #56, #59, #60, #61, #63; blocked because no model qualified |
-| M5-14 | #64 | Add the broader sentence and paragraph correction release gate | #43, #76 and all preceding M5 issues |
-| M5-15 | #66 | Perform final owner verification before first publication | #43, #64 and all preceding M5 issues |
+| M5-12h | #80 | Restore Fast CI on every supported platform | - |
+| M5-12i | #78 | Complete paired-comma automatic corrections for the sentence release gate | #80 |
+| M5-12j | #76 | Add the installed-package sentence correction release gate **(blocked)** | #78, #80 |
+| M5-12k | #81 | Correct evaluation metric semantics and dataset provenance | #80 |
+| M5-12l | #82 | Enforce ADR-0003 failure semantics in the public `Analyzer` | - |
+| M5-12m | #83 | Align public runtime protocols with analyzer composition | - |
+| M5-12n | #84 | Bind automatic correction privileges to source behavior versions | #76 |
+| M5-12o | #85 | Create corpus v4 for benchmarked majority sentence coverage | #76, #81 |
+| M5-12p | #86 | Put qualification runners under static and recorded-replay CI | #76, #81 |
+| M5-12q | #87 | Qualify deterministic finite-candidate coverage for residual sentence edits | #85, #86 |
+| M5-12r | #88 | Integrate the qualified finite-candidate provider into sentence suggestions | #87 |
+| M5-12s | #89 | Qualify a bounded small-model ranker over deterministic candidates | #87 |
+| M5-12t | #43 | Integrate the qualified production provider and bounded small-model ranker **(blocked)** | #82, #83, #84, #88, successful #89 |
+| M5-12u | #90 | Add the installed-package majority-coverage sentence gate | #43, #76, #85, #86, #88, #89 |
+| M5-12v | #91 | Enforce unique release versions and immutable release evidence | #80 |
+| M5-12w | #64 | Add the paragraph/integration release gate **(blocked)** | #76, #90 |
+| M5-12x | #66 | Perform final M5 owner verification after the published 0.1.0 release **(blocked)** | #64, #91 |
+| M5-12y | #92 | Publish the next M5 release from one approved artifact set | #66, #91 |
+| M5-12z | #93 | Track the evidence-first path to the next Polis release | #92 |
+| M5-12aa | #94 | Synchronize the M5 roadmap with the closure tracker | - |
 
 The primary dependency flow is:
 
@@ -114,10 +133,31 @@ qualifies broader deterministic sentence rules for integration in #72, while
 #71 qualifies contextual inflection for integration in #73. After #74 rejected
 the compact-model route, #75 adds only the deterministic residual sentence
 syntax coverage supported by exact evidence. Issue #77 makes these qualified
-sentence components practical through one persistent local process, and #76
-freezes the sentence-only installed-package gate before any paragraph claim.
-Issue #64 is the broader paragraph release gate and #66 is the final owner
-verification.
+sentence components practical through one persistent local process.
+
+The M5 majority-error graph from umbrella #93 is authoritative for the next
+delivery phase. The remote GitHub labels, `status:blocked` values, and native
+`blocked_by` links described below are intended metadata and remain pending
+controller application; this roadmap does not claim that the remote updates
+have already been made.
+
+`#80 -> #78 -> #76`; `#80 -> #81`; `#76 + #81 -> (#85 + #86)`;
+`#85 + #86 -> #87 -> (#88 + #89)`; `#76 -> #84`;
+`#82 + #83 + #84 + #88 + successful #89 -> #43`;
+`#43 + #76 + #85 + #86 + #88 + #89 -> #90`; `#90 -> #64 -> #66`;
+`#80 -> #91 -> #66`; and `#66 + #91 -> #92`.
+
+#76 is intended to be blocked by #78 and #80. #78 owns paired-comma automatic
+corrections under its single intended `area:rules` label; its analysis and
+evaluation integration is recorded here as cross-area coordination, not as
+additional area ownership.
+#43 is intended to remain blocked until the deterministic provider, public
+integration preconditions, and a successful bounded-ranker qualification (#89)
+are all available. #64 is intended to remain limited to the
+paragraph/integration gate after #76 and #90. #66 is the intended final M5
+owner verification, not first-publication verification: version 0.1.0 is
+already published. #94 is planning work and has
+no product dependency; #93 closes only after #92.
 
 Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
 is a valid #63 outcome, but #43 cannot proceed until another exact configuration
@@ -127,8 +167,15 @@ passes the accepted suggestion gates.
 
 M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 -> M3-02 -> M3-06 -> M4-03 -> M4-04
 
-M5 policy and evidence path:
+M5 policy, evidence, and release path:
 
-`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #69 -> ((#70 -> #72) + (#71 -> #73)) -> #74 -> #75 -> #77 -> #76 -> (#43 -> #64) -> #66`
+`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #69 -> ((#70 -> #72) + (#71 -> #73)) -> #74 -> #75 -> #77`
+
+`#80 -> (#78 -> #76; #81; #91)`; `#76 + #81 -> (#85 + #86) -> #87 -> (#88 + #89)`;
+`#82 + #83 + #84 + #88 + successful #89 -> #43 -> #90 -> #64 -> #66 -> #92 -> #93`.
+
+`#80 -> #91 -> #66`; #84 branches from #76. #94 tracks the documentation and
+GitHub-metadata synchronization and is intentionally outside the product
+critical path.
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.
