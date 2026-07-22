@@ -7,7 +7,14 @@ from collections.abc import Awaitable, Callable
 from typing import Protocol, cast
 
 from polis.analysis import normalize_findings
-from polis.core import AnalysisOptions, Finding, PolisError
+from polis.core import (
+    AnalysisOptions,
+    AnalysisTimeoutError,
+    BackendUnavailableError,
+    Finding,
+    InvalidBackendResponseError,
+    PolisError,
+)
 from polis.core.protocols import RuleRegistry
 from polis.segmentation import Sentence, segment_sentences
 
@@ -40,7 +47,7 @@ async def analyze_text_async(
     backend_clock: object | None = None,
     backend_sleep: OperationSleep = asyncio.sleep,
     segmenter: Callable[[str], tuple[Sentence, ...]] = segment_sentences,
-    ignore_backend_failures: bool = True,
+    ignore_backend_failures: bool = False,
     operation: str = "analysis.run",
 ) -> tuple[Finding, ...]:
     """Run deterministic analyzers and optional backend findings on ``text``."""
@@ -55,6 +62,7 @@ async def analyze_text_async(
         for fragment in segmenter(text):
             if not fragment.text:
                 continue
+            backend_error: PolisError | None = None
             try:
                 generated = await local_backend.generate_findings(
                     fragment.text,
@@ -63,10 +71,21 @@ async def analyze_text_async(
                     sleep=backend_sleep,
                     operation=f"{operation}.llm",
                 )
-            except PolisError:
+            except (
+                BackendUnavailableError,
+                AnalysisTimeoutError,
+                InvalidBackendResponseError,
+            ) as exc:
                 if ignore_backend_failures:
                     continue
-                raise
+                backend_error = _canonical_backend_error(
+                    exc,
+                    operation=f"{operation}.llm",
+                    backend=local_backend.name,
+                )
+
+            if backend_error is not None:
+                raise backend_error
 
             for finding in generated:
                 llm_findings.append(
@@ -95,7 +114,7 @@ def analyze_text(
     backend_clock: object | None = None,
     backend_sleep: OperationSleep = asyncio.sleep,
     segmenter: Callable[[str], tuple[Sentence, ...]] = segment_sentences,
-    ignore_backend_failures: bool = True,
+    ignore_backend_failures: bool = False,
     operation: str = "analysis.run",
 ) -> tuple[Finding, ...]:
     """Synchronous wrapper over :func:`analyze_text_async`."""
@@ -133,6 +152,37 @@ def _translate_fragment_offset(finding: Finding, *, offset: int) -> Finding:
         end=finding.end + offset,
         confidence=finding.confidence,
         source=finding.source,
+    )
+
+
+def _canonical_backend_error(
+    error: PolisError,
+    *,
+    operation: str,
+    backend: str,
+) -> PolisError:
+    """Return an ADR-0003-safe public error for one backend failure."""
+
+    context = {"operation": operation, "backend": backend}
+    if isinstance(error, BackendUnavailableError):
+        return BackendUnavailableError(
+            "configured backend is unavailable",
+            code="backend.unavailable",
+            retryable=True,
+            context=context,
+        )
+    if isinstance(error, AnalysisTimeoutError):
+        return AnalysisTimeoutError(
+            "configured analysis deadline expired",
+            code="analysis.timeout",
+            retryable=True,
+            context=context,
+        )
+    return InvalidBackendResponseError(
+        "configured backend returned an invalid response",
+        code="backend.invalid_response",
+        retryable=False,
+        context=context,
     )
 
 
