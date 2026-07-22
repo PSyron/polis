@@ -44,6 +44,7 @@ public final class PolisStdioServer {
     private static final String SOFTWARE_NAME = "LanguageTool";
     private static final String POLISH_LANGUAGE = "pl-PL";
     private static final String CHECK_OPERATION = "check";
+    private static final String INSPECT_OPERATION = "inspect";
     private static final String SYNTHESIZE_OPERATION = "synthesize";
     private static final String TAGS_RESOURCE = "/pl/polish_tags.txt";
     private static final Locale POLISH_LOCALE = Locale.forLanguageTag("pl-PL");
@@ -76,9 +77,16 @@ public final class PolisStdioServer {
                     continue;
                 }
                 final Request request = parseRequest(line);
-                final ObjectNode response = SYNTHESIZE_OPERATION.equals(request.operation())
-                        ? synthesize(request)
-                        : check(languageTool, request);
+                final ObjectNode response;
+                if (SYNTHESIZE_OPERATION.equals(request.operation())) {
+                    response = synthesize(request);
+                } else {
+                    response = check(
+                            languageTool,
+                            request,
+                            INSPECT_OPERATION.equals(request.operation())
+                    );
+                }
                 output.write(JSON.writeValueAsString(response));
                 output.newLine();
                 output.flush();
@@ -106,11 +114,15 @@ public final class PolisStdioServer {
         final String operation = operationNode == null
                 ? CHECK_OPERATION
                 : operationNode.textValue();
-        if (!CHECK_OPERATION.equals(operation) && !SYNTHESIZE_OPERATION.equals(operation)) {
-            throw new IllegalArgumentException("operation must be check or synthesize");
+        if (!CHECK_OPERATION.equals(operation)
+                && !INSPECT_OPERATION.equals(operation)
+                && !SYNTHESIZE_OPERATION.equals(operation)) {
+            throw new IllegalArgumentException(
+                    "operation must be check, inspect, or synthesize"
+            );
         }
         final String text = textNode.textValue();
-        if (CHECK_OPERATION.equals(operation)) {
+        if (CHECK_OPERATION.equals(operation) || INSPECT_OPERATION.equals(operation)) {
             return new Request(operation, text, List.of());
         }
         final JsonNode spansNode = payload.get("spans");
@@ -156,9 +168,13 @@ public final class PolisStdioServer {
 
     private static ObjectNode check(
             final JLanguageTool languageTool,
-            final Request request
+            final Request request,
+            final boolean includeUnqualifiedRules
     ) throws Exception {
         final ObjectNode response = JSON.createObjectNode();
+        if (includeUnqualifiedRules) {
+            response.put("operation", INSPECT_OPERATION);
+        }
         response.putObject("software")
                 .put("name", SOFTWARE_NAME)
                 .put("version", JLanguageTool.VERSION);
@@ -168,7 +184,7 @@ public final class PolisStdioServer {
         final ArrayNode matches = response.putArray("matches");
         for (RuleMatch match : languageTool.check(request.text())) {
             final String ruleId = match.getSpecificRuleId();
-            if (ALLOWED_RULE_IDS.contains(ruleId)) {
+            if (includeUnqualifiedRules || ALLOWED_RULE_IDS.contains(ruleId)) {
                 matches.add(toJson(match, ruleId));
             }
         }

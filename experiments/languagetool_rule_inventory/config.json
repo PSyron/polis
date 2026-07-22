@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-languagetool-rule-inventory-v1",
+  "language_tool": {
+    "version": "6.8",
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6"
+  },
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2",
+    "sentence_only": true
+  },
+  "selection": {
+    "minimum_true_positive_edits": 1,
+    "required_precision": 1.0,
+    "maximum_protected_negative_changes": 0
+  }
+}

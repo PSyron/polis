@@ -13,6 +13,10 @@
   only 0.571 syntax precision and 0.160 syntax recall on development. Bielik
   1.5B and Qwen3 0.6B produced no exact syntax edits. No configuration
   qualified, and corpus-v3 holdout remains unopened for this experiment.
+- Issue #70 qualified four additional LanguageTool punctuation rule IDs on
+  sentences at precision 1.00 and recall 0.038 on its one-shot holdout. They
+  remain research evidence until a separate source-policy change enables them;
+  the production `check` operation still exposes only its existing two rules.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

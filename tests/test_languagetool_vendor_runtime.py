@@ -14,10 +14,13 @@ MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
 RUNNER = MODULE_ROOT / "scripts" / "run_stdio.sh"
 
 
-def _check(text: str) -> dict[str, Any]:
+def _check(text: str, *, operation: str | None = None) -> dict[str, Any]:
+    request: dict[str, object] = {"text": text, "language": "pl-PL"}
+    if operation is not None:
+        request["operation"] = operation
     process = subprocess.run(
         [os.fspath(RUNNER)],
-        input=json.dumps({"text": text, "language": "pl-PL"}),
+        input=json.dumps(request),
         text=True,
         capture_output=True,
         check=True,
@@ -90,3 +93,19 @@ def test_vendored_engine_opens_no_network_socket() -> None:
         if process.stdin is not None:
             process.stdin.close()
         process.wait(timeout=10)
+
+
+@pytest.mark.slow
+def test_inspection_exposes_unfiltered_rules_without_broadening_check() -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+
+    source = "To jest testt."
+    inspected = _check(source, operation="inspect")
+    checked = _check(source)
+    inspected_ids = {match["rule"]["id"] for match in inspected["matches"]}
+    checked_ids = {match["rule"]["id"] for match in checked["matches"]}
+
+    assert inspected["operation"] == "inspect"
+    assert inspected_ids - {"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"}
+    assert checked_ids <= {"BRAK_PRZECINKA_ZE", "BRAK_PRZECINKA_ZEBY"}

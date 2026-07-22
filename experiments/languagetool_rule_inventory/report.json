@@ -1,0 +1,2753 @@
+{
+  "case_evidence": [
+    {
+      "application_valid": true,
+      "case_id": "inflection_001",
+      "elapsed_ms": 900.2243750728667,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_002",
+      "elapsed_ms": 8.86991701554507,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_003",
+      "elapsed_ms": 6.398333003744483,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_004",
+      "elapsed_ms": 5.410666926763952,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_005",
+      "elapsed_ms": 4.613958997651935,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_006",
+      "elapsed_ms": 4.674124997109175,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_007",
+      "elapsed_ms": 6.335875019431114,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_008",
+      "elapsed_ms": 4.641499952413142,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_009",
+      "elapsed_ms": 4.326125024817884,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_011",
+      "elapsed_ms": 3.39087494648993,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_012",
+      "elapsed_ms": 3.375958069227636,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_013",
+      "elapsed_ms": 3.5725829657167196,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_014",
+      "elapsed_ms": 3.162084030918777,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_015",
+      "elapsed_ms": 3.53262503631413,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_016",
+      "elapsed_ms": 3.673416911624372,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_037",
+      "elapsed_ms": 2.99633399117738,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "inflection_041",
+      "elapsed_ms": 2.63525010086596,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_001",
+      "elapsed_ms": 10.291500017046928,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_002",
+      "elapsed_ms": 3.589916042983532,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_003",
+      "elapsed_ms": 8.202709024772048,
+      "exact_output_match": false,
+      "outcome_hash": "dc7900501d9b81b26d4874a274e6d62fbcc4ddc6af05e0d773601efa7a4c7492",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "CZEKAC_ZA"
+      ],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_004",
+      "elapsed_ms": 4.052250063978136,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_005",
+      "elapsed_ms": 3.013125038705766,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_006",
+      "elapsed_ms": 3.0902079306542873,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_007",
+      "elapsed_ms": 3.0847920570522547,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_008",
+      "elapsed_ms": 3.062583040446043,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_009",
+      "elapsed_ms": 2.8780419379472733,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_011",
+      "elapsed_ms": 3.1981669599190354,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_012",
+      "elapsed_ms": 3.275000024586916,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_013",
+      "elapsed_ms": 2.5527500547468662,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_014",
+      "elapsed_ms": 3.1265830621123314,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_021",
+      "elapsed_ms": 3.2810840057209134,
+      "exact_output_match": false,
+      "outcome_hash": "ebaed32d74d710500ff4aeabf01d80aed90dab7fa25ddd3619c0e564335a0d86",
+      "proposed_edit_count": 2,
+      "protected_negative": false,
+      "rule_ids": [
+        "ZWROTNE_BEZ_SIE"
+      ],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_025",
+      "elapsed_ms": 3.534875111654401,
+      "exact_output_match": false,
+      "outcome_hash": "abe8af47d39dd3f04c6a193f5bd929eb35f856658184677ab491f98d6cd24b4b",
+      "proposed_edit_count": 2,
+      "protected_negative": false,
+      "rule_ids": [
+        "ZWROTNE_BEZ_SIE"
+      ],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_041",
+      "elapsed_ms": 3.4104580990970135,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_045",
+      "elapsed_ms": 2.542541944421828,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "syntax_057",
+      "elapsed_ms": 3.3495419193059206,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_001",
+      "elapsed_ms": 2.735125017352402,
+      "exact_output_match": true,
+      "outcome_hash": "4c1015127dcc86b04dddfce6772c78d0f7c1b6d52b21c43e9bcf6f3ff7c4246e",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "BRAK_PRZECINKA_ZE"
+      ],
+      "selected_edit_count": 1
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_002",
+      "elapsed_ms": 2.7440000558272004,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_003",
+      "elapsed_ms": 3.0556670390069485,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_004",
+      "elapsed_ms": 3.73879203107208,
+      "exact_output_match": false,
+      "outcome_hash": "76a457918cd5461cb8193ebcb328388ad258afa6851fac76091f49ad467668ef",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "BRAK_PRZECINKA_KTORY"
+      ],
+      "selected_edit_count": 1
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_013",
+      "elapsed_ms": 3.508875030092895,
+      "exact_output_match": false,
+      "outcome_hash": "42e05dccf2d2acc38302259686e3350b5048234c64997f073a29b70bfb567b3a",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "BRAK_PRZECINKA_CZY"
+      ],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_014",
+      "elapsed_ms": 3.2534170895814896,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_019",
+      "elapsed_ms": 5.059291957877576,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_025",
+      "elapsed_ms": 3.332249936647713,
+      "exact_output_match": false,
+      "outcome_hash": "099248a9aabf9a3b985df5a23d9064d2886840eca54041704c5df2311f78c364",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "WOLACZ_BEZ_PRZECINKA"
+      ],
+      "selected_edit_count": 1
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_026",
+      "elapsed_ms": 4.234207910485566,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_031",
+      "elapsed_ms": 3.965166979469359,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_032",
+      "elapsed_ms": 3.183124936185777,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_037",
+      "elapsed_ms": 2.94158305041492,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_038",
+      "elapsed_ms": 2.9392079450190067,
+      "exact_output_match": false,
+      "outcome_hash": "c9e0e571f30cebbea8d6aa81849a723bf269092769b177e8b29d0d58d91777c4",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "BRAK_PRZECINKA_CZY"
+      ],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_043",
+      "elapsed_ms": 2.9660830041393638,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_044",
+      "elapsed_ms": 3.1746249878779054,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_049",
+      "elapsed_ms": 3.4006250789389014,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_055",
+      "elapsed_ms": 3.0950839864090085,
+      "exact_output_match": false,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": false,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "punctuation_056",
+      "elapsed_ms": 3.579834010452032,
+      "exact_output_match": true,
+      "outcome_hash": "92f7da5293f8edaeb83362446d2cf3bac15e71fcc822d8ed885b926fe3f9264b",
+      "proposed_edit_count": 1,
+      "protected_negative": false,
+      "rule_ids": [
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY"
+      ],
+      "selected_edit_count": 1
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_001",
+      "elapsed_ms": 3.388499957509339,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_002",
+      "elapsed_ms": 2.670458983629942,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_003",
+      "elapsed_ms": 2.241084002889693,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_011",
+      "elapsed_ms": 2.149999956600368,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_012",
+      "elapsed_ms": 2.805666998028755,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_013",
+      "elapsed_ms": 2.2980410140007734,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_021",
+      "elapsed_ms": 2.142084063962102,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_022",
+      "elapsed_ms": 2.5392500683665276,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_027",
+      "elapsed_ms": 2.4245409294962883,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_028",
+      "elapsed_ms": 2.258167020045221,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_029",
+      "elapsed_ms": 2.4292919551953673,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_037",
+      "elapsed_ms": 4.84533398412168,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_038",
+      "elapsed_ms": 2.9207910411059856,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_043",
+      "elapsed_ms": 2.392416005022824,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_044",
+      "elapsed_ms": 2.770625054836273,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    },
+    {
+      "application_valid": true,
+      "case_id": "hard_negative_049",
+      "elapsed_ms": 2.3848750861361623,
+      "exact_output_match": true,
+      "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "proposed_edit_count": 0,
+      "protected_negative": true,
+      "rule_ids": [],
+      "selected_edit_count": 0
+    }
+  ],
+  "configuration_sha256": "3ef2a23ef992ecb6b9171a3f0bd821ef5296d854ba76a5e6006d2d1d09ba0fa1",
+  "decision": {
+    "selected_rule_ids": [
+      "BRAK_PRZECINKA_KTORY",
+      "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+      "BRAK_PRZECINKA_ZE",
+      "WOLACZ_BEZ_PRZECINKA"
+    ]
+  },
+  "environment": {
+    "bridge_sha256": "833aec31ffc50dd3b51706adf6994549af4ea4958ae6c7f16b8d31849b83d596",
+    "language_tool_version": "6.8",
+    "runtime_disk_bytes": 54072523,
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6"
+  },
+  "experiment_id": "polis-languagetool-rule-inventory-v1",
+  "holdout": {
+    "case_evidence": [
+      {
+        "application_valid": true,
+        "case_id": "inflection_017",
+        "elapsed_ms": 904.2459579650313,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_018",
+        "elapsed_ms": 10.382667067460716,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_019",
+        "elapsed_ms": 8.687332971021533,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_021",
+        "elapsed_ms": 4.89470805041492,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_022",
+        "elapsed_ms": 4.487208090722561,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_023",
+        "elapsed_ms": 4.895833088085055,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_024",
+        "elapsed_ms": 4.986958927474916,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_025",
+        "elapsed_ms": 6.283458089455962,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_026",
+        "elapsed_ms": 4.898790968582034,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_027",
+        "elapsed_ms": 15.191500075161457,
+        "exact_output_match": false,
+        "outcome_hash": "2880bb13a183657c61aedb145547e723877a8625bc323c774e53d939564dfc71",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "NIEZGODNO_PRZYPADKW_PRZYMIOTNIKA_I_RZECZOWNIKA_RODZAJU_ESKIEGO"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_028",
+        "elapsed_ms": 4.16662497445941,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_029",
+        "elapsed_ms": 6.4749999437481165,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_031",
+        "elapsed_ms": 4.283625050447881,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_032",
+        "elapsed_ms": 4.032332915812731,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_033",
+        "elapsed_ms": 4.613999975845218,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_034",
+        "elapsed_ms": 5.886625032871962,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_035",
+        "elapsed_ms": 3.799790982156992,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_036",
+        "elapsed_ms": 3.9755000034347177,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_038",
+        "elapsed_ms": 3.41562507674098,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_039",
+        "elapsed_ms": 3.6911669885739684,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_042",
+        "elapsed_ms": 3.714666934683919,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_043",
+        "elapsed_ms": 4.62174997664988,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_044",
+        "elapsed_ms": 3.9130409713834524,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_045",
+        "elapsed_ms": 5.801749997772276,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_046",
+        "elapsed_ms": 3.522332990542054,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_047",
+        "elapsed_ms": 3.442749963141978,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_048",
+        "elapsed_ms": 4.2009580647572875,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_049",
+        "elapsed_ms": 4.649749957025051,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_051",
+        "elapsed_ms": 3.864333964884281,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_052",
+        "elapsed_ms": 3.1382079469040036,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_053",
+        "elapsed_ms": 5.610874970443547,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_054",
+        "elapsed_ms": 5.143249989487231,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_055",
+        "elapsed_ms": 4.418790922500193,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_056",
+        "elapsed_ms": 4.45787503849715,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_057",
+        "elapsed_ms": 3.5626250319182873,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_058",
+        "elapsed_ms": 5.356125067919493,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "inflection_059",
+        "elapsed_ms": 3.7089590914547443,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_015",
+        "elapsed_ms": 4.1050000581890345,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_016",
+        "elapsed_ms": 4.36758401338011,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_017",
+        "elapsed_ms": 9.055832982994616,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_018",
+        "elapsed_ms": 5.947750061750412,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_019",
+        "elapsed_ms": 4.066291963681579,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_022",
+        "elapsed_ms": 3.0294579919427633,
+        "exact_output_match": false,
+        "outcome_hash": "bf93904c3784aad5e178e9abe7d8d8bba539fd22c2147390e4abf7628b546581",
+        "proposed_edit_count": 2,
+        "protected_negative": false,
+        "rule_ids": [
+          "ZWROTNE_BEZ_SIE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_023",
+        "elapsed_ms": 2.7918750420212746,
+        "exact_output_match": false,
+        "outcome_hash": "0879a68a85b1c25af07dfd1e1b62e421bd0f4cac6af1a91ad200fa8e57b5bccf",
+        "proposed_edit_count": 2,
+        "protected_negative": false,
+        "rule_ids": [
+          "ZWROTNE_BEZ_SIE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_024",
+        "elapsed_ms": 2.80954095069319,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_026",
+        "elapsed_ms": 2.5217910297214985,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_027",
+        "elapsed_ms": 4.410416004247963,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_028",
+        "elapsed_ms": 3.4561670618131757,
+        "exact_output_match": false,
+        "outcome_hash": "5a30cbe45dc802dbd66466a2b16a6b7b0eb74bccf3774b23230c2f34c995ed4e",
+        "proposed_edit_count": 2,
+        "protected_negative": false,
+        "rule_ids": [
+          "ZWROTNE_BEZ_SIE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_029",
+        "elapsed_ms": 3.364834003150463,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_031",
+        "elapsed_ms": 3.1421250896528363,
+        "exact_output_match": false,
+        "outcome_hash": "0395724b3c429c57991ce83cebddd33b014f89e4f57321212a5d6e2e381fe4d2",
+        "proposed_edit_count": 2,
+        "protected_negative": false,
+        "rule_ids": [
+          "ZWROTNE_BEZ_SIE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_032",
+        "elapsed_ms": 2.926624962128699,
+        "exact_output_match": false,
+        "outcome_hash": "e02f19d048f300ab7584a7aa399ea7bf7479f2bd7660803b8c063b2cb3facda6",
+        "proposed_edit_count": 2,
+        "protected_negative": false,
+        "rule_ids": [
+          "ZWROTNE_BEZ_SIE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_033",
+        "elapsed_ms": 2.679416094906628,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_034",
+        "elapsed_ms": 3.024665988050401,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_035",
+        "elapsed_ms": 3.2845420064404607,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_036",
+        "elapsed_ms": 2.868875046260655,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_037",
+        "elapsed_ms": 2.9496250208467245,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_038",
+        "elapsed_ms": 3.18304100073874,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_039",
+        "elapsed_ms": 2.6470840675756335,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_042",
+        "elapsed_ms": 2.36754200886935,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_043",
+        "elapsed_ms": 2.7828329475596547,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_044",
+        "elapsed_ms": 2.7717920020222664,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_046",
+        "elapsed_ms": 2.3989160545170307,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_047",
+        "elapsed_ms": 2.521999995224178,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_048",
+        "elapsed_ms": 3.37133405264467,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_049",
+        "elapsed_ms": 3.0428749741986394,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_051",
+        "elapsed_ms": 4.234250052832067,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_052",
+        "elapsed_ms": 3.7139590131118894,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_053",
+        "elapsed_ms": 4.123083082959056,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_054",
+        "elapsed_ms": 3.1717499950900674,
+        "exact_output_match": false,
+        "outcome_hash": "0d77c6ac1f0b7fbc4aae83a5ac16bc62159da135c479146789a901bb95dbefd9",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "PRZECINEK_ANI"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_055",
+        "elapsed_ms": 2.492083003744483,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_056",
+        "elapsed_ms": 3.079625079408288,
+        "exact_output_match": false,
+        "outcome_hash": "797dcd2a2c8957040e8e9aac85e73824fc37ca85aa98fa0550286fb64dc2b6e0",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_JESLI"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_058",
+        "elapsed_ms": 2.8103330405429006,
+        "exact_output_match": false,
+        "outcome_hash": "d6d53cd8e86730523f57687954a344aa622193bf0224816dc8d28934e56c313a",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "PRZECINEK_ANI"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "syntax_059",
+        "elapsed_ms": 2.898958045989275,
+        "exact_output_match": false,
+        "outcome_hash": "0d77c6ac1f0b7fbc4aae83a5ac16bc62159da135c479146789a901bb95dbefd9",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "PRZECINEK_ANI"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_005",
+        "elapsed_ms": 3.5881249932572246,
+        "exact_output_match": false,
+        "outcome_hash": "2e1d4b72a00ca7ffef68a40c802644e631c9cd0c3e33565eefd54baf7724cf06",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_KTORY"
+        ],
+        "selected_edit_count": 1
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_006",
+        "elapsed_ms": 2.8345000464469194,
+        "exact_output_match": false,
+        "outcome_hash": "e57f70fcbeb97b415e6259693c8e14105ed2af928d3371d1705115301d207a2c",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_TEN_CO"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_007",
+        "elapsed_ms": 2.823124988935888,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_008",
+        "elapsed_ms": 2.5690420297905803,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_009",
+        "elapsed_ms": 2.2989159915596247,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_011",
+        "elapsed_ms": 2.536625019274652,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_012",
+        "elapsed_ms": 2.4913341039791703,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_015",
+        "elapsed_ms": 2.3025410482659936,
+        "exact_output_match": true,
+        "outcome_hash": "d8f3ea6c465386c8767986c346e20d3800223b9050907ac5c68494262fec67d0",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_SPOJNIK_PROSTY"
+        ],
+        "selected_edit_count": 1
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_016",
+        "elapsed_ms": 2.3818330373615026,
+        "exact_output_match": false,
+        "outcome_hash": "626f624fb4312f2bd7c9229e4aa5c84a96976e3aa111e4c907ca56ea2edeb694",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_GDY"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_017",
+        "elapsed_ms": 2.685916959308088,
+        "exact_output_match": false,
+        "outcome_hash": "8d2467aa7722cbd5055e1b9a4c87e75c1bc4fb666d4f97ed40ae65362b9d61bd",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_CZY"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_018",
+        "elapsed_ms": 2.21649999730289,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_021",
+        "elapsed_ms": 2.2497919853776693,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_022",
+        "elapsed_ms": 2.2408750373870134,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_023",
+        "elapsed_ms": 2.38191697280854,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_024",
+        "elapsed_ms": 2.1181670017540455,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_027",
+        "elapsed_ms": 2.405041945166886,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_028",
+        "elapsed_ms": 2.2190000163391232,
+        "exact_output_match": true,
+        "outcome_hash": "099248a9aabf9a3b985df5a23d9064d2886840eca54041704c5df2311f78c364",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "WOLACZ_BEZ_PRZECINKA"
+        ],
+        "selected_edit_count": 1
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_029",
+        "elapsed_ms": 2.0778749603778124,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_033",
+        "elapsed_ms": 2.0244999323040247,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_034",
+        "elapsed_ms": 2.1466249600052834,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_035",
+        "elapsed_ms": 1.6243749996647239,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_036",
+        "elapsed_ms": 2.2397079737856984,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_039",
+        "elapsed_ms": 1.6800420125946403,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_041",
+        "elapsed_ms": 2.318125101737678,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_042",
+        "elapsed_ms": 1.7798329936340451,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_045",
+        "elapsed_ms": 2.1509999642148614,
+        "exact_output_match": false,
+        "outcome_hash": "f7ccd81a44993d589235ed8ebe588845e438ad5163723844a2567010521a4195",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "INNYMI_SLOWY"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_046",
+        "elapsed_ms": 1.8724589608609676,
+        "exact_output_match": false,
+        "outcome_hash": "693078307023c474ef7ccb70e17e4bad305239f84d9a1e3240761af8c51eb906",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "CO_WIECEJ"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_047",
+        "elapsed_ms": 1.6842079348862171,
+        "exact_output_match": false,
+        "outcome_hash": "3a4498de2cf5ebff83082f7a761219b65cdf0b2a6b9826a3fab480dd5ebe00b2",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "NAWIASEM_MOWIAC"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_048",
+        "elapsed_ms": 2.199457958340645,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_051",
+        "elapsed_ms": 2.532375045120716,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_052",
+        "elapsed_ms": 1.9992080051451921,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_053",
+        "elapsed_ms": 2.5117499753832817,
+        "exact_output_match": false,
+        "outcome_hash": "9ae98c51443a99b16e119e2afe7f8cb208103f093aa6dc59b3294543435ee7f6",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_O_ILE"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_054",
+        "elapsed_ms": 2.03399988822639,
+        "exact_output_match": false,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": false,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_057",
+        "elapsed_ms": 2.1487080957740545,
+        "exact_output_match": false,
+        "outcome_hash": "ab148404d8cac45600aafca080b2ef2f1918b19c8e6e3972a2e41d8724b49695",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_ANI"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_058",
+        "elapsed_ms": 1.9818750442937016,
+        "exact_output_match": true,
+        "outcome_hash": "a7bc5dff9a06fb4c8b157f19fe833d2c13196516443c60261f278bcb507aeacb",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_SPOJNIK_PROSTY"
+        ],
+        "selected_edit_count": 1
+      },
+      {
+        "application_valid": true,
+        "case_id": "punctuation_059",
+        "elapsed_ms": 2.251707948744297,
+        "exact_output_match": true,
+        "outcome_hash": "d6587ab5806941f48463516e366f761048af1b425965ce927d1c81e61ed4c496",
+        "proposed_edit_count": 1,
+        "protected_negative": false,
+        "rule_ids": [
+          "BRAK_PRZECINKA_SPOJNIK_PROSTY"
+        ],
+        "selected_edit_count": 1
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_004",
+        "elapsed_ms": 1.7347090179100633,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_005",
+        "elapsed_ms": 1.7668750369921327,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_006",
+        "elapsed_ms": 1.9286669557914138,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_007",
+        "elapsed_ms": 1.957083004526794,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_008",
+        "elapsed_ms": 1.9137919880449772,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_009",
+        "elapsed_ms": 1.8073329702019691,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_014",
+        "elapsed_ms": 1.7042920226231217,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_015",
+        "elapsed_ms": 1.6238749958574772,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_016",
+        "elapsed_ms": 1.5792080666869879,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_017",
+        "elapsed_ms": 1.892708009108901,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_018",
+        "elapsed_ms": 1.7877499340102077,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_019",
+        "elapsed_ms": 1.8291249871253967,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_023",
+        "elapsed_ms": 2.112083020620048,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_024",
+        "elapsed_ms": 1.9854590063914657,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_025",
+        "elapsed_ms": 2.443083096295595,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_026",
+        "elapsed_ms": 2.0521669648587704,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_031",
+        "elapsed_ms": 1.9476659363135695,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_032",
+        "elapsed_ms": 1.7122500576078892,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_033",
+        "elapsed_ms": 2.636374905705452,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_034",
+        "elapsed_ms": 2.2765420144423842,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_035",
+        "elapsed_ms": 1.8471250077709556,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_036",
+        "elapsed_ms": 1.9542919471859932,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_039",
+        "elapsed_ms": 3.5526249557733536,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_041",
+        "elapsed_ms": 2.4719579378142953,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_042",
+        "elapsed_ms": 2.0076249493286014,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_045",
+        "elapsed_ms": 2.495999913662672,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_046",
+        "elapsed_ms": 3.1102499924600124,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_047",
+        "elapsed_ms": 2.4892919464036822,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_048",
+        "elapsed_ms": 2.5349160423502326,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_051",
+        "elapsed_ms": 2.832332975231111,
+        "exact_output_match": true,
+        "outcome_hash": "d091d2604b9a0819a67079049fd703f132e96a4cdd244352ae19d4e8563f6985",
+        "proposed_edit_count": 1,
+        "protected_negative": true,
+        "rule_ids": [
+          "SKROTY_Z_KROPKA"
+        ],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_052",
+        "elapsed_ms": 2.4865829618647695,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_053",
+        "elapsed_ms": 2.381332917138934,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      },
+      {
+        "application_valid": true,
+        "case_id": "hard_negative_054",
+        "elapsed_ms": 2.2677909582853317,
+        "exact_output_match": true,
+        "outcome_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "proposed_edit_count": 0,
+        "protected_negative": true,
+        "rule_ids": [],
+        "selected_edit_count": 0
+      }
+    ],
+    "rules": [
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_ANI",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_CZY",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_GDY",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 132,
+        "false_positive_edits": 1,
+        "precision": 0.0,
+        "protected_negative_changes": 0,
+        "recall": 0.0,
+        "rule_id": "BRAK_PRZECINKA_JESLI",
+        "true_positive_edits": 0,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_KTORY",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_O_ILE",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 3,
+        "false_negative_edits": 129,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.022727272727272728,
+        "rule_id": "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "true_positive_edits": 3,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "BRAK_PRZECINKA_TEN_CO",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "CO_WIECEJ",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "INNYMI_SLOWY",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "NAWIASEM_MOWIAC",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 132,
+        "false_positive_edits": 1,
+        "precision": 0.0,
+        "protected_negative_changes": 0,
+        "recall": 0.0,
+        "rule_id": "NIEZGODNO_PRZYPADKW_PRZYMIOTNIKA_I_RZECZOWNIKA_RODZAJU_ESKIEGO",
+        "true_positive_edits": 0,
+        "upstream_categories": [
+          "TYPOS"
+        ]
+      },
+      {
+        "cases_with_edits": 3,
+        "false_negative_edits": 132,
+        "false_positive_edits": 3,
+        "precision": 0.0,
+        "protected_negative_changes": 0,
+        "recall": 0.0,
+        "rule_id": "PRZECINEK_ANI",
+        "true_positive_edits": 0,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 132,
+        "false_positive_edits": 1,
+        "precision": 0.0,
+        "protected_negative_changes": 1,
+        "recall": 0.0,
+        "rule_id": "SKROTY_Z_KROPKA",
+        "true_positive_edits": 0,
+        "upstream_categories": [
+          "SPELLING"
+        ]
+      },
+      {
+        "cases_with_edits": 1,
+        "false_negative_edits": 131,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "protected_negative_changes": 0,
+        "recall": 0.007575757575757576,
+        "rule_id": "WOLACZ_BEZ_PRZECINKA",
+        "true_positive_edits": 1,
+        "upstream_categories": [
+          "PUNCTUATION"
+        ]
+      },
+      {
+        "cases_with_edits": 5,
+        "false_negative_edits": 127,
+        "false_positive_edits": 5,
+        "precision": 0.5,
+        "protected_negative_changes": 0,
+        "recall": 0.03787878787878788,
+        "rule_id": "ZWROTNE_BEZ_SIE",
+        "true_positive_edits": 5,
+        "upstream_categories": [
+          "TYPOS"
+        ]
+      }
+    ],
+    "summary": {
+      "cold_latency_ms": 904.2459579650313,
+      "conflicting_candidate_rule_count": 0,
+      "exact_output_coverage": 0.2605633802816901,
+      "exact_output_matches": 37,
+      "false_negative_edits": 127,
+      "false_positive_edits": 0,
+      "inspected_rule_count": 16,
+      "invalid_output_cases": 0,
+      "peak_rss_bytes": 355434496,
+      "precision": 1.0,
+      "protected_negative_changes": 0,
+      "recall": 0.03787878787878788,
+      "selected_rule_count": 4,
+      "total_cases": 142,
+      "true_positive_edits": 5,
+      "warm_median_latency_ms": 2.7717920020222664,
+      "warm_p95_latency_ms": 5.886625032871962
+    }
+  },
+  "rules": [
+    {
+      "cases_with_edits": 2,
+      "false_negative_edits": 70,
+      "false_positive_edits": 1,
+      "precision": 0.5,
+      "protected_negative_changes": 0,
+      "recall": 0.014084507042253521,
+      "rule_id": "BRAK_PRZECINKA_CZY",
+      "true_positive_edits": 1,
+      "upstream_categories": [
+        "PUNCTUATION"
+      ]
+    },
+    {
+      "cases_with_edits": 1,
+      "false_negative_edits": 70,
+      "false_positive_edits": 0,
+      "precision": 1.0,
+      "protected_negative_changes": 0,
+      "recall": 0.014084507042253521,
+      "rule_id": "BRAK_PRZECINKA_KTORY",
+      "true_positive_edits": 1,
+      "upstream_categories": [
+        "PUNCTUATION"
+      ]
+    },
+    {
+      "cases_with_edits": 1,
+      "false_negative_edits": 70,
+      "false_positive_edits": 0,
+      "precision": 1.0,
+      "protected_negative_changes": 0,
+      "recall": 0.014084507042253521,
+      "rule_id": "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+      "true_positive_edits": 1,
+      "upstream_categories": [
+        "PUNCTUATION"
+      ]
+    },
+    {
+      "cases_with_edits": 1,
+      "false_negative_edits": 70,
+      "false_positive_edits": 0,
+      "precision": 1.0,
+      "protected_negative_changes": 0,
+      "recall": 0.014084507042253521,
+      "rule_id": "BRAK_PRZECINKA_ZE",
+      "true_positive_edits": 1,
+      "upstream_categories": [
+        "PUNCTUATION"
+      ]
+    },
+    {
+      "cases_with_edits": 1,
+      "false_negative_edits": 71,
+      "false_positive_edits": 1,
+      "precision": 0.0,
+      "protected_negative_changes": 0,
+      "recall": 0.0,
+      "rule_id": "CZEKAC_ZA",
+      "true_positive_edits": 0,
+      "upstream_categories": [
+        "STYLE"
+      ]
+    },
+    {
+      "cases_with_edits": 1,
+      "false_negative_edits": 70,
+      "false_positive_edits": 0,
+      "precision": 1.0,
+      "protected_negative_changes": 0,
+      "recall": 0.014084507042253521,
+      "rule_id": "WOLACZ_BEZ_PRZECINKA",
+      "true_positive_edits": 1,
+      "upstream_categories": [
+        "PUNCTUATION"
+      ]
+    },
+    {
+      "cases_with_edits": 2,
+      "false_negative_edits": 69,
+      "false_positive_edits": 2,
+      "precision": 0.5,
+      "protected_negative_changes": 0,
+      "recall": 0.028169014084507043,
+      "rule_id": "ZWROTNE_BEZ_SIE",
+      "true_positive_edits": 2,
+      "upstream_categories": [
+        "TYPOS"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "cold_latency_ms": 900.2243750728667,
+    "conflicting_candidate_rule_count": 0,
+    "exact_output_coverage": 0.2608695652173913,
+    "exact_output_matches": 18,
+    "false_negative_edits": 67,
+    "false_positive_edits": 0,
+    "inspected_rule_count": 7,
+    "invalid_output_cases": 0,
+    "peak_rss_bytes": 359481344,
+    "precision": 1.0,
+    "protected_negative_changes": 0,
+    "recall": 0.056338028169014086,
+    "selected_rule_count": 4,
+    "total_cases": 69,
+    "true_positive_edits": 4,
+    "warm_median_latency_ms": 3.1906459480524063,
+    "warm_p95_latency_ms": 6.398333003744483
+  }
+}

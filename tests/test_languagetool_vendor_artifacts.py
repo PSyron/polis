@@ -109,3 +109,14 @@ def test_stdio_bridge_uses_real_polish_morphology_for_candidate_generation() -> 
     assert "isIntegralNumber" in source
     assert "expected_output" not in source
     assert "polish_correction_corpus_v3" not in source
+
+
+def test_stdio_bridge_keeps_unfiltered_inspection_separate_from_check() -> None:
+    source = (
+        MODULE_ROOT / "src/main/java/org/polis/languagetool/PolisStdioServer.java"
+    ).read_text(encoding="utf-8")
+
+    assert 'INSPECT_OPERATION = "inspect"' in source
+    assert 'response.put("operation", INSPECT_OPERATION)' in source
+    assert "includeUnqualifiedRules" in source
+    assert "ALLOWED_RULE_IDS.contains(ruleId)" in source
