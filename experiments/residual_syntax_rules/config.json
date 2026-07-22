@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-residual-syntax-rules-v1",
+  "sentence_only": true,
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2"
+  },
+  "rules": [
+    "rule:syntax.missing_reflexive",
+    "rule:syntax.missing_correlative"
+  ],
+  "gates": {
+    "minimum_edit_precision": 1.0,
+    "maximum_protected_negative_changes": 0,
+    "maximum_warm_p95_ms": 5.0
+  }
+}

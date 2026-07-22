@@ -35,6 +35,8 @@ from polis.rules import (
     SpellingZebyRule,
     SyntaxCommaSpacingRule,
     SyntaxListSpacingRule,
+    SyntaxMissingCorrelativeRule,
+    SyntaxMissingReflexiveRule,
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
 )
@@ -562,6 +564,8 @@ def _make_default_registry(
         RuleRegistration(rule=SpellingZebyRule()),
         RuleRegistration(rule=SyntaxCommaSpacingRule()),
         RuleRegistration(rule=SyntaxListSpacingRule()),
+        RuleRegistration(rule=SyntaxMissingCorrelativeRule()),
+        RuleRegistration(rule=SyntaxMissingReflexiveRule()),
         RuleRegistration(rule=SyntaxQuoteSpacingRule()),
         RuleRegistration(rule=SyntaxSentenceSpacingRule()),
     ]

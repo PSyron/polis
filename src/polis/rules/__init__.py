@@ -28,6 +28,8 @@ from polis.rules.spelling import (
 from polis.rules.syntax import (
     SyntaxCommaSpacingRule,
     SyntaxListSpacingRule,
+    SyntaxMissingCorrelativeRule,
+    SyntaxMissingReflexiveRule,
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
 )
@@ -187,6 +189,8 @@ __all__ = [
     "AgreementCopulaRule",
     "SyntaxCommaSpacingRule",
     "SyntaxListSpacingRule",
+    "SyntaxMissingCorrelativeRule",
+    "SyntaxMissingReflexiveRule",
     "SyntaxQuoteSpacingRule",
     "SyntaxSentenceSpacingRule",
     "RuleRegistration",

@@ -76,9 +76,22 @@ by category:
   list marker (`1.`, `-`, `*`) when the next token starts immediately.
 - `SyntaxQuoteSpacingRule` (`Category.PUNCTUATION`) adds a missing space after an
   opening quotation mark that is attached directly to a word.
+- `SyntaxMissingReflexiveRule` (`Category.SYNTAX`) suggests a minimal `się`
+  insertion for sentence-initial `On/Ona/Ono boi …` and
+  `Nie spodziewaliśmy …` constructions.
+- `SyntaxMissingCorrelativeRule` (`Category.SYNTAX`) suggests a minimal `tym`
+  insertion for sentence-initial `Im …, bardziej …` constructions.
 
-All three rules support category filtering through the shared `options.categories`
-mechanism and return deterministic findings with stable IDs.
+The two residual syntax rules require exactly one sentence, inspect no model or
+gold data, and abstain on multi-sentence input. Their sources are
+`rule:syntax.missing_reflexive` and `rule:syntax.missing_correlative`. Their
+one-shot holdout contained no eligible construction, so it could not establish
+non-vacuous precision. Both findings remain reviewable and are excluded from
+automatic source-policy `1.1`.
+
+All syntax rules support category filtering through the shared
+`options.categories` mechanism and return deterministic findings with stable
+IDs.
 
 ## Optional LanguageTool punctuation rule
 

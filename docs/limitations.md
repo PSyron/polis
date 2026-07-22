@@ -27,6 +27,14 @@
   correction. The best precision was 1.00 at only 0.04 syntax recall; the best
   recall was 0.16 at 0.571 precision. No route qualified, holdout remains
   unopened, and no real model is enabled for sentence syntax suggestions.
+- Issue #75 adds reviewable deterministic suggestions for only three
+  sentence-initial constructions: missing `się` after `On/Ona/Ono boi` or
+  `Nie spodziewaliśmy`, and missing `tym` in `Im …, bardziej …`. Development
+  produced 3 true-positive edits, no false positives, and precision 1.00. The
+  142-sentence one-shot holdout contained no eligible construction, so it
+  produced no edits and could not establish non-vacuous precision. The sources
+  are not automatically applied, do not generalize to other reflexive verbs or
+  word-order defects, and abstain on multi-sentence input.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

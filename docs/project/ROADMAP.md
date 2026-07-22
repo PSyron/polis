@@ -93,7 +93,8 @@ milestone.
 | M5-12c | #72 | Enable four qualified Polish LanguageTool sentence rules in source policy | #54, #60, #65, #70 |
 | M5-12d | #73 | Integrate qualified contextual inflection suggestions for sentences | #58, #60, #71 |
 | M5-12e | #74 | Qualify a Qwen3 1.7B MLX residual syntax route for sentences | #59, #60, #61, #69, #72, #73 |
-| M5-13 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63, #68, #69, #70, #71, #72, #73 |
+| M5-12f | #75 | Add high-precision residual syntax rules for sentences | #60, #65, #69, #74 |
+| M5-13 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63, #68, #69, #70, #71, #72, #73, #74, #75 |
 | M5-14 | #64 | Add the hybrid sentence and paragraph correction release gate | #43 and all preceding M5 issues |
 | M5-15 | #66 | Perform final owner verification before first publication | #43, #64 and all preceding M5 issues |
 
@@ -108,9 +109,10 @@ Issues #61 and #62 join at #63. Because #63 rejected both its adapter and
 baseline, #67 freezes a two-pass constrained protocol and #68 evaluates the new
 small-model candidate. Because #68 and #69 failed their model gates, #70
 qualifies broader deterministic sentence rules for integration in #72, while
-#71 qualifies contextual inflection for integration in #73. Only the residual
-syntax path then needs another compact-model decision. Issue #64 is the
-installed-package release gate and #66 is the final owner verification.
+#71 qualifies contextual inflection for integration in #73. After #74 rejected
+the compact-model route, #75 adds only the deterministic residual sentence
+syntax coverage supported by exact evidence. Issue #64 is the installed-package
+release gate and #66 is the final owner verification.
 
 Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
 is a valid #63 outcome, but #43 cannot proceed until another exact configuration
@@ -122,6 +124,6 @@ M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 ->
 
 M5 policy and evidence path:
 
-`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #69 -> ((#70 -> #72) + (#71 -> #73)) -> #43 -> #64 -> #66`
+`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #69 -> ((#70 -> #72) + (#71 -> #73)) -> #74 -> #75 -> #43 -> #64 -> #66`
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.

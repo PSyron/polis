@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added two deterministic, sentence-only residual syntax sources for three
+  narrow missing-`się` and missing-`tym` constructions. They remain reviewable
+  because the one-shot holdout contained no eligible examples and therefore
+  could not qualify them for automatic correction.
 - Added and benchmarked a closed two-pass diagnostic and evidence-bound
   Qwen3.5 2B protocol; rejected all three development variants for zero exact
   recall, with no frozen-holdout run or production backend activation.

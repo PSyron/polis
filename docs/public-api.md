@@ -87,6 +87,14 @@ Source-policy version `1.1` adds automatic application of the explicitly
 qualified `languagetool.pl` comma insertions. It does not authorize other
 LanguageTool rules or category-wide correction.
 
+The default analyzer also exposes the sentence-only deterministic sources
+`syntax.missing_reflexive` and `syntax.missing_correlative`. They cover only the
+three exact constructions documented in [rules.md](rules.md), and return no
+finding when the input contains multiple sentences. They are deliberately not
+listed in the automatic policy: `correct()` places their findings in
+`skipped_findings`, and a caller can apply a chosen finding through
+`apply_suggestions()`.
+
 Model findings are never auto-applied in this method; callers can still use
 `CorrectionResult.apply_suggestions(finding_ids)` to explicitly select entries
 from `skipped_findings`. The method atomically reapplies the automatic findings

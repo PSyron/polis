@@ -13,6 +13,7 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
+from polis.segmentation import segment_sentences
 
 
 class SyntaxCommaSpacingRule:
@@ -163,6 +164,84 @@ class SyntaxQuoteSpacingRule:
         return tuple(findings)
 
 
+class SyntaxMissingReflexiveRule:
+    """Detect narrowly qualified missing reflexive insertions."""
+
+    _CATEGORY = Category.SYNTAX
+    _PREFIXES = (
+        re.compile(r"^\s*(?:On|Ona|Ono)\s+boi\b"),
+        re.compile(r"^\s*Nie\s+spodziewaliśmy\b"),
+    )
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.missing_reflexive")
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+
+        for pattern in self._PREFIXES:
+            match = pattern.match(text)
+            if match is None:
+                continue
+            following = text[match.end() :]
+            if not following or not following[0].isspace():
+                return ()
+            next_token = following.lstrip().split(maxsplit=1)[0]
+            if next_token.rstrip(".,!?;:") == "się":
+                return ()
+            return (
+                _make_insertion_or_replacement(
+                    match.end(),
+                    match.end(),
+                    "",
+                    " się",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje zaimka zwrotnego «się».",
+                    explanation=(
+                        "W tej konstrukcji czasownik wymaga zaimka zwrotnego «się»."
+                    ),
+                ),
+            )
+        return ()
+
+
+class SyntaxMissingCorrelativeRule:
+    """Detect a narrowly qualified missing ``tym`` correlative."""
+
+    _CATEGORY = Category.SYNTAX
+    _PATTERN = re.compile(r"^\s*Im\b[^.!?]*?,\s+(?P<bardziej>bardziej)\b")
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.missing_correlative")
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+
+        match = self._PATTERN.match(text)
+        if match is None:
+            return ()
+        start = match.start("bardziej")
+        return (
+            _make_insertion_or_replacement(
+                start,
+                start,
+                "",
+                "tym ",
+                self.source,
+                category=self._CATEGORY,
+                message="Brakuje członu «tym» w konstrukcji porównawczej.",
+                explanation=("Konstrukcja zależności ma postać «im…, tym bardziej…»."),
+            ),
+        )
+
+
 def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:
     before = text[:comma_end].rsplit(" ", 1)[-1]
     if before.lower() in _ABBREVIATIONS:
@@ -202,5 +281,7 @@ __all__ = [
     "SyntaxCommaSpacingRule",
     "SyntaxSentenceSpacingRule",
     "SyntaxListSpacingRule",
+    "SyntaxMissingCorrelativeRule",
+    "SyntaxMissingReflexiveRule",
     "SyntaxQuoteSpacingRule",
 ]
