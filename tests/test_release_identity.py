@@ -130,15 +130,18 @@ def test_freeze_manifest_requires_exact_identity_and_hashes_artifacts(
     root = tmp_path / "repo"
     root.mkdir()
     (root / "pyproject.toml").write_text(
-        '[project]\nname = "polis-nlp"\nversion = "0.2.0rc1"\n', encoding="utf-8"
+        '[project]\nname = "polis-nlp"\nversion = "0.2.0rc1"\n',
+        encoding="utf-8",
+        newline="\n",
     )
     (root / "CHANGELOG.md").write_text(
         "# Changelog\n\n## 0.2.0rc1 (2026-07-22)\n\n- Candidate.\n",
         encoding="utf-8",
+        newline="\n",
     )
     notes = root / "docs/release-notes/0.2.0rc1.md"
     notes.parent.mkdir(parents=True)
-    notes.write_text("# Release notes: 0.2.0rc1\n", encoding="utf-8")
+    notes.write_text("# Release notes: 0.2.0rc1\n", encoding="utf-8", newline="\n")
     wheel, sdist = _write_artifacts(root / "dist", "0.2.0rc1")
     manifest_path = root / "dist/release-manifest.json"
 
@@ -219,13 +222,18 @@ def test_freeze_manifest_rejects_mismatched_identity(
     (root / "pyproject.toml").write_text(
         f'[project]\nname = "polis-nlp"\nversion = "{source_version}"\n',
         encoding="utf-8",
+        newline="\n",
     )
     (root / "CHANGELOG.md").write_text(
-        "# Changelog\n\n## 0.2.0rc1 (2026-07-22)\n", encoding="utf-8"
+        "# Changelog\n\n## 0.2.0rc1 (2026-07-22)\n",
+        encoding="utf-8",
+        newline="\n",
     )
     notes = root / "docs/release-notes/0.2.0rc1.md"
     notes.parent.mkdir(parents=True)
-    notes.write_text(f"# Release notes: {notes_version}\n", encoding="utf-8")
+    notes.write_text(
+        f"# Release notes: {notes_version}\n", encoding="utf-8", newline="\n"
+    )
     _write_artifacts(root / "dist", artifact_version)
 
     with pytest.raises(ValueError, match=error):
