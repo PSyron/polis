@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Callable
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,7 @@ class UnavailableBackend:
         operation: str = "analysis.llm.generate",
     ) -> tuple[tuple[object, ...], ...]:
         raise BackendUnavailableError(
-            "backend is unavailable",
+            f"backend is unavailable for: {text}",
             code="backend_unavailable",
             retryable=True,
             context={"backend": self.name},
@@ -273,3 +274,66 @@ def test_sync_and_async_optional_failures_are_equivalent() -> None:
     )
 
     assert async_result == sync_result
+
+
+@pytest.mark.parametrize(
+    ("backend_factory", "error_type", "code", "retryable", "backend_name"),
+    [
+        (
+            UnavailableBackend,
+            BackendUnavailableError,
+            "backend.unavailable",
+            True,
+            "unavailable-test-backend",
+        ),
+        (
+            TimeoutBackend,
+            AnalysisTimeoutError,
+            "analysis.timeout",
+            True,
+            "timeout-test-backend",
+        ),
+        (
+            InvalidResponseBackend,
+            InvalidBackendResponseError,
+            "backend.invalid_response",
+            False,
+            "invalid-response-test-backend",
+        ),
+    ],
+)
+def test_sync_and_async_analysis_fail_atomically_with_safe_backend_error(
+    backend_factory: Callable[[], Any],
+    error_type: type[Exception],
+    code: str,
+    retryable: bool,
+    backend_name: str,
+) -> None:
+    sync_analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=True))
+    sync_analyzer._backend = backend_factory()
+    async_analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=True))
+    async_analyzer._backend = backend_factory()
+
+    with pytest.raises(error_type) as sync_info:
+        sync_analyzer.analyze("Poufny tekst")
+    with pytest.raises(error_type) as async_info:
+        asyncio.run(async_analyzer.analyze_async("Poufny tekst"))
+
+    for error in (sync_info.value, async_info.value):
+        assert isinstance(
+            error,
+            (
+                BackendUnavailableError,
+                AnalysisTimeoutError,
+                InvalidBackendResponseError,
+            ),
+        )
+        assert error.code == code
+        assert error.retryable is retryable
+        assert error.context == {
+            "operation": "analysis.run.llm",
+            "backend": backend_name,
+        }
+        assert "Poufny tekst" not in str(error)
+        assert error.__cause__ is None
+        assert error.__context__ is None
