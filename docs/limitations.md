@@ -22,6 +22,11 @@
   optional local stdio configuration. It is suggestion-only; first-name
   ambiguity, verbal agreement, most government relations, and all paragraph
   behavior remain unsupported.
+- Issue #74 retested the pinned Qwen3 1.7B MLX model with a generic verifier,
+  an evidence-specific checklist plus verifier, and separate diagnosis plus
+  correction. The best precision was 1.00 at only 0.04 syntax recall; the best
+  recall was 0.16 at 0.571 precision. No route qualified, holdout remains
+  unopened, and no real model is enabled for sentence syntax suggestions.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

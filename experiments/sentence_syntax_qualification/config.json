@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-qwen17-sentence-syntax-qualification-v1",
+  "sentence_only": true,
+  "corpus": {
+    "path": "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
+    "sha256": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2"
+  },
+  "model": {
+    "name": "qwen3-1.7b-mlx-4bit",
+    "engine": "mlx",
+    "identifier": "mlx-community/Qwen3-1.7B-4bit",
+    "revision": "3b1b1768f8f8cf8351c712464f906e86c2b8269e",
+    "license": "Apache-2.0",
+    "artifact_size_bytes": 984013244
+  },
+  "runtime": {
+    "name": "mlx-lm",
+    "version": "0.31.3",
+    "framework": "mlx",
+    "framework_version": "0.32.0",
+    "chat_template_args": {"enable_thinking": false}
+  },
+  "variants": [
+    "generic_verified-v1",
+    "evidence_checklist_verified-v1",
+    "diagnose_then_correct-v1"
+  ],
+  "selection": {
+    "required_valid_response_rate": 1.0,
+    "maximum_negative_changes": 0,
+    "minimum_edit_precision": 0.9,
+    "minimum_focus_recall": 0.25,
+    "supported_focuses": ["syntax"],
+    "maximum_calls_per_sentence": 2,
+    "maximum_warm_p95_latency_ms": 2000.0,
+    "maximum_loaded_memory_bytes": 4294967296,
+    "maximum_swap_delta_bytes": 67108864
+  }
+}

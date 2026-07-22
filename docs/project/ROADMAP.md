@@ -92,6 +92,7 @@ milestone.
 | M5-12b | #71 | Build gold-independent contextual inflection routing for Polish sentences | #54, #56, #58, #69 |
 | M5-12c | #72 | Enable four qualified Polish LanguageTool sentence rules in source policy | #54, #60, #65, #70 |
 | M5-12d | #73 | Integrate qualified contextual inflection suggestions for sentences | #58, #60, #71 |
+| M5-12e | #74 | Qualify a Qwen3 1.7B MLX residual syntax route for sentences | #59, #60, #61, #69, #72, #73 |
 | M5-13 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63, #68, #69, #70, #71, #72, #73 |
 | M5-14 | #64 | Add the hybrid sentence and paragraph correction release gate | #43 and all preceding M5 issues |
 | M5-15 | #66 | Perform final owner verification before first publication | #43, #64 and all preceding M5 issues |
