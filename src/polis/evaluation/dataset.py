@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import dataclass
@@ -50,6 +51,8 @@ class EvaluationDataset:
     schema_version: int
     id: str
     cases: tuple[EvaluationCase, ...]
+    source: str
+    canonical_hash: str
 
 
 def load_dataset(path: Path = DATASET_PATH) -> EvaluationDataset:
@@ -59,10 +62,10 @@ def load_dataset(path: Path = DATASET_PATH) -> EvaluationDataset:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as error:
         raise ValueError(f"invalid dataset JSON: {path}") from error
-    return validate_dataset(raw)
+    return validate_dataset(raw, source=str(path))
 
 
-def validate_dataset(raw: object) -> EvaluationDataset:
+def validate_dataset(raw: object, *, source: str = "memory") -> EvaluationDataset:
     """Return validated records from one exact schema-version-1 JSON object."""
 
     dataset = _require_object(raw, "dataset")
@@ -79,7 +82,23 @@ def validate_dataset(raw: object) -> EvaluationDataset:
 
     seen_ids: set[str] = set()
     cases = tuple(_validate_case(case, seen_ids) for case in raw_cases)
-    return EvaluationDataset(schema_version=1, id=dataset_id, cases=cases)
+    return EvaluationDataset(
+        schema_version=1,
+        id=dataset_id,
+        cases=cases,
+        source=source,
+        canonical_hash=_canonical_hash(raw),
+    )
+
+
+def _canonical_hash(raw: object) -> str:
+    canonical = json.dumps(
+        raw,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def _validate_case(raw: object, seen_ids: set[str]) -> EvaluationCase:
