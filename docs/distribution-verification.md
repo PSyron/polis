@@ -28,28 +28,32 @@ python scripts/verify_distribution_artifacts.py --dist dist
 
 ## Clean-install smoke test
 
-Install both wheel and sdist in a fresh environment and run:
+The installed CLI owns a UTF-8 process boundary for stdin, stdout, and stderr. The
+automated smoke check starts it with `PYTHONIOENCODING=cp1252`, passes Polish text,
+decodes output as UTF-8, and verifies the exact text. This reproduces a legacy
+Windows inherited-codec environment while keeping direct Python calls to `run()`
+caller-owned. Text lines retain platform-native line endings (`LF` on POSIX and
+`CRLF` on Windows); the cross-platform process contract fixes their encoding, not
+the operating system's newline convention.
+
+Run the portable verifier from the repository root:
 
 ```console
-python -m venv /tmp/polis-release-check
-/tmp/polis-release-check/bin/pip install --no-deps dist/polis_nlp-<version>-py3-none-any.whl
-/tmp/polis-release-check/bin/python -c "from importlib.metadata import version; print(version('polis-nlp'))"
-/tmp/polis-release-check/bin/python -m polis.cli analyze --json "Zeby nauczyc sie polskiego."
+python scripts/verify_distribution_install.py --dist dist
 ```
 
-Repeat for the sdist:
-
-```console
-/tmp/polis-release-check/bin/pip install --no-deps dist/polis_nlp-<version>.tar.gz
-/tmp/polis-release-check/bin/python -m polis.cli analyze --json "Zeby nauczyc sie polskiego."
-```
+The script verifies both the wheel and sdist. It creates temporary environments with
+the platform's correct `bin` or `Scripts` layout and sets the inherited CP1252
+environment through Python, so the same command is valid in POSIX shells, Windows
+PowerShell, and `cmd.exe`.
 
 ## Checks covered by tests
 
 - `tests/test_distribution_artifacts.py` verifies metadata and allow-listed file
   contents in built artifacts.
 - `tests/test_release_distribution_installation.py` verifies isolated wheel/sdist
-  installation and import/CLI smoke behavior.
+  installation and import/CLI smoke behavior, including the inherited-CP1252 UTF-8
+  process boundary.
 - `tests/test_privacy_dependency_audit.py` and `tests/test_dependency_licenses.py`
   validate release-audit constraints required before publication.
 

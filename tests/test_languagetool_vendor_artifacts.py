@@ -5,6 +5,8 @@ import os
 import re
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_ROOT = ROOT / "third_party" / "languagetool-pl"
 
@@ -45,9 +47,16 @@ def test_vendor_module_contains_stable_runtime_support_files() -> None:
     assert (MODULE_ROOT / "README.md").exists()
     assert (MODULE_ROOT / "manifest.json").exists()
     assert (MODULE_ROOT / "scripts" / "benchmark.sh").is_file()
-    assert os.access(MODULE_ROOT / "scripts" / "benchmark.sh", os.X_OK)
     assert (MODULE_ROOT / "scripts" / "benchmark.py").is_file()
     assert (MODULE_ROOT / "scripts" / "run_stdio.sh").is_file()
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason="Git executable bits are meaningful only on POSIX filesystems",
+)
+def test_vendor_shell_runner_is_executable_on_posix() -> None:
+    assert os.access(MODULE_ROOT / "scripts" / "benchmark.sh", os.X_OK)
 
 
 def test_vendor_contains_corresponding_core_and_polish_sources() -> None:

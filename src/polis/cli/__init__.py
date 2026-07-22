@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from io import TextIOWrapper
 from pathlib import Path
 from typing import cast
 
@@ -186,7 +187,15 @@ def run(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _configure_process_stdio() -> None:
+    """Use the CLI's UTF-8 wire encoding on real process streams."""
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        if isinstance(stream, TextIOWrapper):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> None:
+    _configure_process_stdio()
     raise SystemExit(run(argv))
 
 

@@ -62,6 +62,8 @@ def _smoke_commands(venv_python: Path) -> list[list[str]]:
 
 
 def _validate_cli_json(python: Path) -> None:
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "cp1252"
     result = subprocess.run(
         [
             str(python),
@@ -69,15 +71,19 @@ def _validate_cli_json(python: Path) -> None:
             "polis.cli",
             "analyze",
             "--json",
-            "Zeby nauczyc sie polskiego.",
+            "Witaj,świecie.",
         ],
         text=True,
+        encoding="utf-8",
         capture_output=True,
         check=True,
+        env=env,
     )
     payload = json.loads(result.stdout)
     if "issues" not in payload or "text" not in payload:
         raise SystemExit("CLI JSON output missing required keys: issues/text")
+    if payload["text"] != "Witaj,świecie.":
+        raise SystemExit("CLI UTF-8 text changed under inherited CP1252 stdio")
 
 
 def _install_and_smoke(artifact: Path, venv_dir: Path) -> None:

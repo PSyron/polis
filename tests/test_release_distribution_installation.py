@@ -43,8 +43,16 @@ def _build_artifacts(dist: Path) -> tuple[Path, Path]:
     return wheels[0], sdists[0]
 
 
-def _run(command: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, text=True, capture_output=True, check=False)
+def _run(
+    command: list[str], *, env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        command,
+        text=True,
+        capture_output=True,
+        check=False,
+        env=env,
+    )
 
 
 def _smoke_install(venv_dir: Path, artifact: Path) -> None:
@@ -89,20 +97,27 @@ def _smoke_install(venv_dir: Path, artifact: Path) -> None:
     )
     assert api_check.returncode == 0, api_check.stderr + api_check.stdout
 
-    cli_run = _run(
+    legacy_stdio_env = os.environ.copy()
+    legacy_stdio_env["PYTHONIOENCODING"] = "cp1252"
+    cli_run = subprocess.run(
         [
             str(python),
             "-m",
             "polis.cli",
             "analyze",
             "--json",
-            "Jutro,powiem o tym jutro.",
-        ]
+            "Witaj,świecie.",
+        ],
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+        env=legacy_stdio_env,
     )
     assert cli_run.returncode == 0, cli_run.stderr + cli_run.stdout
     payload = json.loads(cli_run.stdout)
     assert "issues" in payload
-    assert "text" in payload
+    assert payload["text"] == "Witaj,świecie."
 
 
 def test_release_distribution_installation_path() -> None:
