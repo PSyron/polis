@@ -162,7 +162,7 @@ def test_analyze_text_merges_rules_and_llm_findings_with_offset_translation() ->
     assert result[1].end == 14
 
 
-def test_analyze_text_keeps_deterministic_findings_on_malformed_llm_response() -> None:
+def test_analyze_text_rejects_malformed_llm_response_by_default() -> None:
     registry = DeterministicRuleRegistry(
         (
             RuleRegistration(
@@ -183,17 +183,15 @@ def test_analyze_text_keeps_deterministic_findings_on_malformed_llm_response() -
         )
     )
 
-    result = analyze_text(
-        "To jest.\n\nZeby",
-        registry=registry,
-        local_backend=MalformedBackend(),
-    )
-
-    assert len(result) == 1
-    assert str(result[0].source) == "rule:test"
+    with pytest.raises(InvalidBackendResponseError):
+        analyze_text(
+            "To jest.\n\nZeby",
+            registry=registry,
+            local_backend=MalformedBackend(),
+        )
 
 
-def test_analyze_text_keeps_deterministic_findings_on_timeout_backend_failure() -> None:
+def test_analyze_text_rejects_timeout_backend_failure_by_default() -> None:
     registry = DeterministicRuleRegistry(
         (
             RuleRegistration(
@@ -214,13 +212,12 @@ def test_analyze_text_keeps_deterministic_findings_on_timeout_backend_failure() 
         )
     )
 
-    result = analyze_text(
-        "To jest.\n\nZeby",
-        registry=registry,
-        local_backend=TimeoutBackend(),
-    )
-
-    assert len(result) == 1
+    with pytest.raises(AnalysisTimeoutError):
+        analyze_text(
+            "To jest.\n\nZeby",
+            registry=registry,
+            local_backend=TimeoutBackend(),
+        )
 
 
 def test_analyze_text_without_llm_uses_only_deterministic_findings() -> None:
