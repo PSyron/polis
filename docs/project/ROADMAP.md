@@ -85,8 +85,11 @@ milestone.
 | M5-07 | #61 | Benchmark MLX and GGUF runtimes for the hybrid pipeline | #55, #57, #60 |
 | M5-08 | #62 | Prepare a licensed Polish correction fine-tuning dataset | #56; selected data shapes from #57 |
 | M5-09 | #63 | Benchmark an MLX QLoRA adapter for Bielik 1.5B | #57, #61, #62 |
-| M5-10 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63 |
-| M5-11 | #64 | Add the hybrid sentence and paragraph correction release gate | #43 and all preceding M5 issues |
+| M5-10 | #67 | Specify a two-pass constrained Qwen3.5 correction protocol | #58, #59, #60, #61, #63 |
+| M5-11 | #68 | Benchmark the constrained two-pass Qwen3.5 2B protocol | #67 |
+| M5-12 | #43 | Add the qualified production local model backend | #55, #56, #59, #60, #61, #63, #68 |
+| M5-13 | #64 | Add the hybrid sentence and paragraph correction release gate | #43 and all preceding M5 issues |
+| M5-14 | #66 | Perform final owner verification before first publication | #43, #64 and all preceding M5 issues |
 
 The primary dependency flow is:
 
@@ -95,13 +98,15 @@ The primary dependency flow is:
 After #56, prompt work (`#57 -> #59`) and morphology work (`#58`) may proceed
 independently. Both join at #60. Runtime evidence then proceeds through #61,
 while #62 prepares fine-tuning data from #56 and the selected #57 data shapes.
-Issues #61 and #62 join at #63. The production adapter #43 follows all of its
-recorded evidence and implementation dependencies, and #64 is the final M5
-release gate.
+Issues #61 and #62 join at #63. Because #63 rejected both its adapter and
+baseline, #67 freezes a two-pass constrained protocol and #68 evaluates the new
+small-model candidate. Only a passing #68 result permits the production adapter
+#43. Issue #64 is the installed-package release gate and #66 is the final owner
+verification.
 
 Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
-is a valid #63 outcome and does not block #43 from using a qualified prompt-only
-configuration.
+is a valid #63 outcome, but #43 cannot proceed until another exact configuration
+passes the accepted suggestion gates.
 
 ## Critical Path
 
@@ -109,6 +114,6 @@ M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 ->
 
 M5 policy and evidence path:
 
-`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #43 -> #64`
+`#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #43 -> #64 -> #66`
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.
