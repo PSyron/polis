@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added a build-once release-identity manifest, explicit publication checks, and
+  immutable tagged release-evidence verification. Historical 0.1.0 evidence is
+  restored to the tag; its published-asset digest correction is append-only.
 - Completed both commas for the two narrowly reviewed relative-clause and
   parenthetical-vocative sentence shapes without broadening the qualified
   LanguageTool source channel.
@@ -47,8 +50,6 @@
   pass clean installation smoke tests from both wheel and sdist.
 - No runtime dependencies were introduced; production distribution remains
   dependency-light.
-- Added a disabled-by-default local LanguageTool 6.8 punctuation layer with a
-  strict loopback endpoint policy and a reviewed two-rule allowlist.
 
 ### Known limitations
 

@@ -49,6 +49,20 @@ to another required job, such as POSIX executable-bit verification on Linux/macO
 - **Minor**: additive public symbols, additive enum values, safer validation messages, and new optional features.
 - **Major**: changes that break existing code using documented symbols (`polis.__all__` / `public API snapshots`) or serialized schema versions.
 
+## Release version policy
+
+Release selection uses SemVer's `MAJOR.MINOR.PATCH` line: a new additive Polis
+line after `0.1.0` is `0.2.0`. Python package metadata and artifacts use the
+corresponding canonical PEP 440 forms: normal development is `0.2.0.dev0`, a
+candidate is `0.2.0rcN`, and the stable package is `0.2.0`. Every selected
+package version has the exact matching Git tag `v<version>`; abbreviated,
+local-version, equal, and lower forms are rejected by the release verifier.
+
+`pyproject.toml` is the authoritative package-version source. The verifier
+requires that source metadata, artifact names, embedded wheel/sdist metadata,
+manifest, release-note heading, changelog heading, and requested tag describe
+one exact identity.
+
 ## Serialized data compatibility
 
 - Public analysis JSON is currently `schema_version = 1`.

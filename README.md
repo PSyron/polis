@@ -137,6 +137,10 @@ Unicode offset rules, validation failures, and schema compatibility. The
 [privacy and dependency audit](docs/privacy-audit.md) documents release-gate evidence.
 [Prerelease candidate checklist](docs/prerelease-candidate.md) documents the release-gate
 verification path.
+[Distribution verification](docs/distribution-verification.md) documents the
+build-once release identity and post-publication digest checks. The append-only
+[0.1.0 erratum](docs/release-notes/0.1.0-erratum.md) corrects published asset
+digest evidence without rewriting that release.
 The [protocol boundary](docs/architecture/protocols.md) documents how richer
 orchestrators and adapter variants should be wired around the stable contracts.
 [Changelog](CHANGELOG.md) tracks release history and [release notes](docs/release-notes/0.1.0.md)
@@ -191,6 +195,7 @@ tools, each permitted by ADR-0001:
 | `build` | 1.3.0 | Build wheel and source-distribution artifacts. | MIT is on the approved allowlist. |
 | `hatchling` | 1.27.0 | Build backend used from the locked environment. | MIT is on the approved allowlist. |
 | `mypy` | 2.3.0 | Run strict static type checks. | MIT is on the approved allowlist. |
+| `packaging` | 26.2 | Parse and compare PEP 440 release identities in developer-only release tooling. | Apache-2.0 OR BSD-2-Clause is on the approved allowlist. |
 | `pytest` | 9.0.0 | Run the test suite. | MIT is on the approved allowlist. |
 | `ruff` | 0.15.0 | Lint and format Python files. | MIT is on the approved allowlist. |
 

@@ -14,6 +14,19 @@ python scripts/verify_distribution_artifacts.py --dist dist
 
 `python -m build` must emit exactly one wheel and one source archive.
 
+After the build and before any upload, create one immutable manifest from those
+exact two files:
+
+```console
+python scripts/release_identity.py manifest \
+  --source-commit "$(git rev-parse HEAD)" --dist dist \
+  --output dist/release-manifest.json
+```
+
+The command rejects artifacts whose filename or embedded package metadata does
+not equal the canonical `pyproject.toml` version. It records each SHA-256 in the
+manifest; do not run another build before upload.
+
 ## Artifact metadata and content checks
 
 - Verify metadata keys:
@@ -79,3 +92,19 @@ for name in sorted(Path('dist').glob('*')):
     print(f"{name.name} {digest}")
 PY
 ```
+
+Upload only the two files listed in `dist/release-manifest.json`. After GitHub
+Release and package-index publication, obtain the reported artifact digests in
+a JSON object mapping filename to lowercase SHA-256, then compare them with the
+same manifest:
+
+```console
+python scripts/release_identity.py verify-published \
+  --manifest dist/release-manifest.json \
+  --published-digests published-digests.json
+```
+
+The comparison requires an exact filename/digest set. A mismatch is an
+append-only release incident: do not move a tag or replace a published asset.
+Record an erratum that cites the immutable tag and the published digests instead.
+`docs/release-notes/0.1.0-erratum.md` is the precedent for this procedure.

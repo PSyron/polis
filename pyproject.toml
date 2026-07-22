@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "polis-nlp"
-version = "0.1.0"
+version = "0.2.0.dev0"
 description = "Offline Polish text analysis and minimal correction library."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -29,8 +29,9 @@ dependencies = []
 dev = [
   "build>=1.3.0",
   "hatchling>=1.27.0",
-  "mypy>=2.3.0",
-  "pytest>=9.0.0",
+    "mypy>=2.3.0",
+    "packaging>=26.2",
+    "pytest>=9.0.0",
   "ruff>=0.15.0",
 ]
 
