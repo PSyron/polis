@@ -35,6 +35,12 @@
   produced no edits and could not establish non-vacuous precision. The sources
   are not automatically applied, do not generalize to other reflexive verbs or
   word-order defects, and abstain on multi-sentence input.
+- The corpus-v3 installed-package sentence safety gate did not qualify and its
+  one-shot holdout is consumed. Issue #114 prepares the independent CC0-1.0
+  `polis_polish_correction_safety_corpus_v1`. Paweł Cyroń reviewed all 240 cases
+  and the corpus is frozen, but issue #114 produces no holdout score. The new
+  corpus does not replace corpus v3 or the broader corpus work tracked by #85;
+  a follow-up issue owns the one-shot re-qualification run.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

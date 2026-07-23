@@ -58,3 +58,19 @@ these M5 gates. ADR-0014 later qualified four exact LanguageTool rule IDs and
 source-policy version `1.1` integrates the resulting five-ID allowlist. A model
 adapter may proceed only after its exact prompt, runtime, model, and source
 policies pass their applicable gates.
+
+## Sentence safety re-qualification corpus
+
+Issue #114 introduces `polis_polish_correction_safety_corpus_v1` because the
+corpus-v3 one-shot holdout was consumed by a failed gate and cannot be repaired,
+rerun, or redrawn for re-qualification. The new 240-case CC0-1.0 corpus is
+independent from corpus v3, fine-tuning assets, prompt examples, and E2E data.
+Paweł Cyroń reviewed all cases on 2026-07-22 and the corpus is `frozen` with
+canonical JSON SHA-256
+`2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982`.
+
+No quality gate may select its 160 holdout cases before the frozen state, and
+no development path may load their gold answers. The frozen digest above was
+recorded before first access. Issue #114 itself performs no gate and
+produces no holdout score; a follow-up issue owns the one-shot run. This corpus
+does not replace corpus v3 and does not overlap the broader corpus work in #85.
