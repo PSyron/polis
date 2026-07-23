@@ -74,3 +74,18 @@ no development path may load their gold answers. The frozen digest above was
 recorded before first access. Issue #114 itself performs no gate and
 produces no holdout score; a follow-up issue owns the one-shot run. This corpus
 does not replace corpus v3 and does not overlap the broader corpus work in #85.
+
+Issue #115 qualified the installed-package 80-case development phase on
+2026-07-23. Automatic edits scored `10 TP / 0 FP`, precision `1.00`, and
+correction accuracy `1.00`; reviewable edits scored `18 TP / 0 FP`, precision
+`1.00`, and correction accuracy `1.00`. Structured outcome validity was `1.00`
+and both protected-negative counts were zero. The exact development-report and
+artifact hashes are retained in the experiment's `frozen_gate.json`. The
+160-case holdout was then authorized, reserved, and executed exactly once on
+2026-07-23. Automatic edits scored `11 TP / 0 FP`, precision `1.00`, and
+correction accuracy `1.00`. Reviewable edits scored `0 TP / 2 FP`, precision
+`0.00`, and correction accuracy `1.00`; therefore the required reviewable
+precision `0.90` did not pass. Structured validity remained `1.00`, protected
+counts remained zero, and all privacy/performance gates passed. The retained
+marker makes the holdout permanently consumed, the overall decision is not
+qualified, and #76 remains open.

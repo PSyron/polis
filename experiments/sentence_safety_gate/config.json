@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis-installed-sentence-safety-gate-v1",
+  "sentence_only": true,
+  "source_policy_version": "1.1",
+  "corpus": {
+    "id": "polis_polish_correction_safety_corpus_v1",
+    "canonical_digest": "2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982",
+    "json_path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v1.json",
+    "json_sha256": "921ce0accd120e443a9131f192b8669484d4dd24bf18898fbd2ebcafbe1a87d9",
+    "xml_path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v1.xml",
+    "xml_sha256": "f2fcefef2172efcf3e27338bacc106230cde48b37c3c6989a4803bddc8dcc908"
+  },
+  "sources": {
+    "automatic": [
+      "rule:agreement.copula",
+      "rule:languagetool.pl",
+      "rule:spelling.jestes",
+      "rule:spelling.wlasnie",
+      "rule:spelling.zeby",
+      "rule:syntax.comma_space",
+      "rule:syntax.list_space",
+      "rule:syntax.quote_space",
+      "rule:syntax.sentence_space"
+    ],
+    "reviewable": [
+      "rule:languagetool.contextual_inflection",
+      "rule:syntax.missing_correlative",
+      "rule:syntax.missing_reflexive"
+    ]
+  },
+  "language_tool": {
+    "version": "6.8",
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6",
+    "manifest_sha256": "d5871e8173addb96cc93e2f8ce6833737f08a20c4fc47e99596b4d82b8f3f6e8",
+    "bridge_sha256": "c946c3ddfab36e45dab1716ca66ccfd61d0a6bfaa14b2e69926cb1b3da964c3d",
+    "runner_sha256": "32b2d9bccdfccd1efc94939530de70f05040295861509b72b8b91752435b2fca",
+    "artifact_sha256": "6959bbebad93c028552c21bae4d2524a0c08d09c1753c9a3fdf646ec1d645421",
+    "dependencies_sha256": "de97bed1193abbed914ef23dd99757204aa3bcef29d3cfa8f1ea485178566a99"
+  },
+  "gates": {
+    "automatic_minimum_precision": 1.0,
+    "automatic_minimum_correction_accuracy": 1.0,
+    "reviewable_minimum_precision": 0.9,
+    "minimum_structured_outcome_validity": 1.0,
+    "maximum_protected_automatic_changes": 0,
+    "maximum_protected_reviewable_findings": 0,
+    "maximum_warm_in_process_p95_ms": 100.0,
+    "maximum_warm_e2e_p95_ms": 500.0,
+    "maximum_combined_peak_rss_bytes": 1073741824,
+    "maximum_swap_delta_bytes": 0,
+    "maximum_socket_count": 0,
+    "required_model_calls": 0,
+    "required_process_start_count": 1,
+    "required_stable_repetitions": 2
+  }
+}

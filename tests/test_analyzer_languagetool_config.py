@@ -68,6 +68,22 @@ def _replace_owned_session(
     )
 
 
+def test_analyzer_exposes_only_owned_language_tool_process_start_count(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    session = LocalLanguageToolStdioSession(("unused",), timeout_seconds=1.0)
+    _replace_owned_session(monkeypatch, session)
+    analyzer = Analyzer(
+        AnalyzerConfig(
+            vendored_language_tool_stdio_path=str(Path(sys.executable).resolve())
+        )
+    )
+
+    assert analyzer.language_tool_process_start_count == 0
+    session.process_start_count = 1
+    assert analyzer.language_tool_process_start_count == 1
+
+
 def test_toml_path_fixture_preserves_windows_backslashes() -> None:
     path = PureWindowsPath("C:/Users/Paweł/LanguageTool/run_stdio.cmd")
 

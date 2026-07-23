@@ -456,6 +456,13 @@ class Analyzer:
     def from_config(cls, path: str | Path) -> Analyzer:
         return cls(AnalyzerConfig.from_config(path))
 
+    @property
+    def language_tool_process_start_count(self) -> int:
+        """Return starts of the analyzer-owned vendored LanguageTool process."""
+
+        session = self._owned_language_tool_session
+        return 0 if session is None else session.process_start_count
+
     def analyze(
         self,
         text: str,
