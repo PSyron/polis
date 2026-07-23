@@ -36,11 +36,20 @@
   are not automatically applied, do not generalize to other reflexive verbs or
   word-order defects, and abstain on multi-sentence input.
 - The corpus-v3 installed-package sentence safety gate did not qualify and its
-  one-shot holdout is consumed. Issue #114 prepares the independent CC0-1.0
-  `polis_polish_correction_safety_corpus_v1`. Paweł Cyroń reviewed all 240 cases
-  and the corpus is frozen, but issue #114 produces no holdout score. The new
-  corpus does not replace corpus v3 or the broader corpus work tracked by #85;
-  a follow-up issue owns the one-shot re-qualification run.
+  one-shot holdout is consumed. The independent CC0-1.0
+  `polis_polish_correction_safety_corpus_v1` is frozen and owner-reviewed. Issue
+  #115 qualified its 80-case development split, then executed the independent
+  160-case holdout exactly once. The holdout failed: automatic precision and
+  correction accuracy were `1.00`, but the reviewable channel produced `0 TP /
+  2 FP` and precision `0.00` against the required `0.90`. The holdout is
+  consumed and cannot be rerun or used for tuning. The corpus does not replace
+  corpus v3 or the broader work tracked by #85, and #76 remains open.
+- The development-qualified nominal-agreement extension is reviewable only. It
+  covers a narrowly morphology-confirmed feminine accusative pattern and
+  abstains when case cannot be distinguished from the surface or the local
+  bridge does not support the part of speech. Development reviewable inflection
+  recall is `18/20`; collective and quantifying subject agreement remains
+  unsupported.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

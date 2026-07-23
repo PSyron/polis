@@ -81,3 +81,46 @@ The frozen gates were warm p95 at most 500 ms, combined RSS at most 1 GiB,
 zero swap growth, zero sockets, one process, and repeatable findings for all 69
 cases. This sentence-only local transport qualified. It does not establish
 paragraph quality or broad Polish grammar coverage.
+
+## Installed sentence safety development checkpoint (#115)
+
+Date: `2026-07-23`. The fresh-wheel development run processed 80 independent
+sentence cases twice on `macOS-15.3.1-arm64` with CPython 3.13.12 and the pinned
+LanguageTool 6.8 runtime.
+
+| Metric | Measured result |
+| --- | ---: |
+| Cold installed request | `1,027.75 ms` |
+| Warm in-process p50 / p95 | `5.30 / 11.47 ms` |
+| Warm installed-runner p50 / p95 | `5.46 / 11.59 ms` |
+| Throughput | `79.87` cases/second |
+| Character throughput | `4,983.95` characters/second |
+| Combined loaded/peak RSS | `380,190,720 bytes` |
+| Process starts | `1` |
+| Network sockets | `0` |
+| Swap growth | `0 bytes` |
+| Model calls | `0` |
+| Stable repetitions | `2` |
+
+All development performance and privacy gates qualified. The one-shot holdout
+was subsequently executed once and did not qualify on reviewable precision.
+
+### One-shot holdout performance
+
+| Metric | Measured result |
+| --- | ---: |
+| Cases | `160` |
+| Cold installed request | `950.21 ms` |
+| Warm in-process p50 / p95 | `5.31 / 7.65 ms` |
+| Warm installed-runner p50 / p95 | `5.49 / 7.77 ms` |
+| Throughput | `114.96` cases/second |
+| Character throughput | `7,071.03` characters/second |
+| Combined loaded/peak RSS | `415,662,080 bytes` |
+| Process starts | `1` |
+| Network sockets | `0` |
+| Swap growth | `0 bytes` |
+| Model calls | `0` |
+| Stable repetitions | `2` |
+
+Every holdout performance and privacy threshold passed. These measurements do
+not override the failed reviewable precision gate.

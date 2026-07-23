@@ -219,7 +219,9 @@ The separate `.approval.json` manifest binds that attribution and the
 generator cannot create owner-review metadata on its own. Before writing JSON
 or XML, it checks corpus v3, fine-tuning data, prompt examples, and both E2E
 representations for leakage.
-Issue #114 performs no gate access and produces no holdout score.
+Issue #114 performed no gate access. Issue #115 later reserved and evaluated
+the 160-case holdout exactly once on 2026-07-23. The holdout did not qualify and
+is permanently consumed; it must not be rerun or used for tuning.
 
 Run the candidate integrity and leakage checks with:
 

@@ -107,3 +107,43 @@ Known limitations:
 
 - `llm` source is currently deterministic and returns no additional structured findings for this seed dataset.
 - `syntax` and `spelling` coverage is intentionally minimal and should be expanded in later roadmap items to raise recall.
+
+## Independent sentence safety development checkpoint (#115)
+
+Date: `2026-07-23`. The installed-package evaluator ran the 80-case development
+split of `polis_polish_correction_safety_corpus_v1` twice from fresh audited
+wheel and sdist artifacts. The development decision qualified; the independent
+160-case holdout remains unopened and has no score.
+
+| Channel | TP | FP | FN | Precision | Correction accuracy | Recall |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Automatic | `10` | `0` | `50` | `1.00` | `1.00` | `0.1667` |
+| Reviewable | `18` | `0` | `42` | `1.00` | `1.00` | `0.3000` |
+
+Reviewable inflection recall was `18/20` (`0.90`); automatic punctuation recall
+was `10/20` (`0.50`). Syntax produced no proposal and therefore has undefined
+channel precision rather than a vacuous pass. Structured outcome validity was
+`1.00`; protected hard negatives had zero automatic changes and zero
+reviewable findings.
+
+The exact privacy-safe metrics and frozen identities are retained in
+`experiments/sentence_safety_gate/report.json` and `frozen_gate.json`.
+
+### One-shot holdout verdict
+
+The 160-case holdout was reserved and evaluated exactly once on `2026-07-23`.
+It did not qualify:
+
+| Channel | TP | FP | FN | Precision | Correction accuracy | Recall |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Automatic | `11` | `0` | `109` | `1.00` | `1.00` | `0.0917` |
+| Reviewable | `0` | `2` | `120` | `0.00` | `1.00` | `0.0000` |
+
+Automatic safety, structured validity, protected-negative, privacy,
+performance, stability, and artifact gates passed. The reviewable precision
+gate failed because both proposed reviewable edits were false positives. The
+holdout marker is retained and this holdout cannot be rerun or used for
+tuning. Issue #76 remains open.
+
+The final report canonical SHA-256 is
+`ec43b1691a6d4a348ecd1ce01cd537cf7fac32ae5e9f7d52cf49d20ca2adb706`.

@@ -215,6 +215,40 @@ def test_analyzer_uses_real_context_synthesis_as_reviewable_sentence_suggestion(
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
+    ("source", "suggestion", "expected"),
+    [
+        ("Widzę ten książkę.", "ę", "Widzę tę książkę."),
+        ("Widzę ciężki skrzynię.", "ą", "Widzę ciężką skrzynię."),
+    ],
+)
+def test_analyzer_uses_real_morphology_for_feminine_accusative_agreement(
+    source: str,
+    suggestion: str,
+    expected: str,
+) -> None:
+    if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
+        pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
+    analyzer = Analyzer(
+        AnalyzerConfig(
+            contextual_inflection_stdio_path=os.fspath(RUNNER.resolve()),
+            contextual_inflection_timeout_seconds=30.0,
+        )
+    )
+
+    result = analyzer.correct(source)
+
+    finding = next(
+        item
+        for item in result.skipped_findings
+        if str(item.source) == "rule:languagetool.contextual_inflection"
+    )
+    assert result.corrected_text == source
+    assert finding.suggestion == suggestion
+    assert result.apply_suggestions((finding.id,)) == expected
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
     ("source", "expected_suggestions"),
     [
         ("Wróciła bez ciepła kurtka.", {"ciepłej", "kurtki"}),

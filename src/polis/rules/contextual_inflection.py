@@ -29,6 +29,7 @@ EvidenceKind = Literal[
     "bez_government",
     "reflexive_dative",
     "gratitude_dative",
+    "feminine_accusative_agreement",
 ]
 
 _SOURCE = Source(SourceKind.RULE, "languagetool.contextual_inflection")
@@ -262,6 +263,21 @@ def _detect_evidence(source: str) -> tuple[_Evidence, ...]:
                     None,
                 )
             )
+        if (
+            _space_only(source, left.end, right.start)
+            and right.surface.casefold().endswith("ę")
+            and (
+                left.surface.casefold() == "ten"
+                or left.surface.casefold().endswith(("i", "y"))
+            )
+        ):
+            evidence.add(
+                _Evidence(
+                    "feminine_accusative_agreement",
+                    ((left.start, left.end), (right.start, right.end)),
+                    "acc",
+                )
+            )
     for index, token in enumerate(tokens):
         lowered = token.surface.casefold()
         if lowered == "bez":
@@ -409,6 +425,8 @@ def _rank(
         return _rank_government(source, evidence, results)
     if evidence.kind == "gratitude_dative" and evidence.desired_case is not None:
         return _rank_single(source, evidence, results[0], evidence.desired_case)
+    if evidence.kind == "feminine_accusative_agreement":
+        return _rank_feminine_accusative_agreement(source, evidence, results)
     return ()
 
 
@@ -475,6 +493,43 @@ def _rank_single(
         False,
     )
     return _proposal(source, evidence, result, candidate)
+
+
+def _rank_feminine_accusative_agreement(
+    source: str,
+    evidence: _Evidence,
+    results: tuple[_SpanResult, ...],
+) -> tuple[_Proposal, ...]:
+    if len(results) != 2:
+        return ()
+    target, head = results
+    cases = frozenset({"acc"})
+    numbers = frozenset({"sg"})
+    genders = frozenset({"f"})
+    if not _surface_matches(
+        head,
+        cases,
+        numbers,
+        genders,
+        frozenset({"subst"}),
+        False,
+    ):
+        return ()
+    if not any(
+        item.form == target.surface
+        and any("adj" in features for features in _tag_features(item))
+        for item in target.candidates
+    ):
+        return ()
+    candidate = _unique_candidate(
+        target,
+        cases,
+        numbers,
+        genders,
+        frozenset({"adj"}),
+        True,
+    )
+    return _minimal_proposal(source, evidence, target, candidate)
 
 
 def _unique_candidate(
@@ -570,6 +625,44 @@ def _proposal(
             result.end,
             source[result.start : result.end],
             candidate.form,
+            candidate.candidate_id,
+            evidence.kind,
+        ),
+    )
+
+
+def _minimal_proposal(
+    source: str,
+    evidence: _Evidence,
+    result: _SpanResult,
+    candidate: _Candidate | None,
+) -> tuple[_Proposal, ...]:
+    if candidate is None or candidate.form == result.surface:
+        return ()
+    prefix = 0
+    while (
+        prefix < len(result.surface)
+        and prefix < len(candidate.form)
+        and result.surface[prefix] == candidate.form[prefix]
+    ):
+        prefix += 1
+    original_end = len(result.surface)
+    suggestion_end = len(candidate.form)
+    while (
+        original_end > prefix
+        and suggestion_end > prefix
+        and result.surface[original_end - 1] == candidate.form[suggestion_end - 1]
+    ):
+        original_end -= 1
+        suggestion_end -= 1
+    start = result.start + prefix
+    end = result.start + original_end
+    return (
+        _Proposal(
+            start,
+            end,
+            source[start:end],
+            candidate.form[prefix:suggestion_end],
             candidate.candidate_id,
             evidence.kind,
         ),
