@@ -206,9 +206,12 @@ def _outcome_payload(outcome: object) -> dict[str, object]:
 
 
 def _self_peak_rss_bytes() -> int:
+    if sys.platform == "win32":
+        return 0
+
     import resource
 
-    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    peak = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     return peak if sys.platform == "darwin" else peak * 1024
 
 

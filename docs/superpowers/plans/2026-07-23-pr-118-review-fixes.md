@@ -162,6 +162,13 @@ uv run pytest tests/test_sentence_safety_runner.py -q
 
 Expected on macOS arm64: all tests PASS. Windows CI should skip only the native reuse test.
 
+- [x] **Step 4: Keep the runner type-safe on Windows**
+
+Run `mypy --platform win32` against the runner, reproduce the unavailable
+`resource.getrusage` API, and return zero runner-local RSS before importing the
+POSIX-only module. The macOS evaluator replaces runner-local RSS with its
+process-tree measurement, so this fallback changes no retained evidence.
+
 ### Task 5: Correct evidence documentation
 
 **Files:**
