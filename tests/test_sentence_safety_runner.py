@@ -88,6 +88,10 @@ def _exchange(
     return cast(dict[str, Any], payload)
 
 
+@pytest.mark.skipif(
+    os.name != "posix",
+    reason="native runner fixture requires POSIX resource and executable semantics",
+)
 def test_runner_reuses_one_analyzer_for_multiple_sentence_requests(
     tmp_path: Path,
 ) -> None:

@@ -44,12 +44,12 @@
   2 FP` and precision `0.00` against the required `0.90`. The holdout is
   consumed and cannot be rerun or used for tuning. The corpus does not replace
   corpus v3 or the broader work tracked by #85, and #76 remains open.
-- The development-qualified nominal-agreement extension is reviewable only. It
-  covers a narrowly morphology-confirmed feminine accusative pattern and
-  abstains when case cannot be distinguished from the surface or the local
-  bridge does not support the part of speech. Development reviewable inflection
-  recall is `18/20`; collective and quantifying subject agreement remains
-  unsupported.
+- The evaluated nominal-agreement extension reached reviewable inflection
+  recall `18/20` on development, but the complete reviewable source produced
+  `0 TP / 2 FP` on the one-shot holdout. The extension was therefore removed
+  from active runtime after the verdict. No replacement was selected or tuned
+  against the consumed records; collective and quantifying subject agreement
+  remains unsupported.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

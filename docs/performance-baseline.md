@@ -90,12 +90,12 @@ LanguageTool 6.8 runtime.
 
 | Metric | Measured result |
 | --- | ---: |
-| Cold installed request | `1,027.75 ms` |
-| Warm in-process p50 / p95 | `5.30 / 11.47 ms` |
-| Warm installed-runner p50 / p95 | `5.46 / 11.59 ms` |
-| Throughput | `79.87` cases/second |
-| Character throughput | `4,983.95` characters/second |
-| Combined loaded/peak RSS | `380,190,720 bytes` |
+| Cold installed request | `973.83 ms` |
+| Warm in-process p50 / p95 | `5.41 / 10.68 ms` |
+| Warm installed-runner p50 / p95 | `5.67 / 11.25 ms` |
+| Throughput | `81.89` cases/second |
+| Character throughput | `5,110.02` characters/second |
+| Combined loaded/peak RSS | `376,569,856 bytes` |
 | Process starts | `1` |
 | Network sockets | `0` |
 | Swap growth | `0 bytes` |

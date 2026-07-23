@@ -215,16 +215,11 @@ def test_analyzer_uses_real_context_synthesis_as_reviewable_sentence_suggestion(
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    ("source", "suggestion", "expected"),
-    [
-        ("Widzę ten książkę.", "ę", "Widzę tę książkę."),
-        ("Widzę ciężki skrzynię.", "ą", "Widzę ciężką skrzynię."),
-    ],
+    "source",
+    ["Widzę ten książkę.", "Widzę ciężki skrzynię."],
 )
-def test_analyzer_uses_real_morphology_for_feminine_accusative_agreement(
+def test_analyzer_abstains_from_rejected_feminine_accusative_agreement(
     source: str,
-    suggestion: str,
-    expected: str,
 ) -> None:
     if os.environ.get("POLIS_LT_VENDOR_INTEGRATION") != "1":
         pytest.skip("set POLIS_LT_VENDOR_INTEGRATION=1 after building the module")
@@ -237,14 +232,11 @@ def test_analyzer_uses_real_morphology_for_feminine_accusative_agreement(
 
     result = analyzer.correct(source)
 
-    finding = next(
-        item
-        for item in result.skipped_findings
-        if str(item.source) == "rule:languagetool.contextual_inflection"
-    )
     assert result.corrected_text == source
-    assert finding.suggestion == suggestion
-    assert result.apply_suggestions((finding.id,)) == expected
+    assert all(
+        str(item.source) != "rule:languagetool.contextual_inflection"
+        for item in result.skipped_findings
+    )
 
 
 @pytest.mark.slow

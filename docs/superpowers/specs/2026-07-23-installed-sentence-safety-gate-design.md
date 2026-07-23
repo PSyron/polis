@@ -62,10 +62,12 @@ exactly 160 reviewed holdout cases for the scorer.
 
 ## Installed runner
 
-Fresh wheel and sdist artifacts are built from the exact #115 commit. Their
-contents are audited before use, installed offline into clean environments, and
-smoke-tested outside the repository. The persistent wheel-installed runner
-constructs one `Analyzer` and exercises:
+Fresh wheel and sdist artifacts are built from the immutable #115 evaluation
+snapshot recorded in `evaluated_source.json`. Their contents are audited before
+use, installed offline into clean environments, and smoke-tested outside the
+repository. Final evidence documentation and conservative post-verdict
+maintenance are not represented as evaluated artifact contents. The persistent
+wheel-installed runner constructs one `Analyzer` and exercises:
 
 - `Analyzer.analyze()`;
 - `Analyzer.correct()`;
@@ -157,6 +159,14 @@ wheel and sdist artifacts are built and the full 80-case development gate is
 run again. Only a qualifying report may be frozen; holdout access still
 requires the separate owner checkpoint.
 
+### Post-verdict disposition
+
+The one-shot holdout later rejected the complete reviewable source with `0 TP /
+2 FP`. The nominal-agreement extension was therefore removed from active
+runtime without selecting a replacement or inspecting the consumed records for
+tuning. The evaluated commit, tree, and distribution hashes remain separately
+recorded so the negative result is not attributed to the post-verdict runtime.
+
 ## Explicit owner checkpoint
 
 After a qualifying development report and frozen-gate record exist, execution
@@ -173,7 +183,11 @@ After explicit owner authorization, holdout execution revalidates every frozen
 input and recomputes the development decision rather than trusting a serialized
 boolean. It repeats all unavoidable native preflight checks, then creates the
 new holdout marker atomically and durably before materializing any holdout
-record.
+record. Reusable post-verdict maintenance flushes and fsyncs the marker and its
+parent directory on the POSIX release profile. The evaluated snapshot used
+exclusive creation but did not perform those durability syscalls; its marker
+was nevertheless retained before materialization and remains consumed. This
+maintenance must not be used to rerun that holdout.
 
 An existing marker, mismatched hash, failed preflight, or changed report fails
 closed. The marker is retained whether evaluation passes, fails, or is

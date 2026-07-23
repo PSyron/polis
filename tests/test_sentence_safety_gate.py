@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any, cast
 
@@ -39,6 +40,9 @@ SAFETY_XML = (
 REAL_MARKER = ROOT / "experiments" / "sentence_safety_gate" / "holdout.started"
 FROZEN_GATE = ROOT / "experiments" / "sentence_safety_gate" / "frozen_gate.json"
 FINAL_REPORT = ROOT / "experiments" / "sentence_safety_gate" / "report.json"
+EVALUATED_SOURCE = (
+    ROOT / "experiments" / "sentence_safety_gate" / "evaluated_source.json"
+)
 CONFIG = ROOT / "experiments" / "sentence_safety_gate" / "config.json"
 
 
@@ -79,6 +83,28 @@ def test_real_holdout_marker_retains_the_failed_one_shot_verdict() -> None:
     assert isinstance(holdout, dict)
     assert holdout["total_cases"] == 160
     assert holdout["decision"] == {"qualified": False}
+
+
+def test_evaluated_source_provenance_matches_frozen_artifacts() -> None:
+    provenance = json.loads(EVALUATED_SOURCE.read_text(encoding="utf-8"))
+    frozen = json.loads(FROZEN_GATE.read_text(encoding="utf-8"))
+
+    assert set(provenance) == {
+        "evaluated_commit",
+        "evaluated_tree",
+        "post_verdict_changes_are_not_evaluated",
+        "schema_version",
+        "sdist_sha256",
+        "wheel_sha256",
+    }
+    assert provenance["schema_version"] == 1
+    assert provenance["evaluated_commit"] == (
+        "24cda9ae664bcdf9d486ae713ad426257e614085"
+    )
+    assert provenance["evaluated_tree"] == ("f42ff0b8ccb5a4241c10be2dcd1a0c8976a635b8")
+    assert provenance["wheel_sha256"] == frozen["wheel_sha256"]
+    assert provenance["sdist_sha256"] == frozen["sdist_sha256"]
+    assert provenance["post_verdict_changes_are_not_evaluated"] is True
 
 
 def test_committed_configuration_targets_only_the_safety_corpus() -> None:
@@ -169,6 +195,31 @@ def test_holdout_reservation_is_atomic_and_cannot_repeat(tmp_path: Path) -> None
             inputs,
             development_report=report,
         )
+
+
+def test_holdout_reservation_is_durable_before_returning(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "source.py"
+    source.write_text("frozen\n", encoding="utf-8")
+    frozen_path = tmp_path / "frozen.json"
+    marker = tmp_path / "holdout.started"
+    inputs = FreezeInputs(files={"source": source}, directories={})
+    report = {"development": {"decision": "qualified"}}
+    freeze_gate(inputs, frozen_path, development_report=report)
+    fsynced: list[int] = []
+    monkeypatch.setattr(os, "fsync", fsynced.append)
+
+    reserve_holdout_once(
+        frozen_path,
+        marker,
+        inputs,
+        development_report=report,
+    )
+
+    expected_calls = 2 if os.name == "posix" else 1
+    assert len(fsynced) == expected_calls
 
 
 def test_holdout_loader_rejects_access_before_marker(tmp_path: Path) -> None:

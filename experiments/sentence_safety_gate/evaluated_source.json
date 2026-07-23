@@ -1,0 +1,8 @@
+{
+  "evaluated_commit": "24cda9ae664bcdf9d486ae713ad426257e614085",
+  "evaluated_tree": "f42ff0b8ccb5a4241c10be2dcd1a0c8976a635b8",
+  "post_verdict_changes_are_not_evaluated": true,
+  "schema_version": 1,
+  "sdist_sha256": "4854ed6312f9268a4148310ac02d663563023564545359add98244815a9e4c5e",
+  "wheel_sha256": "a673bf4300ee91fd9b35aaa9d7eb0308a88cf4ba1d36d3d0cffc891a55dc6331"
+}

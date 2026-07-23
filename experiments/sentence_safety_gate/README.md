@@ -11,6 +11,20 @@ The runner exercises the public `Analyzer.analyze()`, `Analyzer.correct()`, and
 Gold edits remain in the repository-side scorer and are never sent to the
 installed process.
 
+## Evaluated source boundary
+
+`evaluated_source.json` binds the frozen wheel and sdist to commit
+`24cda9ae664bcdf9d486ae713ad426257e614085` and tree
+`f42ff0b8ccb5a4241c10be2dcd1a0c8976a635b8`. That immutable snapshot produced
+the development and one-shot results retained here.
+
+The final marker, report, documentation, CI portability fix, durable-reservation
+maintenance, and removal of the rejected nominal-agreement extension are
+post-verdict changes. They are deliberately not represented as holdout-tested
+behavior. `frozen_gate.json`, `holdout.started`, and `report.json` remain the
+unaltered evidence from the consumed run; the holdout must not be loaded or run
+again.
+
 ## Development phase
 
 Build the vendored runtime without network access:
@@ -81,3 +95,7 @@ the marker raw SHA-256 is
 `198371e64acb4fe04c8b2ae962e172b37e61ef3149b2d832c97175bde10f4d82`.
 The holdout is consumed and must not be rerun or used for tuning. Issue #76
 remains open.
+
+The nominal-agreement extension evaluated by this snapshot was removed from
+active runtime after the failed verdict. This preserves the negative evidence
+without promoting the rejected behavior.

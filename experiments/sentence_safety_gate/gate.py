@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import xml.sax
 from collections.abc import Callable, Mapping
@@ -529,8 +530,17 @@ def reserve_holdout_once(
                 separators=(",", ":"),
             )
             marker.write("\n")
+            marker.flush()
+            os.fsync(marker.fileno())
     except FileExistsError as error:
         raise FileExistsError("holdout run is already reserved") from error
+    if os.name == "posix":
+        flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+        directory = os.open(marker_path.parent, flags)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
 
 
 def validate_privacy_safe_report(raw: object) -> Mapping[str, object]:

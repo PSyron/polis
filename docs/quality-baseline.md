@@ -113,7 +113,7 @@ Known limitations:
 Date: `2026-07-23`. The installed-package evaluator ran the 80-case development
 split of `polis_polish_correction_safety_corpus_v1` twice from fresh audited
 wheel and sdist artifacts. The development decision qualified; the independent
-160-case holdout remains unopened and has no score.
+160-case holdout remained unopened and had no score at that checkpoint.
 
 | Channel | TP | FP | FN | Precision | Correction accuracy | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -144,6 +144,12 @@ performance, stability, and artifact gates passed. The reviewable precision
 gate failed because both proposed reviewable edits were false positives. The
 holdout marker is retained and this holdout cannot be rerun or used for
 tuning. Issue #76 remains open.
+
+The evaluated nominal-agreement extension was removed from active runtime after
+this verdict. That removal is a conservative release decision, not holdout
+tuning; no replacement behavior was selected or evaluated against the consumed
+records. `evaluated_source.json` identifies the immutable source snapshot that
+produced the frozen artifacts and report.
 
 The final report canonical SHA-256 is
 `ec43b1691a6d4a348ecd1ce01cd537cf7fac32ae5e9f7d52cf49d20ca2adb706`.
