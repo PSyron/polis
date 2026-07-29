@@ -178,4 +178,33 @@ M5 policy, evidence, and release path:
 GitHub-metadata synchronization and is intentionally outside the product
 critical path.
 
+## Runtime-first product and research boundary
+
+The supported product release is the small offline runtime under `src/polis`.
+Its release gates cover runtime safety, packaging and artifact contents, public
+contracts and serialization, privacy, Unicode half-open offsets, deterministic
+behavior, and conservative correction policy. These gates must remain
+verifiable without a model, model server, Java process, network, holdout, or
+research corpus.
+
+Model qualification, majority-coverage experiments, corpus construction,
+recorded qualification replay, and installed-package evidence remain valuable
+repository research and release evidence. They do not become runtime features
+merely because their issues are on the M5 tracker, and an unqualified model
+must not be described as production-ready. Consumed holdouts, reports, and
+results remain unchanged and are never rerun or tuned against for roadmap
+reconciliation.
+
+M6 internal architecture work (#96-#99) is future product engineering outside
+the immediate release critical path; it is not an implicit dependency of the
+runtime release. #84 and #95 remain product-facing policy/invariant work. The
+research/evidence issues (#76, #85-#90, #92, #93, and #119) document evidence
+and release authorization boundaries rather than missing default-runtime
+capabilities.
+
+Paragraph adapters, GUI integrations, document adapters, cloud services,
+free-form model rewriting, and stylistic rewriting remain out of scope. The
+roadmap preserves the existing issue acceptance criteria and dependencies;
+this section only makes their product-versus-research role explicit.
+
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.
