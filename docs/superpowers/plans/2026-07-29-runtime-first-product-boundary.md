@@ -17,6 +17,7 @@
 - Do not claim a local model is production-qualified unless it passes the existing evidence gates.
 - Do not rerun or tune against consumed M5 holdouts.
 - Keep research and evaluation evidence in Git unless a separate retention decision explicitly approves deletion.
+- Exclude the ignored SDD workspace .superpowers/ from release artifacts as well as tracked research paths.
 - Do not move or remove polis.evaluation code until import compatibility and documentation references have been checked.
 - Use regression-first tests for behavior or packaging changes.
 - Use one focused commit per task and reference issue #120 in each commit message.
@@ -127,6 +128,7 @@ EXCLUDED_ARTIFACT_PREFIXES = (
     "tests/",
     "third_party/",
     "docs/superpowers/",
+    ".superpowers/",
 )
 ~~~
 
@@ -190,6 +192,7 @@ In pyproject.toml, extend tool.hatch.build.targets.sdist.exclude with:
 "/tests",
 "/third_party",
 "/docs/superpowers",
+"/.superpowers",
 ~~~
 
 Preserve existing exclusions and the wheel target packages = ["src/polis"]. Do not exclude src/polis/evaluation in this task; its compatibility decision is handled in Task 3.
