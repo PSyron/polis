@@ -6,6 +6,13 @@ records, normalized templates, entities, and expected outputs are prohibited
 from training. See `docs/architecture/finetuning-dataset.md` for the isolation
 contract.
 
+The evaluator modules, validators, metrics, and committed corpora in this
+document are repository development tooling and provenance assets. They support
+quality measurement, review, and release gates; they are not the primary
+runtime product interface. The supported runtime consumes the typed public
+analysis result models from `polis` / `polis.core` and does not depend on
+development holdout access.
+
 `src/polis/evaluation/datasets/v1/cases.json` is the initial small, versioned
 quality dataset for Polis. It is a reviewable gold set, not a corpus and not a
 claim about production coverage. The validator in `polis.evaluation.dataset`
@@ -231,4 +238,8 @@ uv run --locked --extra dev pytest tests/test_safety_corpus.py -v
 
 The standard-library validator is also available to callers as
 `polis.evaluation.validate_dataset(raw)` and `polis.evaluation.load_dataset()`.
-It validates untrusted candidate JSON before it is accepted as a project asset.
+Per [ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md),
+this remains a compatibility namespace for repository evaluation workflows in
+the current 0.x line. It validates untrusted candidate JSON before it is
+accepted as a project asset; it is not the primary analysis entrypoint for the
+runtime library.

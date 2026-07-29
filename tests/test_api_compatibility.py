@@ -31,3 +31,10 @@ def test_schema_compatibility_constants_stay_stable() -> None:
     )
     payload = json.loads(sample.to_json())
     assert payload["schema_version"] == snapshot["result_schema_version"]
+
+
+def test_evaluation_namespace_remains_compatible_for_the_0x_line() -> None:
+    import polis.evaluation as evaluation
+
+    assert callable(evaluation.load_dataset)
+    assert callable(evaluation.validate_dataset)

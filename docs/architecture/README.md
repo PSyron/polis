@@ -23,6 +23,7 @@ when the policy changes.
 | [ADR-0015](decisions/0015-qualify-contextual-inflection-routing.md) | Accepted | Deterministic contextual inflection routing qualifies as a suggestion source |
 | [ADR-0016](decisions/0016-reject-qwen17-sentence-syntax-route.md) | Accepted | Qwen3 1.7B residual sentence syntax route is rejected |
 | [ADR-0018](decisions/0018-runtime-composition-protocols.md) | Accepted | Runtime composition protocols use executed operations |
+| [ADR-0019](decisions/0019-evaluation-namespace-compatibility.md) | Accepted | `polis.evaluation` stays import-compatible through the 0.x line |
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.

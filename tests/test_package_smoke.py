@@ -68,3 +68,10 @@ def test_public_analysis_model_exports_are_intentional() -> None:
             analysis_result_to_json,
         )
     )
+
+
+def test_distribution_retains_evaluation_namespace_helpers() -> None:
+    evaluation = import_module("polis.evaluation")
+
+    assert callable(evaluation.load_dataset)
+    assert callable(evaluation.validate_dataset)
