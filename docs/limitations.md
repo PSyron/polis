@@ -69,8 +69,8 @@
 - The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
   can wait up to its configured timeout, and it only covers five reviewed
   missing-comma rule IDs.
-- The source-built five-rule LanguageTool subset is not a general Polish
-  corrector. Only those qualified comma findings are automatic under
+- The source-built five-rule LanguageTool subset is not a general Polish corrector.
+  Only those qualified comma findings are automatic under
   source-policy `1.1`; contextual inflection is reviewable, sentence-only, and
   limited to narrow constructions, and paragraph behavior has not passed an M5
   release gate.
