@@ -8,6 +8,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VERIFIER = ROOT / "scripts/verify_distribution_artifacts.py"
+EXCLUDED_ARTIFACT_PREFIXES = (
+    "experiments/",
+    "data/finetuning/",
+    "tests/",
+    "third_party/",
+    "docs/superpowers/",
+    ".superpowers/",
+)
+
+
+def _without_sdist_root(name: str) -> str:
+    parts = name.split("/", 1)
+    return parts[1] if len(parts) == 2 else name
 
 
 def test_built_distributions_declare_mit_metadata_and_contain_license(
@@ -48,12 +61,36 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     assert not any("tests/typecheck/" in name for name in sdist_names)
     assert not any("third_party/languagetool-pl" in name for name in wheel_names)
     assert not any("third_party/languagetool-pl" in name for name in sdist_names)
+    assert "polis/__init__.py" in wheel_names
     assert any(name.endswith("/src/polis/__init__.py") for name in sdist_names)
-    assert any(name.endswith("/tests/test_public_models.py") for name in sdist_names)
-    assert any(
-        name.endswith("/src/polis/evaluation/datasets/v1/cases.json")
-        for name in sdist_names
-    )
+    assert any(name.endswith("/README.md") for name in sdist_names)
     assert any(
         name == "polis/evaluation/datasets/v1/cases.json" for name in wheel_names
     )
+
+
+def test_built_distributions_exclude_repository_only_material(
+    tmp_path: Path,
+) -> None:
+    dist = tmp_path / "dist"
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+    with zipfile.ZipFile(wheel) as archive:
+        wheel_names = archive.namelist()
+    with tarfile.open(sdist) as archive:
+        sdist_names = archive.getnames()
+
+    for name in wheel_names:
+        assert not name.startswith(EXCLUDED_ARTIFACT_PREFIXES)
+    for name in sdist_names:
+        normalized = _without_sdist_root(name)
+        assert not normalized.startswith(EXCLUDED_ARTIFACT_PREFIXES)

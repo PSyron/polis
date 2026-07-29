@@ -50,6 +50,12 @@ packages = ["src/polis"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
+  "/data/finetuning",
+  "/experiments",
+  "/tests",
+  "/third_party",
+  "/docs/superpowers",
+  "/.superpowers",
   "/experiments/sentence_safety_gate/frozen_gate.json",
   "/experiments/sentence_safety_gate/holdout.started",
   "/experiments/sentence_safety_gate/report.json",

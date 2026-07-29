@@ -6,6 +6,15 @@ import zipfile
 from email.parser import BytesParser
 from pathlib import Path
 
+EXCLUDED_ARTIFACT_PREFIXES = (
+    "experiments/",
+    "data/finetuning/",
+    "tests/",
+    "third_party/",
+    "docs/superpowers/",
+    ".superpowers/",
+)
+
 
 def assert_metadata(metadata: bytes, artifact: Path) -> None:
     message = BytesParser().parsebytes(metadata)
@@ -15,9 +24,24 @@ def assert_metadata(metadata: bytes, artifact: Path) -> None:
         raise SystemExit(f"{artifact}: missing License-File: LICENSE")
 
 
+def _without_sdist_root(name: str) -> str:
+    parts = name.split("/", 1)
+    return parts[1] if len(parts) == 2 else name
+
+
+def _assert_no_excluded_members(
+    names: list[str], *, artifact: Path, sdist: bool
+) -> None:
+    for raw_name in names:
+        name = _without_sdist_root(raw_name) if sdist else raw_name
+        if name.startswith(EXCLUDED_ARTIFACT_PREFIXES):
+            raise SystemExit(f"{artifact}: excluded repository path: {name}")
+
+
 def verify_wheel(path: Path) -> None:
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
+        _assert_no_excluded_members(names, artifact=path, sdist=False)
         metadata_name = next(
             (name for name in names if name.endswith(".dist-info/METADATA")), None
         )
@@ -31,6 +55,7 @@ def verify_wheel(path: Path) -> None:
 def verify_sdist(path: Path) -> None:
     with tarfile.open(path) as archive:
         names = archive.getnames()
+        _assert_no_excluded_members(names, artifact=path, sdist=True)
         metadata_name = next(
             (name for name in names if name.endswith("/PKG-INFO")), None
         )
