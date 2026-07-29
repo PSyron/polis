@@ -37,8 +37,17 @@ manifest; do not run another build before upload.
   - includes `LICENSE` in wheel and sdist
   - includes `PKG-INFO` / wheel `METADATA`
   - includes the `src/polis` runtime and only explicitly allow-listed package data
+  - limits the sdist to the supported runtime source, packaging metadata, README,
+    license, Hatch-included VCS exclusion metadata, the example TOML config,
+    release notes, and selected product documentation: public API, quick start,
+    privacy/offline operation, compatibility, distribution/prerelease
+    verification, limitations, customization, rule/segmentation contracts, LLM
+    contracts and quality gates, dependency-license review, and accepted
+    runtime/packaging ADRs
   - excludes repository-only tests, experiments, fine-tuning data, vendored
-    LanguageTool/build output, and SDD planning records
+    LanguageTool/build output, SDD planning records, research scripts,
+    benchmark reports, evaluation-corpus checklists, and historical project
+    planning records
   - excludes `.jar`, Maven repositories, `target/`, and model-weight artifact
     extensions
 

@@ -65,7 +65,7 @@ def main() -> None:
             "dev",
             "pytest",
             "-m",
-            "not slow and not model",
+            "not research and not slow and not model",
         ]
     )
 
