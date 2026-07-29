@@ -14,6 +14,17 @@ EXCLUDED_ARTIFACT_PREFIXES = (
     "docs/superpowers/",
     ".superpowers/",
 )
+PROHIBITED_VENDOR_MARKERS = (
+    ".jar",
+    ".onnx",
+    ".pt",
+    ".pth",
+    ".bin",
+    ".safetensors",
+    ".m2/",
+    "target/",
+    "repository/",
+)
 
 
 def assert_metadata(metadata: bytes, artifact: Path) -> None:
@@ -38,10 +49,20 @@ def _assert_no_excluded_members(
             raise SystemExit(f"{artifact}: excluded repository path: {name}")
 
 
+def _assert_no_prohibited_vendor_members(
+    names: list[str], *, artifact: Path, sdist: bool
+) -> None:
+    for raw_name in names:
+        name = _without_sdist_root(raw_name) if sdist else raw_name
+        if any(marker in name for marker in PROHIBITED_VENDOR_MARKERS):
+            raise SystemExit(f"{artifact}: prohibited vendor path: {name}")
+
+
 def verify_wheel(path: Path) -> None:
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         _assert_no_excluded_members(names, artifact=path, sdist=False)
+        _assert_no_prohibited_vendor_members(names, artifact=path, sdist=False)
         metadata_name = next(
             (name for name in names if name.endswith(".dist-info/METADATA")), None
         )
@@ -56,6 +77,7 @@ def verify_sdist(path: Path) -> None:
     with tarfile.open(path) as archive:
         names = archive.getnames()
         _assert_no_excluded_members(names, artifact=path, sdist=True)
+        _assert_no_prohibited_vendor_members(names, artifact=path, sdist=True)
         metadata_name = next(
             (name for name in names if name.endswith("/PKG-INFO")), None
         )

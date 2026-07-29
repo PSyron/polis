@@ -6,6 +6,8 @@ import tarfile
 import zipfile
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 VERIFIER = ROOT / "scripts/verify_distribution_artifacts.py"
 EXCLUDED_ARTIFACT_PREFIXES = (
@@ -23,9 +25,9 @@ PROHIBITED_VENDOR_MARKERS = (
     ".pth",
     ".bin",
     ".safetensors",
-    "/.m2/",
-    "/target/",
-    "/repository/",
+    ".m2/",
+    "target/",
+    "repository/",
 )
 
 
@@ -38,6 +40,15 @@ def _assert_no_prohibited_vendor_members(names: list[str], *, sdist: bool) -> No
     for raw_name in names:
         name = _without_sdist_root(raw_name) if sdist else raw_name
         assert not any(marker in name for marker in PROHIBITED_VENDOR_MARKERS), name
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["target/classes/example.txt", ".m2/repository/example.pom", "repository/a/b"],
+)
+def test_prohibited_vendor_markers_reject_root_level_directories(name: str) -> None:
+    with pytest.raises(AssertionError, match=name):
+        _assert_no_prohibited_vendor_members([name], sdist=False)
 
 
 def test_built_distributions_declare_mit_metadata_and_contain_license(
