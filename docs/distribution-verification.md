@@ -1,4 +1,4 @@
-# Distribution verification for M4-03
+# Runtime-first distribution verification
 
 This document records the reproducible commands used to produce and validate the
 PyPI-ready distribution artifacts.
@@ -36,11 +36,18 @@ manifest; do not run another build before upload.
 - Verify artifact contents:
   - includes `LICENSE` in wheel and sdist
   - includes `PKG-INFO` / wheel `METADATA`
-  - includes `src/polis` and packaged dataset files
-  - excludes `tests/typecheck/` test fixtures
-  - excludes repository-only LanguageTool/vendor build output, including
-    `third_party/`, `.jar`, Maven repositories, `target/`, and model-weight
-    artifact extensions
+  - includes the `src/polis` runtime and only explicitly allow-listed package data
+  - excludes repository-only tests, experiments, fine-tuning data, vendored
+    LanguageTool/build output, and SDD planning records
+  - excludes `.jar`, Maven repositories, `target/`, and model-weight artifact
+    extensions
+
+The wheel and source distribution contain the supported offline runtime, not the
+research workspace. The lightweight `polis.evaluation` modules remain available
+for the current 0.x import-compatibility guarantee, while large corpora,
+holdouts, reports, experiments, training assets, tests, and vendored Java
+artifacts are not shipped. LanguageTool is therefore an optional local build or
+caller-supplied loopback service, never a default Python dependency.
 
 ## Clean-install smoke test
 

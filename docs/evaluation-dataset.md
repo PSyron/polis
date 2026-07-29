@@ -13,6 +13,16 @@ runtime product interface. The supported runtime consumes the typed public
 analysis result models from `polis` / `polis.core` and does not depend on
 development holdout access.
 
+This separation is part of the runtime-first 0.x boundary. The default product
+is offline, conservative, and does not require a qualified local model or
+LanguageTool. Optional LanguageTool coverage remains narrow and sentence-only;
+DOCX/ODT/RTF adapters, a GUI, and stylistic rewriting are outside scope. Large
+corpora, holdouts, reports, experiments, and training assets stay in the
+repository and are excluded from wheel and source-distribution artifacts.
+The existing `polis.evaluation` imports remain compatible for the current 0.x
+line under [ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md);
+that namespace must not be mistaken for the primary analysis API.
+
 `src/polis/evaluation/datasets/v1/cases.json` is the initial small, versioned
 quality dataset for Polis. It is a reviewable gold set, not a corpus and not a
 claim about production coverage. The validator in `polis.evaluation.dataset`

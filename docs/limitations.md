@@ -1,4 +1,4 @@
-# Known limitations
+# Known limitations and product boundary
 
 - The current runtime covers a small deterministic rule set and a mock local backend path.
 - Local generation integration is available through the mock transport path.
@@ -54,6 +54,9 @@
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
   intentionally conservative.
+- The default installation has no production model or LanguageTool dependency.
+  Research corpora, benchmark runners, training assets, and holdout evidence
+  remain repository-only workflows; they do not establish production support.
 - Default Polis runtime does not require OpenJDK, a LanguageTool process, a
   model, or network access. The optional sentence-only vendored LanguageTool
   path requires OpenJDK and an explicit local build of the pinned vendored 6.8
@@ -71,6 +74,10 @@
   source-policy `1.1`; contextual inflection is reviewable, sentence-only, and
   limited to narrow constructions, and paragraph behavior has not passed an M5
   release gate.
+- `polis.evaluation` remains import-compatible for existing evaluator helpers in
+  the current 0.x line, but it is not the primary runtime analysis API. Large
+  corpora, holdouts, reports, experiments, and training assets are excluded from
+  wheel and source-distribution artifacts.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
   and `correct_async()` share one orchestration path, apply a versioned
