@@ -38,6 +38,9 @@ manifest; do not run another build before upload.
   - includes `PKG-INFO` / wheel `METADATA`
   - includes `src/polis` and packaged dataset files
   - excludes `tests/typecheck/` test fixtures
+  - excludes repository-only LanguageTool/vendor build output, including
+    `third_party/`, `.jar`, Maven repositories, `target/`, and model-weight
+    artifact extensions
 
 ## Clean-install smoke test
 
@@ -63,12 +66,17 @@ PowerShell, and `cmd.exe`.
 ## Checks covered by tests
 
 - `tests/test_distribution_artifacts.py` verifies metadata and allow-listed file
-  contents in built artifacts.
+  contents in built artifacts, including the absence of Java/vendor build output
+  from wheel and sdist.
 - `tests/test_release_distribution_installation.py` verifies isolated wheel/sdist
   installation and import/CLI smoke behavior, including the inherited-CP1252 UTF-8
   process boundary.
 - `tests/test_privacy_dependency_audit.py` and `tests/test_dependency_licenses.py`
   validate release-audit constraints required before publication.
+
+Default Polis analysis remains separate from optional local LanguageTool
+support: the Python distribution artifacts do not contain OpenJDK, LanguageTool
+binaries, Maven caches, or generated JARs.
 
 ## Supported matrix notes
 

@@ -13,10 +13,10 @@
   only 0.571 syntax precision and 0.160 syntax recall on development. Bielik
   1.5B and Qwen3 0.6B produced no exact syntax edits. No configuration
   qualified, and corpus-v3 holdout remains unopened for this experiment.
-- Issue #70 qualified four LanguageTool punctuation rule IDs on sentences at
+- Issue #70 qualified five LanguageTool punctuation rule IDs on sentences at
   precision 1.00 and recall 0.038 on its one-shot holdout. Source-policy version
-  1.1 enables the three newly exposed IDs alongside the two existing IDs. This
-  remains narrow punctuation coverage and does not correct syntax or inflection.
+  1.1 enables all five reviewed IDs. This remains narrow punctuation coverage
+  and does not correct syntax or inflection.
 - The sentence-only contextual inflection router reached precision 1.00 and
   supported recall 0.667 on its one-shot holdout and is available through an
   optional local stdio configuration. It is suggestion-only; first-name
@@ -54,20 +54,23 @@
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and
   intentionally conservative.
-- The preferred sentence-only LanguageTool path requires OpenJDK and an explicit
-  local build of the pinned vendored 6.8 subset. It reuses one persistent stdio
-  JVM; the #77 benchmark measured 441,483,264 bytes combined Python and Java RSS,
-  938.60 ms cold startup, and 5.08 ms warm p95. Java artifacts are not included
-  in wheel or sdist, and Polis does not download them.
+- Default Polis runtime does not require OpenJDK, a LanguageTool process, a
+  model, or network access. The optional sentence-only vendored LanguageTool
+  path requires OpenJDK and an explicit local build of the pinned vendored 6.8
+  subset. It reuses one persistent stdio JVM; the #77 benchmark measured
+  441,483,264 bytes combined Python and Java RSS, 938.60 ms cold startup, and
+  5.08 ms warm p95. Java artifacts are not included in wheel or sdist, and
+  Polis does not download them.
 - The older optional HTTP mode still requires a separately started LanguageTool
   6.8 process on loopback. The two modes cannot be enabled together.
 - The LanguageTool rule is synchronous. Both `analyze()` and `analyze_async()`
   can wait up to its configured timeout, and it only covers five reviewed
   missing-comma rule IDs.
-- The source-built five-rule LanguageTool subset is not a general Polish corrector.
-  Only those qualified comma findings are automatic under
-  source-policy `1.1`; contextual inflection is reviewable, and paragraph
-  behavior has not passed an M5 release gate.
+- The source-built five-rule LanguageTool subset is not a general Polish
+  corrector. Only those qualified comma findings are automatic under
+  source-policy `1.1`; contextual inflection is reviewable, sentence-only, and
+  limited to narrow constructions, and paragraph behavior has not passed an M5
+  release gate.
 - The hybrid architecture in [ADR-0008](architecture/decisions/0008-hybrid-correction-policy.md)
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
   and `correct_async()` share one orchestration path, apply a versioned

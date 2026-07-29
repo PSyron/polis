@@ -16,11 +16,28 @@ EXCLUDED_ARTIFACT_PREFIXES = (
     "docs/superpowers/",
     ".superpowers/",
 )
+PROHIBITED_VENDOR_MARKERS = (
+    ".jar",
+    ".onnx",
+    ".pt",
+    ".pth",
+    ".bin",
+    ".safetensors",
+    "/.m2/",
+    "/target/",
+    "/repository/",
+)
 
 
 def _without_sdist_root(name: str) -> str:
     parts = name.split("/", 1)
     return parts[1] if len(parts) == 2 else name
+
+
+def _assert_no_prohibited_vendor_members(names: list[str], *, sdist: bool) -> None:
+    for raw_name in names:
+        name = _without_sdist_root(raw_name) if sdist else raw_name
+        assert not any(marker in name for marker in PROHIBITED_VENDOR_MARKERS), name
 
 
 def test_built_distributions_declare_mit_metadata_and_contain_license(
@@ -94,3 +111,6 @@ def test_built_distributions_exclude_repository_only_material(
     for name in sdist_names:
         normalized = _without_sdist_root(name)
         assert not normalized.startswith(EXCLUDED_ARTIFACT_PREFIXES)
+
+    _assert_no_prohibited_vendor_members(wheel_names, sdist=False)
+    _assert_no_prohibited_vendor_members(sdist_names, sdist=True)
