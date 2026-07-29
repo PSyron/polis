@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 from experiments.residual_syntax_rules import run_evaluation as evaluator
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments" / "residual_syntax_rules"
 

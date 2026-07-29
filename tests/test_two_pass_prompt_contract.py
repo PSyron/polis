@@ -13,6 +13,8 @@ from polis.llm.corrected_text import (
     validate_evidence_bound_corrected_text_response,
 )
 
+pytestmark = pytest.mark.research
+
 
 def _payload(user_content: str) -> dict[str, object]:
     encoded = user_content.split("<INPUT_JSON_START>\n", 1)[1].split(

@@ -3,6 +3,8 @@ from __future__ import annotations
 import pytest
 from experiments.performance import run_benchmark
 
+pytestmark = pytest.mark.research
+
 
 @pytest.mark.slow
 def test_performance_benchmark_has_required_fields_and_sane_metrics() -> None:

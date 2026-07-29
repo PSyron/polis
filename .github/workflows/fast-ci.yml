@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 
-# Fast suite deliberately excludes slow, model, benchmark, and release work.
+# Fast suite deliberately excludes research, slow, model, benchmark, and release work.
 jobs:
   quality:
     name: ${{ matrix.os }} / CPython ${{ matrix.python-version }}
@@ -65,7 +65,7 @@ jobs:
       - name: Synchronize locked development environment
         run: uv sync --locked --extra dev
       - name: Run pytest suite
-        run: uv run --locked --extra dev pytest -m "not slow and not model"
+        run: uv run --locked --extra dev pytest -m "not research and not slow and not model"
       - name: Run Ruff lint
         run: uv run --locked --extra dev ruff check .
       - name: Run Ruff format check

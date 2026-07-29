@@ -6,6 +6,10 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import pytest
+
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 BENCHMARK_PATH = ROOT / "third_party" / "languagetool-pl" / "scripts" / "benchmark.py"
 CORPUS = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.json"

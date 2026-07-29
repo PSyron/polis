@@ -38,6 +38,8 @@ from experiments.sentence_category_routing.run_benchmark import (
 from polis.core import Category, Confidence, Finding, Severity, Source
 from polis.llm import TextEdit
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "experiments" / "sentence_category_routing" / "config.json"
 CORPUS = (

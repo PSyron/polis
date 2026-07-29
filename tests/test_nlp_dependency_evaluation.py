@@ -12,6 +12,10 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
+
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments/nlp_dependencies"
 CASES = EXPERIMENT / "cases.json"

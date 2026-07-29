@@ -25,6 +25,8 @@ from experiments.inflection_candidates.benchmark import (
 )
 from experiments.inflection_candidates.run_benchmark import LocalStdioClient
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "experiments" / "inflection_candidates" / "cases.json"
 CORPUS_PATH = (

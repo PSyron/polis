@@ -28,6 +28,8 @@ from polis.evaluation.correction_corpus import (
 )
 from polis.evaluation.safety_corpus import safety_entity_catalog_ids
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 JSON_CORPUS = (
     ROOT

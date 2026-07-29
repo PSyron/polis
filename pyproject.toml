@@ -72,6 +72,7 @@ testpaths = ["tests"]
 addopts = "-ra"
 pythonpath = ["."]
 markers = [
+  "research: tests that require research corpora, benchmark runners, recorded qualification, or optional research runtimes",
   "slow: tests excluded from per-change CI because they are resource intensive",
   "model: tests that require a real local language model",
 ]

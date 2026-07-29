@@ -10,6 +10,8 @@ import pytest
 from polis.core import Category
 from polis.evaluation.dataset import DATASET_PATH, load_dataset, validate_dataset
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 DOCUMENTATION = ROOT / "docs" / "evaluation-dataset.md"
 

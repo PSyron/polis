@@ -21,6 +21,8 @@ from polis.evaluation.finetuning_dataset import (
     validate_finetuning_records,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).parents[1]
 BUNDLE = ROOT / "data" / "finetuning" / "bielik_1_5b_v1"
 CORPUS_V3 = (

@@ -29,6 +29,8 @@ from experiments.sentence_safety_gate.run_evaluation import (
     summarize_split,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 SAFETY_XML = (
     ROOT

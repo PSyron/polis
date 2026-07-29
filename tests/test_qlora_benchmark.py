@@ -18,6 +18,8 @@ from experiments.qlora_benchmark.experiment import (
     verify_pinned_artifacts,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).parents[1]
 CONFIG_PATH = ROOT / "experiments" / "qlora_benchmark" / "config.json"
 REPORT_PATH = ROOT / "experiments" / "qlora_benchmark" / "report.json"

@@ -36,6 +36,8 @@ from experiments.sentence_syntax_qualification.run_benchmark import (
 
 from polis.core import Category, Confidence, Finding, Severity, Source
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "experiments" / "sentence_syntax_qualification" / "config.json"
 CORPUS = (

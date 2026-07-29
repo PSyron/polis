@@ -119,9 +119,12 @@ so a second unfiltered test invocation is intentionally absent.
 This fast suite deliberately excludes slow tests, real-model tests, benchmarks,
 release publishing, and any network-dependent product checks. Those workloads
 require their own explicit jobs and remain outside the per-change gate. Mark
-resource-intensive pytest cases with `@pytest.mark.slow` and tests requiring a
-real local model with `@pytest.mark.model`; the local command above reproduces
-CI's exact marker selection.
+research-only pytest modules with `pytest.mark.research`, resource-intensive
+cases with `@pytest.mark.slow`, and tests requiring a real local model with
+`@pytest.mark.model`. The fast gate runs `uv run --locked --extra dev pytest -m
+"not research and not slow and not model"`; see the
+[research workflow guide](docs/development/research-workflow.md) for the
+product-only, research, and explicit slow/model commands.
 
 ## Public models
 

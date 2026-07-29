@@ -30,6 +30,8 @@ from experiments.role_prompt_benchmark.run_benchmark import (
 
 from polis.evaluation.correction_corpus import CorpusEdit
 
+pytestmark = pytest.mark.research
+
 
 def test_ollama_preflight_records_loaded_model_memory(
     monkeypatch: MonkeyPatch,

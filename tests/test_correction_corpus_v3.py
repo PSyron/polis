@@ -27,6 +27,8 @@ from polis.evaluation.correction_corpus import (
     validate_correction_corpus,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 JSON_CORPUS = (
     ROOT / "tests" / "fixtures" / "evaluation" / "polish_correction_corpus_v3.json"
