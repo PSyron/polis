@@ -1,7 +1,7 @@
 # Runtime-First Product Boundary and Artifact Policy
 
-**Status:** Proposed for implementation after maintainer review  
-**Issue:** #120  
+**Status:** Proposed for implementation after maintainer review
+**Issue:** #120
 **Date:** 2026-07-29
 
 ## Decision summary
@@ -287,4 +287,3 @@ runtime interface. It may be revisited after Phase 1 evidence.
   no Java and keep its configuration opt-in.
 - **Research work silently blocking product work:** encode issue dispositions
   and CI paths explicitly instead of relying on milestone names.
-
