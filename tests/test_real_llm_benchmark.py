@@ -31,6 +31,8 @@ from experiments.real_llm_benchmark.run_benchmark import (
 
 from polis.llm import validate_llm_response
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.json"
 

@@ -10,6 +10,8 @@ from typing import Any, cast
 import pytest
 from scripts import run_sentence_safety_case as runner
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "scripts" / "run_sentence_safety_case.py"
 FAKE_STDIO = ROOT / "tests" / "fixtures" / "fake_languagetool_stdio.py"

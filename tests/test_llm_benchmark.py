@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
 from experiments.llm_backends import run_benchmark
+
+pytestmark = pytest.mark.research
 
 
 def test_benchmark_prefers_heuristic_backend_for_seed_slice() -> None:

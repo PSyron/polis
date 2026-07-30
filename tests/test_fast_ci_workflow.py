@@ -24,6 +24,11 @@ BYTE_EXACT_UPSTREAM_PATHS = (
     "third_party/languagetool-pl/LICENSE-LGPL-2.1.txt",
     "third_party/languagetool-pl/sources/languagetool-core/pom.xml",
 )
+FAST_PYTEST_COMMAND = (
+    'run: uv run --locked --extra dev pytest -m "not research and not slow and'
+    ' not model"'
+)
+FAST_PYTEST_FILTER = 'pytest -m "not research and not slow and not model"'
 
 
 def run_validator(workflow: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -124,8 +129,8 @@ def test_fast_ci_contract_rejects_an_unfiltered_pytest_command(
     invalid_workflow = tmp_path / "fast-ci.yml"
     invalid_workflow.write_text(
         WORKFLOW.read_text(encoding="utf-8").replace(
+            FAST_PYTEST_FILTER,
             'pytest -m "not slow and not model"',
-            "pytest",
         ),
         encoding="utf-8",
     )
@@ -142,8 +147,8 @@ def test_fast_ci_contract_rejects_a_second_unfiltered_test_command(
     invalid_workflow = tmp_path / "fast-ci.yml"
     invalid_workflow.write_text(
         WORKFLOW.read_text(encoding="utf-8").replace(
-            'run: uv run --locked --extra dev pytest -m "not slow and not model"',
-            'run: uv run --locked --extra dev pytest -m "not slow and not model"\n'
+            FAST_PYTEST_COMMAND,
+            FAST_PYTEST_COMMAND + "\n"
             "      - name: Run unfiltered unittest suite\n"
             "        run: uv run --locked --extra dev python -m unittest discover",
         ),
@@ -164,9 +169,8 @@ def test_workflow_has_only_the_filtered_pytest_test_command() -> None:
         if line.lstrip().startswith("run:") and ("pytest" in line or "unittest" in line)
     ]
 
-    assert test_commands == [
-        'run: uv run --locked --extra dev pytest -m "not slow and not model"'
-    ]
+    assert FAST_PYTEST_FILTER in workflow
+    assert test_commands == [FAST_PYTEST_COMMAND]
 
 
 def test_workflow_actions_have_an_exact_license_review() -> None:
@@ -204,6 +208,12 @@ class SlowCase(unittest.TestCase):
 class ModelCase(unittest.TestCase):
     def test_model_case(self):
         self.assertTrue(True)
+
+
+@pytest.mark.research
+class ResearchCase(unittest.TestCase):
+    def test_research_case(self):
+        self.assertTrue(True)
 """,
         encoding="utf-8",
     )
@@ -217,7 +227,7 @@ class ModelCase(unittest.TestCase):
             "-c",
             str(ROOT / "pyproject.toml"),
             "-m",
-            "not slow and not model",
+            "not research and not slow and not model",
             str(sample),
         ],
         cwd=ROOT,
@@ -227,7 +237,7 @@ class ModelCase(unittest.TestCase):
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "1 passed, 2 deselected" in result.stdout
+    assert "1 passed, 3 deselected" in result.stdout
 
 
 def test_byte_stable_text_uses_effective_text_and_lf_attributes() -> None:

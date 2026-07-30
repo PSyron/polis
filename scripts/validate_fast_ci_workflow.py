@@ -25,6 +25,10 @@ EXPECTED_ACTIONS = {
     "actions/setup-python": "ece7cb06caefa5fff74198d8649806c4678c61a1",
     "astral-sh/setup-uv": "37802adc94f370d6bfd71619e3f0bf239e1f3b78",
 }
+FAST_PYTEST_COMMAND = (
+    'run: uv run --locked --extra dev pytest -m "not research and not slow and'
+    ' not model"'
+)
 REQUIRED_SNIPPETS = (
     "push:",
     "pull_request:",
@@ -40,7 +44,10 @@ REQUIRED_SNIPPETS = (
     "cache-dependency-glob: uv.lock",
     "fetch-depth: 0",
     "fetch-tags: true",
-    "Fast suite deliberately excludes slow, model, benchmark, and release work.",
+    (
+        "Fast suite deliberately excludes research, slow, model, benchmark, and"
+        " release work."
+    ),
 )
 
 
@@ -113,15 +120,12 @@ def validate_contract(path: Path) -> list[str]:
             "setup-python architecture input must use the mapped matrix field"
         )
 
-    fast_pytest_command = (
-        'run: uv run --locked --extra dev pytest -m "not slow and not model"'
-    )
-    if fast_pytest_command not in workflow:
+    if FAST_PYTEST_COMMAND not in workflow:
         errors.append("fast pytest marker filter is missing")
     test_commands = re.findall(
         r"^\s+run: .*\b(?:pytest|unittest)\b.*$", workflow, re.MULTILINE
     )
-    if [command.strip() for command in test_commands] != [fast_pytest_command]:
+    if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
 
     action_references = re.findall(

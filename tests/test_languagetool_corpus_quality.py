@@ -15,6 +15,8 @@ from polis.rules import (
     LoopbackLanguageToolHttpTransport,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.json"
 SNAPSHOT = (

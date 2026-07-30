@@ -22,6 +22,8 @@ from experiments.languagetool_rule_inventory.run_benchmark import (
 
 from polis.llm import TextEdit
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/evaluation/polish_correction_corpus_v3.json"
 

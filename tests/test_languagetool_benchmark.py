@@ -22,6 +22,8 @@ from experiments.languagetool_spike.benchmark import (
 )
 from experiments.languagetool_spike.run_benchmark import LanguageToolClient
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.json"
 RESPONSE = ROOT / "tests" / "fixtures" / "languagetool" / "pl_response.json"

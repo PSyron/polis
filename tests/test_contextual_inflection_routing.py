@@ -27,6 +27,8 @@ from experiments.contextual_inflection_routing.run_benchmark import (
 
 from polis.llm import TextEdit
 
+pytestmark = pytest.mark.research
+
 
 def _result(
     source: str,

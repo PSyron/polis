@@ -41,6 +41,8 @@ from polis.rules.spelling import (
     SpellingZebyRule,
 )
 
+pytestmark = pytest.mark.research
+
 
 def _analysis_pipeline_config(
     local_backend: bool,

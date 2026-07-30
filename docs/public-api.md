@@ -4,6 +4,17 @@ Polis exposes immutable, typed data models from both `polis` and `polis.core`.
 This contract describes analysis data and the public analyzer surface.
 The current package ships a thin runtime analyzer in `polis` and a stricter
 contract in [ADR-0003](architecture/decisions/0003-public-api-and-exception-contract.md).
+Repository evaluation tooling under `polis.evaluation` remains import-compatible
+for the current 0.x line per
+[ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md),
+but it is not the primary interface for runtime text analysis.
+
+The supported runtime is offline and conservative. No tested local model has
+qualified for production correction or suggestions, so no model is selected by
+default. The optional LanguageTool adapter is local-only, sentence-only, and
+narrow: only the five qualified comma rule IDs described below are retained.
+DOCX/ODT/RTF adapters, a GUI, and broad stylistic rewriting are outside this
+package's scope.
 
 ## Approved analyzer contract
 
@@ -51,6 +62,9 @@ error returns no partial corrected text.
 ## Conservative correction
 
 `Analyzer.correct(text)` is the convenience path for a sentence or paragraph.
+Paragraph input is supported by the deterministic runtime path; the optional
+LanguageTool and contextual inflection paths remain sentence-only and abstain
+from multi-sentence coverage.
 `await Analyzer.correct_async(text)` runs the identical orchestration without
 starting an event loop; results, ordering, call budgets, failures, and policy
 decisions are equivalent.
@@ -294,6 +308,7 @@ Extension points and boundaries are documented in:
 - [rules](rules.md)
 - [customization](customization.md)
 - [offline operation](offline-operation.md)
+- [evaluation methodology and datasets](evaluation-dataset.md)
 - [protocols](architecture/protocols.md)
 - [privacy](privacy.md)
 - [compatibility and semver](compatibility.md)

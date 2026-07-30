@@ -10,6 +10,8 @@ from experiments.role_prompt_benchmark.protocols import (
     validate_role_corrected_text_response,
 )
 
+pytestmark = pytest.mark.research
+
 
 def test_role_corrected_text_request_separates_system_instructions_from_data() -> None:
     request = build_role_corrected_text_request(

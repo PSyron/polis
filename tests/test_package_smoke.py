@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from importlib import import_module
 from importlib.metadata import metadata, version
+from pathlib import Path
 
 import pytest
 
@@ -68,3 +69,22 @@ def test_public_analysis_model_exports_are_intentional() -> None:
             analysis_result_to_json,
         )
     )
+
+
+def test_distribution_retains_evaluation_namespace_helpers() -> None:
+    evaluation = import_module("polis.evaluation")
+
+    assert callable(evaluation.load_dataset)
+    assert callable(evaluation.validate_dataset)
+
+
+def test_readme_states_runtime_first_product_boundary() -> None:
+    readme = (Path(__file__).parents[1] / "README.md").read_text(encoding="utf-8")
+    required_phrases = (
+        "offline",
+        "LanguageTool",
+        "No tested local model has qualified",
+    )
+
+    for phrase in required_phrases:
+        assert phrase in readme

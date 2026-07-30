@@ -11,6 +11,8 @@ from experiments.languagetool_stdio_session.run_benchmark import (
     validate_privacy_safe_report,
 )
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments" / "languagetool_stdio_session"
 CONFIG = EXPERIMENT / "config.json"

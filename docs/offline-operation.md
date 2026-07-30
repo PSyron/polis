@@ -4,17 +4,20 @@ This project is designed to run analysis without external network access.
 
 ## Supported offline configuration
 
-- Runtime uses `Analyzer` and deterministic rule registry in-process.
+- Default runtime uses `Analyzer` and the deterministic rule registry entirely
+  in-process. With `AnalyzerConfig(use_local_heuristic_backend=False)` and no
+  optional LanguageTool sections, Polis does not require Java, a LanguageTool
+  process, a model, or network access.
 - Optional mock backend uses local prompt parsing and local transport (`MockHeuristicBackend`).
 - The specialist engine is disabled unless a caller explicitly injects both a
   router and backend. The #60 engine performs no I/O itself; the injected
   adapter remains responsible for proving local-only transport.
-- Optional LanguageTool support connects only to a separately started
-  LanguageTool 6.8 server on a numeric loopback address. It never uses a public
-  LanguageTool API, DNS name, proxy, or redirect.
-- The preferred vendored LanguageTool mode directly starts one persistent local
-  stdio child from an explicit absolute path. It opens no socket and performs no
-  implicit download or update.
+- Optional loopback HTTP LanguageTool support connects only to a separately
+  started LanguageTool 6.8 server on a numeric loopback address. It never uses
+  a public LanguageTool API, DNS name, proxy, or redirect.
+- Optional vendored stdio LanguageTool mode directly starts one persistent
+  local child from an explicit absolute path. It opens no socket and performs
+  no implicit download or update.
 - Dependency installation uses locked `uv` files from the repository.
 
 ## Verification command
@@ -30,11 +33,13 @@ use causes the test to fail before analysis starts.
 
 ## Expected outcomes
 
-- Analyzer succeeds in deterministic mode (`use_local_heuristic_backend = false`).
+- Analyzer succeeds in default deterministic mode
+  (`use_local_heuristic_backend = false`) without starting optional
+  LanguageTool support.
 - Analyzer succeeds with config-based local mock backend enabled.
 - No private input text is logged by these checks.
 
-## Preferred vendored LanguageTool sentence path
+## Optional vendored LanguageTool sentence path
 
 Build the pinned subset during explicit dependency preparation:
 
@@ -61,7 +66,9 @@ text in an error.
 
 The runner binds no port and opens no network socket. Removing
 `[vendored_language_tool]` disables the process. Do not combine this section
-with either legacy mode below.
+with either optional mode below. The vendored source tree, Maven cache, JARs,
+and generated Java build output are repository build artifacts and are excluded
+from Polis wheels and source distributions.
 
 ## Optional loopback LanguageTool compatibility mode
 

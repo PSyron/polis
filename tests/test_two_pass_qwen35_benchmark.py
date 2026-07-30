@@ -28,6 +28,8 @@ from experiments.two_pass_qwen35.run_benchmark import (
 from polis.llm import TextEdit
 from polis.llm.corrected_text import FiniteCandidate, PromptRequest
 
+pytestmark = pytest.mark.research
+
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "experiments" / "two_pass_qwen35" / "config.json"
 

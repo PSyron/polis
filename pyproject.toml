@@ -49,16 +49,36 @@ required-version = "==0.11.2"
 packages = ["src/polis"]
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-  "/experiments/sentence_safety_gate/frozen_gate.json",
-  "/experiments/sentence_safety_gate/holdout.started",
-  "/experiments/sentence_safety_gate/report.json",
-  "/tests/fixtures/evaluation/polish_correction_corpus_v3.json",
-  "/tests/fixtures/evaluation/polish_correction_corpus_v3.xml",
-  "/tests/fixtures/evaluation/polish_correction_safety_corpus_v1.json",
-  "/tests/fixtures/evaluation/polish_correction_safety_corpus_v1.xml",
-  "/tests/typecheck",
-  "/third_party/languagetool-pl",
+ignore-vcs = true
+include = [
+  "/LICENSE",
+  "/README.md",
+  "/pyproject.toml",
+  "/src/polis/**",
+  "/docs/compatibility.md",
+  "/docs/customization.md",
+  "/docs/development/dependency-licenses.md",
+  "/docs/distribution-verification.md",
+  "/docs/limitations.md",
+  "/docs/llm-corrected-text-contract.md",
+  "/docs/llm-prompt-response-contract.md",
+  "/docs/llm-quality-gates.md",
+  "/docs/offline-operation.md",
+  "/docs/prerelease-candidate.md",
+  "/docs/privacy-audit.md",
+  "/docs/privacy.md",
+  "/docs/public-api.md",
+  "/docs/quick-start.md",
+  "/docs/release-notes/0.1.0-erratum.md",
+  "/docs/release-notes/0.1.0.md",
+  "/docs/rules.md",
+  "/docs/segmentation.md",
+  "/docs/architecture/decisions/0001-python-platform-licensing-policy.md",
+  "/docs/architecture/decisions/0003-public-api-and-exception-contract.md",
+  "/docs/architecture/decisions/0008-hybrid-correction-policy.md",
+  "/docs/architecture/decisions/0018-runtime-composition-protocols.md",
+  "/docs/architecture/decisions/0019-evaluation-namespace-compatibility.md",
+  "/examples/polis.toml",
 ]
 
 [tool.pytest.ini_options]
@@ -66,6 +86,7 @@ testpaths = ["tests"]
 addopts = "-ra"
 pythonpath = ["."]
 markers = [
+  "research: tests that require research corpora, benchmark runners, recorded qualification, or optional research runtimes",
   "slow: tests excluded from per-change CI because they are resource intensive",
   "model: tests that require a real local language model",
 ]

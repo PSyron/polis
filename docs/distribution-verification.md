@@ -1,4 +1,4 @@
-# Distribution verification for M4-03
+# Runtime-first distribution verification
 
 This document records the reproducible commands used to produce and validate the
 PyPI-ready distribution artifacts.
@@ -36,8 +36,27 @@ manifest; do not run another build before upload.
 - Verify artifact contents:
   - includes `LICENSE` in wheel and sdist
   - includes `PKG-INFO` / wheel `METADATA`
-  - includes `src/polis` and packaged dataset files
-  - excludes `tests/typecheck/` test fixtures
+  - includes the `src/polis` runtime and only explicitly allow-listed package data
+  - limits the sdist to the supported runtime source, packaging metadata, README,
+    license, Hatch-included VCS exclusion metadata, the example TOML config,
+    release notes, and selected product documentation: public API, quick start,
+    privacy/offline operation, compatibility, distribution/prerelease
+    verification, limitations, customization, rule/segmentation contracts, LLM
+    contracts and quality gates, dependency-license review, and accepted
+    runtime/packaging ADRs
+  - excludes repository-only tests, experiments, fine-tuning data, vendored
+    LanguageTool/build output, SDD planning records, research scripts,
+    benchmark reports, evaluation-corpus checklists, and historical project
+    planning records
+  - excludes `.jar`, Maven repositories, `target/`, and model-weight artifact
+    extensions
+
+The wheel and source distribution contain the supported offline runtime, not the
+research workspace. The lightweight `polis.evaluation` modules remain available
+for the current 0.x import-compatibility guarantee, while large corpora,
+holdouts, reports, experiments, training assets, tests, and vendored Java
+artifacts are not shipped. LanguageTool is therefore an optional local build or
+caller-supplied loopback service, never a default Python dependency.
 
 ## Clean-install smoke test
 
@@ -63,12 +82,17 @@ PowerShell, and `cmd.exe`.
 ## Checks covered by tests
 
 - `tests/test_distribution_artifacts.py` verifies metadata and allow-listed file
-  contents in built artifacts.
+  contents in built artifacts, including the absence of Java/vendor build output
+  from wheel and sdist.
 - `tests/test_release_distribution_installation.py` verifies isolated wheel/sdist
   installation and import/CLI smoke behavior, including the inherited-CP1252 UTF-8
   process boundary.
 - `tests/test_privacy_dependency_audit.py` and `tests/test_dependency_licenses.py`
   validate release-audit constraints required before publication.
+
+Default Polis analysis remains separate from optional local LanguageTool
+support: the Python distribution artifacts do not contain OpenJDK, LanguageTool
+binaries, Maven caches, or generated JARs.
 
 ## Supported matrix notes
 

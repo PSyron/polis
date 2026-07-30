@@ -1,8 +1,35 @@
 # Polis
 
 Polis is an offline Python library for analysing Polish text and proposing
-minimal, structured corrections. It provides deterministic analysis and a thin
-CLI wrapper for manual and scripted use while the LLM-backed backend is developed.
+minimal, structured corrections. The supported product is a small runtime:
+deterministic analysis, conservative correction, typed result models, and a
+thin CLI for manual or scripted use.
+
+No tested local model has qualified for production correction or suggestions.
+The default installation therefore does not select, download, or require a
+local model. Research and evaluation work remains in the repository and is
+described in the [research workflow guide](docs/development/research-workflow.md).
+
+## Product boundary
+
+The default installation has no production dependencies and runs offline. It
+does not include a DOCX/ODT/RTF adapter, GUI, or broad stylistic rewriting.
+`Analyzer.correct()` applies only high-confidence, non-conflicting findings
+covered by the current deterministic source policy. Other findings, including
+model-generated and contextual suggestions, are reviewable and require an
+explicit caller selection.
+
+The optional LanguageTool integration is not a core dependency. A caller may
+explicitly provide a separately running loopback service or build the pinned
+vendored executable locally. Both modes are offline-only from Polis's point of
+view; the supported vendored path is sentence-only and retains only five
+qualified comma rules. The vendored source, Java artifacts, research fixtures,
+experiments, training data, tests, and SDD planning records are excluded from
+wheel and source-distribution artifacts.
+
+`polis.evaluation` remains import-compatible for existing evaluator helpers in
+the current 0.x line, but it is repository evaluation tooling rather than the
+primary text-analysis API. See [ADR-0019](docs/architecture/decisions/0019-evaluation-namespace-compatibility.md).
 
 ## Conservative correction
 
@@ -24,7 +51,7 @@ event-loop applications. Optional specialist suggestions, when explicitly
 injected, remain in `skipped_findings` and report a versioned outcome with their
 actual one-call/two-call budget; no real specialist model is enabled by default.
 
-## Vendored LanguageTool sentence path
+## Optional LanguageTool sentence path
 
 For the currently supported sentence-only LanguageTool path, first build the
 pinned Polish subset explicitly; Polis does not download Java, dependencies, or
@@ -86,7 +113,7 @@ uv sync --locked --extra dev
 Run every check through the same locked environment:
 
 ```console
-uv run --locked --extra dev pytest -m "not slow and not model"
+uv run --locked --extra dev pytest -m "not research and not slow and not model"
 uv run --locked --extra dev ruff check .
 uv run --locked --extra dev ruff format --check .
 uv run --locked --extra dev mypy .
@@ -119,9 +146,12 @@ so a second unfiltered test invocation is intentionally absent.
 This fast suite deliberately excludes slow tests, real-model tests, benchmarks,
 release publishing, and any network-dependent product checks. Those workloads
 require their own explicit jobs and remain outside the per-change gate. Mark
-resource-intensive pytest cases with `@pytest.mark.slow` and tests requiring a
-real local model with `@pytest.mark.model`; the local command above reproduces
-CI's exact marker selection.
+research-only pytest modules with `pytest.mark.research`, resource-intensive
+cases with `@pytest.mark.slow`, and tests requiring a real local model with
+`@pytest.mark.model`. The fast gate runs `uv run --locked --extra dev pytest -m
+"not research and not slow and not model"`; see the
+[research workflow guide](docs/development/research-workflow.md) for the
+product-only, research, and explicit slow/model commands.
 
 ## Public models
 
@@ -179,9 +209,9 @@ safe context only.
 
 ## Evaluation data
 
-The initial licensed Polish gold set is versioned with the package and checked
-by a strict standard-library validator. Its schema, CC0 provenance, hard
-negatives, and contribution rules are documented in
+The initial licensed Polish gold set and larger research corpora are evaluation
+assets, not claims of production coverage. They are checked by strict validators;
+their schema, CC0 provenance, hard negatives, and contribution rules are documented in
 [the evaluation dataset guide](docs/evaluation-dataset.md).
 
 ## Dependency groups

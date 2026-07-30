@@ -73,17 +73,20 @@ review.
 LanguageTool 6.8 is supported as an optional local process but is not present in
 `pyproject.toml`, `uv.lock`, wheels, or source distributions. Its open-source
 core and Polish grammar rules are licensed under LGPL-2.1-or-later. The
-adapter communicates with an unmodified, separately installed process over
-HTTP and does not redistribute its binaries. OpenJDK 17 is likewise supplied
-by the local package manager rather than Polis.
+default Python runtime does not require it. When enabled, the loopback adapter
+communicates with an unmodified, separately installed process over HTTP and
+does not redistribute its binaries. OpenJDK 17 is likewise supplied by the
+local package manager rather than Polis.
 
 For M4, this repository carries the unmodified LanguageTool 6.8 core and Polish
 `src/main` trees in `third_party/languagetool-pl`, together with exact
 provenance, the LGPL text, and a machine-readable inclusion manifest. The
 project-authored stdio bridge links against locally built, uncombined core and
-Polish JARs. Its Maven cache, runtime libraries, and Java build products remain
-ignored local artifacts; the entire directory is excluded from Python wheel
-and sdist output.
+Polish JARs only when a caller explicitly builds and points Polis at the
+vendored runner. Its Maven cache, runtime libraries, and Java build products
+remain ignored local artifacts; the entire directory is excluded from Python
+wheel and sdist output. Those artifacts are outside the reviewed MIT Python
+distribution boundary and do not become Python production dependencies.
 
 The Polish morphology resource preserves its BSD-2-Clause notice. The Hunspell
 resource preserves its upstream GPL/LGPL/MPL/CC-SA-1.0 options and Apache-2.0
