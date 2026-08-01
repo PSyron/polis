@@ -126,3 +126,125 @@ def test_portfolio_manifest_covers_every_affected_open_issue_exactly_once() -> N
         "acceptance criteria were not completed",
     ):
         assert phrase in portfolio
+
+
+def test_portfolio_manifest_records_exact_label_transitions() -> None:
+    portfolio = PORTFOLIO.read_text(encoding="utf-8")
+    normalized = " ".join(portfolio.split())
+
+    for forbidden in (
+        "preserve current labels",
+        "Preserve current labels",
+        "preserve other current labels",
+        "Preserve other current labels",
+        "Retain `status:blocked` only while",
+        "retain `status:blocked` only while",
+        "keep unblocked",
+    ):
+        assert forbidden not in portfolio
+
+    expected_transitions = (
+        (
+            43,
+            "`status:superseded`",
+            "`status:blocked`",
+            "`type:feature`, `area:llm`, `priority:P0`, `status:superseded`",
+        ),
+        (
+            64,
+            "`status:superseded`",
+            "`status:blocked`",
+            "`type:test`, `area:evaluation`, `priority:P0`, `status:superseded`",
+        ),
+        (
+            66,
+            "`status:superseded`",
+            "`status:blocked`",
+            "`type:test`, `area:evaluation`, `priority:P0`, `status:superseded`",
+        ),
+        (
+            76,
+            "none",
+            "none",
+            "`type:research`, `area:evaluation`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            84,
+            "none",
+            "`status:blocked`",
+            "`type:bug`, `area:correction`, `priority:P0`",
+        ),
+        (
+            85,
+            "none",
+            "none",
+            "`type:research`, `area:evaluation`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            86,
+            "none",
+            "none",
+            "`type:research`, `area:evaluation`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            87,
+            "none",
+            "none",
+            "`type:research`, `area:rules`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            88,
+            "none",
+            "none",
+            "`type:research`, `area:rules`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            89,
+            "none",
+            "none",
+            "`type:research`, `area:llm`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            90,
+            "none",
+            "none",
+            "`type:research`, `area:evaluation`, `priority:P0`, `status:blocked`",
+        ),
+        (
+            92,
+            "`status:superseded`",
+            "`status:blocked`",
+            "`type:research`, `area:packaging`, `priority:P0`, `status:superseded`",
+        ),
+        (
+            93,
+            "`status:superseded`",
+            "none",
+            "`type:research`, `area:packaging`, `priority:P0`, `status:superseded`",
+        ),
+        (95, "none", "none", "`type:chore`, `area:evaluation`, `priority:P1`"),
+        (96, "none", "none", "`type:chore`, `area:core`, `priority:P1`"),
+        (97, "none", "none", "`type:chore`, `area:rules`, `priority:P2`"),
+        (98, "none", "none", "`type:chore`, `area:rules`, `priority:P2`"),
+        (99, "none", "none", "`type:chore`, `area:analysis`, `priority:P2`"),
+        (100, "none", "none", "`type:chore`, `area:core`, `priority:P1`"),
+        (
+            119,
+            "none",
+            "none",
+            "`type:research`, `area:evaluation`, `priority:P0`",
+        ),
+        (
+            120,
+            "`type:decision`, `area:core`",
+            "`type:chore`, `area:packaging`",
+            "`type:decision`, `area:core`, `priority:P0`",
+        ),
+    )
+
+    for issue, add_labels, remove_labels, final_labels in expected_transitions:
+        phrase = (
+            f"`#{issue}`: add {add_labels}; remove {remove_labels}; "
+            f"final labels {final_labels}."
+        )
+        assert phrase in normalized
