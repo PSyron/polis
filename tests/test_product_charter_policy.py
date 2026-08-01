@@ -100,3 +100,29 @@ def test_release_docs_do_not_require_model_research() -> None:
     assert "optional model research never blocks a runtime release" in joined
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
+
+
+def test_portfolio_manifest_covers_every_affected_open_issue_exactly_once() -> None:
+    portfolio = PORTFOLIO.read_text(encoding="utf-8")
+    product = {84, 95, 120}
+    research = {76, 85, 86, 87, 88, 89, 90, 119}
+    superseded = {43, 64, 66, 92, 93}
+    future = {96, 97, 98, 99, 100}
+
+    groups = (product, research, superseded, future)
+    assert all(
+        left.isdisjoint(right)
+        for index, left in enumerate(groups)
+        for right in groups[index + 1 :]
+    )
+    for issue in set().union(*groups):
+        assert portfolio.count(f"| #{issue} |") == 1
+
+    for phrase in (
+        "Runtime 0.x Hardening",
+        "Research — Optional Local Model Qualification",
+        "status:superseded",
+        "not planned",
+        "acceptance criteria were not completed",
+    ):
+        assert phrase in portfolio
