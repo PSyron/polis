@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 PROMPT = ROOT / "PROMPT.md"
 ADR = (
@@ -14,6 +16,14 @@ ADR = (
 ARCHITECTURE_INDEX = ROOT / "docs" / "architecture" / "README.md"
 ROADMAP = ROOT / "docs" / "project" / "ROADMAP.md"
 PORTFOLIO = ROOT / "docs" / "project" / "runtime-first-portfolio-disposition.md"
+
+GOVERNED_RELEASE_DOCUMENTS = (
+    pytest.param(ROOT / "README.md", id="readme"),
+    pytest.param(ROOT / "docs" / "limitations.md", id="limitations"),
+    pytest.param(ROOT / "docs" / "llm-quality-gates.md", id="llm-quality-gates"),
+    pytest.param(ROOT / "docs" / "prerelease-candidate.md", id="prerelease"),
+    pytest.param(ROOT / "docs" / "compatibility.md", id="compatibility"),
+)
 
 
 def test_prompt_defines_a_complete_runtime_without_a_model() -> None:
@@ -84,6 +94,20 @@ def test_roadmap_separates_product_delivery_from_optional_research() -> None:
     assert "M5 majority-error graph from umbrella #93 is authoritative" not in roadmap
 
 
+def test_roadmap_records_product_safety_priority_without_blocking_on_p1() -> None:
+    roadmap = " ".join(ROADMAP.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "#84 is P0 product-safety work",
+        "#95 is P1 hardening",
+        "The `#120 -> #84 -> #95` arrow records sequencing; it does not mean "
+        "that #95 blocks the current runtime release.",
+        "Shared `Runtime 0.x Hardening` milestone membership does not make #95 "
+        "a release blocker unless a separate accepted issue says so.",
+    ):
+        assert phrase in roadmap
+
+
 def test_release_docs_do_not_require_model_research() -> None:
     documents = {
         path.name: path.read_text(encoding="utf-8")
@@ -100,6 +124,35 @@ def test_release_docs_do_not_require_model_research() -> None:
     assert "optional model research never blocks a runtime release" in joined
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
+
+
+@pytest.mark.parametrize("path", GOVERNED_RELEASE_DOCUMENTS)
+def test_each_release_doc_independently_rejects_research_release_dependencies(
+    path: Path,
+) -> None:
+    document = " ".join(path.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "optional model research never blocks a runtime release",
+        "does not require a model, Java process, network service, research "
+        "corpus, or consumed holdout",
+    ):
+        assert phrase in document
+
+    for forbidden in (
+        "tracked by M5 and [#43]",
+        "until later M5 selection",
+        "M5 majority-error graph from umbrella #93 is authoritative",
+        "#93 remains authoritative for the next release",
+        "#43 blocks a runtime release",
+        "#76 blocks a runtime release",
+        "runtime release depends on model research",
+        "runtime release depends on Java",
+        "runtime release depends on network",
+        "runtime release depends on a research corpus",
+        "runtime release depends on a consumed holdout",
+    ):
+        assert forbidden not in document
 
 
 def test_portfolio_manifest_covers_every_affected_open_issue_exactly_once() -> None:
@@ -124,6 +177,67 @@ def test_portfolio_manifest_covers_every_affected_open_issue_exactly_once() -> N
         "status:superseded",
         "not planned",
         "acceptance criteria were not completed",
+        "docs/superpowers/specs/2026-08-01-runtime-first-product-charter-design.md",
+    ):
+        assert phrase in portfolio
+
+
+def test_portfolio_manifest_records_p0_p1_milestone_semantics() -> None:
+    portfolio = " ".join(PORTFOLIO.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "`Runtime 0.x Hardening`: active product safety and invariant work; "
+        "#84 is P0 product-safety work; #95 is P1 hardening; shared milestone "
+        "membership does not make #95 a current runtime-release blocker.",
+        "`#95` appends a product-hardening section stating that it is P1 "
+        "hardening after `#84`, that it follows the P0 product-safety gate, "
+        "and that neither the shared milestone nor roadmap arrow makes it a "
+        "current runtime-release blocker.",
+        "`#120` updates its checklist/body to reference PR #121 as Phase 1, "
+        "carry the #84 P0 / #95 P1 distinction, and state that the issue "
+        "closes only after every live-state assertion in this manifest passes.",
+    ):
+        assert phrase in portfolio
+
+
+def test_portfolio_manifest_replaces_legacy_issue_body_and_native_edges() -> None:
+    portfolio = " ".join(PORTFOLIO.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "`#84`: replace the complete legacy dependency section, not only one "
+        "sentence; remove body claims that it depends on `#76`, blocks `#64`, "
+        "or blocks final release authorization; remove native `blockedBy` "
+        "edge `#76 -> #84`; remove native `blocking` edge `#84 -> #64`.",
+        "`#95`: replace legacy M5 publication wording, including any claim "
+        "that it does not block publication of M5; record it as P1 runtime "
+        "hardening that follows #84 without blocking the current runtime "
+        "release by milestone membership alone.",
+        "`#90`: replace the complete dependency section so it keeps only "
+        "internal optional-research dependencies `#76`, `#85`, `#86`, `#88`, "
+        "and `#89`; remove body and native edges involving superseded `#43`, "
+        "product `#84`, and blocking `#64`.",
+        "`#100`: replace legacy release-authority prose, including any claim "
+        "that `#93` remains authoritative for the next release or that the "
+        "current M5 publication controls runtime release sequencing.",
+    ):
+        assert phrase in portfolio
+
+
+def test_portfolio_post_mutation_assertions_reject_legacy_release_language() -> None:
+    portfolio = " ".join(PORTFOLIO.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "post-mutation inventory rejects `#93 remains authoritative for the "
+        "next release`",
+        "post-mutation inventory rejects `current M5 publication`",
+        "post-mutation inventory rejects `blocks #64` on #84 or #90",
+        "post-mutation inventory rejects native `blockedBy` edges from #76 to "
+        "#84, from #43 to #90, and from #84 to #90",
+        "post-mutation inventory rejects native `blocking` edges from #84 to "
+        "#64 and from #90 to #64",
+        "post-mutation inventory rejects any product-release dependency on "
+        "#43, #76, #90, #93, model research, Java, network, research corpus, "
+        "or consumed holdout",
     ):
         assert phrase in portfolio
 

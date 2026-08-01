@@ -12,7 +12,9 @@ This document publishes the M4 compatibility baseline and deprecation policy.
 
 No optional model runtime is required for core deterministic checks. Model
 backends are optional extensions; their absence is not a degraded core-runtime
-state, and optional model research never blocks a runtime release.
+state, and optional model research never blocks a runtime release. The runtime
+release path does not require a model, Java process, network service, research
+corpus, or consumed holdout.
 
 ### Evidence and deprecation policy enforcement
 

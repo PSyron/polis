@@ -4,6 +4,8 @@ Decision authority:
 
 - Issue #120
 - ADR-0020
+- [accepted runtime-first charter design](../superpowers/specs/2026-08-01-runtime-first-product-charter-design.md)
+  (`docs/superpowers/specs/2026-08-01-runtime-first-product-charter-design.md`)
 - the accepted runtime-first charter in `PROMPT.md` and `docs/project/ROADMAP.md`
 
 Baseline snapshot for this manifest:
@@ -22,8 +24,9 @@ Baseline snapshot for this manifest:
 
 Milestone definitions:
 
-- `Runtime 0.x Hardening`: active product safety and invariant work; no due
-  date
+- `Runtime 0.x Hardening`: active product safety and invariant work; #84 is P0
+  product-safety work; #95 is P1 hardening; shared milestone membership does not
+  make #95 a current runtime-release blocker.
 - `Research — Optional Local Model Qualification`: optional evidence work; no
   due date
 
@@ -54,19 +57,33 @@ through #120. The acceptance criteria were not completed.
 
 ### Product issue body requirements
 
-- `#84` replaces `Depends on completion of #76` with an implementation-
-  independent runtime section stating that automatic privileges are versioned
-  product behavior, new automatic privileges still require direct source
-  behavior evidence, and the runtime issue no longer depends on optional
-  research completion.
-- `#95` appends a product-hardening section stating that it follows `#84` in
-  the supported runtime lane and does not turn M6 architecture work into a
-  current runtime-release blocker.
+- `#84`: replace the complete legacy dependency section, not only one sentence;
+  remove body claims that it depends on `#76`, blocks `#64`, or blocks final
+  release authorization; remove native `blockedBy` edge `#76 -> #84`; remove
+  native `blocking` edge `#84 -> #64`.
+- `#84` adds an implementation-independent runtime section stating that
+  automatic privileges are versioned P0 product-safety behavior, new automatic
+  privileges still require direct source behavior evidence, and optional
+  research completion does not block this issue.
+- `#95`: replace legacy M5 publication wording, including any claim that it does
+  not block publication of M5; record it as P1 runtime hardening that follows
+  #84 without blocking the current runtime release by milestone membership
+  alone.
+- `#95` appends a product-hardening section stating that it is P1 hardening after
+  `#84`, that it follows the P0 product-safety gate, and that neither the shared
+  milestone nor roadmap arrow makes it a current runtime-release blocker.
+- `#90`: replace the complete dependency section so it keeps only internal
+  optional-research dependencies `#76`, `#85`, `#86`, `#88`, and `#89`; remove
+  body and native edges involving superseded `#43`, product `#84`, and blocking
+  `#64`.
 - `#100` records `#95` as an external hardening prerequisite, not an M6 child,
   and its child checklist becomes `#96`, `#97`, `#98`, and `#99` only.
-- `#120` updates its checklist/body to reference PR #121 as Phase 1 and to
-  state that the issue closes only after every live-state assertion in this
-  manifest passes.
+- `#100`: replace legacy release-authority prose, including any claim that `#93`
+  remains authoritative for the next release or that the current M5 publication
+  controls runtime release sequencing.
+- `#120` updates its checklist/body to reference PR #121 as Phase 1, carry the
+  #84 P0 / #95 P1 distinction, and state that the issue closes only after every
+  live-state assertion in this manifest passes.
 
 ## Execution gates
 
@@ -77,6 +94,19 @@ through #120. The acceptance criteria were not completed.
 - `M5 - Hybrid Polish Correction` closes only after its open issue count reaches
   zero.
 - `#120` closes only after every live-state assertion passes.
+
+## Post-mutation rejection assertions
+
+- post-mutation inventory rejects `#93 remains authoritative for the next
+  release`
+- post-mutation inventory rejects `current M5 publication`
+- post-mutation inventory rejects `blocks #64` on #84 or #90
+- post-mutation inventory rejects native `blockedBy` edges from #76 to #84, from
+  #43 to #90, and from #84 to #90
+- post-mutation inventory rejects native `blocking` edges from #84 to #64 and
+  from #90 to #64
+- post-mutation inventory rejects any product-release dependency on #43, #76,
+  #90, #93, model research, Java, network, research corpus, or consumed holdout
 
 ## Exact label transition ledger
 
@@ -106,16 +136,16 @@ through #120. The acceptance criteria were not completed.
 
 | Group | Issue | Current state | Target state | Labels | Milestone | Dependency/body change | Closure reason |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Product | #84 | Open in M5 legacy release-train metadata; runtime product gate still represented with a dependency on #76. | Open runtime product gate. | Add none; remove `status:blocked`; final labels `type:bug`, `area:correction`, `priority:P0`. | Move from `M5 - Hybrid Polish Correction` to `Runtime 0.x Hardening`. | Replace `Depends on completion of #76` with the implementation-independent runtime section; state that new automatic privileges still require evidence and that optional research does not block this issue. | - |
-| Product | #95 | Open in M6 as future architecture/hardening follow-up. | Open product-hardening follow-up after #84. | Add none; remove none; final labels `type:chore`, `area:evaluation`, `priority:P1`. | Move from `M6 - Internal Architecture and Extensibility` to `Runtime 0.x Hardening`. | Append the product-hardening disposition so the issue is explicitly part of the runtime lane. | - |
-| Product | #120 | Open with no milestone. | Open portfolio-migration controller for the runtime-first charter. | Add `type:decision`, `area:core`; remove `type:chore`, `area:packaging`; final labels `type:decision`, `area:core`, `priority:P0`. | Assign `Runtime 0.x Hardening`. | Update checklist/body to mark PR #121 as Phase 1 and to require final live-state verification before closure. | - |
+| Product | #84 | Open in M5 legacy release-train metadata; runtime product gate still represented with a dependency on #76 plus legacy #64/final-release body authority. | Open P0 runtime product-safety gate. | Add none; remove `status:blocked`; final labels `type:bug`, `area:correction`, `priority:P0`. | Move from `M5 - Hybrid Polish Correction` to `Runtime 0.x Hardening`. | Replace the complete dependency section; remove #76, #64, and final-release body claims; remove native `blockedBy` #76 and native `blocking` #64; state that new automatic privileges still require evidence and optional research does not block this issue. | - |
+| Product | #95 | Open in M6 as future architecture/hardening follow-up with legacy M5 publication wording. | Open P1 product-hardening follow-up after #84; not a current runtime-release blocker by milestone or arrow alone. | Add none; remove none; final labels `type:chore`, `area:evaluation`, `priority:P1`. | Move from `M6 - Internal Architecture and Extensibility` to `Runtime 0.x Hardening`. | Replace legacy M5 publication wording and append the P1 hardening disposition so the issue is explicitly part of the runtime lane without making M6 or #95 current-release blockers. | - |
+| Product | #120 | Open with no milestone. | Open portfolio-migration controller for the runtime-first charter. | Add `type:decision`, `area:core`; remove `type:chore`, `area:packaging`; final labels `type:decision`, `area:core`, `priority:P0`. | Assign `Runtime 0.x Hardening`. | Update checklist/body to mark PR #121 as Phase 1, carry the #84 P0 / #95 P1 distinction, and require final live-state verification before closure. | - |
 | Research | #76 | Open in M5 as optional model-qualification work. | Open optional research gate. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section and name `#119` as the current independent requalification dependency; state that this issue does not block runtime releases. | - |
 | Research | #85 | Open in M5 as research follow-up. | Open optional research corpus work. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
 | Research | #86 | Open in M5 as research/qualification replay work. | Open optional research qualification-replay work. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
 | Research | #87 | Open in M5 as research qualification work. | Open optional research qualification work. | Add none; remove none; final labels `type:research`, `area:rules`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
 | Research | #88 | Open in M5 as research integration work. | Open optional provider research integration work. | Add none; remove none; final labels `type:research`, `area:rules`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
 | Research | #89 | Open in M5 as research ranker qualification work. | Open optional bounded-ranker research work. | Add none; remove none; final labels `type:research`, `area:llm`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
-| Research | #90 | Open in M5 as research majority-coverage gate work. | Open optional installed-package research gate work. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; retain only internal research dependencies and state that this issue does not block runtime releases. | - |
+| Research | #90 | Open in M5 as research majority-coverage gate work with legacy dependencies on superseded #43, product #84, and blocking #64. | Open optional installed-package research gate work. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`, `status:blocked`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section; replace dependency prose and native edges so only internal research dependencies #76, #85, #86, #88, and #89 remain; remove #43, #84, and #64 body/native edges; state that this issue does not block runtime releases. | - |
 | Research | #119 | Open in M5 as the current research prerequisite. | Open optional research prerequisite. | Add none; remove none; final labels `type:research`, `area:evaluation`, `priority:P0`. | Move from `M5 - Hybrid Polish Correction` to `Research — Optional Local Model Qualification`. | Append the standard research section and state that this issue does not block runtime releases. | - |
 | Superseded | #43 | Open in M5 as part of the old combined product/research release train. | Closed as superseded historical evidence. | Add `status:superseded`; remove `status:blocked`; final labels `type:feature`, `area:llm`, `priority:P0`, `status:superseded`. | Remove from `M5 - Hybrid Polish Correction`. | Add the superseded comment prefix and identify surviving research in `#88` and `#89`. | `not planned` |
 | Superseded | #64 | Open in M5 as the paragraph/integration release gate in the old train. | Closed as superseded historical evidence. | Add `status:superseded`; remove `status:blocked`; final labels `type:test`, `area:evaluation`, `priority:P0`, `status:superseded`. | Remove from `M5 - Hybrid Polish Correction`. | Add the superseded comment prefix and state that paragraph integration is outside the current Polis runtime product. | `not planned` |
@@ -126,4 +156,4 @@ through #120. The acceptance criteria were not completed.
 | Future product | #97 | Open in M6 future product architecture. | Remain open future product architecture. | Add none; remove none; final labels `type:chore`, `area:rules`, `priority:P2`. | Remain in `M6 - Internal Architecture and Extensibility`. | No dependency/body change in this migration. | - |
 | Future product | #98 | Open in M6 future product architecture. | Remain open future product architecture. | Add none; remove none; final labels `type:chore`, `area:rules`, `priority:P2`. | Remain in `M6 - Internal Architecture and Extensibility`. | No dependency/body change in this migration. | - |
 | Future product | #99 | Open in M6 future product architecture. | Remain open future product architecture. | Add none; remove none; final labels `type:chore`, `area:analysis`, `priority:P2`. | Remain in `M6 - Internal Architecture and Extensibility`. | No dependency/body change in this migration. | - |
-| Future product | #100 | Open in M6 future product architecture with `#95` still represented as part of its child/dependency framing. | Remain open future product architecture. | Add none; remove none; final labels `type:chore`, `area:core`, `priority:P1`. | Remain in `M6 - Internal Architecture and Extensibility`. | Treat `#95` as an external hardening prerequisite, not an M6 child; the child checklist becomes `#96`, `#97`, `#98`, and `#99` only. | - |
+| Future product | #100 | Open in M6 future product architecture with `#95` still represented as part of its child/dependency framing and legacy #93/M5 release-authority prose. | Remain open future product architecture. | Add none; remove none; final labels `type:chore`, `area:core`, `priority:P1`. | Remain in `M6 - Internal Architecture and Extensibility`. | Treat `#95` as an external hardening prerequisite, not an M6 child; the child checklist becomes `#96`, `#97`, `#98`, and `#99` only; replace legacy #93/current-M5 release-authority prose. | - |

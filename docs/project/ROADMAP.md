@@ -23,10 +23,15 @@ identity. Product delivery follows ADR-0020's runtime-first charter and does
 not require a model, Java process, network service, research corpus, or
 consumed holdout.
 
-#84 is independent from #76. New automatic privileges still need direct source
-behavior evidence before they can enter the versioned automatic policy, but
-that evidence is a product safety requirement, not a model-research release
-dependency.
+#84 is P0 product-safety work and is independent from #76. New automatic
+privileges still need direct source behavior evidence before they can enter the
+versioned automatic policy, but that evidence is a product safety requirement,
+not a model-research release dependency.
+
+#95 is P1 hardening after #84. The `#120 -> #84 -> #95` arrow records
+sequencing; it does not mean that #95 blocks the current runtime release. Shared
+`Runtime 0.x Hardening` milestone membership does not make #95 a release blocker
+unless a separate accepted issue says so.
 
 ## Optional research lane
 
@@ -50,9 +55,10 @@ They remain auditable as historical issue metadata and planning evidence.
 
 ## Historical delivery record
 
-The completed M0–M5 history below is retained as historical evidence. Dependency
-tables in this section record the delivery understanding at the time they were
-written; they are not the active product-release graph under ADR-0020.
+The historical M0–M5 delivery record below is retained as historical evidence.
+It includes completed, open, rejected, and superseded work. Dependency tables in
+this section record the delivery understanding at the time they were written;
+they are not the active product-release graph under ADR-0020.
 
 ### M0 - Foundation and Decisions
 

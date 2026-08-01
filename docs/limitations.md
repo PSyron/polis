@@ -3,7 +3,8 @@
 - The current runtime covers a small deterministic rule set and a mock local backend path.
 - Polis is a complete offline runtime without a model. No production support
   waits for model qualification, and optional model research never blocks a
-  runtime release.
+  runtime release. The runtime release path does not require a model, Java
+  process, network service, research corpus, or consumed holdout.
 - Local generation integration is available through the mock transport path.
   No tested local model has qualified for production correction or suggestions;
   repaired evidence, specialist prompts, runtime comparison, and adapter work
