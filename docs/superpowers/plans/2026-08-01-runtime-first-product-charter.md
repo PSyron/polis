@@ -713,14 +713,15 @@ Classification: P1 hardening after #84 under ADR-0020 and #120.
 hardens generative and review-only invariants after that gate.
 
 Shared `Runtime 0.x Hardening` milestone membership and the `#120 -> #84 -> #95`
-roadmap sequence do not make #95 a current runtime-release blocker.
+roadmap sequence alone do not make #95 a blocker for the current runtime
+release. A future accepted issue may explicitly make #95 a release blocker.
 
 ## Dependencies and ordering
 
 - CI integration depends on #80.
 - Work may begin in parallel with optional model qualification once #80 is green.
 - The completed invariant guardrail should precede broad migration to a shared analyzed-document representation.
-- This umbrella does not block #76, #90, #92, or a runtime release.
+- This umbrella remains independent from #76, #90, and #92.
 ```
 
 #100: replace the complete heading-delimited release-authority section with the
@@ -914,8 +915,10 @@ Require:
 - #90 has no body or native dependency edge involving #43, #84, or #64;
 - #95 body contains `P1 hardening after #84`;
 - #95 body contains no legacy M5 non-publication wording;
-- #95 body states that shared milestone membership and roadmap sequencing do not
-  make #95 a current runtime-release blocker;
+- #95 body states that shared milestone membership and roadmap sequencing alone
+  do not make #95 a blocker for the current runtime release and that a future
+  accepted issue may explicitly make #95 a release blocker;
+- #95 body contains no generic claim that #95 does not block a runtime release;
 - #100 body contains no #93/current-M5 release-authority wording;
 - #100 body contains no `current M5 publication` wording in any section;
 - #120 body carries the #84 P0 / #95 P1 distinction and says #95 is not a

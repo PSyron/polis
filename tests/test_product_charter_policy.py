@@ -33,6 +33,109 @@ GOVERNED_RELEASE_DOCUMENTS = (
     pytest.param(ROOT / "docs" / "compatibility.md", id="compatibility"),
 )
 
+_SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?])\s+")
+_PUNCTUATION_BOUNDARY = re.compile(r"\s*[;:]\s*")
+_CONTRAST_BOUNDARY = re.compile(
+    r"\s*(?:,\s*)?\b(?:but|while|whereas|yet|however|even though|although|"
+    r"though|despite)\b\s+",
+    flags=re.IGNORECASE,
+)
+_LEADING_CONCESSION = re.compile(
+    r"^(?:even though|although|though|despite)\b\s*",
+    flags=re.IGNORECASE,
+)
+
+
+def _compile_concept_group(*patterns: str) -> tuple[re.Pattern[str], ...]:
+    return tuple(re.compile(pattern, flags=re.IGNORECASE) for pattern in patterns)
+
+
+_RELEASE_CONCEPTS = _compile_concept_group(
+    r"\breleases?\b",
+    r"\bpublications?\b",
+    r"\bpublish(?:es|ed|ing)?\b",
+    r"\bprereleases?\b",
+    r"\brelease[- ]candidates?\b",
+    r"\bships?\b",
+    r"\bshipped\b",
+    r"\bshipping\b",
+)
+
+_DEPENDENCY_OR_AUTHORITY_CONCEPTS = _compile_concept_group(
+    r"\b(?:blocks?|blocked|blocking)\b",
+    r"\b(?:requires?|required)\b",
+    r"\bdepends? on\b",
+    r"\bdependenc(?:y|ies)\b",
+    r"\bprerequisites?\b",
+    r"\bpreconditions?\b",
+    r"\buntil\b",
+    r"\bonly after\b",
+    r"\bcannot proceed\b",
+    r"\b(?:waits? for|awaits?|must await)\b",
+    r"\bgoverned by\b",
+    r"\bcontrolled by\b",
+    r"\b(?:authoritative|authority)\b",
+    r"\brelease blockers?\b",
+    r"\brelease-blocking\b",
+    r"\bcontingent (?:upon|on)\b",
+    r"\bgatekeepers?\b",
+    r"\bconditions? (?:for|of)\b",
+    r"\b(?:is|are|remains?|becomes?) (?:not )?(?:(?:an?|the) )?"
+    r"(?:(?:release|publication|shipping) )?gates?\b",
+    r"\bhing(?:e|es|ed) (?:upon|on)\b",
+    r"\bcontrols? whether\b",
+    r"\bdetermines? whether\b",
+    r"\bdeciding factor\b",
+    r"\btied to\b",
+)
+
+_FORBIDDEN_LEGACY_CONCEPTS = _compile_concept_group(
+    r"#(?:43|76|90|93)\b",
+    r"\bM5\b",
+)
+
+_FORBIDDEN_MODEL_CONCEPTS = _compile_concept_group(
+    r"\b(?:a|the|any) models?\b",
+    r"\bqualified models?\b",
+    r"\blocal (?:language )?models?\b",
+    r"\bmodel (?:research|qualification|servers?|backends?|artifacts?|"
+    r"providers?|rankers?)\b",
+)
+
+_FORBIDDEN_RESEARCH_CONCEPTS = _compile_concept_group(
+    r"\boptional (?:model )?research\b",
+    r"\bresearch evidence\b",
+    r"\bresearch corp(?:us|ora)\b",
+    r"\bconsumed holdouts?\b",
+)
+
+_FORBIDDEN_PLATFORM_CONCEPTS = _compile_concept_group(
+    r"\bJava(?: process)?\b",
+    r"\bnetwork(?: access| services?)?\b",
+)
+
+_NEGATED_DEPENDENCY_CONTEXTS = _compile_concept_group(
+    r"\b(?:does|do|did) not (?:require|depend on|execute or depend on|block)\b",
+    r"\bnever blocks?\b",
+    r"\bcannot block\b",
+    r"\bno longer depends?\b",
+    r"\bno current[- ]release dependency\b",
+    r"\b(?:is|are|was|were) not (?:an? )?(?:dependency|prerequisite|condition|"
+    r"gate|gatekeeper|release blocker|product-release authority)\b",
+    r"\bnot (?:a )?(?:current[- ]runtime[- ]release blocker|"
+    r"product-release authority|release dependency|release blocker|release gate)\b",
+    r"\bwithout (?:becoming|being|making)\b.*"
+    r"\b(?:dependency|prerequisite|condition|gate|blocker)\b",
+    r"\bmust not become\b.*\bdependency\b",
+    r"\bnon-blocking\b",
+    r"\b(?:has|have|had) not (?:passed|met|cleared|satisfied)\b.*"
+    r"\b(?:release|publication|shipping)?[- ]?gate\b",
+)
+
+
+def _matches_concept_group(unit: str, group: tuple[re.Pattern[str], ...]) -> bool:
+    return any(pattern.search(unit) for pattern in group)
+
 
 def assert_no_runtime_release_dependency_conflict(document: str) -> None:
     for unit in _release_policy_units(document):
@@ -54,70 +157,83 @@ def _release_policy_units(document: str) -> tuple[str, ...]:
         line = " ".join(raw_line.split())
         if not line:
             continue
-        for sentence in re.split(r"(?<=[.!?;])\s+", line):
-            for clause in re.split(
-                r"\s*(?:[,;]\s*)?\b(?:but|while|whereas|although|though|however)\b\s+",
-                sentence,
-                flags=re.IGNORECASE,
-            ):
-                normalized = clause.strip(" ,;")
-                if normalized:
-                    units.append(normalized)
+        for sentence in _SENTENCE_BOUNDARY.split(line):
+            units.extend(_policy_units_from_sentence(sentence))
     return tuple(dict.fromkeys(units))
 
 
-def _has_runtime_release_concept(unit: str) -> bool:
-    return bool(
-        re.search(
-            r"\b(?:runtime|product|polis|next|current)?[- ]?"
-            r"(?:release|publication|publishing|publish|prerelease|candidate|"
-            r"ship|shipping)\b",
-            unit,
-            flags=re.IGNORECASE,
-        )
+def _policy_units_from_sentence(sentence: str) -> tuple[str, ...]:
+    units: list[str] = []
+    for punctuation_clause in _PUNCTUATION_BOUNDARY.split(sentence):
+        units.extend(_split_contrast_scopes(punctuation_clause))
+    return tuple(units)
+
+
+def _split_contrast_scopes(clause: str) -> tuple[str, ...]:
+    normalized = clause.strip(" ,;")
+    if not normalized:
+        return ()
+
+    concession = _LEADING_CONCESSION.match(normalized)
+    if concession is not None:
+        normalized = normalized[concession.end() :]
+        before_comma, comma, after_comma = normalized.partition(",")
+        if comma:
+            return _normalized_units((before_comma, after_comma))
+
+    return _normalized_units(_CONTRAST_BOUNDARY.split(normalized))
+
+
+def _normalized_units(clauses: tuple[str, ...] | list[str]) -> tuple[str, ...]:
+    return tuple(
+        normalized for clause in clauses if (normalized := clause.strip(" ,;"))
     )
+
+
+def _has_runtime_release_concept(unit: str) -> bool:
+    return _matches_concept_group(unit, _RELEASE_CONCEPTS)
 
 
 def _has_dependency_or_authority_concept(unit: str) -> bool:
-    return bool(
-        re.search(
-            r"\b(?:blocked?|blocking|requires?|required|depends? on|dependency|"
-            r"prerequisite|precondition|until|only after|cannot proceed|"
-            r"waits? for|governed by|authoritative|authority|release blocker|"
-            r"release-blocking|contingent (?:upon|on)|gatekeepers?)\b",
-            unit,
-            flags=re.IGNORECASE,
-        )
-    )
+    return _matches_concept_group(unit, _DEPENDENCY_OR_AUTHORITY_CONCEPTS)
 
 
 def _has_forbidden_release_dependency_concept(unit: str) -> bool:
-    return bool(
-        re.search(
-            r"(?:#43|#76|#93|\bM5\b|\bqualified local model\b|"
-            r"\blocal model\b|\bmodel research\b|\bmodel qualification\b|"
-            r"\bJava(?: process)?\b|\bnetwork(?: access| service)?\b|"
-            r"\bresearch corp(?:us|ora)\b|\bconsumed holdouts?\b)",
-            unit,
-            flags=re.IGNORECASE,
+    return any(
+        _matches_concept_group(unit, group)
+        for group in (
+            _FORBIDDEN_LEGACY_CONCEPTS,
+            _FORBIDDEN_MODEL_CONCEPTS,
+            _FORBIDDEN_RESEARCH_CONCEPTS,
+            _FORBIDDEN_PLATFORM_CONCEPTS,
         )
     )
 
 
 def _is_allowed_historical_or_negative_context(unit: str) -> bool:
-    return bool(
-        re.search(
-            r"(?:\bdoes not (?:require|depend on|execute or depend on|block)\b|"
-            r"\bdo not block\b|\bnever blocks?\b|\bno current-release "
-            r"dependency\b|\bnot .*current[- ]runtime[- ]release blocker\b|"
-            r"\bnot .*product-release authority\b|\bnot .*release dependency\b|"
-            r"\bnot .*release blocker\b|\bnot .*release gate\b|"
-            r"\bno longer depends\b|\bwithout making\b|\bhistorical evidence\b|"
-            r"\bsuperseded\b|\boptional research\b|\bresearch evidence\b)",
-            unit,
-            flags=re.IGNORECASE,
-        )
+    return _has_negated_dependency(unit) or _has_historical_policy_scope(unit)
+
+
+def _has_negated_dependency(unit: str) -> bool:
+    return _matches_concept_group(unit, _NEGATED_DEPENDENCY_CONTEXTS)
+
+
+def _has_historical_policy_scope(unit: str) -> bool:
+    if re.search(r"\bbefore\s+ADR-\d+\b", unit, flags=re.IGNORECASE):
+        return True
+
+    historical_subject = re.search(
+        r"\b(?:archived|retired|superseded|former|legacy|historical|earlier)\b"
+        r".{0,80}\b(?:plan|policy|graph|release train|record|evidence|authority)\b",
+        unit,
+        flags=re.IGNORECASE,
     )
+    past_policy = re.search(
+        r"\b(?:was|were|treated|governed|controlled|served|recorded)\b",
+        unit,
+        flags=re.IGNORECASE,
+    )
+    return historical_subject is not None and past_policy is not None
 
 
 def test_prompt_defines_a_complete_runtime_without_a_model() -> None:
@@ -293,6 +409,58 @@ def test_release_docs_do_not_require_model_research() -> None:
             ),
             id="historical-evidence-while-local-model-required",
         ),
+        pytest.param(
+            (
+                "The runtime release hinges on completion of #76 and model "
+                "qualification."
+            ),
+            "hinge wording for #76 and model qualification",
+            id="runtime-release-hinges-on-76-and-model-qualification",
+        ),
+        pytest.param(
+            "A local model remains a condition for publication.",
+            "condition wording for a local-model publication dependency",
+            id="local-model-condition-for-publication",
+        ),
+        pytest.param(
+            (
+                "Although optional research is archived, the current runtime "
+                "release requires #76."
+            ),
+            "although prefix cannot allowlist a current #76 requirement",
+            id="although-optional-research-current-release-requires-76",
+        ),
+        pytest.param(
+            "M5 and #93 control whether the runtime may ship.",
+            "control-whether wording for M5 and #93 release authority",
+            id="m5-93-control-whether-runtime-ships",
+        ),
+        pytest.param(
+            (
+                "Research evidence remains available, yet publication depends "
+                "on network access."
+            ),
+            "yet contrast cannot allowlist a network publication dependency",
+            id="research-evidence-yet-network-required",
+        ),
+        pytest.param(
+            "Network access is the deciding factor in whether the runtime ships.",
+            "deciding-factor synonym for network release authority",
+            id="network-decides-whether-runtime-ships",
+        ),
+        pytest.param(
+            (
+                "Even though model research is optional, publication is "
+                "contingent on a model."
+            ),
+            "even-though prefix cannot allowlist a generic model dependency",
+            id="even-though-optional-research-model-publication-dependency",
+        ),
+        pytest.param(
+            ("Despite the archived M5 plan, publication is controlled by #93."),
+            "despite prefix cannot allowlist legacy publication control",
+            id="despite-archived-m5-plan-93-controls-publication",
+        ),
     ),
 )
 def test_release_dependency_policy_rejects_semantic_contradiction_probes(
@@ -341,12 +509,113 @@ def test_release_dependency_policy_allows_historical_and_optional_contexts() -> 
             ),
             id="historical-evidence-with-no-longer-depends-boundary",
         ),
+        pytest.param(
+            (
+                "Before ADR-0020, the next release was governed by M5; that "
+                "policy is superseded."
+            ),
+            id="superseded-pre-adr-m5-release-policy",
+        ),
+        pytest.param(
+            ("The archived M5 plan treated #93 as authoritative for publication."),
+            id="archived-m5-plan-publication-authority",
+        ),
+        pytest.param(
+            (
+                "Optional model research can inform future work without "
+                "becoming a runtime release dependency."
+            ),
+            id="optional-model-research-without-release-dependency",
+        ),
+        pytest.param(
+            "A local model is not a gate for runtime publication.",
+            id="local-model-is-not-publication-gate",
+        ),
+        pytest.param(
+            ("Under the retired M5 policy, #76 was a prerequisite for publication."),
+            id="retired-m5-policy-publication-prerequisite",
+        ),
     ),
 )
 def test_release_dependency_policy_allows_nearby_non_contradictory_probes(
     document: str,
 ) -> None:
     assert_no_runtime_release_dependency_conflict(document)
+
+
+@pytest.mark.parametrize(
+    ("document", "expected_units"),
+    (
+        pytest.param(
+            (
+                "Although optional research is archived, the current runtime "
+                "release requires #76."
+            ),
+            (
+                "optional research is archived",
+                "the current runtime release requires #76.",
+            ),
+            id="although-comma",
+        ),
+        pytest.param(
+            (
+                "Research evidence remains available, yet publication depends "
+                "on network access."
+            ),
+            (
+                "Research evidence remains available",
+                "publication depends on network access.",
+            ),
+            id="yet-comma",
+        ),
+        pytest.param(
+            (
+                "Even though model research is optional, publication is "
+                "contingent on a model."
+            ),
+            (
+                "model research is optional",
+                "publication is contingent on a model.",
+            ),
+            id="even-though-comma",
+        ),
+        pytest.param(
+            ("Despite the archived M5 plan, publication is controlled by #93."),
+            (
+                "the archived M5 plan",
+                "publication is controlled by #93.",
+            ),
+            id="despite-comma",
+        ),
+    ),
+)
+def test_release_policy_units_split_contrast_scopes(
+    document: str,
+    expected_units: tuple[str, ...],
+) -> None:
+    units = _release_policy_units(document)
+
+    for expected in expected_units:
+        assert expected in units
+
+
+@pytest.mark.parametrize(
+    "unit",
+    (
+        pytest.param("Publication remains a condition for launch.", id="condition"),
+        pytest.param("The release hinges on evidence.", id="hinges-on"),
+        pytest.param("M5 controls whether the runtime ships.", id="controls-whether"),
+        pytest.param("#93 is the publication gatekeeper.", id="gatekeeper"),
+        pytest.param(
+            "Network access is the deciding factor for shipping.",
+            id="deciding-factor",
+        ),
+    ),
+)
+def test_dependency_or_authority_concept_group_covers_policy_synonyms(
+    unit: str,
+) -> None:
+    assert _has_dependency_or_authority_concept(unit)
 
 
 @pytest.mark.parametrize("path", GOVERNED_RELEASE_DOCUMENTS)
@@ -474,6 +743,11 @@ def test_task_6_plan_requires_executable_body_and_native_edge_contract() -> None
         "#95 old anchor appears exactly once",
         "#100 old anchors each appear exactly once",
         "This umbrella does not block #76, #90, #92, or publication of M5.",
+        "Shared `Runtime 0.x Hardening` milestone membership and the "
+        "`#120 -> #84 -> #95` roadmap sequence alone do not make #95 a "
+        "blocker for the current runtime release.",
+        "A future accepted issue may explicitly make #95 a release blocker.",
+        "This umbrella remains independent from #76, #90, and #92.",
         "The current M5 tracker #93 remains authoritative for the next release.",
         "#83 + #84 + current M5 publication",
         "M6 is non-blocking for #93 and the current M5 publication.",
@@ -482,6 +756,9 @@ def test_task_6_plan_requires_executable_body_and_native_edge_contract() -> None
         assert phrase in plan
 
     assert "append the exact heading and template" not in plan
+    assert (
+        "This umbrella does not block #76, #90, #92, or a runtime release." not in plan
+    )
 
 
 def test_task_6_plan_verifies_exact_live_postconditions() -> None:
@@ -497,7 +774,9 @@ def test_task_6_plan_verifies_exact_live_postconditions() -> None:
         "#95 body contains `P1 hardening after #84`",
         "#95 body contains no legacy M5 non-publication wording",
         "#95 body states that shared milestone membership and roadmap sequencing "
-        "do not make #95 a current runtime-release blocker",
+        "alone do not make #95 a blocker for the current runtime release and "
+        "that a future accepted issue may explicitly make #95 a release blocker",
+        "#95 body contains no generic claim that #95 does not block a runtime release",
         "#100 body contains no #93/current-M5 release-authority wording",
         "#100 body contains no `current M5 publication` wording in any section",
         "#120 body carries the #84 P0 / #95 P1 distinction and says #95 is not "
