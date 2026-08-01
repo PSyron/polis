@@ -54,12 +54,15 @@ def _release_policy_units(document: str) -> tuple[str, ...]:
         line = " ".join(raw_line.split())
         if not line:
             continue
-        units.append(line)
-        units.extend(
-            sentence.strip()
-            for sentence in re.split(r"(?<=[.!?;])\s+", line)
-            if sentence.strip()
-        )
+        for sentence in re.split(r"(?<=[.!?;])\s+", line):
+            for clause in re.split(
+                r"\s*(?:[,;]\s*)?\b(?:but|while|whereas|although|though|however)\b\s+",
+                sentence,
+                flags=re.IGNORECASE,
+            ):
+                normalized = clause.strip(" ,;")
+                if normalized:
+                    units.append(normalized)
     return tuple(dict.fromkeys(units))
 
 
@@ -81,7 +84,7 @@ def _has_dependency_or_authority_concept(unit: str) -> bool:
             r"\b(?:blocked?|blocking|requires?|required|depends? on|dependency|"
             r"prerequisite|precondition|until|only after|cannot proceed|"
             r"waits? for|governed by|authoritative|authority|release blocker|"
-            r"release-blocking)\b",
+            r"release-blocking|contingent (?:upon|on)|gatekeepers?)\b",
             unit,
             flags=re.IGNORECASE,
         )
@@ -258,6 +261,38 @@ def test_release_docs_do_not_require_model_research() -> None:
             "#43 and #76 as runtime publication prerequisites",
             id="43-76-publication-prerequisites",
         ),
+        pytest.param(
+            (
+                "The current runtime release is contingent upon completion of "
+                "#76 and model qualification."
+            ),
+            "contingent #76 plus model qualification release prerequisite",
+            id="contingent-76-model-qualification",
+        ),
+        pytest.param(
+            "M5 and #93 remain the gatekeepers for publishing the runtime.",
+            "M5 and #93 as publication gatekeepers",
+            id="m5-93-publication-gatekeepers",
+        ),
+        pytest.param(
+            (
+                "Optional research is documented here, but the current runtime "
+                "release requires #76."
+            ),
+            "optional-research clause cannot allowlist #76 release requirement",
+            id="optional-research-but-76-required",
+        ),
+        pytest.param(
+            (
+                "Historical evidence remains archived, while publication "
+                "depends on a local model."
+            ),
+            (
+                "historical-evidence clause cannot allowlist local-model "
+                "publication dependency"
+            ),
+            id="historical-evidence-while-local-model-required",
+        ),
     ),
 )
 def test_release_dependency_policy_rejects_semantic_contradiction_probes(
@@ -286,6 +321,32 @@ def test_release_dependency_policy_allows_historical_and_optional_contexts() -> 
         completed.
         """
     )
+
+
+@pytest.mark.parametrize(
+    "document",
+    (
+        pytest.param(
+            (
+                "Optional research is documented here while the runtime release "
+                "path does not require a model, Java process, network service, "
+                "research corpus, or consumed holdout."
+            ),
+            id="optional-research-with-negative-runtime-boundary",
+        ),
+        pytest.param(
+            (
+                "Historical evidence remains archived, but publication no "
+                "longer depends on the combined M5 artifact graph."
+            ),
+            id="historical-evidence-with-no-longer-depends-boundary",
+        ),
+    ),
+)
+def test_release_dependency_policy_allows_nearby_non_contradictory_probes(
+    document: str,
+) -> None:
+    assert_no_runtime_release_dependency_conflict(document)
 
 
 @pytest.mark.parametrize("path", GOVERNED_RELEASE_DOCUMENTS)
@@ -407,8 +468,20 @@ def test_task_6_plan_requires_executable_body_and_native_edge_contract() -> None
         "#100: replace the complete heading-delimited release-authority section "
         "with the exact `## Runtime-first M6 architecture disposition` template",
         "remove or reconcile every prohibited native `blockedBy` and `blocking` edge",
+        "The mutation must abort if any old anchor is missing, appears more "
+        "than once, or differs from the recorded live text.",
+        "Do not append these templates as a fallback for #95 or #100.",
+        "#95 old anchor appears exactly once",
+        "#100 old anchors each appear exactly once",
+        "This umbrella does not block #76, #90, #92, or publication of M5.",
+        "The current M5 tracker #93 remains authoritative for the next release.",
+        "#83 + #84 + current M5 publication",
+        "M6 is non-blocking for #93 and the current M5 publication.",
+        "native `blocking` excludes #84 -> #43, #84 -> #64, and #90 -> #64",
     ):
         assert phrase in plan
+
+    assert "append the exact heading and template" not in plan
 
 
 def test_task_6_plan_verifies_exact_live_postconditions() -> None:
@@ -426,11 +499,13 @@ def test_task_6_plan_verifies_exact_live_postconditions() -> None:
         "#95 body states that shared milestone membership and roadmap sequencing "
         "do not make #95 a current runtime-release blocker",
         "#100 body contains no #93/current-M5 release-authority wording",
+        "#100 body contains no `current M5 publication` wording in any section",
         "#120 body carries the #84 P0 / #95 P1 distinction and says #95 is not "
         "a current runtime-release blocker by shared milestone or roadmap "
         "sequencing alone",
-        "native `blockedBy` excludes #76 -> #84, #43 -> #90, and #84 -> #90",
-        "native `blocking` excludes #84 -> #64 and #90 -> #64",
+        "native `blockedBy` excludes #76 -> #84, #84 -> #43, #43 -> #90, and "
+        "#84 -> #90",
+        "native `blocking` excludes #84 -> #43, #84 -> #64, and #90 -> #64",
     ):
         assert phrase in plan
 

@@ -650,9 +650,11 @@ Use `gh api --method POST repos/PSyron/polis/milestones` with the exact descript
   prerequisite, not an M6 child.
 
 Complete body edits must preserve unrelated body content while replacing only
-the heading-delimited sections named below. If the named heading does not exist
-in the current live body, append the exact heading and template at the end of
-the body instead of rewriting unrelated content.
+the heading-delimited sections named below. For #95 and #100, use the exact
+old-to-new anchor substitutions recorded below instead of heading fallback. The
+mutation must abort if any old anchor is missing, appears more than once, or
+differs from the recorded live text. Do not append these templates as a fallback
+for #95 or #100.
 
 #84: replace the complete heading-delimited dependency section with the exact
 `## Runtime-first product-safety dependency` template:
@@ -687,7 +689,20 @@ Retained dependencies: #76, #85, #86, #88, and #89.
 ```
 
 #95: replace the complete heading-delimited M5 publication section with the
-exact `## Runtime-first product-hardening disposition` template:
+exact `## Runtime-first product-hardening disposition` template. #95 old anchor
+appears exactly once in the live body as the complete current
+`## Dependencies and ordering` section:
+
+```markdown
+## Dependencies and ordering
+
+- CI integration depends on #80.
+- Work may begin in parallel with later M5 qualification once #80 is green.
+- The completed invariant guardrail should precede broad migration to a shared analyzed-document representation.
+- This umbrella does not block #76, #90, #92, or publication of M5.
+```
+
+Replace that exact old anchor with this exact new section:
 
 ```markdown
 ## Runtime-first product-hardening disposition
@@ -699,30 +714,133 @@ hardens generative and review-only invariants after that gate.
 
 Shared `Runtime 0.x Hardening` milestone membership and the `#120 -> #84 -> #95`
 roadmap sequence do not make #95 a current runtime-release blocker.
+
+## Dependencies and ordering
+
+- CI integration depends on #80.
+- Work may begin in parallel with optional model qualification once #80 is green.
+- The completed invariant guardrail should precede broad migration to a shared analyzed-document representation.
+- This umbrella does not block #76, #90, #92, or a runtime release.
 ```
 
 #100: replace the complete heading-delimited release-authority section with the
-exact `## Runtime-first M6 architecture disposition` template:
+exact `## Runtime-first M6 architecture disposition` template. #100 old anchors
+each appear exactly once in the live body and must be replaced independently so
+unrelated content is preserved.
+
+First #100 old anchor in `## Scope and sequencing policy`:
+
+```markdown
+The current M5 tracker #93 remains authoritative for the next release. M6 work must not become an implicit dependency of #76, #90, #66, or #92. A defect discovered by M6 can block a release only through a separately triaged issue with explicit evidence.
+```
+
+Replace it with:
 
 ```markdown
 ## Runtime-first M6 architecture disposition
 
 Classification: future product architecture under ADR-0020 and #120.
 
-#95 is an external product-hardening prerequisite, not an M6 child. The M6 child
-checklist is #96, #97, #98, and #99.
-
 Runtime release sequencing follows the runtime-first product lane and optional
 research lane adopted by ADR-0020.
+
+M6 work must not become an implicit dependency of #76, #90, #66, #92, #93, or a
+runtime release. A defect discovered by M6 can block a release only through a
+separately triaged issue with explicit evidence.
+```
+
+Second #100 old anchor in `## Dependency order`:
+
+```markdown
+#80 -> #95 generative invariant hardening
+
+#83 + #87 evidence + #88 + #90
+    -> #96 shared analyzed-document substrate
+
+#83 + #84 + current M5 publication
+    -> #97 rule catalog and per-source configuration
+
+generative invariants + analyzed document + rule catalog + #87/#88 evidence
+    -> #98 minimal token-pattern primitives
+
+analyzed document + rule catalog
+    -> #99 adapter-owned suppression fingerprint
+```
+
+Replace it with:
+
+```markdown
+#95 product-hardening evidence is an external prerequisite, not an M6 child.
+
+#83 + #87 evidence + #88 + #90
+    -> #96 shared analyzed-document substrate
+
+#83 + #84 runtime product-safety evidence
+    -> #97 rule catalog and per-source configuration
+
+generative invariants + analyzed document + rule catalog + #87/#88 evidence
+    -> #98 minimal token-pattern primitives
+
+analyzed document + rule catalog
+    -> #99 adapter-owned suppression fingerprint
+```
+
+Third #100 old anchor in `## Tracking checklist`:
+
+```markdown
+- [ ] #95 — Generative Unicode, offset, and correction invariant hardening.
+- [ ] #96 — Shared request-scoped analyzed-document substrate.
+- [ ] #97 — Rule catalog and exact per-source configuration.
+- [ ] #98 — Minimal token-pattern primitives for deterministic Polish rules.
+- [ ] #99 — Location-independent suggestion fingerprints for adapter-owned suppression.
+```
+
+Replace it with:
+
+```markdown
+External prerequisite:
+
+- [ ] #95 — P1 runtime product-hardening evidence before broad M6 implementation.
+
+M6 children:
+
+- [ ] #96 — Shared request-scoped analyzed-document substrate.
+- [ ] #97 — Rule catalog and exact per-source configuration.
+- [ ] #98 — Minimal token-pattern primitives for deterministic Polish rules.
+- [ ] #99 — Location-independent suggestion fingerprints for adapter-owned suppression.
+```
+
+Fourth #100 old anchor in `## Out of scope`:
+
+```markdown
+- Expanding the current M5 release claims or lowering any gate.
+```
+
+Replace it with:
+
+```markdown
+- Expanding superseded release claims, optional-research claims, or lowering any gate.
+```
+
+Fifth #100 old anchor in `## Dependencies`:
+
+```markdown
+None for tracking. Implementation order is controlled by the graph above. M6 is non-blocking for #93 and the current M5 publication.
+```
+
+Replace it with:
+
+```markdown
+None for tracking. Implementation order is controlled by the graph above. M6 is non-blocking for the runtime release path. #95 is an external product-hardening prerequisite, not an M6 child.
 ```
 
 After writing the complete body files, fetch each edited issue again and remove
 or reconcile every prohibited native `blockedBy` and `blocking` edge. The target
-graph prohibits `blockedBy` edges #76 -> #84, #43 -> #90, and #84 -> #90, and
-prohibits `blocking` edges #84 -> #64 and #90 -> #64. If GitHub exposes a
-native edge but the available API cannot remove it, stop before closing any
-issue or milestone and report the specific edge as blocked rather than relying
-on body prose.
+graph prohibits `blockedBy` edges #76 -> #84, #84 -> #43, #43 -> #90, and
+#84 -> #90, and prohibits `blocking` edges #84 -> #43, #84 -> #64, and
+#90 -> #64. If GitHub exposes a native edge but the available API cannot remove
+it, stop before closing any issue or milestone and report the specific edge as
+blocked rather than relying on body prose.
 
 Write every complete updated body to a file and use `gh issue edit --body-file`.
 Do not use inline bodies containing Markdown formatting.
@@ -799,11 +917,13 @@ Require:
 - #95 body states that shared milestone membership and roadmap sequencing do not
   make #95 a current runtime-release blocker;
 - #100 body contains no #93/current-M5 release-authority wording;
+- #100 body contains no `current M5 publication` wording in any section;
 - #120 body carries the #84 P0 / #95 P1 distinction and says #95 is not a
   current runtime-release blocker by shared milestone or roadmap sequencing
   alone;
-- native `blockedBy` excludes #76 -> #84, #43 -> #90, and #84 -> #90;
-- native `blocking` excludes #84 -> #64 and #90 -> #64;
+- native `blockedBy` excludes #76 -> #84, #84 -> #43, #43 -> #90, and
+  #84 -> #90;
+- native `blocking` excludes #84 -> #43, #84 -> #64, and #90 -> #64;
 - #76, #85–#90, and #119 are open in the research milestone;
 - #43, #64, #66, #92, and #93 are closed with `status:superseded` and `stateReason == NOT_PLANNED`;
 - #96–#100 remain open in M6;
