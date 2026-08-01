@@ -35,6 +35,11 @@ provenance, engine identity, or confidence alone never grants eligibility.
 
 ## Suggestion gates
 
+Suggestion and model gates are promotion evidence for an optional extension.
+They are not product release gates, and optional model research never blocks a
+runtime release. The runtime release path does not require a model, Java
+process, network service, research corpus, or consumed holdout.
+
 Model-dependent edits remain suggestion-only for the first hybrid release,
 including finite-candidate selections and verifier-accepted proposals:
 

@@ -1,13 +1,17 @@
 # Known limitations and product boundary
 
 - The current runtime covers a small deterministic rule set and a mock local backend path.
+- Polis is a complete offline runtime without a model. No production support
+  waits for model qualification, and optional model research never blocks a
+  runtime release. The runtime release path does not require a model, Java
+  process, network service, research corpus, or consumed holdout.
 - Local generation integration is available through the mock transport path.
   No tested local model has qualified for production correction or suggestions;
-  the repaired evidence, specialist prompts, runtime comparison, and production
-  adapter are tracked by M5 and [#43](https://github.com/PSyron/polis/issues/43).
+  repaired evidence, specialist prompts, runtime comparison, and adapter work
+  remain optional research evidence.
 - The #60 specialist engine and router boundary are implemented and tested with
   injected fakes. No default router identifies residual syntax or inflection
-  work, and no real specialist backend is configured until later M5 selection.
+  work, and no real specialist backend is configured for the supported runtime.
 - The sentence-only category router from #69 is experimental and is not wired
   into the default analyzer. Its best configuration, Qwen3 1.7B MLX, reached
   only 0.571 syntax precision and 0.160 syntax recall on development. Bielik
@@ -43,7 +47,8 @@
   correction accuracy were `1.00`, but the reviewable channel produced `0 TP /
   2 FP` and precision `0.00` against the required `0.90`. The holdout is
   consumed and cannot be rerun or used for tuning. The corpus does not replace
-  corpus v3 or the broader work tracked by #85, and #76 remains open.
+  corpus v3 or the broader optional research work tracked by #85, and #76
+  remains open.
 - The evaluated nominal-agreement extension reached reviewable inflection
   recall `18/20` on development, but the complete reviewable source produced
   `0 TP / 2 FP` on the one-shot holdout. The extension was therefore removed
@@ -56,7 +61,8 @@
   intentionally conservative.
 - The default installation has no production model or LanguageTool dependency.
   Research corpora, benchmark runners, training assets, and holdout evidence
-  remain repository-only workflows; they do not establish production support.
+  remain repository-only workflows; they do not establish production support
+  and optional model research never blocks a runtime release.
 - Default Polis runtime does not require OpenJDK, a LanguageTool process, a
   model, or network access. The optional sentence-only vendored LanguageTool
   path requires OpenJDK and an explicit local build of the pinned vendored 6.8
@@ -83,6 +89,9 @@
   and `correct_async()` share one orchestration path, apply a versioned
   source-policy for deterministic rules, keep every model edit reviewable, and
   expose optional suggestion status and actual call counts.
+  [ADR-0020](architecture/decisions/0020-runtime-first-product-charter.md)
+  supersedes only the mandatory-model critical path; it does not rewrite the
+  failed qualification results above.
 
 ## Accuracy and policy notes
 

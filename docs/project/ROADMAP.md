@@ -13,7 +13,54 @@
   unavailable or not exported.
 - Quality thresholds are derived from the measured baseline, not selected in advance.
 
-## M0 - Foundation and Decisions
+## Active product lane
+
+`#120 -> #84 -> #95`
+
+The product release gates are contracts, privacy, deterministic behavior,
+versioned automatic policy, packaging, offline installation, and release
+identity. Product delivery follows ADR-0020's runtime-first charter and does
+not require a model, Java process, network service, research corpus, or
+consumed holdout.
+
+#84 is P0 product-safety work and is independent from #76. New automatic
+privileges still need direct source behavior evidence before they can enter the
+versioned automatic policy, but that evidence is a product safety requirement,
+not a model-research release dependency.
+
+#95 is P1 hardening after #84. The `#120 -> #84 -> #95` arrow records
+sequencing; it does not mean that #95 blocks the current runtime release. Shared
+`Runtime 0.x Hardening` milestone membership does not make #95 a release blocker
+unless a separate accepted issue says so.
+
+## Optional research lane
+
+`#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90`
+
+Research outcomes do not block runtime releases. This graph has no product
+dependency edge and no due date; it organizes optional model, corpus,
+majority-coverage, and qualification-replay research without making those
+outcomes authoritative for the supported runtime.
+
+## Future product architecture
+
+#96–#100 remain M6 product architecture work and do not block current runtime
+releases.
+
+## Superseded M5 release train
+
+#43, #64, #66, #92, and #93 are superseded by ADR-0020 as active release-train
+authority. Their acceptance criteria are not represented as completed here.
+They remain auditable as historical issue metadata and planning evidence.
+
+## Historical delivery record
+
+The historical M0–M5 delivery record below is retained as historical evidence.
+It includes completed, open, rejected, and superseded work. Dependency tables in
+this section record the delivery understanding at the time they were written;
+they are not the active product-release graph under ADR-0020.
+
+### M0 - Foundation and Decisions
 
 | Key | Outcome | Labels | Depends on |
 | --- | --- | --- | --- |
@@ -26,7 +73,7 @@
 | M0-07 | Define analyzer, rule, and LLM backend protocols | `type:feature`, `area:core`, `priority:P0` | M0-05, M0-06 |
 | M0-08 | Create the initial licensed evaluation dataset | `type:test`, `area:evaluation`, `priority:P0` | M0-03, M0-05 |
 
-## M1 - Deterministic Core
+### M1 - Deterministic Core
 
 | Key | Outcome | Labels | Depends on |
 | --- | --- | --- | --- |
@@ -39,7 +86,7 @@
 | M1-07 | Detect conflicting corrections | `type:feature`, `area:correction`, `priority:P0` | M0-05 |
 | M1-08 | Apply selected non-conflicting corrections deterministically | `type:feature`, `area:correction`, `priority:P0` | M1-07 |
 
-## M2 - Local LLM
+### M2 - Local LLM
 
 | Key | Outcome | Labels | Depends on |
 | --- | --- | --- | --- |
@@ -50,7 +97,7 @@
 | M2-05 | Integrate LLM findings with the analysis pipeline | `type:feature`, `area:analysis`, `priority:P0` | M1-06, M2-04 |
 | M2-06 | Verify and document fully offline operation | `type:docs`, `area:llm`, `priority:P1` | M2-03, M2-05 |
 
-## M3 - MVP Quality
+### M3 - MVP Quality
 
 | Key | Outcome | Labels | Depends on |
 | --- | --- | --- | --- |
@@ -61,7 +108,7 @@
 | M3-05 | Add a thin CLI and executable examples | `type:feature`, `area:cli`, `priority:P1` | M0-06, M2-05 |
 | M3-06 | Build and verify the first prerelease candidate | `type:chore`, `area:packaging`, `priority:P0` | M3-02, M3-03, M3-04, M3-05 |
 
-## M4 - Release Stabilization
+### M4 - Release Stabilization
 
 | Key | Outcome | Labels | Depends on |
 | --- | --- | --- | --- |
@@ -70,7 +117,7 @@
 | M4-03 | Produce and validate the PyPI distribution | `type:chore`, `area:packaging`, `priority:P0` | M4-01, M4-02 |
 | M4-04 | Publish version 0.1.0 with release notes and documented limitations | `type:chore`, `area:packaging`, `priority:P0` | M4-03 |
 
-## M5 - Hybrid Polish Correction
+### M5 - Hybrid Polish Correction
 
 M5 keeps automatic deterministic corrections separate from reviewable model
 suggestions. ADR-0008 is the policy gate for every behavior change in this
@@ -135,14 +182,15 @@ the compact-model route, #75 adds only the deterministic residual sentence
 syntax coverage supported by exact evidence. Issue #77 makes these qualified
 sentence components practical through one persistent local process.
 
-The M5 majority-error graph from umbrella #93 is authoritative for the next
-delivery phase. The remote GitHub labels, `status:blocked` values, and native
-`blocked_by` links described below are intended metadata and remain pending
-controller application; this roadmap does not claim that the remote updates
-have already been made.
+The following M5 majority-error graph from umbrella #93 is historical evidence
+for the earlier combined product-and-research plan. The remote GitHub labels,
+`status:blocked` values, and native `blocked_by` links described below were
+intended metadata and remain pending controller application; this roadmap does
+not claim that the remote updates have already been made or that the graph is
+current product-release authority.
 
 `#80 -> #78 -> #76`; `#80 -> #81`; `#76 + #81 -> (#85 + #86)`;
-`#85 + #86 -> #87 -> (#88 + #89)`; `#76 -> #84`;
+`#85 + #86 -> #87 -> (#88 + #89)`;
 `#82 + #83 + #84 + #88 + successful #89 -> #43`;
 `#43 + #76 + #85 + #86 + #88 + #89 -> #90`; `#90 -> #64 -> #66`;
 `#80 -> #91 -> #66`; and `#66 + #91 -> #92`.
@@ -163,48 +211,30 @@ Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
 is a valid #63 outcome, but #43 cannot proceed until another exact configuration
 passes the accepted suggestion gates.
 
-## Critical Path
+### Historical critical path evidence
 
 M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 -> M3-02 -> M3-06 -> M4-03 -> M4-04
 
-M5 policy, evidence, and release path:
+Earlier M5 policy, evidence, and release path:
 
 `#54 -> #65 -> #55 -> #56 -> (#57 + #58) -> (#59 + #60) -> #61 -> #63 -> #67 -> #68 -> #69 -> ((#70 -> #72) + (#71 -> #73)) -> #74 -> #75 -> #77`
 
 `#80 -> (#78 -> #76; #81; #91)`; `#76 + #81 -> (#85 + #86) -> #87 -> (#88 + #89)`;
 `#82 + #83 + #84 + #88 + successful #89 -> #43 -> #90 -> #64 -> #66 -> #92 -> #93`.
 
-`#80 -> #91 -> #66`; #84 branches from #76. #94 tracks the documentation and
-GitHub-metadata synchronization and is intentionally outside the product
-critical path.
-
-## Runtime-first product and research boundary
-
-The supported product release is the small offline runtime under `src/polis`.
-Its release gates cover runtime safety, packaging and artifact contents, public
-contracts and serialization, privacy, Unicode half-open offsets, deterministic
-behavior, and conservative correction policy. These gates must remain
-verifiable without a model, model server, Java process, network, holdout, or
-research corpus.
+#80 -> #91 -> #66. #94 tracked documentation and GitHub-metadata
+synchronization and was intentionally outside the earlier product critical
+path.
 
 Model qualification, majority-coverage experiments, corpus construction,
 recorded qualification replay, and installed-package evidence remain valuable
 repository research and release evidence. They do not become runtime features
-merely because their issues are on the M5 tracker, and an unqualified model
-must not be described as production-ready. Consumed holdouts, reports, and
-results remain unchanged and are never rerun or tuned against for roadmap
-reconciliation.
-
-M6 internal architecture work (#96-#99) is future product engineering outside
-the immediate release critical path; it is not an implicit dependency of the
-runtime release. #84 and #95 remain product-facing policy/invariant work. The
-research/evidence issues (#76, #85-#90, #92, #93, and #119) document evidence
-and release authorization boundaries rather than missing default-runtime
-capabilities.
+merely because their issues are on the historical M5 tracker, and an
+unqualified model must not be described as production-ready. Consumed holdouts,
+reports, and results remain unchanged and are never rerun or tuned against for
+roadmap reconciliation.
 
 Paragraph adapters, GUI integrations, document adapters, cloud services,
-free-form model rewriting, and stylistic rewriting remain out of scope. The
-roadmap preserves the existing issue acceptance criteria and dependencies;
-this section only makes their product-versus-research role explicit.
+free-form model rewriting, and stylistic rewriting remain out of scope.
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.
