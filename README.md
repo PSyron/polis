@@ -9,6 +9,9 @@ No tested local model has qualified for production correction or suggestions.
 The default installation therefore does not select, download, or require a
 local model. Research and evaluation work remains in the repository and is
 described in the [research workflow guide](docs/development/research-workflow.md).
+[ADR-0020](docs/architecture/decisions/0020-runtime-first-product-charter.md)
+records that Polis is complete without a model, and optional model research
+never blocks a runtime release.
 
 ## Product boundary
 

@@ -10,7 +10,9 @@ This document publishes the M4 compatibility baseline and deprecation policy.
 - CPython 3.12, 3.14 on macOS arm64,
 - CPython 3.12, 3.14 on Windows x86_64.
 
-No optional model runtime is required for core deterministic checks.
+No optional model runtime is required for core deterministic checks. Model
+backends are optional extensions; their absence is not a degraded core-runtime
+state, and optional model research never blocks a runtime release.
 
 ### Evidence and deprecation policy enforcement
 

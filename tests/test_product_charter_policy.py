@@ -60,3 +60,43 @@ def test_accepted_charter_adr_supersedes_only_the_mandatory_model_path() -> None
 def test_architecture_index_links_the_runtime_first_charter() -> None:
     index = ARCHITECTURE_INDEX.read_text(encoding="utf-8")
     assert "0020-runtime-first-product-charter.md" in index
+
+
+def test_roadmap_separates_product_delivery_from_optional_research() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+
+    for heading in (
+        "## Active product lane",
+        "## Optional research lane",
+        "## Future product architecture",
+        "## Historical delivery record",
+    ):
+        assert heading in roadmap
+
+    for phrase in (
+        "#120 -> #84 -> #95",
+        "#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90",
+        "Research outcomes do not block runtime releases",
+    ):
+        assert phrase in roadmap
+
+    assert "#76 -> #84" not in roadmap
+    assert "M5 majority-error graph from umbrella #93 is authoritative" not in roadmap
+
+
+def test_release_docs_do_not_require_model_research() -> None:
+    documents = {
+        path.name: path.read_text(encoding="utf-8")
+        for path in (
+            ROOT / "README.md",
+            ROOT / "docs" / "limitations.md",
+            ROOT / "docs" / "llm-quality-gates.md",
+            ROOT / "docs" / "prerelease-candidate.md",
+            ROOT / "docs" / "compatibility.md",
+        )
+    }
+
+    joined = "\n".join(documents.values())
+    assert "optional model research never blocks a runtime release" in joined
+    assert "tracked by M5 and [#43]" not in joined
+    assert "until later M5 selection" not in joined

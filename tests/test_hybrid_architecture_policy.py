@@ -38,7 +38,7 @@ def test_hybrid_adr_records_architecture_and_safety_boundaries() -> None:
         assert policy in decision
 
 
-def test_m5_roadmap_records_every_outcome_in_dependency_order() -> None:
+def test_m5_roadmap_keeps_completed_historical_record() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     issue_refs = (
         "#65",
@@ -51,14 +51,12 @@ def test_m5_roadmap_records_every_outcome_in_dependency_order() -> None:
         "#61",
         "#62",
         "#63",
-        "#43",
-        "#64",
     )
 
+    assert "## Historical delivery record" in roadmap
     assert all(issue in roadmap for issue in issue_refs)
     assert roadmap.index("#65") < roadmap.index("#55") < roadmap.index("#56")
-    assert roadmap.index("#60") < roadmap.index("#61") < roadmap.index("#43")
-    assert roadmap.index("#43") < roadmap.index("#64")
+    assert roadmap.index("#60") < roadmap.index("#61")
 
 
 def test_m5_risk_register_covers_hybrid_evidence_and_runtime_risks() -> None:

@@ -1,6 +1,10 @@
 # Prerelease candidate verification
 
 Use this checklist to produce and validate an installable `M3-06` prerelease candidate.
+Runtime prerelease verification covers the supported offline runtime and does
+not execute or depend on model research, optional model qualification, research
+corpora, or consumed holdouts. Optional model research never blocks a runtime
+release.
 
 ## 1) Prepare artifact
 
