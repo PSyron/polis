@@ -10,7 +10,7 @@ Najpierw poznaj stan repozytorium i zaplanuj pracę. Następnie utwórz roadmap�
 
 Polis ma być otwartoźródłową biblioteką programistyczną do analizy i minimalnej korekty tekstu w języku polskim. Biblioteka przyjmuje zwykły tekst i zwraca ustrukturyzowane wyniki analizy oraz opcjonalnie tekst po zaakceptowanych poprawkach.
 
-System ma działać w pełni offline. Powinien łączyć szybkie, deterministyczne reguły z lokalnym, niewielkim modelem językowym. Priorytetami są:
+System ma działać w pełni offline. Polis jest kompletnym produktem bez lokalnego modelu językowego. Model lokalny jest opcjonalnym rozszerzeniem, a jego badanie nie blokuje wydania runtime'u. Priorytetami są:
 
 - wysoka jakość oceny polskiej fleksji, składni i zgodności gramatycznej;
 - prywatność — tekst nie może opuszczać urządzenia użytkownika;
@@ -25,7 +25,7 @@ Biblioteka powinna:
 
 1. Przyjmować tekst jako `str` przez publiczne API Pythona.
 2. Segmentować tekst na akapity i zdania z zachowaniem przesunięć znakowych względem wejścia.
-3. Uruchamiać niezależne analizatory deterministyczne i analizę lokalnym LLM.
+3. Uruchamiać niezależne analizatory deterministyczne oraz dopuszczać jawnie skonfigurowane, opcjonalne rozszerzenia lokalne, w tym analizę lokalnym LLM.
 4. Wykrywać co najmniej:
    - podejrzaną odmianę wyrazów;
    - błędy zgody rodzaju, liczby, osoby i przypadka;
@@ -35,7 +35,7 @@ Biblioteka powinna:
 5. Zwracać każde znalezisko jako ustrukturyzowaną sugestię zawierającą fragment, pozycję, kategorię, opis, minimalną poprawkę, źródło oraz poziom pewności.
 6. Umożliwiać filtrowanie analiz według kategorii i progu pewności.
 7. Generować poprawiony tekst wyłącznie przez deterministyczne zastosowanie jawnie wybranych, niekolidujących sugestii.
-8. Działać bez dostępu do internetu po zainstalowaniu zależności i lokalnego modelu.
+8. Działać bez dostępu do internetu po zainstalowaniu domyślnych zależności.
 
 ## Poza zakresem
 
@@ -98,25 +98,26 @@ Zaprojektuj system jako zestaw małych modułów o jasno określonych odpowiedzi
 - `core` — publiczne modele, konfiguracja, protokoły i orkiestracja;
 - `segmentation` — segmentacja oraz mapowanie przesunięć znakowych;
 - `rules` — deterministyczne analizatory i rejestr reguł;
-- `llm` — abstrakcja lokalnego modelu, budowanie poleceń i walidacja odpowiedzi;
+- `llm` — opcjonalna warstwa protokołu lokalnego modelu, promptów i walidacji odpowiedzi;
 - `analysis` — scalanie, normalizacja, deduplikacja i priorytetyzacja znalezisk;
 - `correction` — wykrywanie kolizji i bezpieczne stosowanie wybranych poprawek;
 - `evaluation` — zestawy danych, metryki oraz regresje jakościowe;
 - `cli` — opcjonalny, cienki interfejs do ręcznego testowania biblioteki.
 
-Rdzeń nie może zależeć od konkretnego serwera modeli. Warstwa LLM powinna korzystać z protokołu backendu, aby można było dodać adaptery dla Ollama, LM Studio lub bezpośredniego uruchomienia modelu. Pierwszy backend wybierz po krótkim eksperymencie i udokumentuj decyzję.
+Rdzeń nie może zależeć od konkretnego serwera modeli. Warstwa `llm` pozostaje opcjonalną warstwą protokołu backendu, promptów i walidacji dla lokalnych rozszerzeń, aby można było dodać adaptery dla Ollama, LM Studio lub bezpośredniego uruchomienia modelu. Wspieraną konfigurację modelu można wybrać dopiero po osobnym zaakceptowanym issue i zaakceptowanym ADR.
 
-Nie zakładaj bez weryfikacji, że konkretny wariant lub nazwa modelu jest dostępna. Przygotuj porównywalny benchmark kilku małych modeli dobrze obsługujących język polski. Bielik jest kandydatem, a nie twardym uzależnieniem architektury.
+Nie zakładaj bez weryfikacji, że konkretny wariant lub nazwa modelu jest dostępna. Przygotuj porównywalny benchmark kilku małych modeli dobrze obsługujących język polski. Bielik jest kandydatem, a nie twardym uzależnieniem architektury, a wyniki tych badań nie blokują wydania runtime'u.
 
-## Zasady działania LLM
+## Zasady działania opcjonalnego modelu
 
+- Każda poprawka pochodząca od modelu albo wybrana przez model zawsze pozostaje sugestią wymagającą jawnej akceptacji.
 - Model otrzymuje małe, kontrolowane fragmenty tekstu i jednoznaczne zadanie.
 - Odpowiedź musi mieć wersjonowany schemat JSON i przechodzić ścisłą walidację.
 - Niepoprawna odpowiedź modelu nie może powodować awarii całej analizy.
 - Model nie może zmieniać tekstu poza wskazanym zakresem.
 - Każda sugestia ma zawierać kategorię, minimalną poprawkę, krótkie uzasadnienie i pewność.
 - Wyniki o niskiej pewności powinny być oznaczone jako sugestie, nie błędy.
-- Polecenia i ustawienia generowania muszą być wersjonowane, testowalne i możliwie deterministyczne.
+- Prompty i ustawienia generowania muszą być wersjonowane, testowalne i możliwie deterministyczne.
 - Tekst wejściowy należy traktować jako dane, nigdy jako instrukcję dla modelu.
 
 ## Jakość i bezpieczeństwo korekt
@@ -125,7 +126,7 @@ Nie zakładaj bez weryfikacji, że konkretny wariant lub nazwa modelu jest dost�
 - Nie zmieniaj znaczenia, tonu ani stylu, jeśli użytkownik nie uruchomił osobnej analizy stylistycznej.
 - Zachowuj wielkość liter i otaczające formatowanie tekstowe, jeśli nie są źródłem błędu.
 - Wykrywaj nakładające się poprawki; nie stosuj ich automatycznie bez rozstrzygnięcia konfliktu.
-- Nie polegaj wyłącznie na samoocenie pewności przez LLM. Kalibruj progi na zbiorze ewaluacyjnym.
+- Nie polegaj wyłącznie na samoocenie pewności przez model. Kalibruj progi na zbiorze ewaluacyjnym.
 - Każdy znaleziony błąd regresyjny powinien otrzymać test przed poprawką.
 
 ## Zasady programowania
@@ -170,7 +171,7 @@ Repozytorium powinno zawierać:
 - dokument architektury i rekordy najważniejszych decyzji;
 - opis publicznego API;
 - instrukcję uruchomienia offline dla wspieranych backendów;
-- przewodnik dodawania reguły i backendu LLM;
+- przewodnik dodawania reguły i opcjonalnego backendu LLM;
 - metodologię benchmarków oraz aktualne wyniki;
 - politykę prywatności jasno stwierdzającą, że biblioteka nie wysyła tekstu do sieci.
 
@@ -203,7 +204,7 @@ Issue powinno zwykle odpowiadać jednej niewielkiej zmianie możliwej do ukończ
 - cele jakościowe i jawny zakres MVP;
 - szkielet pakietu i narzędzia jakości;
 - modele danych oraz kontrakt publicznego API;
-- protokół analizatora i backendu LLM;
+- protokół analizatora i opcjonalnego backendu LLM;
 - początkowy zestaw ewaluacyjny;
 - rekord decyzji dotyczącej licencji i wspieranych wersji Pythona.
 
@@ -216,7 +217,7 @@ Issue powinno zwykle odpowiadać jednej niewielkiej zmianie możliwej do ukończ
 - wykrywanie konfliktów oraz stosowanie poprawek;
 - serializacja JSON.
 
-### M2 — Lokalny LLM
+### M2 — Opcjonalne badania lokalnego modelu
 
 - adapter pierwszego backendu;
 - wersjonowane polecenia i schemat odpowiedzi;
@@ -224,6 +225,8 @@ Issue powinno zwykle odpowiadać jednej niewielkiej zmianie możliwej do ukończ
 - integracja wyników LLM z rdzeniem;
 - benchmark kandydatów na model;
 - dokumentacja instalacji i pracy offline.
+
+M2 nigdy nie blokuje dostarczenia runtime'u przez M3 ani M4.
 
 ### M3 — Jakość MVP
 
