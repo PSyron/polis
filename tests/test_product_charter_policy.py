@@ -18,14 +18,18 @@ PORTFOLIO = ROOT / "docs" / "project" / "runtime-first-portfolio-disposition.md"
 
 def test_prompt_defines_a_complete_runtime_without_a_model() -> None:
     prompt = PROMPT.read_text(encoding="utf-8")
+    normalized_prompt = " ".join(prompt.split())
 
     for phrase in (
         "Polis jest kompletnym produktem bez lokalnego modelu językowego",
         "Model lokalny jest opcjonalnym rozszerzeniem",
         "nie blokuje wydania runtime'u",
         "zawsze pozostaje sugestią wymagającą jawnej akceptacji",
+        "Wspierana ścieżka wydania runtime'u wymaga wyłącznie domyślnych zależności",
+        "nie wymaga modelu lokalnego, serwera modeli, procesu Java, sieci, "
+        "korpusu badawczego ani zużytego holdoutu",
     ):
-        assert phrase in prompt
+        assert phrase in normalized_prompt
 
     assert "po zainstalowaniu zależności i lokalnego modelu" not in prompt
     assert (
@@ -43,7 +47,11 @@ def test_accepted_charter_adr_supersedes_only_the_mandatory_model_path() -> None
         "complete product without a local language model",
         "always review-only",
         "never blocks a runtime release",
+        "Java process",
+        "research corpus",
         "consumed holdouts",
+        "consumed holdout",
+        "This ADR supersedes only the mandatory-model critical path",
         "Issue #120",
     ):
         assert phrase in decision

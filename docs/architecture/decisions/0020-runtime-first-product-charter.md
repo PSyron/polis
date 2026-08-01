@@ -36,8 +36,8 @@ from this charter.
 The runtime release path is authoritative for Polis product releases. Product
 delivery depends on the default offline dependency set, deterministic
 analyzers, regression tests, static checks, packaging verification, and other
-runtime safety gates that run without a model, a model server, or external
-services.
+runtime safety gates that run without a local language model, a model server,
+a Java process, network access, a research corpus, or a consumed holdout.
 
 Runtime release evidence is therefore sufficient to ship the supported product.
 Optional research outcomes may inform later decisions, but they never define

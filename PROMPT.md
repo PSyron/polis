@@ -37,6 +37,10 @@ Biblioteka powinna:
 7. Generować poprawiony tekst wyłącznie przez deterministyczne zastosowanie jawnie wybranych, niekolidujących sugestii.
 8. Działać bez dostępu do internetu po zainstalowaniu domyślnych zależności.
 
+Wspierana ścieżka wydania runtime'u wymaga wyłącznie domyślnych zależności i
+nie wymaga modelu lokalnego, serwera modeli, procesu Java, sieci, korpusu
+badawczego ani zużytego holdoutu.
+
 ## Poza zakresem
 
 Pierwsza wersja świadomie nie obejmuje:
