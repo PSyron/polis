@@ -629,12 +629,103 @@ Use `gh api --method POST repos/PSyron/polis/milestones` with the exact descript
 
 - [ ] **Step 3: Move and clarify product issues**
 
-- #120: replace `type:chore` with `type:decision`, replace `area:packaging` with `area:core`, keep `priority:P0`, assign `Runtime 0.x Hardening`, and update its checklist/body to reference PR #121 as Phase 1 and the merged charter as the final migration.
-- #84: assign `Runtime 0.x Hardening`, remove `status:blocked`, replace its dependency section with the fail-closed enforcement-versus-qualification split, and state that new automatic privileges still require evidence.
-- #95: assign `Runtime 0.x Hardening` and append its product-hardening disposition.
-- #100: keep M6, remove #95 from the child checklist, and record #95 as an external product-hardening prerequisite.
+- #120: replace `type:chore` with `type:decision`, replace `area:packaging`
+  with `area:core`, keep `priority:P0`, assign `Runtime 0.x Hardening`, and
+  update its checklist/body to reference PR #121 as Phase 1 and the merged
+  charter as the final migration. The body must carry the #84 P0 / #95 P1
+  distinction and state that shared milestone membership and roadmap sequencing
+  do not make #95 a current runtime-release blocker.
+- #84: assign `Runtime 0.x Hardening`, remove `status:blocked`, and perform a
+  complete heading-delimited body section replacement for the legacy dependency
+  section. Remove body claims that #84 depends on #76, blocks #64, or blocks
+  final release authorization.
+- #95: assign `Runtime 0.x Hardening` and perform a complete heading-delimited
+  body section replacement for legacy M5 publication or non-publication wording.
+  The live body must state that #95 is P1 hardening after #84 and does not block
+  the current runtime release by shared milestone membership or roadmap
+  sequencing alone.
+- #100: keep M6, remove #95 from the child checklist, and perform a complete
+  heading-delimited body section replacement for any legacy #93/current-M5
+  release-authority section. Record #95 as an external product-hardening
+  prerequisite, not an M6 child.
 
-Write every complete updated body to a file and use `gh issue edit --body-file`. Do not use inline bodies containing Markdown formatting.
+Complete body edits must preserve unrelated body content while replacing only
+the heading-delimited sections named below. If the named heading does not exist
+in the current live body, append the exact heading and template at the end of
+the body instead of rewriting unrelated content.
+
+#84: replace the complete heading-delimited dependency section with the exact
+`## Runtime-first product-safety dependency` template:
+
+```markdown
+## Runtime-first product-safety dependency
+
+Classification: P0 product-safety work under ADR-0020 and #120.
+
+This issue is independent from #76 and optional model research. Automatic
+correction privileges are versioned product behavior and fail closed for every
+unknown or changed source, category, operation, behavior, or policy version.
+
+New automatic privileges still require direct source-behavior evidence before
+they can enter the supported runtime policy. Shared milestone membership and
+roadmap sequencing do not make #95 a current runtime-release blocker.
+```
+
+#90: replace the complete heading-delimited dependency section with the exact
+`## Runtime-first optional-research dependency` template:
+
+```markdown
+## Runtime-first optional-research dependency
+
+Classification: optional research under ADR-0020 and #120.
+
+This issue preserves installed-package majority-coverage research evidence. Its
+outcome does not block a Polis runtime release and cannot qualify an unverified
+model as supported product behavior.
+
+Retained dependencies: #76, #85, #86, #88, and #89.
+```
+
+#95: replace the complete heading-delimited M5 publication section with the
+exact `## Runtime-first product-hardening disposition` template:
+
+```markdown
+## Runtime-first product-hardening disposition
+
+Classification: P1 hardening after #84 under ADR-0020 and #120.
+
+#84 is the P0 product-safety gate for version-bound automatic privileges. #95
+hardens generative and review-only invariants after that gate.
+
+Shared `Runtime 0.x Hardening` milestone membership and the `#120 -> #84 -> #95`
+roadmap sequence do not make #95 a current runtime-release blocker.
+```
+
+#100: replace the complete heading-delimited release-authority section with the
+exact `## Runtime-first M6 architecture disposition` template:
+
+```markdown
+## Runtime-first M6 architecture disposition
+
+Classification: future product architecture under ADR-0020 and #120.
+
+#95 is an external product-hardening prerequisite, not an M6 child. The M6 child
+checklist is #96, #97, #98, and #99.
+
+Runtime release sequencing follows the runtime-first product lane and optional
+research lane adopted by ADR-0020.
+```
+
+After writing the complete body files, fetch each edited issue again and remove
+or reconcile every prohibited native `blockedBy` and `blocking` edge. The target
+graph prohibits `blockedBy` edges #76 -> #84, #43 -> #90, and #84 -> #90, and
+prohibits `blocking` edges #84 -> #64 and #90 -> #64. If GitHub exposes a
+native edge but the available API cannot remove it, stop before closing any
+issue or milestone and report the specific edge as blocked rather than relying
+on body prose.
+
+Write every complete updated body to a file and use `gh issue edit --body-file`.
+Do not use inline bodies containing Markdown formatting.
 
 - [ ] **Step 4: Move optional research issues**
 
@@ -653,6 +744,11 @@ unverified model as supported product behavior.
 ```
 
 For #76, additionally name #119 as the current independent requalification dependency. Retain `status:blocked` on #76 and #85–#90 only while their internal research dependencies remain unresolved. #119 remains unblocked.
+
+For #90, replace the complete heading-delimited dependency section with the
+exact #90 template from Step 3 before appending the standard research section.
+Verify its body and native edge set retain only the internal optional-research
+dependencies #76, #85, #86, #88, and #89.
 
 - [ ] **Step 5: Close superseded issues accurately**
 
@@ -692,6 +788,22 @@ Require:
 
 - #84, #95, and #120 are open in `Runtime 0.x Hardening`;
 - #84 has no `status:blocked` label and no #76 dependency in its body;
+- #84 body contains `P0 product-safety work`;
+- #84 body contains no #64 blocking claim and no final-release authorization
+  blocker claim;
+- #90 has only internal optional-research dependencies #76, #85, #86, #88, and
+  #89 in body prose and native edges;
+- #90 has no body or native dependency edge involving #43, #84, or #64;
+- #95 body contains `P1 hardening after #84`;
+- #95 body contains no legacy M5 non-publication wording;
+- #95 body states that shared milestone membership and roadmap sequencing do not
+  make #95 a current runtime-release blocker;
+- #100 body contains no #93/current-M5 release-authority wording;
+- #120 body carries the #84 P0 / #95 P1 distinction and says #95 is not a
+  current runtime-release blocker by shared milestone or roadmap sequencing
+  alone;
+- native `blockedBy` excludes #76 -> #84, #43 -> #90, and #84 -> #90;
+- native `blocking` excludes #84 -> #64 and #90 -> #64;
 - #76, #85–#90, and #119 are open in the research milestone;
 - #43, #64, #66, #92, and #93 are closed with `status:superseded` and `stateReason == NOT_PLANNED`;
 - #96–#100 remain open in M6;

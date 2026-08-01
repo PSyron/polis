@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,13 @@ ADR = (
 ARCHITECTURE_INDEX = ROOT / "docs" / "architecture" / "README.md"
 ROADMAP = ROOT / "docs" / "project" / "ROADMAP.md"
 PORTFOLIO = ROOT / "docs" / "project" / "runtime-first-portfolio-disposition.md"
+PLAN = (
+    ROOT
+    / "docs"
+    / "superpowers"
+    / "plans"
+    / ("2026-08-01-runtime-first-product-charter.md")
+)
 
 GOVERNED_RELEASE_DOCUMENTS = (
     pytest.param(ROOT / "README.md", id="readme"),
@@ -24,6 +32,89 @@ GOVERNED_RELEASE_DOCUMENTS = (
     pytest.param(ROOT / "docs" / "prerelease-candidate.md", id="prerelease"),
     pytest.param(ROOT / "docs" / "compatibility.md", id="compatibility"),
 )
+
+
+def assert_no_runtime_release_dependency_conflict(document: str) -> None:
+    for unit in _release_policy_units(document):
+        if not _has_runtime_release_concept(unit):
+            continue
+        if not _has_dependency_or_authority_concept(unit):
+            continue
+        if not _has_forbidden_release_dependency_concept(unit):
+            continue
+        if _is_allowed_historical_or_negative_context(unit):
+            continue
+        msg = f"release dependency policy violation: {unit}"
+        raise AssertionError(msg)
+
+
+def _release_policy_units(document: str) -> tuple[str, ...]:
+    units: list[str] = []
+    for raw_line in document.splitlines():
+        line = " ".join(raw_line.split())
+        if not line:
+            continue
+        units.append(line)
+        units.extend(
+            sentence.strip()
+            for sentence in re.split(r"(?<=[.!?;])\s+", line)
+            if sentence.strip()
+        )
+    return tuple(dict.fromkeys(units))
+
+
+def _has_runtime_release_concept(unit: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(?:runtime|product|polis|next|current)?[- ]?"
+            r"(?:release|publication|publishing|publish|prerelease|candidate|"
+            r"ship|shipping)\b",
+            unit,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+def _has_dependency_or_authority_concept(unit: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(?:blocked?|blocking|requires?|required|depends? on|dependency|"
+            r"prerequisite|precondition|until|only after|cannot proceed|"
+            r"waits? for|governed by|authoritative|authority|release blocker|"
+            r"release-blocking)\b",
+            unit,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+def _has_forbidden_release_dependency_concept(unit: str) -> bool:
+    return bool(
+        re.search(
+            r"(?:#43|#76|#93|\bM5\b|\bqualified local model\b|"
+            r"\blocal model\b|\bmodel research\b|\bmodel qualification\b|"
+            r"\bJava(?: process)?\b|\bnetwork(?: access| service)?\b|"
+            r"\bresearch corp(?:us|ora)\b|\bconsumed holdouts?\b)",
+            unit,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+def _is_allowed_historical_or_negative_context(unit: str) -> bool:
+    return bool(
+        re.search(
+            r"(?:\bdoes not (?:require|depend on|execute or depend on|block)\b|"
+            r"\bdo not block\b|\bnever blocks?\b|\bno current-release "
+            r"dependency\b|\bnot .*current[- ]runtime[- ]release blocker\b|"
+            r"\bnot .*product-release authority\b|\bnot .*release dependency\b|"
+            r"\bnot .*release blocker\b|\bnot .*release gate\b|"
+            r"\bno longer depends\b|\bwithout making\b|\bhistorical evidence\b|"
+            r"\bsuperseded\b|\boptional research\b|\bresearch evidence\b)",
+            unit,
+            flags=re.IGNORECASE,
+        )
+    )
 
 
 def test_prompt_defines_a_complete_runtime_without_a_model() -> None:
@@ -126,6 +217,77 @@ def test_release_docs_do_not_require_model_research() -> None:
     assert "until later M5 selection" not in joined
 
 
+@pytest.mark.parametrize(
+    ("document", "break_it_catches"),
+    (
+        pytest.param(
+            (
+                "A runtime release remains blocked until #76 completes and "
+                "requires a qualified local model."
+            ),
+            "#76 plus qualified-local-model current release blocking",
+            id="qualified-model-and-76-block-runtime-release",
+        ),
+        pytest.param(
+            "The runtime can ship only after a Java process is available.",
+            "Java as a runtime shipment prerequisite",
+            id="java-process-release-prerequisite",
+        ),
+        pytest.param(
+            "Publication depends on network access for verification.",
+            "network access as publication prerequisite",
+            id="network-publication-prerequisite",
+        ),
+        pytest.param(
+            ("The product release requires the research corpus before publishing."),
+            "research corpus as product release prerequisite",
+            id="research-corpus-release-prerequisite",
+        ),
+        pytest.param(
+            ("A runtime release cannot proceed until the consumed holdout is rerun."),
+            "consumed holdout as runtime release prerequisite",
+            id="consumed-holdout-release-prerequisite",
+        ),
+        pytest.param(
+            "The next runtime release is governed by M5 and #93.",
+            "M5 and #93 as current release authority",
+            id="m5-93-release-authority",
+        ),
+        pytest.param(
+            "Publishing the runtime waits for #43 and #76.",
+            "#43 and #76 as runtime publication prerequisites",
+            id="43-76-publication-prerequisites",
+        ),
+    ),
+)
+def test_release_dependency_policy_rejects_semantic_contradiction_probes(
+    document: str,
+    break_it_catches: str,
+) -> None:
+    assert break_it_catches
+
+    with pytest.raises(AssertionError, match="release dependency policy violation"):
+        assert_no_runtime_release_dependency_conflict(document)
+
+
+def test_release_dependency_policy_allows_historical_and_optional_contexts() -> None:
+    assert_no_runtime_release_dependency_conflict(
+        """
+        Optional model research never blocks a runtime release. The runtime
+        release path does not require a model, Java process, network service,
+        research corpus, or consumed holdout.
+
+        The following M5 majority-error graph from umbrella #93 is historical
+        evidence for the earlier combined product-and-research plan; it is not
+        current product-release authority.
+
+        Superseded by ADR-0020: runtime publication no longer depends on the
+        combined M5 artifact graph, and the acceptance criteria were not
+        completed.
+        """
+    )
+
+
 @pytest.mark.parametrize("path", GOVERNED_RELEASE_DOCUMENTS)
 def test_each_release_doc_independently_rejects_research_release_dependencies(
     path: Path,
@@ -139,20 +301,7 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
     ):
         assert phrase in document
 
-    for forbidden in (
-        "tracked by M5 and [#43]",
-        "until later M5 selection",
-        "M5 majority-error graph from umbrella #93 is authoritative",
-        "#93 remains authoritative for the next release",
-        "#43 blocks a runtime release",
-        "#76 blocks a runtime release",
-        "runtime release depends on model research",
-        "runtime release depends on Java",
-        "runtime release depends on network",
-        "runtime release depends on a research corpus",
-        "runtime release depends on a consumed holdout",
-    ):
-        assert forbidden not in document
+    assert_no_runtime_release_dependency_conflict(document)
 
 
 def test_portfolio_manifest_covers_every_affected_open_issue_exactly_once() -> None:
@@ -240,6 +389,50 @@ def test_portfolio_post_mutation_assertions_reject_legacy_release_language() -> 
         "or consumed holdout",
     ):
         assert phrase in portfolio
+
+
+def test_task_6_plan_requires_executable_body_and_native_edge_contract() -> None:
+    plan = " ".join(PLAN.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "Complete body edits must preserve unrelated body content while "
+        "replacing only the heading-delimited sections named below.",
+        "#84: replace the complete heading-delimited dependency section with "
+        "the exact `## Runtime-first product-safety dependency` template",
+        "#90: replace the complete heading-delimited dependency section with "
+        "the exact `## Runtime-first optional-research dependency` template",
+        "#95: replace the complete heading-delimited M5 publication section "
+        "with the exact `## Runtime-first product-hardening disposition` "
+        "template",
+        "#100: replace the complete heading-delimited release-authority section "
+        "with the exact `## Runtime-first M6 architecture disposition` template",
+        "remove or reconcile every prohibited native `blockedBy` and `blocking` edge",
+    ):
+        assert phrase in plan
+
+
+def test_task_6_plan_verifies_exact_live_postconditions() -> None:
+    plan = " ".join(PLAN.read_text(encoding="utf-8").split())
+
+    for phrase in (
+        "#84 body contains `P0 product-safety work`",
+        "#84 body contains no #64 blocking claim and no final-release "
+        "authorization blocker claim",
+        "#90 has only internal optional-research dependencies #76, #85, #86, "
+        "#88, and #89 in body prose and native edges",
+        "#90 has no body or native dependency edge involving #43, #84, or #64",
+        "#95 body contains `P1 hardening after #84`",
+        "#95 body contains no legacy M5 non-publication wording",
+        "#95 body states that shared milestone membership and roadmap sequencing "
+        "do not make #95 a current runtime-release blocker",
+        "#100 body contains no #93/current-M5 release-authority wording",
+        "#120 body carries the #84 P0 / #95 P1 distinction and says #95 is not "
+        "a current runtime-release blocker by shared milestone or roadmap "
+        "sequencing alone",
+        "native `blockedBy` excludes #76 -> #84, #43 -> #90, and #84 -> #90",
+        "native `blocking` excludes #84 -> #64 and #90 -> #64",
+    ):
+        assert phrase in plan
 
 
 def test_portfolio_manifest_records_exact_label_transitions() -> None:
