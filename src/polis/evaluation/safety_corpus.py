@@ -3,9 +3,9 @@
 The safety corpus re-qualifies the installed-package sentence safety claim
 after the corpus-v3 frozen holdout was consumed by a failed one-shot gate.
 It reuses the schema-v3 invariants from
-:mod:`polis.evaluation.correction_corpus` without changing that module, and
-adds a dedicated controlled entity-surface catalog that shares no canonical
-entity identifier with the corpus-v3 catalog.
+:mod:`polis.evaluation.correction_corpus`, including its policy-parameterized
+review validation helper, and adds dedicated controlled entity-surface catalogs
+that share no canonical entity identifier with the corpus-v3 catalog.
 """
 
 from __future__ import annotations
@@ -15,9 +15,11 @@ import json
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
+from types import MappingProxyType
 from typing import Literal, cast
 
 from polis.evaluation.correction_corpus import (
@@ -58,6 +60,20 @@ from polis.evaluation.correction_corpus import (
 
 CORPUS_ID = "polis_polish_correction_safety_corpus_v1"
 REVIEW_CHECKLIST_VERSION = "safety-corpus-review-v1"
+CORPUS_V2_ID = "polis_polish_correction_safety_corpus_v2"
+REVIEW_CHECKLIST_V2_VERSION = "safety-corpus-review-v2"
+V2_REQUIRED_REVIEWER = "Polis architecture owner"
+V2_APPROVED_REVIEW_DATE = "2026-08-02"
+V2_APPROVED_CANDIDATE_DIGEST = (
+    "c64f009f14f0cde8390a46acc24660305534576bc897f70e281ffebbbbca6f53"
+)
+V2_APPROVED_FROZEN_DIGEST = (
+    "53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29"
+)
+V2_APPROVAL_REVIEW_BASIS = (
+    "Role-authorized exhaustive checklist review completed on 2026-08-02 "
+    "under the accepted clarification in issue #119."
+)
 
 _CASE_FIELDS = frozenset(
     {
@@ -193,6 +209,97 @@ SAFETY_ENTITY_ID_OVERRIDES = {
     "zakopanego": "zakopane",
 }
 
+SAFETY_V2_CONTROLLED_ENTITY_SURFACES = frozenset(
+    {
+        "Alicja Kurek",
+        "Bartosz Domański",
+        "Błękitna Dolina",
+        "Celina Rogalska",
+        "Cichy Bór",
+        "Damian Kaczmarek",
+        "Ewa Leszczyńska",
+        "Filip Jaworski",
+        "Grażyna Kłos",
+        "Ireneusz Marciniak",
+        "Joanna Rybak",
+        "Kamienny Brzeg",
+        "Konrad Zięba",
+        "Leśna Przełęcz",
+        "Nowa Przystań",
+        "Srebrny Jar",
+        "Stary Most",
+        "Wysoka Łąka",
+        "Zielone Wzgórze",
+        "Źródlana Polana",
+    }
+)
+SAFETY_V2_ENTITY_ID_OVERRIDES: dict[str, str] = {}
+
+
+@dataclass(frozen=True)
+class _SafetyCorpusApproval:
+    approval_scope: str
+    approved_case_count: int
+    candidate_digest: str
+    frozen_digest: str
+    reviewer: str
+    reviewed_at: str
+    checklist_version: str
+    review_basis: str
+
+    def manifest(self, *, corpus_id: str) -> dict[str, object]:
+        return {
+            "corpus_id": corpus_id,
+            "approval_scope": self.approval_scope,
+            "approved_case_count": self.approved_case_count,
+            "candidate_digest": self.candidate_digest,
+            "frozen_digest": self.frozen_digest,
+            "reviewer": self.reviewer,
+            "reviewed_at": self.reviewed_at,
+            "checklist_version": self.checklist_version,
+            "review_basis": self.review_basis,
+        }
+
+
+@dataclass(frozen=True)
+class _SafetyCorpusPolicy:
+    corpus_id: str
+    checklist_version: str
+    required_reviewer: str
+    controlled_entity_surfaces: frozenset[str]
+    entity_id_overrides: Mapping[str, str]
+    quality_gate_approval: _SafetyCorpusApproval | None = None
+
+
+_SAFETY_CORPUS_POLICIES: Mapping[str, _SafetyCorpusPolicy] = MappingProxyType(
+    {
+        CORPUS_ID: _SafetyCorpusPolicy(
+            corpus_id=CORPUS_ID,
+            checklist_version=REVIEW_CHECKLIST_VERSION,
+            required_reviewer="Paweł Cyroń",
+            controlled_entity_surfaces=SAFETY_CONTROLLED_ENTITY_SURFACES,
+            entity_id_overrides=MappingProxyType(dict(SAFETY_ENTITY_ID_OVERRIDES)),
+        ),
+        CORPUS_V2_ID: _SafetyCorpusPolicy(
+            corpus_id=CORPUS_V2_ID,
+            checklist_version=REVIEW_CHECKLIST_V2_VERSION,
+            required_reviewer=V2_REQUIRED_REVIEWER,
+            controlled_entity_surfaces=SAFETY_V2_CONTROLLED_ENTITY_SURFACES,
+            entity_id_overrides=MappingProxyType(dict(SAFETY_V2_ENTITY_ID_OVERRIDES)),
+            quality_gate_approval=_SafetyCorpusApproval(
+                approval_scope="all-cases",
+                approved_case_count=240,
+                candidate_digest=V2_APPROVED_CANDIDATE_DIGEST,
+                frozen_digest=V2_APPROVED_FROZEN_DIGEST,
+                reviewer=V2_REQUIRED_REVIEWER,
+                reviewed_at=V2_APPROVED_REVIEW_DATE,
+                checklist_version=REVIEW_CHECKLIST_V2_VERSION,
+                review_basis=V2_APPROVAL_REVIEW_BASIS,
+            ),
+        ),
+    }
+)
+
 
 def load_safety_corpus_json(path: Path) -> CorrectionCorpus:
     """Load and validate the UTF-8 JSON safety corpus."""
@@ -222,27 +329,23 @@ def validate_safety_corpus(raw: object) -> CorrectionCorpus:
     if dataset["schema_version"] != 3:
         raise ValueError("corpus schema_version must be 3")
     corpus_id = _require_id(dataset["id"], "corpus id")
-    if corpus_id != CORPUS_ID:
-        raise ValueError(f"corpus id must be {CORPUS_ID}")
+    policy = _policy_for_id(corpus_id)
     if dataset["language"] != "pl-PL":
         raise ValueError("corpus language must be pl-PL")
     holdout_state = dataset["holdout_state"]
     if holdout_state not in {"unfrozen-candidates", "frozen"}:
         raise ValueError("corpus holdout_state is invalid")
     provenance = _validate_provenance(dataset["provenance"], "corpus provenance")
-    policy = _validate_review_policy(dataset["review_policy"])
+    review_policy = _validate_review_policy(dataset["review_policy"], policy)
     raw_cases = dataset["cases"]
     if not isinstance(raw_cases, list) or not raw_cases:
         raise ValueError("corpus cases must be a non-empty list")
     seen_ids: set[str] = set()
-    cases = tuple(
-        _validate_case(item, seen_ids, policy["checklist_version"])
-        for item in raw_cases
-    )
+    cases = tuple(_validate_case(item, seen_ids, policy) for item in raw_cases)
     _validate_balance(cases)
-    _validate_isolation(cases)
+    _validate_isolation(cases, policy)
     if holdout_state == "frozen" and any(
-        case.review.status != policy["approval_status"] for case in cases
+        case.review.status != review_policy["approval_status"] for case in cases
     ):
         raise ValueError("a frozen holdout cannot contain unapproved candidates")
     return CorrectionCorpus(
@@ -251,8 +354,8 @@ def validate_safety_corpus(raw: object) -> CorrectionCorpus:
         language="pl-PL",
         holdout_state=cast(str, holdout_state),
         provenance=provenance,
-        required_reviewer=policy["required_reviewer"],
-        checklist_version=policy["checklist_version"],
+        required_reviewer=review_policy["required_reviewer"],
+        checklist_version=review_policy["checklist_version"],
         cases=cases,
     )
 
@@ -261,17 +364,35 @@ def select_safety_cases_for_purpose(
     corpus: CorrectionCorpus,
     *,
     purpose: Literal["benchmark", "quality_gate", "training"],
+    raw: object | None = None,
+    approval_manifest: object | None = None,
 ) -> tuple[CorrectionCorpusCase, ...]:
     """Return approved cases when the safety corpus policy permits the purpose.
 
     Benchmark selection exposes approved development cases only. A quality
-    gate requires the frozen state and all 160 approved holdout cases.
-    Training use is always prohibited.
+    gate requires the frozen state and all 160 approved holdout cases. V2 also
+    requires the exact canonical raw corpus and approval manifest; missing or
+    drifted evidence raises :class:`CorpusUsageError`. Training use is always
+    prohibited.
     """
 
-    if corpus.id != CORPUS_ID:
+    if corpus.id not in _SAFETY_CORPUS_POLICIES:
         raise CorpusUsageError(
             "select_safety_cases_for_purpose requires the safety corpus"
+        )
+    policy = _SAFETY_CORPUS_POLICIES[corpus.id]
+    if purpose == "quality_gate" and policy.quality_gate_approval is not None:
+        if not any(case.review.status == "human-reviewed" for case in corpus.cases):
+            raise CorpusUsageError(
+                "all corpus candidates are pending-human-review and unavailable "
+                "for quality_gate"
+            )
+        if corpus.holdout_state != "frozen":
+            raise CorpusUsageError("quality_gate requires a frozen holdout")
+        _validate_quality_gate_admission(
+            corpus,
+            raw=raw,
+            approval_manifest=approval_manifest,
         )
     return cast(
         tuple[CorrectionCorpusCase, ...],
@@ -336,22 +457,76 @@ def safety_corpus_digest(raw: object) -> str:
     return hashlib.sha256(canonical_corpus_json(raw).encode("utf-8")).hexdigest()
 
 
-def safety_entity_catalog_ids() -> frozenset[str]:
-    """Return every canonical entity identifier in the safety catalog."""
+def safety_entity_catalog_ids(corpus_id: str = CORPUS_ID) -> frozenset[str]:
+    """Return every canonical entity identifier in one safety catalog."""
 
+    policy = _policy_for_id(corpus_id)
     return frozenset(
-        _entity_id(surface) for surface in SAFETY_CONTROLLED_ENTITY_SURFACES
+        _entity_id(surface, policy) for surface in policy.controlled_entity_surfaces
     )
 
 
-def _validate_review_policy(raw: object) -> dict[str, str]:
+def _policy_for_id(corpus_id: str) -> _SafetyCorpusPolicy:
+    try:
+        return _SAFETY_CORPUS_POLICIES[corpus_id]
+    except KeyError as error:
+        raise ValueError(f"unsupported safety corpus id: {corpus_id}") from error
+
+
+def _validate_quality_gate_admission(
+    corpus: CorrectionCorpus,
+    *,
+    raw: object | None,
+    approval_manifest: object | None,
+) -> None:
+    policy = _policy_for_id(corpus.id)
+    approval = policy.quality_gate_approval
+    if approval is None:
+        return
+    if raw is None or approval_manifest is None:
+        raise CorpusUsageError(
+            "quality_gate requires the exact approved raw corpus and approval "
+            "manifest evidence"
+        )
+    expected_manifest = approval.manifest(corpus_id=policy.corpus_id)
+    if not isinstance(approval_manifest, Mapping) or dict(approval_manifest) != (
+        expected_manifest
+    ):
+        raise CorpusUsageError(
+            "quality_gate approval manifest does not match immutable policy evidence"
+        )
+    try:
+        digest = safety_corpus_digest(raw)
+    except (TypeError, ValueError) as error:
+        raise CorpusUsageError("quality_gate raw corpus evidence is invalid") from error
+    if digest != approval.frozen_digest:
+        raise CorpusUsageError(
+            "quality_gate requires the exact approved frozen corpus digest"
+        )
+    try:
+        validated = validate_safety_corpus(raw)
+    except ValueError as error:
+        raise CorpusUsageError("quality_gate raw corpus evidence is invalid") from error
+    if validated != corpus:
+        raise CorpusUsageError(
+            "quality_gate corpus does not match its approved raw corpus evidence"
+        )
+    if any(case.review.reviewed_at != approval.reviewed_at for case in corpus.cases):
+        raise CorpusUsageError(
+            "quality_gate review date does not match immutable approval evidence"
+        )
+
+
+def _validate_review_policy(
+    raw: object, corpus_policy: _SafetyCorpusPolicy
+) -> dict[str, str]:
     policy = _require_object(raw, "review policy")
     _require_exact_fields(policy, _REVIEW_POLICY_FIELDS, "review policy")
     expected = {
         "candidate_status": "pending-human-review",
         "approval_status": "human-reviewed",
-        "required_reviewer": "Paweł Cyroń",
-        "checklist_version": REVIEW_CHECKLIST_VERSION,
+        "required_reviewer": corpus_policy.required_reviewer,
+        "checklist_version": corpus_policy.checklist_version,
         "training_use": "prohibited",
     }
     if policy != expected:
@@ -360,7 +535,7 @@ def _validate_review_policy(raw: object) -> dict[str, str]:
 
 
 def _validate_case(
-    raw: object, seen_ids: set[str], checklist_version: str
+    raw: object, seen_ids: set[str], policy: _SafetyCorpusPolicy
 ) -> CorrectionCorpusCase:
     case = _require_object(raw, "case")
     _require_exact_fields(case, _CASE_FIELDS, "case")
@@ -374,7 +549,9 @@ def _validate_case(
     input_text = _require_text(case["input"], "case input")
     expected_output = _require_text(case["expected_output"], "case expected_output")
     description = _require_text(case["description"], "case description")
-    entity_spans = _validate_entity_spans(case["entity_spans"], input_text, case_id)
+    entity_spans = _validate_entity_spans(
+        case["entity_spans"], input_text, case_id, policy
+    )
     normalized_template = _require_text(
         case["normalized_template"], "case normalized_template"
     )
@@ -386,7 +563,9 @@ def _validate_case(
     if not tags or len(tags) != len(set(tags)):
         raise ValueError("case tags must be a non-empty unique string list")
     entity_ids = _require_string_tuple(case["entity_ids"], "case entity_ids")
-    derived_entity_ids = tuple(_entity_id(span.surface) for span in entity_spans)
+    derived_entity_ids = tuple(
+        _entity_id(span.surface, policy) for span in entity_spans
+    )
     if entity_ids != derived_entity_ids:
         raise ValueError("case entity_ids must equal derived entity_ids")
     if len(entity_ids) != len(set(entity_ids)):
@@ -399,7 +578,12 @@ def _validate_case(
             "case protected_phenomenon must be null or lowercase snake_case"
         )
     provenance = _validate_provenance(case["provenance"], f"case {case_id} provenance")
-    review = _validate_review(case["review"], case_id, checklist_version)
+    review = _validate_review(
+        case["review"],
+        case_id,
+        policy.checklist_version,
+        required_reviewer=policy.required_reviewer,
+    )
     raw_edits = case["edits"]
     if not isinstance(raw_edits, list):
         raise ValueError("case edits must be a list")
@@ -438,7 +622,7 @@ def _validate_case(
 
 
 def _validate_entity_spans(
-    raw: object, input_text: str, case_id: str
+    raw: object, input_text: str, case_id: str, policy: _SafetyCorpusPolicy
 ) -> tuple[EntitySpan, ...]:
     if not isinstance(raw, list):
         raise ValueError("case entity_spans must be a list")
@@ -453,22 +637,24 @@ def _validate_entity_spans(
             raise ValueError("entity surface must be a non-empty string")
         if end <= start or end > len(input_text) or input_text[start:end] != surface:
             raise ValueError("entity surface does not match input range")
-        if surface not in SAFETY_CONTROLLED_ENTITY_SURFACES:
+        if surface not in policy.controlled_entity_surfaces:
             raise ValueError("entity surface violates the controlled entity policy")
         spans.append(EntitySpan(start=start, end=end, surface=surface))
     ordered = tuple(sorted(spans, key=lambda item: item.start))
     for left, right in zip(ordered, ordered[1:], strict=False):
         if right.start < left.end:
             raise ValueError("entity spans must not overlap")
-    if ordered != _detect_controlled_entity_spans(input_text):
+    if ordered != _detect_controlled_entity_spans(input_text, policy):
         raise ValueError("case must include every controlled entity span")
     return ordered
 
 
-def _detect_controlled_entity_spans(input_text: str) -> tuple[EntitySpan, ...]:
+def _detect_controlled_entity_spans(
+    input_text: str, policy: _SafetyCorpusPolicy
+) -> tuple[EntitySpan, ...]:
     candidates: list[EntitySpan] = []
     occupied: list[tuple[int, int]] = []
-    for surface in sorted(SAFETY_CONTROLLED_ENTITY_SURFACES, key=len, reverse=True):
+    for surface in sorted(policy.controlled_entity_surfaces, key=len, reverse=True):
         cursor = 0
         while True:
             start = input_text.find(surface, cursor)
@@ -488,8 +674,8 @@ def _detect_controlled_entity_spans(input_text: str) -> tuple[EntitySpan, ...]:
     return tuple(sorted(candidates, key=lambda item: item.start))
 
 
-def _entity_id(surface: str) -> str:
-    override = SAFETY_ENTITY_ID_OVERRIDES.get(surface.casefold())
+def _entity_id(surface: str, policy: _SafetyCorpusPolicy) -> str:
+    override = policy.entity_id_overrides.get(surface.casefold())
     if override is not None:
         return override
     value = unicodedata.normalize("NFKD", surface.casefold()).replace("ł", "l")
@@ -499,11 +685,15 @@ def _entity_id(surface: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value).strip("_")
 
 
-def _entity_signature(spans: tuple[EntitySpan, ...]) -> tuple[str, ...]:
-    return tuple(sorted(_entity_id(span.surface) for span in spans))
+def _entity_signature(
+    spans: tuple[EntitySpan, ...], policy: _SafetyCorpusPolicy
+) -> tuple[str, ...]:
+    return tuple(sorted(_entity_id(span.surface, policy) for span in spans))
 
 
-def _validate_isolation(cases: tuple[CorrectionCorpusCase, ...]) -> None:
+def _validate_isolation(
+    cases: tuple[CorrectionCorpusCase, ...], policy: _SafetyCorpusPolicy
+) -> None:
     inputs: dict[str, str] = {}
     templates: dict[str, str] = {}
     entities_by_split: dict[str, dict[tuple[str, ...], str]] = {
@@ -524,7 +714,7 @@ def _validate_isolation(cases: tuple[CorrectionCorpusCase, ...]) -> None:
                 f"{existing_template} and {case.id}"
             )
         templates[case.normalized_template] = case.id
-        signature = _entity_signature(case.entity_spans)
+        signature = _entity_signature(case.entity_spans, policy)
         if signature:
             entities_by_split[case.split][signature] = case.id
 
@@ -545,9 +735,17 @@ def _validate_isolation(cases: tuple[CorrectionCorpusCase, ...]) -> None:
 
 __all__ = [
     "CORPUS_ID",
+    "CORPUS_V2_ID",
     "REVIEW_CHECKLIST_VERSION",
+    "REVIEW_CHECKLIST_V2_VERSION",
     "SAFETY_CONTROLLED_ENTITY_SURFACES",
     "SAFETY_ENTITY_ID_OVERRIDES",
+    "SAFETY_V2_CONTROLLED_ENTITY_SURFACES",
+    "SAFETY_V2_ENTITY_ID_OVERRIDES",
+    "V2_APPROVAL_REVIEW_BASIS",
+    "V2_APPROVED_CANDIDATE_DIGEST",
+    "V2_APPROVED_FROZEN_DIGEST",
+    "V2_APPROVED_REVIEW_DATE",
     "assert_no_cross_corpus_leakage",
     "canonical_corpus_json",
     "load_safety_corpus_json",

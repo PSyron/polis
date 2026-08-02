@@ -58,6 +58,14 @@
   from active runtime after the verdict. No replacement was selected or tuned
   against the consumed records; collective and quantifying subject agreement
   remains unsupported.
+- Issue #119 prepares `polis_polish_correction_safety_corpus_v2` as an
+  independent CC0-1.0 qualification asset. All 240 cases were reviewed by the
+  authorized `Polis architecture owner` role and frozen at canonical JSON
+  SHA-256
+  `53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
+  This produces no development or holdout quality score, does not reverse the
+  failed #115 verdict, and does not qualify #76. A separate one-shot gate is
+  still required. This work remains separate from #85 and #90.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

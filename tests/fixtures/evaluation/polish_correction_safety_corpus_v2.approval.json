@@ -1,0 +1,11 @@
+{
+  "corpus_id": "polis_polish_correction_safety_corpus_v2",
+  "approval_scope": "all-cases",
+  "approved_case_count": 240,
+  "candidate_digest": "c64f009f14f0cde8390a46acc24660305534576bc897f70e281ffebbbbca6f53",
+  "frozen_digest": "53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29",
+  "reviewer": "Polis architecture owner",
+  "reviewed_at": "2026-08-02",
+  "checklist_version": "safety-corpus-review-v2",
+  "review_basis": "Role-authorized exhaustive checklist review completed on 2026-08-02 under the accepted clarification in issue #119."
+}

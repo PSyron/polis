@@ -878,7 +878,13 @@ def _validate_provenance(raw: object, label: str) -> CorpusProvenance:
     )
 
 
-def _validate_review(raw: object, case_id: str, checklist_version: str) -> CaseReview:
+def _validate_review(
+    raw: object,
+    case_id: str,
+    checklist_version: str,
+    *,
+    required_reviewer: str = "Paweł Cyroń",
+) -> CaseReview:
     review = _require_object(raw, f"case {case_id} review")
     _require_exact_fields(review, _REVIEW_FIELDS, "case review")
     if review["checklist_version"] != checklist_version:
@@ -891,12 +897,12 @@ def _validate_review(raw: object, case_id: str, checklist_version: str) -> CaseR
             raise ValueError("pending review cannot name a reviewer or review date")
     elif status == "human-reviewed":
         if (
-            reviewer != "Paweł Cyroń"
+            reviewer != required_reviewer
             or not isinstance(reviewed_at, str)
             or not reviewed_at
         ):
             raise ValueError(
-                "human-reviewed case requires Paweł Cyroń and a review date"
+                f"human-reviewed case requires {required_reviewer} and a review date"
             )
         try:
             parsed_review_date = date.fromisoformat(reviewed_at)
