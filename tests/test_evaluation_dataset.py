@@ -192,16 +192,30 @@ def test_validator_rejects_duplicate_insertions_at_one_offset() -> None:
         validate_dataset(raw)
 
 
-@pytest.mark.parametrize("insertion_offset", [2, 3])
-def test_validator_allows_end_boundary_and_separated_insertions(
-    insertion_offset: int,
-) -> None:
+def test_validator_rejects_insertion_at_replacement_end() -> None:
     raw = _raw_dataset()
     raw["cases"][0]["expected_findings"].append(
         {
             "category": "punctuation",
-            "start": insertion_offset,
-            "end": insertion_offset,
+            "start": 2,
+            "end": 2,
+            "original": "",
+            "suggestion": ",",
+            "rationale": "Adversarial insertion at a replacement end.",
+        }
+    )
+
+    with pytest.raises(ValueError, match="colliding expected findings"):
+        validate_dataset(raw)
+
+
+def test_validator_allows_insertion_strictly_outside_replacement() -> None:
+    raw = _raw_dataset()
+    raw["cases"][0]["expected_findings"].append(
+        {
+            "category": "punctuation",
+            "start": 3,
+            "end": 3,
             "original": "",
             "suggestion": ",",
             "rationale": "A deterministic non-colliding insertion.",
