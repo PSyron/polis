@@ -49,3 +49,20 @@ These generated structural invariants provide bounded structural breadth only.
 They do not replace authored regression tests or corpus gates, and they make no
 claim about Polish linguistic quality. The harness must not receive private
 text, run model or holdout evaluation, or become unbounded CI fuzzing.
+
+## Correction properties
+
+Issue #129 applies the same 64-case synthetic source to correction conflict
+and application properties. Its independent ADR-0003 oracle checks symmetric
+conflicts for overlapping replacements, duplicate insertions, and an insertion
+at every closed boundary of a replacement. A digest derived from each replay
+identity varies compatible replacement, deletion, and insertion positions
+while retaining insertions strictly outside replacements. Every non-empty
+selected subset must normalize deterministically, apply independently of every
+selected-ID order, and equal a separately derived right-to-left reconstruction.
+
+The property also submits conflicting, stale, unknown, duplicate, and
+uncorrectable selections. Each must fail before output, leave the immutable
+result unchanged, and report a failing property through only its invariant and
+the #123 replay metadata. This is bounded structural contract coverage, not a
+claim about correction quality, corpus performance, models, or evaluation.
