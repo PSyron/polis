@@ -181,7 +181,7 @@ def _validate_non_overlapping(
     if len(insertion_offsets) != len(set(insertion_offsets)):
         raise ValueError(f"case {case_id} has duplicate insertions at one offset")
     for insertion in insertion_offsets:
-        if any(start <= insertion < end for start, end in replacements):
+        if any(start <= insertion <= end for start, end in replacements):
             raise ValueError(f"case {case_id} has colliding expected findings")
 
 

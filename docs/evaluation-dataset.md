@@ -62,10 +62,9 @@ non-empty. Every correction must differ exactly from its original fragment.
 Expected findings must be deterministic when applied from right to left against
 the original offsets. Non-empty replacement ranges cannot overlap. Two
 insertions at the same offset are rejected because their order is ambiguous.
-An insertion is also rejected at the start of or strictly inside a non-empty
-replacement range. An insertion exactly at that range's end is allowed: it is
-applied first and remains after the replacement. Insertions outside replacement
-ranges are allowed.
+An insertion is also rejected at the start of, inside, or at the end of a
+non-empty replacement range. Insertions are allowed only at offsets strictly
+outside replacement ranges.
 
 `outcome: "incorrect"` requires one or more expected findings. `outcome:
 "correct"` is an explicit hard negative and must contain exactly
