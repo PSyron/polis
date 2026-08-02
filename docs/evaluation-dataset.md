@@ -278,6 +278,18 @@ follow-up issue may run a one-shot installed-package gate for #76; this issue
 does not authorize or execute that gate. Corpus v2 does not overlap corpus-v4
 majority-coverage work in #85 and #90.
 
+Issue #146 ran its single permitted audit over 80 development cases with two
+stable repetitions. The aggregate decision was not qualified. Report SHA-256 is
+`7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
+Automatic precision and correction accuracy were `1.00`, with recall
+`0.3333333333333333`; the reviewable channel proposed no edits and therefore
+did not satisfy the non-vacuous precision gate. Structured validity was `1.00`
+and both protected-negative counts were zero. There is no frozen gate, the real
+marker is absent, and the holdout was not reserved, materialized, or run. The
+development audit will not be rerun or used for tuning. #76 remains open and
+Task 6 is forbidden. This optional research does not qualify a production model
+and does not qualify paragraph behavior.
+
 Run the frozen-corpus integrity, retained-evidence, and isolation checks with:
 
 ```console

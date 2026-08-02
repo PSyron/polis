@@ -42,6 +42,14 @@ dependency edge and no due date; it organizes optional model, corpus,
 majority-coverage, and qualification-replay research without making those
 outcomes authoritative for the supported runtime.
 
+#146 ran 80 development cases in two stable repetitions under the unchanged
+sentence-only gates and was not qualified. The aggregate report SHA-256 is
+`7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
+There is no frozen gate, the marker remains absent, and the holdout was not
+reserved, materialized, or run. No rerun or tuning is permitted. #76 remains
+open and Task 6 is forbidden. This optional research does not qualify a
+production model and does not qualify paragraph behavior.
+
 ## Future product architecture
 
 #96–#100 remain M6 product architecture work and do not block current runtime
@@ -245,5 +253,9 @@ cases and froze canonical JSON SHA-256
 `53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
 A separately tracked one-shot execution may unblock #76; #119 itself does not
 authorize or run it. #85 and #90 remain distinct majority-coverage work.
+
+Issue #146 executed only the development stage of that separately tracked gate.
+The two stable repetitions over 80 development cases were not qualified, so no
+frozen gate was created. The holdout remains unopened and #76 remains open.
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.

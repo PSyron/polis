@@ -1,0 +1,161 @@
+{
+  "artifact_audit": {
+    "qualified": true,
+    "sdist_members": 64,
+    "sdist_sha256": "c3fc26a25261907978cc08bea8d02d6903b8d20735c8db7258018333927d2ec5",
+    "wheel_members": 40,
+    "wheel_sha256": "2bd5280d1b8d24c1b48e276d5dbadf109545f71120e6869633cf2d42007c18b6"
+  },
+  "configuration_sha256": "d4aaf92f2f8f9dc83558108b14de4a8f5a5b196588cb5e7717dc46b89a9d43ff",
+  "decision": {
+    "qualified": false,
+    "scope": "sentence_only"
+  },
+  "development": {
+    "automatic": {
+      "correction_accuracy": 1.0,
+      "false_negative_edits": 40,
+      "false_positive_edits": 0,
+      "precision": 1.0,
+      "proposed_edits": 20,
+      "recall": 0.3333333333333333,
+      "true_positive_edits": 20
+    },
+    "categories": {
+      "inflection": {
+        "automatic": {
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "precision": null,
+          "proposed_edits": 0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        },
+        "gold_edits": 20,
+        "reviewable": {
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "precision": null,
+          "proposed_edits": 0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        }
+      },
+      "punctuation": {
+        "automatic": {
+          "false_negative_edits": 0,
+          "false_positive_edits": 0,
+          "precision": 1.0,
+          "proposed_edits": 20,
+          "recall": 1.0,
+          "true_positive_edits": 20
+        },
+        "gold_edits": 20,
+        "reviewable": {
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "precision": null,
+          "proposed_edits": 0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        }
+      },
+      "syntax": {
+        "automatic": {
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "precision": null,
+          "proposed_edits": 0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        },
+        "gold_edits": 20,
+        "reviewable": {
+          "false_negative_edits": 20,
+          "false_positive_edits": 0,
+          "precision": null,
+          "proposed_edits": 0,
+          "recall": 0.0,
+          "true_positive_edits": 0
+        }
+      }
+    },
+    "decision": {
+      "qualified": false
+    },
+    "performance": {
+      "cases_per_second": 81.5490303093664,
+      "characters_per_second": 4298.6532601824765,
+      "child_loaded_rss_bytes": 381681664,
+      "child_peak_rss_bytes": 381681664,
+      "cold_e2e_ms": 1041.7294159997255,
+      "combined_loaded_rss_bytes": 412663808,
+      "combined_peak_rss_bytes": 412663808,
+      "model_calls": 0,
+      "process_start_count": 1,
+      "python_loaded_rss_bytes": 30982144,
+      "python_peak_rss_bytes": 30982144,
+      "socket_count": 0,
+      "stable_repetitions": 2,
+      "swap_delta_bytes": 0,
+      "warm_e2e_p50_ms": 5.222582956776023,
+      "warm_e2e_p95_ms": 8.939959108829498,
+      "warm_in_process_p50_ms": 5.001832963898778,
+      "warm_in_process_p95_ms": 8.777499897405505
+    },
+    "protected_automatic_changes": 0,
+    "protected_reviewable_findings": 0,
+    "reviewable": {
+      "correction_accuracy": null,
+      "false_negative_edits": 60,
+      "false_positive_edits": 0,
+      "precision": null,
+      "proposed_edits": 0,
+      "recall": 0.0,
+      "true_positive_edits": 0
+    },
+    "sources": {
+      "rule:languagetool.pl": {
+        "false_negative_edits": 40,
+        "false_positive_edits": 0,
+        "precision": 1.0,
+        "proposed_edits": 20,
+        "recall": 0.3333333333333333,
+        "recall_denominator": "all_gold_edits",
+        "true_positive_edits": 20
+      }
+    },
+    "stable_repetition_digest": "e033b3285ea3aee82e4256da0496896247511743a8e7b97a74562c6fab3b9963",
+    "structured_outcome_validity": 1.0,
+    "total_cases": 80
+  },
+  "environment": {
+    "implementation": "CPython",
+    "language_tool_artifact_sha256": "6959bbebad93c028552c21bae4d2524a0c08d09c1753c9a3fdf646ec1d645421",
+    "language_tool_bridge_sha256": "c946c3ddfab36e45dab1716ca66ccfd61d0a6bfaa14b2e69926cb1b3da964c3d",
+    "language_tool_dependencies_sha256": "de97bed1193abbed914ef23dd99757204aa3bcef29d3cfa8f1ea485178566a99",
+    "language_tool_manifest_sha256": "d5871e8173addb96cc93e2f8ce6833737f08a20c4fc47e99596b4d82b8f3f6e8",
+    "language_tool_runner_sha256": "32b2d9bccdfccd1efc94939530de70f05040295861509b72b8b91752435b2fca",
+    "language_tool_upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6",
+    "language_tool_version": "6.8",
+    "machine": "arm64",
+    "model_calls_per_sentence": 0.0,
+    "operating_system": "macOS-15.3.1-arm64-arm-64bit-Mach-O",
+    "platform_profile": "macos-arm64-v1",
+    "python_version": "3.13.12",
+    "source_policy_version": "1.2"
+  },
+  "experiment_id": "polis_sentence_safety_gate_v2_2026_08_02",
+  "fallback": {
+    "automatic_sources": [
+      "rule:spelling.zeby"
+    ],
+    "model_calls": 0,
+    "output_hash": "9e0a48d8645ace94e655013782e1b25838e1671834c5e91ff1d01646e5eaaaab",
+    "qualified": true,
+    "reviewable_sources": [],
+    "status": "complete"
+  },
+  "holdout": null,
+  "schema_version": 2
+}

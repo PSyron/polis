@@ -115,3 +115,18 @@ Freezing v2 does not itself qualify #76. A separate follow-up issue must first
 pass development and may then reserve the new holdout once under the unchanged
 automatic and reviewable gates. This path is separate from corpus v4 in #85
 and the majority-coverage installed-package gate in #90.
+
+Issue #146 owns that sentence-only one-shot execution. It is optional research.
+It does not block a runtime release and preserves every unchanged gate above.
+The accepted autonomous authorization required preflight, qualifying
+development, frozen verification, and independent review. The 80 development
+cases ran in two stable repetitions but were not qualified: automatic precision
+and correction accuracy were `1.00`, automatic recall was
+`0.3333333333333333`, and the reviewable channel proposed no edits, so its
+non-vacuous precision gate did not pass. Structured validity was `1.00` and
+both protected-negative counts were zero. Aggregate report SHA-256 is
+`7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
+There is no frozen gate, the marker remains absent, and the holdout was not
+reserved, materialized, or run. No rerun or tuning is permitted. #76 remains
+open and Task 6 is forbidden. The experiment does not qualify a production
+model and does not qualify paragraph behavior.
