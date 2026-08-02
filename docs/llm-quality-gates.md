@@ -101,3 +101,17 @@ precision `0.90` did not pass. Structured validity remained `1.00`, protected
 counts remained zero, and all privacy/performance gates passed. The retained
 marker makes the holdout permanently consumed, the overall decision is not
 qualified, and #76 remains open.
+
+Issue #119 creates `polis_polish_correction_safety_corpus_v2` as the next
+independent qualification asset. Its 240 CC0-1.0 cases are frozen after
+exhaustive review by the authorized `Polis architecture owner` role. Frozen
+canonical JSON SHA-256 is
+`53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
+The corpus is mechanically isolated from both earlier corpora and all reserved
+prompt/training/E2E assets. Its creation and review produce no development or
+holdout quality score and do not expose holdout gold.
+
+Freezing v2 does not itself qualify #76. A separate follow-up issue must first
+pass development and may then reserve the new holdout once under the unchanged
+automatic and reviewable gates. This path is separate from corpus v4 in #85
+and the majority-coverage installed-package gate in #90.

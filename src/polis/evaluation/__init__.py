@@ -11,6 +11,12 @@ from polis.evaluation.safety_corpus import (
     CORPUS_ID as SAFETY_CORPUS_ID,
 )
 from polis.evaluation.safety_corpus import (
+    CORPUS_V2_ID as SAFETY_CORPUS_V2_ID,
+)
+from polis.evaluation.safety_corpus import (
+    REVIEW_CHECKLIST_V2_VERSION as SAFETY_REVIEW_CHECKLIST_V2_VERSION,
+)
+from polis.evaluation.safety_corpus import (
     REVIEW_CHECKLIST_VERSION as SAFETY_REVIEW_CHECKLIST_VERSION,
 )
 from polis.evaluation.safety_corpus import (
@@ -28,7 +34,9 @@ __all__ = [
     "EvaluationDataset",
     "QualityCounts",
     "SAFETY_CORPUS_ID",
+    "SAFETY_CORPUS_V2_ID",
     "SAFETY_REVIEW_CHECKLIST_VERSION",
+    "SAFETY_REVIEW_CHECKLIST_V2_VERSION",
     "assert_no_cross_corpus_leakage",
     "evaluate_baseline",
     "findings_snapshot_for_run",

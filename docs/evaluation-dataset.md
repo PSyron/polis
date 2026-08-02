@@ -245,6 +245,45 @@ Run the candidate integrity and leakage checks with:
 uv run --locked --extra dev pytest tests/test_safety_corpus.py -v
 ```
 
+## Independent sentence safety corpus v2 candidates
+
+Issue #119 adds the candidate corpus
+`polis_polish_correction_safety_corpus_v2` after the independent v1 holdout
+from #114 was consumed by the valid but non-qualifying #115 run. V2 contains
+240 newly project-authored synthetic Polish CC0-1.0 cases: 60 each for
+inflection, syntax, punctuation, and protected hard negatives, with 20
+development and 40 holdout cases per stratum.
+
+The corpus is `frozen` after exhaustive review of all 240 cases by the
+`Polis architecture owner` role under the accepted clarification in issue
+#119. The role is recorded without personal attribution. Candidate canonical
+JSON SHA-256
+`c64f009f14f0cde8390a46acc24660305534576bc897f70e281ffebbbbca6f53`
+is bound to frozen canonical JSON SHA-256
+`53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
+Freezing produces no development or holdout quality score. It does not tune
+the analyzer and does not change the thresholds or the failed #115 verdict.
+
+The v2 entity catalog, inputs, normalized templates, entity combinations, and
+near-duplicate linguistic families are mechanically checked for independence
+from corpus v3, safety corpus v1, fine-tuning records, prompt examples, and E2E
+fixtures. Existing v1 fixtures, approval data, #115 markers, reports, and
+digests are pinned byte-for-byte.
+
+Owner review follows
+[`evaluation-safety-corpus-v2-review-checklist.md`](evaluation-safety-corpus-v2-review-checklist.md).
+The approval manifest records the authorized `Polis architecture owner` role,
+all-case scope, review date, checklist version, and both digests. A separate
+follow-up issue may run a one-shot installed-package gate for #76; this issue
+does not authorize or execute that gate. Corpus v2 does not overlap corpus-v4
+majority-coverage work in #85 and #90.
+
+Run the frozen-corpus integrity, retained-evidence, and isolation checks with:
+
+```console
+uv run --locked --extra dev pytest tests/test_safety_corpus_v2.py -v
+```
+
 The standard-library validator is also available to callers as
 `polis.evaluation.validate_dataset(raw)` and `polis.evaluation.load_dataset()`.
 Per [ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md),

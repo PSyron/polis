@@ -147,7 +147,7 @@ milestone.
 | M5-12g | #77 | Integrate one persistent vendored LanguageTool stdio session for sentences | #54, #60, #70, #71, #72, #73 |
 | M5-12h | #80 | Restore Fast CI on every supported platform | - |
 | M5-12i | #78 | Complete paired-comma automatic corrections for the sentence release gate | #80 |
-| M5-12j | #76 | Add the installed-package sentence correction release gate **(blocked)** | #78, #80 |
+| M5-12j | #76 | Add the installed-package sentence correction release gate **(blocked)** | #78, #80, #119, follow-up one-shot gate |
 | M5-12k | #81 | Correct evaluation metric semantics and dataset provenance | #80 |
 | M5-12l | #82 | Enforce ADR-0003 failure semantics in the public `Analyzer` | - |
 | M5-12m | #83 | Align public runtime protocols with analyzer composition | - |
@@ -165,6 +165,7 @@ milestone.
 | M5-12y | #92 | Publish the next M5 release from one approved artifact set | #66, #91 |
 | M5-12z | #93 | Track the evidence-first path to the next Polis release | #92 |
 | M5-12aa | #94 | Synchronize the M5 roadmap with the closure tracker | - |
+| M5-12ab | #119 | Create sentence safety corpus v2 for independent #76 requalification | completed #114 and #115 evidence |
 
 The primary dependency flow is:
 
@@ -236,5 +237,13 @@ roadmap reconciliation.
 
 Paragraph adapters, GUI integrations, document adapters, cloud services,
 free-form model rewriting, and stylistic rewriting remain out of scope.
+
+After the valid but non-qualifying #115 run consumed the #114 holdout, #119
+creates a new independent corpus v2 without producing a development or holdout
+quality score. The authorized `Polis architecture owner` role reviewed all 240
+cases and froze canonical JSON SHA-256
+`53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
+A separately tracked one-shot execution may unblock #76; #119 itself does not
+authorize or run it. #85 and #90 remain distinct majority-coverage work.
 
 Rule implementations M1-03 through M1-05 can proceed independently after segmentation and the rule registry. Documentation and performance work in M3 can proceed in parallel after their listed dependencies close.
