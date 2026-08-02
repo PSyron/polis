@@ -185,7 +185,9 @@ def _assert_registry_order_properties() -> None:
 
 
 def _assert_generated_fail_closed_properties() -> None:
-    for case in generate_unicode_text_cases()[1:]:
+    cases = generate_unicode_text_cases()
+    processed_case_indexes: set[int] = set()
+    for case in cases:
         specification = _specifications_for(case.replay)[0]
         duplicate_source = _GeneratedRule(
             source=specification.source,
@@ -299,6 +301,13 @@ def _assert_generated_fail_closed_properties() -> None:
             invariant="registry.fail_closed.incompatible_category",
             replay=case.replay,
         )
+        processed_case_indexes.add(case.replay.case_index)
+
+    assert_structural_invariant(
+        cases[0].text == "" and 0 in processed_case_indexes,
+        invariant="registry.fail_closed.empty_case",
+        replay=cases[0].replay,
+    )
 
 
 def _specifications_for(replay: Replay) -> tuple[_RuleSpec, ...]:
@@ -490,7 +499,7 @@ def _assert_safe_registry_error(
         replay=replay,
     )
     assert_structural_invariant(
-        text not in str(error),
+        not text or text not in str(error),
         invariant=f"{invariant}.privacy",
         replay=replay,
     )
