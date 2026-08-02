@@ -66,6 +66,17 @@
   This produces no development or holdout quality score, does not reverse the
   failed #115 verdict, and does not qualify #76. A separate one-shot gate is
   still required. This work remains separate from #85 and #90.
+- Issue #146 ran 80 development cases in two stable repetitions under the
+  unchanged sentence-only gates and was not qualified. Automatic precision and
+  correction accuracy were `1.00`, with recall `0.3333333333333333`; the
+  reviewable channel proposed no edits and failed the required non-vacuous
+  precision gate. Structured validity was `1.00` and both protected-negative
+  counts were zero. Aggregate report SHA-256 is
+  `7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
+  There is no frozen gate, the marker is absent, and the holdout was not
+  reserved, materialized, or run. Development will not be rerun or used for
+  tuning. #76 remains open and Task 6 is forbidden. The result does not qualify
+  a production model or paragraph behavior.
 - No DOCX/ODT/RTF document adapters are in scope for this repository yet.
 - No GUI is included.
 - No broad stylistic rewriting is performed; corrections are limited and

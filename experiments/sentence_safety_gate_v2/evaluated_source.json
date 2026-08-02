@@ -1,0 +1,124 @@
+{
+  "schema_version": 4,
+  "issue": 146,
+  "base_commit": "3035eb201f48bd84a5ada364ae41a96293259e50",
+  "staged_tree": "5162007cfc9eac13aed415256ee698e5d0c5de4b",
+  "pre_evaluation_patch": {
+    "path": "experiments/sentence_safety_gate_v2/pre_evaluation_inputs.patch",
+    "sha256": "32a5419baf4bf673bcfb181b19e5533886e57ee71acc0089770db06969144aa2",
+    "direction": "forward",
+    "unidiff_zero": true
+  },
+  "pre_evaluation_changes": {
+    "docs/evaluation-dataset.md": {
+      "status": "M",
+      "mode": "100644",
+      "blob": "7898fba03e2b93a2a955c3724b0779a9b6d5adaa"
+    },
+    "docs/limitations.md": {
+      "status": "M",
+      "mode": "100644",
+      "blob": "ae2688870467cb5d3439d386334ffca31f1d5081"
+    },
+    "docs/llm-quality-gates.md": {
+      "status": "M",
+      "mode": "100644",
+      "blob": "a5a685f11ec364dc28676b3c98e141c0e5406afd"
+    },
+    "docs/project/ROADMAP.md": {
+      "status": "M",
+      "mode": "100644",
+      "blob": "00443efae0cb403d400ee0efc8ad760a6bd0b73b"
+    },
+    "docs/superpowers/plans/2026-08-02-issue-146-sentence-safety-gate-v2.md": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "dcf09ad56393223b1b4835dc7c292845405210eb"
+    },
+    "docs/superpowers/specs/2026-08-02-issue-146-sentence-safety-gate-v2-design.md": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "dd6b2febbd990bad39eaf4435333bbf2f146e091"
+    },
+    "experiments/sentence_safety_gate_v2/README.md": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "6597d060fe14330ccb896d26c40325b3113d5071"
+    },
+    "experiments/sentence_safety_gate_v2/__init__.py": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "84fba0d67f022b1e9db5491ad58c1d5cf11951c2"
+    },
+    "experiments/sentence_safety_gate_v2/config.json": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "51d67c2988c9b6156e29ca0858fb2ffcc9ad47cb"
+    },
+    "experiments/sentence_safety_gate_v2/gate.py": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "be2fc4bf16721454b1947d90057120dc24570428"
+    },
+    "experiments/sentence_safety_gate_v2/run_evaluation.py": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "f54e0c848c570b2dab7bce76928b67b17478c601"
+    },
+    "tests/test_sentence_safety_gate_v2.py": {
+      "status": "A",
+      "mode": "100644",
+      "blob": "b149a2c702311f9a5cc5da6926c2d8f1c5bdbfb1"
+    }
+  },
+  "files": {
+    "evaluator": {
+      "path": "experiments/sentence_safety_gate_v2/run_evaluation.py",
+      "sha256": "bf2806e84f6e732df569173fa62f271a760bc40c057e8707f4bc9ce6bf1351cf"
+    },
+    "gate": {
+      "path": "experiments/sentence_safety_gate_v2/gate.py",
+      "sha256": "8a3c177a68dbcab1148d40697ec29aa3e6651e0d9dd46ba5e44897f724c65b8f"
+    },
+    "installed_runner": {
+      "path": "scripts/run_sentence_safety_case.py",
+      "sha256": "da02d7bcb5888045d32fd83102189ea4c2ca469ee88245e7b15c24fcef7c31a2"
+    },
+    "analyzer_source_policy": {
+      "path": "src/polis/analyzer.py",
+      "sha256": "d9882b0d3d85eb690402204b944fabbc3d5b38d48c1b83d0470cfc674b5bab01"
+    },
+    "corpus_json": {
+      "path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.json",
+      "sha256": "9c9b1cf1103dfaa096dd113948e0b47bfb26d5722ebe5edce1250e9889a59f69"
+    },
+    "corpus_xml": {
+      "path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.xml",
+      "sha256": "676bc630e6644aecd30daf166c50ebe9c8558fd5714e74081722b0c4123ecb3a"
+    },
+    "corpus_approval": {
+      "path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.approval.json",
+      "sha256": "8a21b3d291eb0542b484db318350678bde39cbf549451eb6f35cfd995ba39d77"
+    },
+    "configuration": {
+      "path": "experiments/sentence_safety_gate_v2/config.json",
+      "sha256": "d4aaf92f2f8f9dc83558108b14de4a8f5a5b196588cb5e7717dc46b89a9d43ff"
+    }
+  },
+  "protected_history": {
+    "docs/performance-baseline.md": "cebb7ce95cecbb57d5383b1dbae220f10358c69ed7f09196292a8f9187dd09f7",
+    "docs/quality-baseline.md": "6723ca24b6ba18eb1ebbf0aee1ead603207008e7f84439866e69b7835a2aaf97",
+    "experiments/sentence_safety_gate/README.md": "e32140dd11b9324e043da4b8bddc6fbe2222ef35327f6c6d37246d52c6afa3ee",
+    "experiments/sentence_safety_gate/config.json": "6c637167d7cb77003db28e6072009a2606a45597dfee1ec3173f31c2dea87fc6",
+    "experiments/sentence_safety_gate/evaluated_source.json": "b1bd4fda10301c06dbe5fd6c0397f88c1acf44016652299de854a4001acd5ab9",
+    "experiments/sentence_safety_gate/frozen_gate.json": "9fe74303924707df59d44a654877cec074219ea6f3314d2a60c993052d8ab736",
+    "experiments/sentence_safety_gate/holdout.started": "198371e64acb4fe04c8b2ae962e172b37e61ef3149b2d832c97175bde10f4d82",
+    "experiments/sentence_safety_gate/report.json": "69c88ac8370ff9d604a4669b674dc242954c6b28cc7c6e7d60ade6764f8a1c99",
+    "tests/fixtures/evaluation/polish_correction_corpus_v3.json": "bd2c186bb22e32f948ed6592c24bc2267c6a2a77b185bd9424310068e680a1f2",
+    "tests/fixtures/evaluation/polish_correction_corpus_v3.xml": "32d99cf82609ff43c034f008c64dbb1b3c19f04fb77ef89c834ff433ccf59e3c",
+    "tests/fixtures/evaluation/polish_correction_safety_corpus_v1.approval.json": "8f0bb298c32f3b1c58dcfe008ad5e21da6eed851237839cde14c433cfa2c8559",
+    "tests/fixtures/evaluation/polish_correction_safety_corpus_v1.json": "921ce0accd120e443a9131f192b8669484d4dd24bf18898fbd2ebcafbe1a87d9",
+    "tests/fixtures/evaluation/polish_correction_safety_corpus_v1.xml": "f2fcefef2172efcf3e27338bacc106230cde48b37c3c6989a4803bddc8dcc908"
+  },
+  "protected_history_manifest_sha256": "c16fceeefd6b1bc7ce44be5d414304cd719c13ba36b737071ddfbf092bfcac43"
+}

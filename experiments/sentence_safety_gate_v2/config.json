@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "experiment_id": "polis_sentence_safety_gate_v2_2026_08_02",
+  "sentence_only": true,
+  "platform_profile": "macos-arm64-v1",
+  "source_policy_version": "1.2",
+  "corpus": {
+    "id": "polis_polish_correction_safety_corpus_v2",
+    "candidate_digest": "c64f009f14f0cde8390a46acc24660305534576bc897f70e281ffebbbbca6f53",
+    "frozen_digest": "53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29",
+    "json_path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.json",
+    "json_sha256": "9c9b1cf1103dfaa096dd113948e0b47bfb26d5722ebe5edce1250e9889a59f69",
+    "xml_path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.xml",
+    "xml_sha256": "676bc630e6644aecd30daf166c50ebe9c8558fd5714e74081722b0c4123ecb3a",
+    "approval_path": "tests/fixtures/evaluation/polish_correction_safety_corpus_v2.approval.json",
+    "approval_sha256": "8a21b3d291eb0542b484db318350678bde39cbf549451eb6f35cfd995ba39d77"
+  },
+  "sources": {
+    "automatic": [
+      "rule:agreement.copula",
+      "rule:languagetool.pl",
+      "rule:spelling.jestes",
+      "rule:spelling.wlasnie",
+      "rule:spelling.zeby",
+      "rule:syntax.comma_space",
+      "rule:syntax.list_space",
+      "rule:syntax.quote_space",
+      "rule:syntax.sentence_space"
+    ],
+    "reviewable": [
+      "rule:languagetool.contextual_inflection",
+      "rule:syntax.missing_correlative",
+      "rule:syntax.missing_reflexive"
+    ]
+  },
+  "language_tool": {
+    "version": "6.8",
+    "upstream_commit": "e807fcde6a6506191e1470744d2345da28c26be6",
+    "manifest_sha256": "d5871e8173addb96cc93e2f8ce6833737f08a20c4fc47e99596b4d82b8f3f6e8",
+    "bridge_sha256": "c946c3ddfab36e45dab1716ca66ccfd61d0a6bfaa14b2e69926cb1b3da964c3d",
+    "runner_sha256": "32b2d9bccdfccd1efc94939530de70f05040295861509b72b8b91752435b2fca",
+    "artifact_sha256": "6959bbebad93c028552c21bae4d2524a0c08d09c1753c9a3fdf646ec1d645421",
+    "dependencies_sha256": "de97bed1193abbed914ef23dd99757204aa3bcef29d3cfa8f1ea485178566a99"
+  },
+  "gates": {
+    "automatic_minimum_precision": 1.0,
+    "automatic_minimum_correction_accuracy": 1.0,
+    "reviewable_minimum_precision": 0.9,
+    "minimum_structured_outcome_validity": 1.0,
+    "maximum_protected_automatic_changes": 0,
+    "maximum_protected_reviewable_findings": 0,
+    "maximum_warm_in_process_p95_ms": 100,
+    "maximum_warm_e2e_p95_ms": 500,
+    "maximum_combined_peak_rss_bytes": 1073741824,
+    "maximum_swap_delta_bytes": 0,
+    "maximum_socket_count": 0,
+    "required_model_calls": 0,
+    "required_process_start_count": 1,
+    "required_stable_repetitions": 2
+  }
+}
