@@ -28,3 +28,7 @@ when the policy changes.
 
 The [analyzer and local backend protocol boundary](protocols.md) records the
 runtime implementation seams that follow the accepted public API contract.
+
+The [rule catalog inventory](rule-catalog-inventory.md) records the current
+standard runtime rule identities and policy disposition before catalog ownership
+is decided.
