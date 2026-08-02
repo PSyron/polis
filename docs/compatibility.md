@@ -71,6 +71,14 @@ one exact identity.
 
 - Public analysis JSON is currently `schema_version = 1`.
 - Any change to wire shape or identifier semantics is a **major** change and must be paired with migration guidance.
+- Policy `1.2` does not change `Finding` or analysis JSON schema version `1`.
+  Serialized findings do not carry automatic-correction authority.
+- `CorrectionResult.source_policy_version` is an additive Python API field. This
+  issue introduces no canonical `CorrectionResult` JSON schema.
+- The installed sentence-safety runner request/response protocol uses schema
+  version `2` and records the observed runtime policy version. Its protocol is
+  separate from the historical evaluation report, which remains schema version
+  `1`, byte-stable, and identified with historical policy `1.1`.
 
 ## How we track compatibility
 

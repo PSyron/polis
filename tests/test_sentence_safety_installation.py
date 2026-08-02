@@ -72,6 +72,8 @@ def test_clean_wheel_runs_public_sentence_paths_from_external_cwd(
         response, elapsed_ms = session.exchange(1, "Wiem że wróciła.")
 
     assert response["status"] == "complete"
+    assert response["schema_version"] == 2
+    assert response["source_policy_version"] == "1.2"
     assert response["corrected_text"] == "Wiem, że wróciła."
     assert response["model_calls"] == 0
     assert elapsed_ms > 0

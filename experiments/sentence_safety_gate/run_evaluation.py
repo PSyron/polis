@@ -42,6 +42,7 @@ from .gate import (
     score_exact_edits,
     sha256_path,
     validate_privacy_safe_report,
+    validate_runner_observations,
     validate_runner_response,
     verify_frozen_gate,
 )
@@ -339,7 +340,7 @@ class InstalledRunnerSession:
             raise RuntimeError("installed runner pipes are unavailable")
         request = json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "request_id": request_id,
                 "operation": "analyze_sentence",
                 "text": text,
@@ -644,6 +645,7 @@ def run_installed_cases(
         raise ValueError("installed evaluation has too few stability repetitions")
     swap_before = _swap_used_bytes()
     first_runs: list[CaseRun] = []
+    observations: list[RunnerObservation] = []
     hashes_by_case: dict[str, list[str]] = defaultdict(list)
     in_process_latencies: list[float] = []
     e2e_latencies: list[float] = []
@@ -655,7 +657,9 @@ def run_installed_cases(
         for case in cases:
             request_id += 1
             raw, e2e_elapsed_ms = session.exchange(request_id, case.source)
-            observation = validate_runner_response(case.source, raw, config=config)
+            observation = validate_runner_response(case.source, raw)
+            observations.append(observation)
+            validate_runner_observations(observations, config)
             output_hash = _observation_hash(observation)
             hashes_by_case[case.case_id].append(output_hash)
             if repetition == 0:
@@ -712,6 +716,7 @@ def run_installed_cases(
 
 def _observation_hash(observation: RunnerObservation) -> str:
     payload = {
+        "source_policy_version": observation.source_policy_version,
         "analysis_finding_ids": observation.analysis_finding_ids,
         "automatic": [
             (*item.exact_key, item.category, item.source, item.finding_id)
@@ -1405,7 +1410,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "schema_version": 1,
             "experiment_id": config.experiment_id,
             "configuration_sha256": sha256_path(arguments.config),
-            "environment": _environment_payload(config, performance, len(cases)),
+            "environment": _environment_payload(
+                config,
+                performance,
+                len(cases),
+                observations=tuple(run.observation for run in runs),
+            ),
             "artifact_audit": audit.as_dict(),
             "fallback": fallback,
             "development": split_payload,
@@ -1579,15 +1589,20 @@ def _fallback_evidence(
 
 
 def _environment_payload(
-    config: GateConfig, performance: PerformanceEvidence, cases: int
+    config: GateConfig,
+    performance: PerformanceEvidence,
+    cases: int,
+    *,
+    observations: Sequence[RunnerObservation],
 ) -> dict[str, object]:
+    source_policy_version = validate_runner_observations(observations, config)
     return {
         "python_version": platform.python_version(),
         "implementation": platform.python_implementation(),
         "machine": platform.machine(),
         "operating_system": platform.platform(),
         "platform_profile": release_platform_profile(),
-        "source_policy_version": config.source_policy_version,
+        "source_policy_version": source_policy_version,
         "language_tool_version": config.language_tool["version"],
         "language_tool_upstream_commit": config.language_tool["upstream_commit"],
         "language_tool_manifest_sha256": config.language_tool["manifest_sha256"],

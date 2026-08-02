@@ -5,6 +5,12 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 from polis.core import Finding
+from polis.correction.policy import (
+    SOURCE_POLICY_VERSION,
+    SourceBehavior,
+    SourcePolicyKey,
+    is_automatic_correction_eligible,
+)
 
 
 class _UnorderedInputError(ValueError):
@@ -79,7 +85,11 @@ def _overlapping_ranges(start1: int, end1: int, start2: int, end2: int) -> bool:
 
 
 __all__ = [
+    "SOURCE_POLICY_VERSION",
+    "SourceBehavior",
+    "SourcePolicyKey",
     "findings_conflict",
+    "is_automatic_correction_eligible",
     "sort_findings_for_application",
     "validate_non_conflicting_corrections",
 ]

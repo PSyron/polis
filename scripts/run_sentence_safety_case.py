@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, TextIO, cast
 
 _MAX_REQUEST_BYTES = 65_536
-_SCHEMA_VERSION = 1
+_SCHEMA_VERSION = 2
 _OPERATION = "analyze_sentence"
 _PROXY_VARIABLES = (
     "ALL_PROXY",
@@ -307,6 +307,7 @@ def main() -> int:
                     "schema_version": _SCHEMA_VERSION,
                     "request_id": request.request_id,
                     "status": "complete",
+                    "source_policy_version": correction.source_policy_version,
                     "analysis_findings": [
                         _finding_payload(finding) for finding in analysis.issues
                     ],

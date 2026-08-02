@@ -25,6 +25,18 @@ class SyntaxCommaSpacingRule:
         self.source = Source(SourceKind.RULE, "syntax.comma_space")
         self._pattern = re.compile(r"(?<!\d),(?=[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ])")
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "normalize.comma_spacing"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "syntax-comma-space/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
@@ -64,6 +76,18 @@ class SyntaxSentenceSpacingRule:
             r"(?<!\d)(?<!\bnp)(?<!\bitp)(?<!\btj)\.(?=[A-ZĄĆĘŁŃÓŚŹŻ])"
         )
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "normalize.sentence_spacing"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "syntax-sentence-space/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
@@ -90,6 +114,18 @@ class SyntaxListSpacingRule:
     def __init__(self) -> None:
         self.source = Source(SourceKind.RULE, "syntax.list_space")
         self._pattern = re.compile(r"(?m)(?:^|\n)([0-9]+\.|-|\*)(?=\S)")
+
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "normalize.list_marker_spacing"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "syntax-list-space/1.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
@@ -136,6 +172,18 @@ class SyntaxQuoteSpacingRule:
         self.source = Source(SourceKind.RULE, "syntax.quote_space")
         self._pattern = re.compile(r"([\"“”„])(?=[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ])")
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "normalize.quote_spacing"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "syntax-quote-space/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
@@ -175,6 +223,18 @@ class SyntaxMissingReflexiveRule:
 
     def __init__(self) -> None:
         self.source = Source(SourceKind.RULE, "syntax.missing_reflexive")
+
+    @property
+    def operation(self) -> str:
+        """Return the review-only action performed by this rule."""
+
+        return "insert.reflexive_pronoun"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the review-only implementation behavior version."""
+
+        return "syntax-missing-reflexive/1.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
@@ -217,6 +277,18 @@ class SyntaxMissingCorrelativeRule:
 
     def __init__(self) -> None:
         self.source = Source(SourceKind.RULE, "syntax.missing_correlative")
+
+    @property
+    def operation(self) -> str:
+        """Return the review-only action performed by this rule."""
+
+        return "insert.correlative"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the review-only implementation behavior version."""
+
+        return "syntax-missing-correlative/1.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:

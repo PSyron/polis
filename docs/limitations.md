@@ -19,8 +19,11 @@
   qualified, and corpus-v3 holdout remains unopened for this experiment.
 - Issue #70 qualified five LanguageTool punctuation rule IDs on sentences at
   precision 1.00 and recall 0.038 on its one-shot holdout. Source-policy version
-  1.1 enables all five reviewed IDs. This remains narrow punctuation coverage
-  and does not correct syntax or inflection.
+  1.1 is the historical qualification record for all five reviewed IDs. Active
+  policy `1.2` preserves only that membership under the exact
+  `check.allowlisted_comma` / `pl-6.8-five-rule-comma/1.0` behavior identity.
+  This remains narrow punctuation coverage and does not correct syntax or
+  inflection.
 - The sentence-only contextual inflection router reached precision 1.00 and
   supported recall 0.667 on its one-shot holdout and is available through an
   optional local stdio configuration. It is suggestion-only; first-name
@@ -77,9 +80,10 @@
   missing-comma rule IDs.
 - The source-built five-rule LanguageTool subset is not a general Polish corrector.
   Only those qualified comma findings are automatic under
-  source-policy `1.1`; contextual inflection is reviewable, sentence-only, and
-  limited to narrow constructions, and paragraph behavior has not passed an M5
-  release gate.
+  active source-policy `1.2` when their complete behavior identity matches;
+  policy `1.1` remains the historical qualification record. Contextual
+  inflection is reviewable, sentence-only, and limited to narrow constructions,
+  and paragraph behavior has not passed an M5 release gate.
 - `polis.evaluation` remains import-compatible for existing evaluator helpers in
   the current 0.x line, but it is not the primary runtime analysis API. Large
   corpora, holdouts, reports, experiments, and training assets are excluded from
@@ -88,7 +92,9 @@
   is implemented as the baseline delivery behavior in #60. `Analyzer.correct()`
   and `correct_async()` share one orchestration path, apply a versioned
   source-policy for deterministic rules, keep every model edit reviewable, and
-  expose optional suggestion status and actual call counts.
+  expose optional suggestion status, actual call counts, and the effective
+  policy version. Policy `1.2` adds exact behavior identity enforcement; it
+  does not qualify another rule, LanguageTool feature, or model.
   [ADR-0020](architecture/decisions/0020-runtime-first-product-charter.md)
   supersedes only the mandatory-model critical path; it does not rewrite the
   failed qualification results above.

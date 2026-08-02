@@ -69,7 +69,8 @@ from multi-sentence coverage.
 starting an event loop; results, ordering, call budgets, failures, and policy
 decisions are equivalent.
 It returns `CorrectionResult` with `original_text`, `corrected_text`,
-`applied_findings`, `skipped_findings`, and `suggestion_outcomes`.
+`applied_findings`, `skipped_findings`, `suggestion_outcomes`, and
+`source_policy_version`.
 It automatically applies only non-conflicting deterministic rule findings that are
 covered by the calibrated source-policy. Currently that includes:
 
@@ -97,9 +98,18 @@ attempts. For each suggestion-capable operation it records:
 - `operation_version`: suggestion operation contract version
 - `source_policy_version`: source-policy contract version
 
-Source-policy version `1.1` adds automatic application of the explicitly
-qualified `languagetool.pl` comma insertions. It does not authorize other
-LanguageTool rules or category-wide correction.
+The active source-policy is version `1.2`. It grants automatic application only
+when the installed deterministic behavior exactly matches
+`(source, category, operation, behavior_version, source_policy_version)` and
+then meets that entry's confidence threshold. Missing behavior metadata,
+unknown entries, and any identity drift remain reviewable; confidence alone
+never grants automatic eligibility, and model findings are denied
+unconditionally. The nine automatic behaviors are unchanged from the
+historical policy-`1.1` qualification record. That historical policy first
+qualified the explicit `languagetool.pl` comma insertions; policy `1.2` retains
+them only as `check.allowlisted_comma` behavior
+`pl-6.8-five-rule-comma/1.0`, not as broader LanguageTool or category-wide
+permission.
 
 The default analyzer also exposes the sentence-only deterministic sources
 `syntax.missing_reflexive` and `syntax.missing_correlative`. They cover only the
@@ -162,8 +172,9 @@ timeout_seconds = 2.0
 This sentence-only mode creates one persistent local stdio session implementing
 both LanguageTool check and contextual synthesis. It is mutually exclusive with
 `[language_tool]` and `[contextual_inflection]`. It starts lazily, performs no
-download, preserves source-policy `1.1`, and leaves contextual inflection
-reviewable. Analyzer-owned sessions are terminated by `Analyzer.close()` or
+download, uses the active source-policy `1.2`, and leaves contextual inflection
+reviewable. The historical source-policy `1.1` qualification record remains
+unchanged. Analyzer-owned sessions are terminated by `Analyzer.close()` or
 context-manager exit. Transports injected by callers remain caller-owned and
 are not closed by the analyzer.
 

@@ -17,6 +17,7 @@ from polis.core.protocols import (
     MonotonicClock,
     Rule,
     RuleRegistry,
+    VersionedRule,
 )
 from polis.llm import MockHeuristicBackend, MockHeuristicTransport
 from polis.rules import DeterministicRuleRegistry
@@ -33,6 +34,11 @@ class FakeRule:
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         return ()
+
+
+class FakeVersionedRule(FakeRule):
+    operation = "replace.example"
+    behavior_version = "example-rule/1.0"
 
 
 class FakeDeterministicAnalyzer:
@@ -86,6 +92,8 @@ class FakeOrchestrator:
 
 def test_strict_fakes_structurally_satisfy_runtime_protocols() -> None:
     assert isinstance(FakeRule(), Rule)
+    assert not isinstance(FakeRule(), VersionedRule)
+    assert isinstance(FakeVersionedRule(), VersionedRule)
     assert isinstance(FakeDeterministicAnalyzer(), DeterministicAnalyzer)
     assert isinstance(FakeRuleRegistry(), RuleRegistry)
     assert isinstance(FakeBackend(), LocalGenerationBackend)

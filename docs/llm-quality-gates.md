@@ -22,16 +22,21 @@ runtime, and artifact configuration under test.
 
 ## Automatic-correction gates
 
-Automatic eligibility is evaluated per deterministic source, rule or operation
-version, and category:
+Automatic eligibility is evaluated per deterministic source, category,
+operation, behavior version, and source-policy version:
 
 - exact edit precision: **1.00**;
 - correction accuracy: **1.00**;
 - protected hard negatives: **0** changed cases.
 
-Passing these metrics does not itself change runtime policy. The exact source
-must also be added to the versioned automatic-correction source policy. Rule
-provenance, engine identity, or confidence alone never grants eligibility.
+Passing these metrics does not itself change runtime policy. The exact behavior
+must also be added to the versioned automatic-correction source policy. The
+active `1.2` policy enforces the full immutable key `(source, category,
+operation, behavior_version, source_policy_version)` and checks confidence only
+after that key matches. Rule provenance, engine identity, a source name, or
+confidence alone never grants eligibility. A behavior-version change requires
+new direct evidence and a separate exact policy entry; model findings remain
+reviewable regardless of evidence or confidence.
 
 ## Suggestion gates
 
@@ -59,10 +64,12 @@ split hashes, loaded memory, cold and warm latency, throughput, model calls,
 and offline verification. Development and holdout results remain separate.
 
 The original LanguageTool two-rule subset and every model in ADR-0005 predate
-these M5 gates. ADR-0014 later qualified four exact LanguageTool rule IDs and
-source-policy version `1.1` integrates the resulting five-ID allowlist. A model
-adapter may proceed only after its exact prompt, runtime, model, and source
-policies pass their applicable gates.
+these M5 gates. ADR-0014 later qualified four exact LanguageTool rule IDs, and
+historical source-policy version `1.1` records the resulting five-ID allowlist.
+Active policy `1.2` preserves that qualification only for
+`check.allowlisted_comma` behavior `pl-6.8-five-rule-comma/1.0`; it does not
+broaden LanguageTool support. A model adapter may proceed only after its exact
+prompt, runtime, model, and source policies pass their applicable gates.
 
 ## Sentence safety re-qualification corpus
 

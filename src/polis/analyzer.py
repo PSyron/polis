@@ -16,15 +16,17 @@ from polis.core import (
     AnalysisResult,
     AnalysisTimeoutError,
     BackendUnavailableError,
-    Confidence,
     ConfigurationError,
     Finding,
     InvalidBackendResponseError,
-    Source,
     SourceKind,
 )
 from polis.core.models import Category
 from polis.correction import findings_conflict
+from polis.correction.policy import (
+    SOURCE_POLICY_VERSION,
+    is_automatic_correction_eligible,
+)
 from polis.llm.adapter import MockHeuristicBackend, MockHeuristicTransport
 from polis.rules import (
     AgreementCopulaRule,
@@ -72,17 +74,6 @@ SuggestionStatus = Literal[
 
 _SUGGESTION_OUTCOME_VERSION: Final[str] = "1.0"
 _SUGGESTION_BACKEND_OPERATION: Final[str] = "analysis.correct.suggestions"
-_SOURCE_POLICY_VERSION: Final[str] = "1.1"
-
-
-@dataclass(frozen=True)
-class AutomaticCorrectionPolicy:
-    """One source-policy entry for automatic deterministic correction."""
-
-    source: Source
-    minimum_confidence: Confidence
-    category: Category
-    policy_version: str = "1.0"
 
 
 @dataclass(frozen=True)
@@ -96,62 +87,7 @@ class SuggestionOutcome:
     model_calls: int
     protocol_versions: tuple[str, ...] = ()
     operation_version: str = _SUGGESTION_OUTCOME_VERSION
-    source_policy_version: str = _SOURCE_POLICY_VERSION
-
-
-_AUTOMATIC_CORRECTION_POLICY: tuple[AutomaticCorrectionPolicy, ...] = (
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "agreement.copula"),
-        category=Category.AGREEMENT,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "spelling.jestes"),
-        category=Category.SPELLING,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "spelling.wlasnie"),
-        category=Category.SPELLING,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "spelling.zeby"),
-        category=Category.SPELLING,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "syntax.comma_space"),
-        category=Category.PUNCTUATION,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "syntax.list_space"),
-        category=Category.SYNTAX,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "syntax.quote_space"),
-        category=Category.PUNCTUATION,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "syntax.sentence_space"),
-        category=Category.PUNCTUATION,
-        minimum_confidence=Confidence(0.9),
-    ),
-    AutomaticCorrectionPolicy(
-        source=Source(SourceKind.RULE, "languagetool.pl"),
-        category=Category.PUNCTUATION,
-        minimum_confidence=Confidence(0.85),
-        policy_version="1.1",
-    ),
-)
-
-
-_POLICY_BY_SOURCE: Final[dict[Source, AutomaticCorrectionPolicy]] = {
-    entry.source: entry for entry in _AUTOMATIC_CORRECTION_POLICY
-}
+    source_policy_version: str = SOURCE_POLICY_VERSION
 
 
 @dataclass(frozen=True)
@@ -382,6 +318,7 @@ class CorrectionResult:
     applied_findings: tuple[Finding, ...]
     skipped_findings: tuple[Finding, ...]
     suggestion_outcomes: tuple[SuggestionOutcome, ...]
+    source_policy_version: str
 
     def apply_suggestions(self, finding_ids: Iterable[str]) -> str:
         """Apply explicitly selected skipped suggestions with automatic findings."""
@@ -531,6 +468,7 @@ class Analyzer:
                     suggestions=len(specialist_run.suggestions),
                     model_calls=specialist_run.model_calls,
                     protocol_versions=specialist_run.operation_versions,
+                    source_policy_version=SOURCE_POLICY_VERSION,
                 ),
             )
 
@@ -560,6 +498,7 @@ class Analyzer:
             applied_findings=tuple(selected),
             skipped_findings=tuple(skipped),
             suggestion_outcomes=outcomes,
+            source_policy_version=SOURCE_POLICY_VERSION,
         )
 
     async def _analysis_for_correction(
@@ -610,6 +549,7 @@ class Analyzer:
             operation=_SUGGESTION_BACKEND_OPERATION,
             suggestions=_count_llm_suggestion_findings(analysis.issues),
             model_calls=counted_backend.calls,
+            source_policy_version=SOURCE_POLICY_VERSION,
         )
         return analysis, (outcome,)
 
@@ -634,14 +574,14 @@ class Analyzer:
             raise RuntimeError("Analyzer-owned LanguageTool session is closed")
 
     def _should_apply_automatically(self, finding: Finding) -> bool:
-        policy = _POLICY_BY_SOURCE.get(finding.source)
-        if policy is None:
-            return False
-        if policy.category != finding.category:
-            return False
-        if finding.confidence.value < policy.minimum_confidence.value:
-            return False
-        return True
+        behavior = self._registry.source_behavior(finding.source)
+        return bool(
+            is_automatic_correction_eligible(
+                finding,
+                behavior,
+                source_policy_version=SOURCE_POLICY_VERSION,
+            )
+        )
 
 
 def _make_default_registry(

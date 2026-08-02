@@ -5,7 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from polis.core import AnalysisOptions, Category, Finding, Rule, Source
+from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
+from polis.correction.policy import SourceBehavior
 from polis.rules.agreement import AgreementCopulaRule
 from polis.rules.contextual_inflection import (
     ContextMorphologyTransport,
@@ -83,6 +84,15 @@ class DeterministicRuleRegistry:
 
     def __init__(self, registrations: Iterable[RuleRegistration]) -> None:
         self._registrations = _normalize_registrations(registrations)
+        self._behaviors = {
+            entry.rule.source: SourceBehavior(
+                source=entry.rule.source,
+                operation=entry.rule.operation,
+                behavior_version=entry.rule.behavior_version,
+            )
+            for entry in self._registrations
+            if isinstance(entry.rule, VersionedRule)
+        }
 
     def rules(self) -> tuple[Rule, ...]:
         """Return registered rules in deterministic order."""
@@ -99,6 +109,11 @@ class DeterministicRuleRegistry:
             for entry in self._registrations
             if _selected_by_categories(entry.categories, categories)
         )
+
+    def source_behavior(self, source: Source) -> SourceBehavior | None:
+        """Return trusted registered behavior metadata for ``source`` if available."""
+
+        return self._behaviors.get(source)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Execute selected rules and validate their findings."""

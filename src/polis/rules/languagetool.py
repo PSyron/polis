@@ -150,6 +150,18 @@ class LocalLanguageToolRule:
         default_factory=threading.Lock, init=False, repr=False, compare=False
     )
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified allowlisted punctuation action."""
+
+        return "check.allowlisted_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified LanguageTool behavior version."""
+
+        return "pl-6.8-five-rule-comma/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if (
             options.categories is not None

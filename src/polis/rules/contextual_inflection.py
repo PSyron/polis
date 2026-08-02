@@ -165,6 +165,18 @@ class ContextualInflectionRule:
     transport: ContextMorphologyTransport
     source: Source = _SOURCE
 
+    @property
+    def operation(self) -> str:
+        """Return the review-only local synthesis action."""
+
+        return "synthesize.contextual_inflection"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the review-only implementation behavior version."""
+
+        return "languagetool-contextual-inflection/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if (
             options.categories is not None

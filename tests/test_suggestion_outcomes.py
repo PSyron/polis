@@ -13,6 +13,7 @@ from polis.core import (
     CorrectionConflictError,
     InvalidBackendResponseError,
 )
+from polis.correction import SOURCE_POLICY_VERSION
 from polis.llm import PromptRequest
 
 
@@ -137,7 +138,8 @@ def test_suggestion_outcomes_present_when_backend_is_enabled_and_complete() -> N
     assert outcome.suggestions >= 1
     assert outcome.operation == "analysis.correct.suggestions"
     assert outcome.model_calls == 1
-    assert outcome.source_policy_version == "1.1"
+    assert result.source_policy_version == SOURCE_POLICY_VERSION
+    assert outcome.source_policy_version == SOURCE_POLICY_VERSION
 
 
 @pytest.mark.parametrize(
@@ -182,6 +184,8 @@ def test_specialist_suggestion_is_reviewable_and_never_auto_applied() -> None:
         "specialist-corrected-text/1.0",
         "specialist-proposal-verifier/1.0",
     )
+    assert result.source_policy_version == SOURCE_POLICY_VERSION
+    assert outcome.source_policy_version == SOURCE_POLICY_VERSION
     assert len(backend.calls) == 2
     assert result.apply_suggestions((result.skipped_findings[0].id,)) == (
         "Wiem, że wróci."
@@ -200,6 +204,22 @@ def test_model_confidence_cannot_grant_automatic_correction() -> None:
 
     assert result.corrected_text == result.original_text
     assert result.skipped_findings[0].confidence == Confidence(1.0)
+
+
+def test_every_suggestion_outcome_uses_the_active_source_policy_version() -> None:
+    engine, _backend = _specialist_engine(
+        ('{"corrected_text":"Wiem, że wróci."}', '{"decision":"accept"}')
+    )
+    result = Analyzer(
+        AnalyzerConfig(use_local_heuristic_backend=True),
+        specialist_engine=engine,
+    ).correct("Wiem że wróci.")
+
+    assert len(result.suggestion_outcomes) == 2
+    assert result.source_policy_version == SOURCE_POLICY_VERSION
+    assert {
+        outcome.source_policy_version for outcome in result.suggestion_outcomes
+    } == {SOURCE_POLICY_VERSION}
 
 
 def test_specialist_failure_preserves_deterministic_correction() -> None:

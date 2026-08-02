@@ -222,6 +222,49 @@ and only after all safety, privacy, quality, memory, and licensing gates pass.
   alone do not cover the required contextual inflection and syntax cases, though
   rules-only operation remains a supported fallback.
 
+## Implementation notes (Issue #84)
+
+Issue #84 makes this decision's source-policy boundary executable without
+rewriting the historical decision or adding an automatic privilege. The active
+automatic-correction policy is `1.2` and its immutable enforcement key is:
+
+```text
+(source, category, operation, behavior_version, source_policy_version)
+```
+
+All five dimensions must match one explicit entry, and its configured minimum
+confidence is checked only after that match. The deterministic registry, not a
+finding or its serialized form, supplies the installed rule's operation and
+behavior version. Missing metadata, an unknown key, or any version drift fails
+closed to reviewable. `SourceKind.LLM` is denied regardless of confidence.
+
+Policy `1.1` remains the historical qualification identity for the same nine
+behaviors; its evidence and meaning are not changed in place. Policy `1.2`
+preserves those behaviors only at these exact identities:
+
+| Source | Category | Operation | Behavior version | Source-policy version |
+| --- | --- | --- | --- | --- |
+| `rule:agreement.copula` | `agreement` | `replace.copula_form` | `agreement-copula/1.0` | `1.2` |
+| `rule:spelling.jestes` | `spelling` | `replace.common_typo` | `spelling-jestes/1.0` | `1.2` |
+| `rule:spelling.wlasnie` | `spelling` | `replace.common_typo` | `spelling-wlasnie/1.0` | `1.2` |
+| `rule:spelling.zeby` | `spelling` | `replace.common_typo` | `spelling-zeby/1.0` | `1.2` |
+| `rule:syntax.comma_space` | `punctuation` | `normalize.comma_spacing` | `syntax-comma-space/1.0` | `1.2` |
+| `rule:syntax.list_space` | `syntax` | `normalize.list_marker_spacing` | `syntax-list-space/1.0` | `1.2` |
+| `rule:syntax.quote_space` | `punctuation` | `normalize.quote_spacing` | `syntax-quote-space/1.0` | `1.2` |
+| `rule:syntax.sentence_space` | `punctuation` | `normalize.sentence_spacing` | `syntax-sentence-space/1.0` | `1.2` |
+| `rule:languagetool.pl` | `punctuation` | `check.allowlisted_comma` | `pl-6.8-five-rule-comma/1.0` | `1.2` |
+
+Changing a behavior version requires new direct qualification evidence before a
+new exact policy entry may be added. Reviewable deterministic rules may expose
+behavior metadata, but do not gain automatic eligibility without such an entry.
+
+`Finding` and analysis JSON schema version `1` remain unchanged; serialized
+findings do not assert automatic-correction authority. `CorrectionResult`
+records the active `source_policy_version` as an additive Python API field. The
+installed sentence-safety runner protocol uses schema version `2` to report the
+observed runtime policy version, while the historical evaluation report remains
+schema version `1` and byte-stable with its policy-`1.1` identity.
+
 ## Delivery order
 
 The binding M5 dependency graph is maintained in

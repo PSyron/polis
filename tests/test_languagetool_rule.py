@@ -9,6 +9,7 @@ import pytest
 
 import polis.rules.languagetool as languagetool_module
 from polis import AnalysisOptions, AnalysisResult, Category
+from polis.correction import SourceBehavior
 from polis.rules.languagetool import (
     LanguageToolRuleConfig,
     LocalLanguageToolRule,
@@ -68,6 +69,25 @@ def test_rule_allowlist_contains_exactly_qualified_identifiers() -> None:
         "BRAK_PRZECINKA_ZEBY",
         "WOLACZ_BEZ_PRZECINKA",
     }
+
+
+def test_rule_exposes_the_frozen_allowlisted_comma_behavior() -> None:
+    rule = _rule(FakeTransport([]))
+
+    assert rule.operation == "check.allowlisted_comma"
+    assert rule.behavior_version == "pl-6.8-five-rule-comma/1.0"
+    assert SourceBehavior(
+        source=rule.source,
+        operation=rule.operation,
+        behavior_version=rule.behavior_version,
+    ) == SourceBehavior(
+        source=rule.source,
+        operation="check.allowlisted_comma",
+        behavior_version="pl-6.8-five-rule-comma/1.0",
+    )
+
+    with pytest.raises((AttributeError, TypeError)):
+        rule.operation = "check.changed"
 
 
 @pytest.mark.parametrize(

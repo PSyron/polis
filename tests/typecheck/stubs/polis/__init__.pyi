@@ -67,6 +67,7 @@ class CorrectionResult:
     applied_findings: tuple[Finding, ...]
     skipped_findings: tuple[Finding, ...]
     suggestion_outcomes: tuple[SuggestionOutcome, ...]
+    source_policy_version: str
     def apply_suggestions(self, finding_ids: Iterable[str]) -> str: ...
 
 

@@ -27,6 +27,7 @@ from polis.core.protocols import (
     MonotonicClock,
     Rule,
     RuleRegistry,
+    VersionedRule,
 )
 from polis.core.serialization import (
     ANALYSIS_SCHEMA_VERSION,
@@ -48,6 +49,7 @@ __all__ = [
     "MonotonicClock",
     "Rule",
     "RuleRegistry",
+    "VersionedRule",
     "PolisError",
     "AnalysisTimeoutError",
     "BackendUnavailableError",

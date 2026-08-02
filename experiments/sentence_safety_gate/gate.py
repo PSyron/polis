@@ -8,7 +8,7 @@ import math
 import os
 import re
 import xml.sax
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -27,6 +27,7 @@ _SAFETY_CORPUS_ID = "polis_polish_correction_safety_corpus_v1"
 _SAFETY_CORPUS_DIGEST = (
     "2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982"
 )
+_KNOWN_SOURCE_POLICY_VERSIONS = frozenset({"1.1", "1.2"})
 _TOP_LEVEL_KEYS = frozenset(
     {
         "schema_version",
@@ -169,6 +170,7 @@ class RunnerObservation:
     """One structurally validated installed-runner result."""
 
     request_id: int
+    source_policy_version: str
     automatic_edits: tuple[ObservedEdit, ...]
     reviewable_edits: tuple[ObservedEdit, ...]
     analysis_finding_ids: tuple[str, ...]
@@ -341,8 +343,12 @@ def load_gate_config(path: Path) -> GateConfig:
         raise ValueError("configuration schema_version must be 1")
     if raw["sentence_only"] is not True:
         raise ValueError("configuration must be sentence-only")
-    if raw["source_policy_version"] != "1.1":
-        raise ValueError("source policy version must be 1.1")
+    source_policy_version = _required_text(
+        raw["source_policy_version"],
+        "source policy version",
+    )
+    if source_policy_version not in _KNOWN_SOURCE_POLICY_VERSIONS:
+        raise ValueError("configuration has an unknown source policy version")
 
     corpus = _mapping(raw["corpus"], "corpus configuration")
     sources = _mapping(raw["sources"], "source configuration")
@@ -376,7 +382,7 @@ def load_gate_config(path: Path) -> GateConfig:
         schema_version=1,
         experiment_id=_required_text(raw["experiment_id"], "experiment id"),
         sentence_only=True,
-        source_policy_version="1.1",
+        source_policy_version=source_policy_version,
         corpus_id=corpus_id,
         canonical_corpus_digest=canonical_digest,
         corpus_json_path=_required_text(corpus["json_path"], "corpus JSON path"),
@@ -588,10 +594,13 @@ def validate_runner_response(
     """Validate the complete installed-runner response against original text."""
 
     response = _mapping(raw, "runner response")
+    if "source_policy_version" not in response:
+        raise ValueError("runner response source policy version is required")
     expected_keys = {
         "schema_version",
         "request_id",
         "status",
+        "source_policy_version",
         "analysis_findings",
         "automatic_findings",
         "reviewable_findings",
@@ -611,8 +620,14 @@ def validate_runner_response(
     }
     if set(response) != expected_keys:
         raise ValueError("runner response must contain exactly the protocol fields")
-    if response["schema_version"] != 1 or response["status"] != "complete":
-        raise ValueError("runner response is not a complete schema-v1 outcome")
+    if response["schema_version"] != 2 or response["status"] != "complete":
+        raise ValueError("runner response is not a complete schema-v2 outcome")
+    source_policy_version = _required_text(
+        response["source_policy_version"],
+        "source policy version",
+    )
+    if source_policy_version not in _KNOWN_SOURCE_POLICY_VERSIONS:
+        raise ValueError("runner response has an unknown source policy version")
     request_id = _positive_integer(response["request_id"], "request id")
     analysis = _finding_sequence(response["analysis_findings"], source, "analysis")
     automatic = _finding_sequence(
@@ -640,14 +655,6 @@ def validate_runner_response(
         for item in (*automatic, *reviewable)
     ):
         raise ValueError("correction findings must be identical to analyze findings")
-    if config is not None:
-        if any(item.source not in config.automatic_sources for item in automatic):
-            raise ValueError("automatic finding source is not allowlisted")
-        if any(item.source not in config.reviewable_sources for item in reviewable):
-            raise ValueError("reviewable finding source is not allowlisted")
-        if any(item.source.startswith("llm:") for item in automatic):
-            raise ValueError("model finding cannot enter automatic channel")
-
     corrected_text = _required_text(response["corrected_text"], "corrected text")
     selected_text = _required_text(response["selected_text"], "selected text")
     if _apply_observed_edits(source, automatic) != corrected_text:
@@ -701,8 +708,9 @@ def validate_runner_response(
         or combined_peak_rss < combined_rss
     ):
         raise ValueError("peak RSS cannot be below loaded RSS")
-    return RunnerObservation(
+    observation = RunnerObservation(
         request_id=request_id,
+        source_policy_version=source_policy_version,
         automatic_edits=automatic,
         reviewable_edits=reviewable,
         analysis_finding_ids=analysis_ids,
@@ -722,6 +730,43 @@ def validate_runner_response(
             "process start count",
         ),
     )
+    if config is not None:
+        validate_runner_observations((observation,), config)
+    return observation
+
+
+def validate_runner_observations(
+    observations: Sequence[RunnerObservation],
+    config: GateConfig,
+) -> str:
+    """Validate source-policy and channel agreement for one evaluation run."""
+
+    if not observations:
+        raise ValueError("installed evaluation requires runner observations")
+    versions = {observation.source_policy_version for observation in observations}
+    if versions - _KNOWN_SOURCE_POLICY_VERSIONS:
+        raise ValueError("runner response has an unknown source policy version")
+    if len(versions) != 1:
+        raise ValueError("runner source policy observations disagree")
+    source_policy_version = next(iter(versions))
+    if source_policy_version != config.source_policy_version:
+        raise ValueError("runner source policy version does not match configuration")
+    for observation in observations:
+        if any(
+            item.source not in config.automatic_sources
+            for item in observation.automatic_edits
+        ):
+            raise ValueError("automatic finding source is not allowlisted")
+        if any(
+            item.source not in config.reviewable_sources
+            for item in observation.reviewable_edits
+        ):
+            raise ValueError("reviewable finding source is not allowlisted")
+        if any(
+            item.source.startswith("llm:") for item in observation.automatic_edits
+        ):
+            raise ValueError("model finding cannot enter automatic channel")
+    return source_policy_version
 
 
 def gate_qualifies(report: Mapping[str, object], config: GateConfig) -> bool:

@@ -90,6 +90,18 @@ class SpellingZebyRule(TypoSpellingRule):
             source_name="spelling.zeby", typed="zeby", corrected="żeby", confidence=0.98
         )
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "spelling-zeby/1.0"
+
 
 class SpellingWlasnieRule(TypoSpellingRule):
     """Corrects ``wlasnie`` -> ``właśnie``."""
@@ -102,6 +114,18 @@ class SpellingWlasnieRule(TypoSpellingRule):
             confidence=0.97,
         )
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "spelling-wlasnie/1.0"
+
 
 class SpellingJestesRule(TypoSpellingRule):
     """Corrects ``jestes`` -> ``jesteś``."""
@@ -113,6 +137,18 @@ class SpellingJestesRule(TypoSpellingRule):
             corrected="jesteś",
             confidence=0.96,
         )
+
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "spelling-jestes/1.0"
 
 
 __all__ = [

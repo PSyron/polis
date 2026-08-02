@@ -317,6 +317,20 @@ def test_json_is_canonical_versioned_and_preserves_polish_text() -> None:
     payload = json.loads(encoded)
     assert payload["schema_version"] == 1
     assert payload["options"]["categories"] == ["agreement", "spelling"]
+    assert set(Finding.__dataclass_fields__) == {
+        "id",
+        "category",
+        "severity",
+        "message",
+        "explanation",
+        "original",
+        "suggestion",
+        "start",
+        "end",
+        "confidence",
+        "source",
+    }
+    assert set(payload["issues"][0]) == set(Finding.__dataclass_fields__)
     assert payload["issues"][0] == {
         "category": "agreement",
         "confidence": 0.98,
@@ -330,6 +344,16 @@ def test_json_is_canonical_versioned_and_preserves_polish_text() -> None:
         "start": 0,
         "suggestion": "To zdanie",
     }
+    assert encoded == (
+        '{"issues":[{"category":"agreement","confidence":0.98,"end":9,'
+        '"explanation":"Forma „Te” nie zgadza się z rzeczownikiem „zdanie”.",'
+        '"id":"finding_b89cbdbde56272994279f763b05cf63b",'
+        '"message":"Niezgodność rodzaju zaimka i rzeczownika.",'
+        '"original":"Te zdanie","severity":"error","source":"rule:agreement",'
+        '"start":0,"suggestion":"To zdanie"}],"options":{"categories":['
+        '"agreement","spelling"],"minimum_confidence":0.5},'
+        '"schema_version":1,"text":"Te zdanie zawiera błąd."}'
+    )
 
 
 def test_json_round_trip_is_lossless_including_optional_suggestion() -> None:

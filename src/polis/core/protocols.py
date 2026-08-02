@@ -45,6 +45,19 @@ class Rule(Protocol):
 
 
 @runtime_checkable
+class VersionedRule(Rule, Protocol):
+    """A rule with trusted immutable behavior provenance metadata."""
+
+    @property
+    def operation(self) -> str:
+        """Return the stable action performed by this rule."""
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the exact qualified implementation behavior version."""
+
+
+@runtime_checkable
 class RuleRegistry(Protocol):
     """Execute the fixed ordered rule entries for one analyzer lifecycle.
 

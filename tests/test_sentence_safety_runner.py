@@ -4,11 +4,15 @@ import json
 import os
 import subprocess
 import sys
+from io import BytesIO, StringIO
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
 from scripts import run_sentence_safety_case as runner
+
+from polis import analyzer as analyzer_module
 
 pytestmark = pytest.mark.research
 
@@ -75,7 +79,7 @@ def _exchange(
     process.stdin.write(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "request_id": request_id,
                 "operation": "analyze_sentence",
                 "text": text,
@@ -108,10 +112,59 @@ def test_runner_reuses_one_analyzer_for_multiple_sentence_requests(
 
     assert first["status"] == "complete"
     assert second["status"] == "complete"
+    assert first["schema_version"] == 2
+    assert second["schema_version"] == 2
+    assert first["source_policy_version"] == "1.2"
+    assert second["source_policy_version"] == "1.2"
     assert first["process_start_count"] == 1
     assert second["process_start_count"] == 1
     assert first["corrected_text"] == "Wiem, że wróciła."
     assert second["selected_text"] == "Rozmawiałem z Janem Nowakiem."
+
+
+def test_runner_observes_policy_version_from_correction_result(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = json.dumps(
+        {
+            "schema_version": 2,
+            "request_id": 1,
+            "operation": "analyze_sentence",
+            "text": "To zdanie jest poprawne.",
+        }
+    ).encode("utf-8")
+    output = StringIO()
+    executable = _fake_stdio_executable(tmp_path)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(analyzer_module, "SOURCE_POLICY_VERSION", "observed-test-policy")
+        patch.setattr(
+            sys,
+            "stdin",
+            SimpleNamespace(buffer=BytesIO(request + b"\n")),
+        )
+        patch.setattr(sys, "stdout", output)
+        patch.setattr(
+            sys,
+            "argv",
+            [
+                os.fspath(RUNNER),
+                "--vendored-stdio",
+                os.fspath(executable),
+                "--expected-install-root",
+                os.fspath(ROOT / "src"),
+                "--timeout-seconds",
+                "1",
+            ],
+        )
+        for name in runner._PROXY_VARIABLES:
+            patch.delenv(name, raising=False)
+
+        assert runner.main() == 0
+
+    response = json.loads(output.getvalue())
+    assert response["source_policy_version"] == "observed-test-policy"
 
 
 @pytest.mark.parametrize("measured", (0, 1, 2))

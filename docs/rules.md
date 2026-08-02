@@ -87,7 +87,7 @@ gold data, and abstain on multi-sentence input. Their sources are
 `rule:syntax.missing_reflexive` and `rule:syntax.missing_correlative`. Their
 one-shot holdout contained no eligible construction, so it could not establish
 non-vacuous precision. Both findings remain reviewable and are excluded from
-automatic source-policy `1.1`.
+automatic source-policy `1.2`.
 
 All syntax rules support category filtering through the shared
 `options.categories` mechanism and return deterministic findings with stable
@@ -100,8 +100,11 @@ It accepts a separately installed local LanguageTool 6.8 server and maps only
 `BRAK_PRZECINKA_KTORY`, `BRAK_PRZECINKA_SPOJNIK_PROSTY`,
 `BRAK_PRZECINKA_ZE`, `BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` to
 minimal comma insertions with source `rule:languagetool.pl` and confidence
-`0.85`. Source-policy version `1.1` permits these findings to be applied
-automatically when they do not conflict.
+`0.85`. Active source-policy version `1.2` permits these findings to be applied
+automatically only when the installed behavior is
+`check.allowlisted_comma` / `pl-6.8-five-rule-comma/1.0`, the complete policy
+key matches, and they do not conflict. Policy `1.1` remains the historical
+qualification record for this five-ID allowlist.
 
 The rule converts Java UTF-16 offsets to Python code-point offsets, minimizes
 wide replacements, rejects ambiguous alternatives and conflicting findings,
@@ -137,7 +140,30 @@ before the local transport is called.
 Findings use `Category.INFLECTION`, source
 `rule:languagetool.contextual_inflection`, confidence `0.95`, and original
 Unicode `[start, end)` offsets. They are suggestion-only and excluded from
-automatic source-policy `1.1`.
+automatic source-policy `1.2`.
+
+## Automatic-policy behavior identities
+
+The active automatic-correction source-policy is `1.2`. It preserves the nine
+behaviors qualified under historical policy `1.1`, but identifies each one by
+the complete key `(source, category, operation, behavior_version,
+source_policy_version)`. A source name, category, or confidence value alone is
+not sufficient. The policy reads operation and behavior-version metadata from
+the registered deterministic rule; missing or changed metadata leaves a finding
+reviewable. Any behavior-version change requires new direct evidence and a new
+exact policy entry. Model findings are always reviewable.
+
+| Source | Category | Operation | Behavior version | Source-policy version |
+| --- | --- | --- | --- | --- |
+| `rule:agreement.copula` | `agreement` | `replace.copula_form` | `agreement-copula/1.0` | `1.2` |
+| `rule:spelling.jestes` | `spelling` | `replace.common_typo` | `spelling-jestes/1.0` | `1.2` |
+| `rule:spelling.wlasnie` | `spelling` | `replace.common_typo` | `spelling-wlasnie/1.0` | `1.2` |
+| `rule:spelling.zeby` | `spelling` | `replace.common_typo` | `spelling-zeby/1.0` | `1.2` |
+| `rule:syntax.comma_space` | `punctuation` | `normalize.comma_spacing` | `syntax-comma-space/1.0` | `1.2` |
+| `rule:syntax.list_space` | `syntax` | `normalize.list_marker_spacing` | `syntax-list-space/1.0` | `1.2` |
+| `rule:syntax.quote_space` | `punctuation` | `normalize.quote_spacing` | `syntax-quote-space/1.0` | `1.2` |
+| `rule:syntax.sentence_space` | `punctuation` | `normalize.sentence_spacing` | `syntax-sentence-space/1.0` | `1.2` |
+| `rule:languagetool.pl` | `punctuation` | `check.allowlisted_comma` | `pl-6.8-five-rule-comma/1.0` | `1.2` |
 
 ## Analysis normalization
 

@@ -28,6 +28,18 @@ class AgreementCopulaRule:
         )
         self._confidence = Confidence(0.93)
 
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.copula_form"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "agreement-copula/1.0"
+
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()

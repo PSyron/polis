@@ -18,6 +18,7 @@ FAKE_STDIO_SERVER = ROOT / "tests" / "fixtures" / "fake_languagetool_stdio.py"
 
 class FakeHttpTransport:
     failure: Exception | None = None
+    rule_id = "BRAK_PRZECINKA_ZE"
 
     def __init__(self, _config: object) -> None:
         self.calls: list[str] = []
@@ -35,7 +36,7 @@ class FakeHttpTransport:
                     "offset": 0,
                     "length": 7,
                     "replacements": [{"value": "Wiem, że"}],
-                    "rule": {"id": "BRAK_PRZECINKA_ZE"},
+                    "rule": {"id": self.rule_id},
                 }
             )
         return {
@@ -162,10 +163,22 @@ def test_sidecar_failure_preserves_builtin_findings(
     assert any(str(finding.source) == "rule:spelling.zeby" for finding in result.issues)
 
 
-def test_qualified_language_tool_sentence_rule_is_automatically_applied(
+@pytest.mark.parametrize(
+    "rule_id",
+    (
+        "BRAK_PRZECINKA_KTORY",
+        "BRAK_PRZECINKA_SPOJNIK_PROSTY",
+        "BRAK_PRZECINKA_ZE",
+        "BRAK_PRZECINKA_ZEBY",
+        "WOLACZ_BEZ_PRZECINKA",
+    ),
+)
+def test_each_qualified_language_tool_rule_id_is_automatically_applied(
     monkeypatch: pytest.MonkeyPatch,
+    rule_id: str,
 ) -> None:
     FakeHttpTransport.failure = None
+    monkeypatch.setattr(FakeHttpTransport, "rule_id", rule_id)
     monkeypatch.setattr(
         "polis.analyzer.LoopbackLanguageToolHttpTransport", FakeHttpTransport
     )

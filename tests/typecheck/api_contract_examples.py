@@ -41,6 +41,15 @@ async def correct_without_blocking_an_event_loop() -> str:
     return result.corrected_text
 
 
+def correction_result_exposes_active_policy_identity(
+    result: polis.CorrectionResult,
+) -> bool:
+    return result.source_policy_version == "1.2" and all(
+        outcome.source_policy_version == result.source_policy_version
+        for outcome in result.suggestion_outcomes
+    )
+
+
 def root_result_as_core(
     result: polis.AnalysisResult,
 ) -> polis.core.AnalysisResult:

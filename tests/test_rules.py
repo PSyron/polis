@@ -1,16 +1,40 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import cast
 
-from polis.core import AnalysisOptions, Category, Confidence, Finding, Source
+import pytest
+
+from polis.core import (
+    AnalysisOptions,
+    Category,
+    Confidence,
+    Finding,
+    Source,
+    VersionedRule,
+)
 from polis.core.models import Severity
+from polis.correction import SourceBehavior
 from polis.rules import (
+    AgreementCopulaRule,
+    ContextMorphologyTransport,
+    ContextualInflectionRule,
+    ContextualInflectionRuleConfig,
     DeterministicRuleRegistry,
     DuplicateFindingError,
     DuplicateRuleSourceError,
     IncompatibleRuleOutputError,
     RuleRegistration,
     RuleRegistryError,
+    SpellingJestesRule,
+    SpellingWlasnieRule,
+    SpellingZebyRule,
+    SyntaxCommaSpacingRule,
+    SyntaxListSpacingRule,
+    SyntaxMissingCorrelativeRule,
+    SyntaxMissingReflexiveRule,
+    SyntaxQuoteSpacingRule,
+    SyntaxSentenceSpacingRule,
 )
 
 
@@ -27,6 +51,11 @@ class FakeRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         self.calls.append(text)
         return self._findings
+
+
+class FakeVersionedRule(FakeRule):
+    operation = "replace.example"
+    behavior_version = "example-rule/1.0"
 
 
 def make_finding(source: str, *, category: Category, start: int, end: int) -> Finding:
@@ -57,6 +86,82 @@ def test_registry_rejects_duplicate_rule_sources() -> None:
         assert "duplicate rule source" in str(exc)
     else:
         raise AssertionError("expected DuplicateRuleSourceError")
+
+
+def test_registry_resolves_behavior_only_from_a_registered_versioned_rule() -> None:
+    rule = FakeVersionedRule("rule:example", ())
+    registry = DeterministicRuleRegistry((RuleRegistration(rule=rule),))
+
+    assert registry.source_behavior(rule.source) == SourceBehavior(
+        source=Source.parse("rule:example"),
+        operation="replace.example",
+        behavior_version="example-rule/1.0",
+    )
+
+
+def test_registry_returns_no_behavior_for_unversioned_or_unknown_sources() -> None:
+    rule = FakeRule("rule:third-party", ())
+    registry = DeterministicRuleRegistry((RuleRegistration(rule=rule),))
+
+    assert registry.source_behavior(rule.source) is None
+    assert registry.source_behavior(Source.parse("rule:unknown")) is None
+
+
+@pytest.mark.parametrize(
+    ("rule", "operation", "behavior_version"),
+    (
+        (AgreementCopulaRule(), "replace.copula_form", "agreement-copula/1.0"),
+        (SpellingJestesRule(), "replace.common_typo", "spelling-jestes/1.0"),
+        (SpellingWlasnieRule(), "replace.common_typo", "spelling-wlasnie/1.0"),
+        (SpellingZebyRule(), "replace.common_typo", "spelling-zeby/1.0"),
+        (
+            ContextualInflectionRule(
+                ContextualInflectionRuleConfig(),
+                cast(ContextMorphologyTransport, object()),
+            ),
+            "synthesize.contextual_inflection",
+            "languagetool-contextual-inflection/1.0",
+        ),
+        (
+            SyntaxCommaSpacingRule(),
+            "normalize.comma_spacing",
+            "syntax-comma-space/1.0",
+        ),
+        (
+            SyntaxListSpacingRule(),
+            "normalize.list_marker_spacing",
+            "syntax-list-space/1.0",
+        ),
+        (
+            SyntaxQuoteSpacingRule(),
+            "normalize.quote_spacing",
+            "syntax-quote-space/1.0",
+        ),
+        (
+            SyntaxSentenceSpacingRule(),
+            "normalize.sentence_spacing",
+            "syntax-sentence-space/1.0",
+        ),
+        (
+            SyntaxMissingReflexiveRule(),
+            "insert.reflexive_pronoun",
+            "syntax-missing-reflexive/1.0",
+        ),
+        (
+            SyntaxMissingCorrelativeRule(),
+            "insert.correlative",
+            "syntax-missing-correlative/1.0",
+        ),
+    ),
+)
+def test_builtin_rules_expose_read_only_behavior_metadata(
+    rule: VersionedRule, operation: str, behavior_version: str
+) -> None:
+    assert rule.operation == operation
+    assert rule.behavior_version == behavior_version
+
+    with pytest.raises((AttributeError, TypeError)):
+        rule.operation = "replace.changed"
 
 
 def test_registry_selects_rules_by_category() -> None:
