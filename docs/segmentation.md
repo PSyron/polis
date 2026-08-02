@@ -28,6 +28,22 @@ Python index offsets in Unicode code points.
 - Decimal points (digit dot digit), like `3.14`, are not treated as sentence ends.
 - Segment slices are concatenated back to the original input in implementation order.
 
+## Generated structural guardrail
+
+Issue #125 runs the bounded synthetic Unicode generator from issue #123 through
+both segmenters. It checks ordered, contiguous, bounded Unicode code-point
+half-open spans `[start, end)`, exact source slices, and exact reconstruction
+of the original source. The 64-case run covers the generator's declared ASCII,
+Polish-diacritic, non-BMP, combining-mark, LF, CRLF, punctuation, and quote
+families, including its explicit empty-input case.
+
+Failures report only a stable invariant identifier and deterministic replay
+metadata, never the generated source text. This is a structural guardrail: it
+does not change segmentation heuristics, replace authored linguistic
+regressions, or claim linguistic coverage. See
+[`docs/development/generative-invariants.md`](development/generative-invariants.md)
+for the generator and replay contract.
+
 ## Limitations and known caveats
 
 - This is a deterministic heuristic, not a full language model.
