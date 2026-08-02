@@ -65,6 +65,10 @@ jobs:
       - name: Synchronize locked development environment
         run: uv sync --locked --extra dev
       - name: Run pytest suite
+        env:
+          POLIS_GENERATIVE_GENERATOR_VERSION: unicode-structural-v1
+          POLIS_GENERATIVE_SEED: 95001
+          POLIS_GENERATIVE_CASES: 64
         run: uv run --locked --extra dev pytest -m "not research and not slow and not model"
       - name: Run Ruff lint
         run: uv run --locked --extra dev ruff check .

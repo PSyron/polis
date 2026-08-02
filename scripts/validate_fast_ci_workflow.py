@@ -25,10 +25,20 @@ EXPECTED_ACTIONS = {
     "actions/setup-python": "ece7cb06caefa5fff74198d8649806c4678c61a1",
     "astral-sh/setup-uv": "37802adc94f370d6bfd71619e3f0bf239e1f3b78",
 }
+GENERATIVE_GENERATOR_VERSION = "unicode-structural-v1"
+GENERATIVE_SEED = 95001
+GENERATIVE_CASES = 64
+GENERATIVE_MAX_CASES = 256
+GENERATIVE_ENVIRONMENT = (
+    ("POLIS_GENERATIVE_GENERATOR_VERSION", GENERATIVE_GENERATOR_VERSION),
+    ("POLIS_GENERATIVE_SEED", str(GENERATIVE_SEED)),
+    ("POLIS_GENERATIVE_CASES", str(GENERATIVE_CASES)),
+)
 FAST_PYTEST_COMMAND = (
     'run: uv run --locked --extra dev pytest -m "not research and not slow and'
     ' not model"'
 )
+FAST_PYTEST_FILTER = 'pytest -m "not research and not slow and not model"'
 REQUIRED_SNIPPETS = (
     "push:",
     "pull_request:",
@@ -81,6 +91,70 @@ def validate_yaml_syntax(path: Path) -> str | None:
     return None
 
 
+def validate_generated_invariant_configuration(workflow: str) -> list[str]:
+    """Return policy errors for safe, bounded generated-test metadata."""
+    step = re.search(
+        r"^      - name: Run pytest suite\n(?P<content>.*?)(?=^      - |\Z)",
+        workflow,
+        re.MULTILINE | re.DOTALL,
+    )
+    if step is None:
+        return ["generated-invariant configuration must be on the pytest step"]
+
+    step_content = step.group("content")
+    environment = re.search(
+        r"^        env:\n(?P<entries>(?:^          [^\n]+\n?)*)",
+        step_content,
+        re.MULTILINE,
+    )
+    if environment is None:
+        return [
+            "generated-invariant configuration must use the pytest step env mapping"
+        ]
+
+    environment_entries = environment.group("entries")
+    configuration: dict[str, str] = {}
+    errors: list[str] = []
+    for name, _ in GENERATIVE_ENVIRONMENT:
+        matches = re.findall(rf"^\s+{name}: ([^\s]+)\s*$", workflow, re.MULTILINE)
+        step_matches = re.findall(
+            rf"^          {name}: ([^\s]+)\s*$", environment_entries, re.MULTILINE
+        )
+        if not matches:
+            errors.append(f"generated-invariant configuration is missing: {name}")
+        elif len(matches) != 1 or len(step_matches) != 1:
+            if len(matches) > 1 or len(step_matches) > 1:
+                errors.append("generated-invariant configuration is duplicated")
+            else:
+                errors.append(
+                    "generated-invariant configuration must be on the pytest step"
+                )
+        else:
+            configuration[name] = step_matches[0]
+    if errors:
+        return errors
+
+    if (
+        configuration["POLIS_GENERATIVE_GENERATOR_VERSION"]
+        != GENERATIVE_GENERATOR_VERSION
+    ):
+        errors.append("generated-invariant generator version is invalid")
+
+    seed = configuration["POLIS_GENERATIVE_SEED"]
+    if not seed.isascii() or not seed.isdecimal() or int(seed) != GENERATIVE_SEED:
+        errors.append("generated-invariant seed is invalid")
+
+    cases = configuration["POLIS_GENERATIVE_CASES"]
+    if not cases.isascii() or not cases.isdecimal():
+        errors.append("generated-invariant case budget is invalid")
+    elif int(cases) > GENERATIVE_MAX_CASES:
+        errors.append("generated-invariant case budget exceeds maximum")
+    elif int(cases) != GENERATIVE_CASES:
+        errors.append("generated-invariant case budget is invalid")
+
+    return errors
+
+
 def validate_contract(path: Path) -> list[str]:
     if not path.is_file():
         return [f"workflow does not exist: {path}"]
@@ -120,13 +194,14 @@ def validate_contract(path: Path) -> list[str]:
             "setup-python architecture input must use the mapped matrix field"
         )
 
-    if FAST_PYTEST_COMMAND not in workflow:
+    if FAST_PYTEST_FILTER not in workflow:
         errors.append("fast pytest marker filter is missing")
     test_commands = re.findall(
         r"^\s+run: .*\b(?:pytest|unittest)\b.*$", workflow, re.MULTILINE
     )
     if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
+    errors.extend(validate_generated_invariant_configuration(workflow))
 
     action_references = re.findall(
         r"^\s+uses: ([^@\s]+)@([^\s]+)$", workflow, re.MULTILINE

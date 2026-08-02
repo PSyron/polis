@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from hashlib import sha256
+from os import environ
 
 GENERATOR_VERSION = "unicode-structural-v1"
 DEFAULT_SEED = 95001
@@ -12,6 +13,11 @@ DEFAULT_CASES = 64
 MAX_CASES = 256
 _MAX_SEED = 2**64 - 1
 _SAFE_INVARIANT = re.compile(r"[a-z][a-z0-9_.-]{0,63}\Z")
+_CONFIGURATION_ENVIRONMENT = (
+    "POLIS_GENERATIVE_GENERATOR_VERSION",
+    "POLIS_GENERATIVE_SEED",
+    "POLIS_GENERATIVE_CASES",
+)
 
 _FAMILY_FRAGMENTS = (
     ("ascii", "Ala ma kota"),
@@ -69,13 +75,19 @@ class SyntheticTextCase:
 
 
 def generate_unicode_text_cases(
-    *, seed: int = DEFAULT_SEED, count: int = DEFAULT_CASES
+    *, seed: int | None = None, count: int | None = None
 ) -> tuple[SyntheticTextCase, ...]:
     """Return exactly ``count`` independently replayable synthetic text cases.
 
     ``seed`` must be an integer in the inclusive unsigned 64-bit range and
     ``count`` must be an integer from one through ``MAX_CASES``.
     """
+    if seed is None and count is None:
+        seed, count = _configured_defaults()
+    else:
+        seed = DEFAULT_SEED if seed is None else seed
+        count = DEFAULT_CASES if count is None else count
+
     _validate_seed(seed)
     _validate_count(count)
 
@@ -114,6 +126,35 @@ def generate_unicode_text_cases(
         cases.append(SyntheticTextCase(replay, families, text))
 
     return tuple(cases)
+
+
+def _configured_defaults() -> tuple[int, int]:
+    configured = {name: environ.get(name) for name in _CONFIGURATION_ENVIRONMENT}
+    if all(value is None for value in configured.values()):
+        return DEFAULT_SEED, DEFAULT_CASES
+    if any(value is None for value in configured.values()):
+        raise ValueError("generated configuration must be complete")
+
+    version = configured["POLIS_GENERATIVE_GENERATOR_VERSION"]
+    seed = configured["POLIS_GENERATIVE_SEED"]
+    count = configured["POLIS_GENERATIVE_CASES"]
+    if version is None or seed is None or count is None:
+        raise ValueError("generated configuration must be complete")
+    if version != GENERATOR_VERSION:
+        raise ValueError("generated configuration version is invalid")
+    if not seed.isascii() or not seed.isdecimal():
+        raise ValueError("generated configuration seed is invalid")
+    if not count.isascii() or not count.isdecimal():
+        raise ValueError("generated configuration case budget is invalid")
+
+    parsed_seed = int(seed)
+    parsed_count = int(count)
+    try:
+        _validate_seed(parsed_seed)
+        _validate_count(parsed_count)
+    except (TypeError, ValueError) as error:
+        raise ValueError("generated configuration values are out of range") from error
+    return parsed_seed, parsed_count
 
 
 def assert_structural_invariant(

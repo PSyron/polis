@@ -21,7 +21,7 @@ def test_generated_sentence_spans_reconstruct_the_original_source() -> None:
 
 
 def test_generated_segmentation_failures_hide_source_text() -> None:
-    case = generate_unicode_text_cases(count=2)[1]
+    case = generate_unicode_text_cases()[1]
 
     with pytest.raises(AssertionError) as error:
         _assert_generated_segmentation(kind="paragraph", segmenter=lambda _: ())

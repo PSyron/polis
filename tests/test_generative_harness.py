@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from dataclasses import FrozenInstanceError
 from hashlib import sha256
+from pathlib import Path
 
 import pytest
 from tests.generative import (
@@ -21,6 +25,19 @@ _GOLDEN_CASE_FINGERPRINTS = {
         "c581990272f0660faf9ead3ad1d209c4aebd9cc82d9560c41f912cad4b44907e"
     ),
 }
+_CONFIGURATION_ENVIRONMENT = (
+    "POLIS_GENERATIVE_GENERATOR_VERSION",
+    "POLIS_GENERATIVE_SEED",
+    "POLIS_GENERATIVE_CASES",
+)
+ROOT = Path(__file__).resolve().parents[1]
+COMPLETED_PROPERTY_MODULES = (
+    "tests/test_segmentation_properties.py",
+    "tests/test_generated_finding_fidelity.py",
+    "tests/test_correction_properties.py",
+    "tests/test_rule_registry_properties.py",
+    "tests/test_generated_pipeline_parity.py",
+)
 
 
 def _length_prefixed(value: bytes) -> bytes:
@@ -60,6 +77,88 @@ def test_default_cases_match_the_versioned_golden_fingerprint() -> None:
 
     assert expected is not None
     assert _case_fingerprint(generate_unicode_text_cases()) == expected
+
+
+def test_default_generator_configuration_uses_constants_when_environment_is_absent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for name in _CONFIGURATION_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+
+    cases = generate_unicode_text_cases()
+
+    assert len(cases) == DEFAULT_CASES
+    assert all(case.replay.seed == DEFAULT_SEED for case in cases)
+
+
+def test_default_generator_configuration_consumes_complete_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POLIS_GENERATIVE_GENERATOR_VERSION", GENERATOR_VERSION)
+    monkeypatch.setenv("POLIS_GENERATIVE_SEED", "95002")
+    monkeypatch.setenv("POLIS_GENERATIVE_CASES", "8")
+
+    cases = generate_unicode_text_cases()
+
+    assert len(cases) == 8
+    assert all(case.replay.seed == 95002 for case in cases)
+
+
+def test_completed_properties_accept_alternate_generator_configuration() -> None:
+    environment = {
+        **os.environ,
+        "POLIS_GENERATIVE_GENERATOR_VERSION": GENERATOR_VERSION,
+        "POLIS_GENERATIVE_SEED": "95002",
+        "POLIS_GENERATIVE_CASES": "8",
+    }
+
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", *COMPLETED_PROPERTY_MODULES, "-q"],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_default_generator_configuration_rejects_partial_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POLIS_GENERATIVE_SEED", "95002")
+    for name in (
+        "POLIS_GENERATIVE_GENERATOR_VERSION",
+        "POLIS_GENERATIVE_CASES",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    with pytest.raises(ValueError, match="complete"):
+        generate_unicode_text_cases()
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("POLIS_GENERATIVE_GENERATOR_VERSION", "unicode-structural-v2"),
+        ("POLIS_GENERATIVE_SEED", "not-a-seed"),
+        ("POLIS_GENERATIVE_SEED", str(2**64)),
+        ("POLIS_GENERATIVE_CASES", "0"),
+        ("POLIS_GENERATIVE_CASES", "many"),
+        ("POLIS_GENERATIVE_CASES", "257"),
+    ),
+)
+def test_default_generator_configuration_rejects_invalid_environment(
+    monkeypatch: pytest.MonkeyPatch, name: str, value: str
+) -> None:
+    monkeypatch.setenv("POLIS_GENERATIVE_GENERATOR_VERSION", GENERATOR_VERSION)
+    monkeypatch.setenv("POLIS_GENERATIVE_SEED", str(DEFAULT_SEED))
+    monkeypatch.setenv("POLIS_GENERATIVE_CASES", str(DEFAULT_CASES))
+    monkeypatch.setenv(name, value)
+
+    with pytest.raises(ValueError):
+        generate_unicode_text_cases()
 
 
 def test_case_prefix_is_stable_across_budgets() -> None:
