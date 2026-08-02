@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "catalog_candidates": [
+    {
+      "source": "rule:agreement.copula",
+      "class": "polis.rules.agreement.AgreementCopulaRule",
+      "category": "agreement",
+      "operation": "replace.copula_form",
+      "behavior_version": "agreement-copula/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Correct narrowly qualified copula agreement mismatches."
+    },
+    {
+      "source": "rule:spelling.jestes",
+      "class": "polis.rules.spelling.SpellingJestesRule",
+      "category": "spelling",
+      "operation": "replace.common_typo",
+      "behavior_version": "spelling-jestes/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Correct the common Polish spelling form 'jestes'."
+    },
+    {
+      "source": "rule:spelling.wlasnie",
+      "class": "polis.rules.spelling.SpellingWlasnieRule",
+      "category": "spelling",
+      "operation": "replace.common_typo",
+      "behavior_version": "spelling-wlasnie/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Correct the common Polish spelling form 'wlasnie'."
+    },
+    {
+      "source": "rule:spelling.zeby",
+      "class": "polis.rules.spelling.SpellingZebyRule",
+      "category": "spelling",
+      "operation": "replace.common_typo",
+      "behavior_version": "spelling-zeby/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Correct the common Polish spelling form 'zeby'."
+    },
+    {
+      "source": "rule:syntax.comma_space",
+      "class": "polis.rules.syntax.SyntaxCommaSpacingRule",
+      "category": "punctuation",
+      "operation": "normalize.comma_spacing",
+      "behavior_version": "syntax-comma-space/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Normalize missing spacing after qualified commas."
+    },
+    {
+      "source": "rule:syntax.list_space",
+      "class": "polis.rules.syntax.SyntaxListSpacingRule",
+      "category": "syntax",
+      "operation": "normalize.list_marker_spacing",
+      "behavior_version": "syntax-list-space/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Normalize missing spacing after list markers."
+    },
+    {
+      "source": "rule:syntax.missing_correlative",
+      "class": "polis.rules.syntax.SyntaxMissingCorrelativeRule",
+      "category": "syntax",
+      "operation": "insert.correlative",
+      "behavior_version": "syntax-missing-correlative/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "fail_closed_review_only",
+        "minimum_confidence": null,
+        "source_policy_version": "1.2"
+      },
+      "role": "Suggest a missing correlative in a narrowly qualified construction."
+    },
+    {
+      "source": "rule:syntax.missing_reflexive",
+      "class": "polis.rules.syntax.SyntaxMissingReflexiveRule",
+      "category": "syntax",
+      "operation": "insert.reflexive_pronoun",
+      "behavior_version": "syntax-missing-reflexive/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "fail_closed_review_only",
+        "minimum_confidence": null,
+        "source_policy_version": "1.2"
+      },
+      "role": "Suggest a missing reflexive pronoun in qualified constructions."
+    },
+    {
+      "source": "rule:syntax.quote_space",
+      "class": "polis.rules.syntax.SyntaxQuoteSpacingRule",
+      "category": "punctuation",
+      "operation": "normalize.quote_spacing",
+      "behavior_version": "syntax-quote-space/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Normalize missing spacing after qualified quote marks."
+    },
+    {
+      "source": "rule:syntax.sentence_space",
+      "class": "polis.rules.syntax.SyntaxSentenceSpacingRule",
+      "category": "punctuation",
+      "operation": "normalize.sentence_spacing",
+      "behavior_version": "syntax-sentence-space/1.0",
+      "availability": "default",
+      "registry_categories": null,
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.9,
+        "source_policy_version": "1.2"
+      },
+      "role": "Normalize missing spacing between qualified sentence fragments."
+    },
+    {
+      "source": "rule:languagetool.pl",
+      "class": "polis.rules.languagetool.LocalLanguageToolRule",
+      "category": "punctuation",
+      "operation": "check.allowlisted_comma",
+      "behavior_version": "pl-6.8-five-rule-comma/1.0",
+      "availability": "optional",
+      "registry_categories": [
+        "punctuation"
+      ],
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "eligible",
+        "minimum_confidence": 0.85,
+        "source_policy_version": "1.2"
+      },
+      "role": "Run the qualified local LanguageTool comma allowlist."
+    },
+    {
+      "source": "rule:languagetool.contextual_inflection",
+      "class": "polis.rules.contextual_inflection.ContextualInflectionRule",
+      "category": "inflection",
+      "operation": "synthesize.contextual_inflection",
+      "behavior_version": "languagetool-contextual-inflection/1.0",
+      "availability": "optional",
+      "registry_categories": [
+        "inflection"
+      ],
+      "construction_owner": "polis.analyzer._make_default_registry",
+      "automatic_correction": {
+        "disposition": "fail_closed_review_only",
+        "minimum_confidence": null,
+        "source_policy_version": "1.2"
+      },
+      "role": "Suggest uniquely constrained local contextual inflection forms."
+    }
+  ],
+  "excluded_source_families": [
+    {
+      "family": "llm_and_finding_backends",
+      "reason": "Backends emit dynamic llm: sources outside DeterministicRuleRegistry and are always ineligible for automatic correction."
+    },
+    {
+      "family": "transport_and_process_helpers",
+      "reason": "Local HTTP and stdio transports, including LocalLanguageToolStdioSession, execute rule dependencies but do not emit rule sources."
+    },
+    {
+      "family": "extension_constructors",
+      "reason": "TypoSpellingRule and custom RuleRegistration values are extension mechanisms, not concrete sources registered by the standard Analyzer composition root."
+    },
+    {
+      "family": "test_only_rules",
+      "reason": "Synthetic rules and sources defined by tests exercise protocols but are absent from the production Analyzer registry."
+    }
+  ]
+}
