@@ -76,16 +76,38 @@ def test_generated_results_have_deterministic_lossless_canonical_json() -> None:
     """Catch a canonical serializer or decoder losing result structure."""
     for case in generate_unicode_text_cases():
         result = AnalysisResult(text=case.text, issues=_generated_findings(case.text))
+        independent_result = AnalysisResult(
+            text=case.text, issues=_generated_findings(case.text)
+        )
         encoded = result.to_json()
+        independent_encoded = independent_result.to_json()
         decoded = AnalysisResult.from_json(encoded)
+        independent_decoded = AnalysisResult.from_json(independent_encoded)
 
         assert_structural_invariant(
-            result.to_json() == encoded,
-            invariant="result.canonical_json",
+            result is not independent_result
+            and result.issues is not independent_result.issues
+            and len(result.issues) == len(independent_result.issues)
+            and all(
+                left is not right
+                for left, right in zip(
+                    result.issues, independent_result.issues, strict=False
+                )
+            )
+            and result == independent_result,
+            invariant="result.independent_construction",
             replay=case.replay,
         )
         assert_structural_invariant(
-            decoded == result and decoded.to_json() == encoded,
+            encoded == independent_encoded,
+            invariant="result.independent_canonical_json",
+            replay=case.replay,
+        )
+        assert_structural_invariant(
+            decoded == result
+            and independent_decoded == independent_result
+            and decoded.to_json() == encoded
+            and independent_decoded.to_json() == independent_encoded,
             invariant="result.json_round_trip",
             replay=case.replay,
         )
