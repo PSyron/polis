@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate_fast_ci_workflow.py"
 WORKFLOW = ROOT / ".github/workflows/fast-ci.yml"
@@ -29,6 +31,17 @@ FAST_PYTEST_COMMAND = (
     ' not model"'
 )
 FAST_PYTEST_FILTER = 'pytest -m "not research and not slow and not model"'
+GENERATIVE_CONFIGURATION = (
+    ("POLIS_GENERATIVE_GENERATOR_VERSION", "unicode-structural-v1"),
+    ("POLIS_GENERATIVE_SEED", "95001"),
+    ("POLIS_GENERATIVE_CASES", "64"),
+)
+GENERATIVE_ENVIRONMENT_BLOCK = (
+    "        env:\n"
+    "          POLIS_GENERATIVE_GENERATOR_VERSION: unicode-structural-v1\n"
+    "          POLIS_GENERATIVE_SEED: 95001\n"
+    "          POLIS_GENERATIVE_CASES: 64\n"
+)
 
 
 def run_validator(workflow: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -159,6 +172,136 @@ def test_fast_ci_contract_rejects_a_second_unfiltered_test_command(
 
     assert result.returncode != 0
     assert "exactly one filtered test command" in result.stderr
+
+
+@pytest.mark.parametrize("name,value", GENERATIVE_CONFIGURATION)
+def test_fast_ci_contract_rejects_missing_generated_invariant_configuration(
+    tmp_path: Path, name: str, value: str
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            f"          {name}: {value}\n", ""
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert f"generated-invariant configuration is missing: {name}" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("replacement", "expected_error"),
+    (
+        (
+            "POLIS_GENERATIVE_GENERATOR_VERSION=unicode-structural-v2",
+            "generated-invariant generator version is invalid",
+        ),
+        (
+            "POLIS_GENERATIVE_SEED=not-a-seed",
+            "generated-invariant seed is invalid",
+        ),
+        (
+            "POLIS_GENERATIVE_CASES=many",
+            "generated-invariant case budget is invalid",
+        ),
+        (
+            "POLIS_GENERATIVE_CASES=257",
+            "generated-invariant case budget exceeds maximum",
+        ),
+    ),
+)
+def test_fast_ci_contract_rejects_invalid_generated_invariant_configuration(
+    tmp_path: Path, replacement: str, expected_error: str
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    name = replacement.partition("=")[0]
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            next(
+                f"{configured_name}: {configured_value}"
+                for configured_name, configured_value in GENERATIVE_CONFIGURATION
+                if configured_name == name
+            ),
+            replacement.replace("=", ": "),
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert expected_error in result.stderr
+
+
+def test_fast_ci_contract_rejects_duplicate_generated_invariant_configuration(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "          POLIS_GENERATIVE_SEED: 95001\n",
+            "          POLIS_GENERATIVE_SEED: 95001\n"
+            "          POLIS_GENERATIVE_SEED: 95001\n",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "generated-invariant configuration is duplicated" in result.stderr
+
+
+def test_fast_ci_contract_requires_generated_invariant_configuration_on_pytest_step(
+    tmp_path: Path,
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        workflow.replace(
+            "      - name: Run pytest suite\n" + GENERATIVE_ENVIRONMENT_BLOCK,
+            "      - name: Run pytest suite\n"
+            "        env:\n"
+            "          UNRELATED_SETTING: retained\n",
+        ).replace(
+            "      - name: Synchronize locked development environment\n"
+            "        run: uv sync --locked --extra dev\n",
+            "      - name: Synchronize locked development environment\n"
+            + GENERATIVE_ENVIRONMENT_BLOCK
+            + "        run: uv sync --locked --extra dev\n",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert (
+        "generated-invariant configuration must be on the pytest step" in result.stderr
+    )
+
+
+def test_fast_ci_contract_requires_an_env_mapping_on_the_pytest_step(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "      - name: Run pytest suite\n        env:\n",
+            "      - name: Run pytest suite\n        with:\n",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "generated-invariant configuration must use the pytest step env mapping" in (
+        result.stderr
+    )
 
 
 def test_workflow_has_only_the_filtered_pytest_test_command() -> None:

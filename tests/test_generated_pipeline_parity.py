@@ -6,7 +6,7 @@ import asyncio
 
 import pytest
 from tests.generative import (
-    DEFAULT_CASES,
+    MAX_CASES,
     UNICODE_FAMILIES,
     Replay,
     SyntheticTextCase,
@@ -85,8 +85,8 @@ def test_generated_pipeline_replay_is_deterministic_and_bounded() -> None:
     replay = repeated_run[-1].replay
 
     assert_structural_invariant(
-        len(first_run) == DEFAULT_CASES == len(repeated_run),
-        invariant="pipeline.replay.default_budget",
+        1 <= len(first_run) == len(repeated_run) <= MAX_CASES,
+        invariant="pipeline.replay.bounded_budget",
         replay=replay,
     )
     assert_structural_invariant(
