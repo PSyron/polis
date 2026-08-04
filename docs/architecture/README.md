@@ -27,11 +27,12 @@ późniejszy ADR.
 | [ADR-0018](decisions/0018-runtime-composition-protocols.md) | Zaakceptowany | Protokoły kompozycji runtime'u używają wykonywanych operacji |
 | [ADR-0019](decisions/0019-evaluation-namespace-compatibility.md) | Zaakceptowany | `polis.evaluation` zachowuje zgodność importów w całej linii 0.x |
 | [ADR-0020](decisions/0020-runtime-first-product-charter.md) | Zaakceptowany | Karta produktu runtime-first nadaje nadrzędność runtime'owi offline |
+| [ADR-0021](decisions/0021-rule-catalog-ownership.md) | Zaakceptowany | `polis.rules` posiada kuratorowany katalog standardowych źródeł reguł |
 
 [Granica protokołów analizatora i lokalnego backendu](protocols.md) opisuje
 punkty rozdziału implementacji runtime'u zgodne z zaakceptowanym kontraktem
 publicznego API.
 
 [Inwentarz katalogu reguł](rule-catalog-inventory.md) zapisuje obecne
-identyfikatory standardowych reguł runtime'u i ich dyspozycje polityki przed
-rozstrzygnięciem własności katalogu.
+identyfikatory standardowych reguł runtime'u i ich dyspozycje polityki, a
+ADR-0021 rozstrzyga własność i przyszły wybór źródeł bez zmiany snapshotu.

@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / "docs/architecture/decisions/0001-python-platform-licensing-policy.md"
 INDEX = ROOT / "docs/architecture/README.md"
+RULE_CATALOG_ADR = "decisions/0021-rule-catalog-ownership.md"
 
 
 class ArchitecturePolicyTests(unittest.TestCase):
@@ -25,10 +26,15 @@ class ArchitecturePolicyTests(unittest.TestCase):
         }
         linked = re.findall(r"\(decisions/([^)]+\.md)\)", index)
 
-        self.assertEqual(len(accepted), 20)
+        self.assertEqual(len(accepted), 21)
         self.assertEqual(set(linked), accepted)
         self.assertEqual(len(linked), len(set(linked)))
         self.assertNotIn("<!--", index)
+
+    def test_architecture_index_links_rule_catalog_decision(self) -> None:
+        index = INDEX.read_text(encoding="utf-8")
+
+        self.assertIn(f"({RULE_CATALOG_ADR})", index)
 
     def test_architecture_guides_preserve_source_policy_identifier(self) -> None:
         guides = (

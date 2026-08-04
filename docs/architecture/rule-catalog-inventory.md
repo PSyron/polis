@@ -1,6 +1,7 @@
 # Inwentarz katalogu reguł
 
-Status: dowód dla issue #148 i dane wejściowe do decyzji o własności w #149.
+Status: zamknięty dowód dla issue #148; decyzję o własności przyjęto w
+[ADR-0021](decisions/0021-rule-catalog-ownership.md).
 
 Maszynowo czytelnym źródłem tego snapshotu jest
 [`rule-catalog-inventory.json`](rule-catalog-inventory.json). Test porównuje 12
@@ -11,6 +12,11 @@ standardowego analizatora oraz z każdym wpisem polityki automatycznych poprawek
 Ten inwentarz nie zmienia zachowania runtime'u ani publicznego kontraktu.
 Zapisuje obecny composition root, w tym luki polityki fail-closed, przed
 rozstrzygnięciem własności katalogu i pierwszeństwa wyboru.
+
+ADR-0021 ustanawia `polis.rules` właścicielem kuratorowanego katalogu 12
+standardowych źródeł i pozostawia composition rootowi składanie efektywnego
+rejestru. Ten dokument nadal opisuje stan zastany w #148, a jego maszynowy
+snapshot JSON pozostaje niezmieniony.
 
 ## Obecna granica
 
