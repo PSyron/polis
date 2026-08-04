@@ -53,7 +53,7 @@ def test_m5_roadmap_keeps_completed_historical_record() -> None:
         "#63",
     )
 
-    assert "## Historical delivery record" in roadmap
+    assert "## Archiwalny rejestr dostarczania M0–M5" in roadmap
     assert all(issue in roadmap for issue in issue_refs)
     assert roadmap.index("#65") < roadmap.index("#55") < roadmap.index("#56")
     assert roadmap.index("#60") < roadmap.index("#61")
@@ -72,6 +72,27 @@ def test_m5_risk_register_covers_hybrid_evidence_and_runtime_risks() -> None:
         "fine-tuning overfit",
     ):
         assert risk in risks
+
+
+def test_polish_risk_register_uses_precise_quality_and_artifact_terms() -> None:
+    risks = RISKS.read_text(encoding="utf-8")
+
+    for phrase in (
+        "danych wzorcowych",
+        "0.90 precyzji dokładnej edycji",
+        "Nadmierne dopasowanie podczas dostrajania",
+        "dołączone wyniki kompilacji",
+    ):
+        assert phrase in risks
+
+    for rejected_phrase in (
+        "gold data",
+        "0,90 precyzji dokładnej edycji",
+        "dokładności dokładnej edycji",
+        "Overfitting fine-tuningu",
+        "vendored output",
+    ):
+        assert rejected_phrase not in risks
 
 
 def test_quality_gates_split_automatic_corrections_from_suggestions() -> None:

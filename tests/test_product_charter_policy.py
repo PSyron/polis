@@ -352,20 +352,21 @@ def test_roadmap_separates_product_delivery_from_optional_research() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
 
     for heading in (
-        "## Active product lane",
-        "## Optional research lane",
-        "## Future product architecture",
-        "## Historical delivery record",
+        "## Aktywna ścieżka produktu",
+        "## Opcjonalna ścieżka badawcza",
+        "## Przyszła architektura produktu",
+        "## Archiwalny rejestr dostarczania M0–M5",
     ):
         assert heading in roadmap
 
     for phrase in (
         "#120 -> #84 -> #95",
         "#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90",
-        "Research outcomes do not block runtime releases",
+        "Wyniki badań nie blokują wydań runtime'u",
     ):
         assert phrase in roadmap
 
+    assert "<!--" not in roadmap
     assert "#76 -> #84" not in roadmap
     assert "M5 majority-error graph from umbrella #93 is authoritative" not in roadmap
 
@@ -374,12 +375,12 @@ def test_roadmap_records_product_safety_priority_without_blocking_on_p1() -> Non
     roadmap = " ".join(ROADMAP.read_text(encoding="utf-8").split())
 
     for phrase in (
-        "#84 is P0 product-safety work",
-        "#95 is P1 hardening",
-        "The `#120 -> #84 -> #95` arrow records sequencing; it does not mean "
-        "that #95 blocks the current runtime release.",
-        "Shared `Runtime 0.x Hardening` milestone membership does not make #95 "
-        "a release blocker unless a separate accepted issue says so.",
+        "#84 to praca P0 nad bezpieczeństwem produktu",
+        "#95 to utwardzanie P1",
+        "Strzałka `#120 -> #84 -> #95` zapisuje kolejność; nie oznacza, że #95 "
+        "blokuje bieżące wydanie runtime'u.",
+        "Wspólna przynależność do milestone'u `Runtime 0.x Hardening` nie czyni "
+        "z #95 blokady wydania, chyba że stanowi tak osobne zaakceptowane issue.",
     ):
         assert phrase in roadmap
 
