@@ -1,37 +1,46 @@
-# Sentence safety corpus v1 review checklist
+# Lista kontrolna przeglądu korpusu bezpieczeństwa zdań v1
 
-`polis_polish_correction_safety_corpus_v1` contains project-authored synthetic
-CC0-1.0 cases. Paweł Cyroń completed the required owner review on 2026-07-22,
-after correction and re-review of 49 rejected candidates. The corpus is now
-`frozen`; issue #114 does not access or score its holdout.
+`polis_polish_correction_safety_corpus_v1` zawiera autorskie, syntetyczne
+przypadki projektu na licencji CC0-1.0. Paweł Cyroń ukończył wymagany przegląd
+właścicielski 2026-07-22 po poprawieniu i ponownym przeglądzie 49 odrzuconych
+kandydatów. Korpus jest obecnie w stanie `frozen`; issue #114 nie uzyskuje
+dostępu do jego holdoutu ani go nie ocenia.
 
-Review all 240 cases one at a time in canonical JSON and rendered Polish. Mark
-a case as approved only after every item below is satisfied:
+Wykonaj przegląd wszystkich 240 przypadków, po jednym naraz, w kanonicznym JSON-ie
+i wyrenderowanym polskim tekście. Oznacz przypadek jako zatwierdzony dopiero po
+spełnieniu każdego z poniższych punktów:
 
-- [x] **Correctness:** the input contains exactly the claimed objective problem,
-  or is genuinely correct when it is a protected hard negative.
-- [x] **Category:** the stratum, edit category, tags, and protected phenomenon
-  describe the linguistic behavior rather than a stylistic preference.
-- [x] **Minimality:** the edit is the smallest justified change and preserves
-  meaning, tone, capitalization, and unaffected formatting.
-- [x] **Offsets:** each half-open `[start, end)` range selects the declared
-  original fragment using Python Unicode code-point indexing.
-- [x] **Reconstruction:** applying edits from right to left yields the exact
-  `expected_output`, without overlap or ambiguous insertion order.
-- [x] **Proper-name behavior:** personal and place names are correctly inflected
-  or protected; every controlled surface has one exact span and canonical ID.
-- [x] **Syntax and word order:** positive syntax cases are ungrammatical rather
-  than merely marked, while protected marked-order cases remain unchanged.
-- [x] **Provenance:** the sentence is newly project-authored, synthetic, contains
-  no private or copied text, and retains the issue #114 provenance record.
-- [x] **Licensing:** the case can be released under CC0-1.0 and contains no
-  third-party passage, confidential material, or restricted personal data.
-- [x] **Isolation:** the input, entity combination, normalized template, and
-  near-duplicate family are independent across splits and from corpus v3,
-  fine-tuning data, prompt examples, and E2E fixtures.
+- [x] **Poprawność:** wejście zawiera dokładnie deklarowany obiektywny problem
+  albo jest rzeczywiście poprawne, gdy stanowi chroniony trudny przypadek
+  negatywny.
+- [x] **Kategoria:** warstwa, kategoria edycji, tagi i chronione zjawisko opisują
+  zachowanie językowe, a nie preferencję stylistyczną.
+- [x] **Minimalność:** edycja jest najmniejszą uzasadnioną zmianą i zachowuje
+  znaczenie, ton, wielkość liter oraz nieobjęte zmianą formatowanie.
+- [x] **Przesunięcia:** każdy półotwarty zakres `[start, end)` wybiera
+  zadeklarowany oryginalny fragment z użyciem indeksowania punktów kodowych
+  Unicode w Pythonie.
+- [x] **Rekonstrukcja:** zastosowanie edycji od prawej do lewej daje dokładny
+  `expected_output`, bez nakładania się zakresów ani niejednoznacznej kolejności
+  wstawień.
+- [x] **Obsługa nazw własnych:** nazwy osób i miejsc są poprawnie odmieniane
+  albo chronione; każda kontrolowana forma powierzchniowa ma jeden dokładny
+  zakres i kanoniczny identyfikator.
+- [x] **Składnia i szyk wyrazów:** pozytywne przypadki składniowe są
+  niegramatyczne, a nie jedynie nacechowane, natomiast chronione przypadki
+  z nacechowanym szykiem pozostają bez zmian.
+- [x] **Proweniencja:** zdanie jest nową, autorską i syntetyczną treścią projektu,
+  nie zawiera prywatnego ani skopiowanego tekstu i zachowuje zapis proweniencji
+  issue #114.
+- [x] **Licencjonowanie:** przypadek może zostać wydany na licencji CC0-1.0 i nie
+  zawiera fragmentu podmiotu trzeciego, materiału poufnego ani objętych
+  ograniczeniami danych osobowych.
+- [x] **Izolacja:** wejście, kombinacja encji, znormalizowany szablon i rodzina
+  bliskich duplikatów są niezależne między splitami oraz od korpusu v3, danych
+  do dostrajania, przykładów promptów i danych testowych E2E.
 
-After completing the checklist, Paweł Cyroń may change only that case's review
-record from:
+Po ukończeniu listy kontrolnej Paweł Cyroń może zmienić wyłącznie zapis
+przeglądu danego przypadku z:
 
 ```json
 {
@@ -42,23 +51,25 @@ record from:
 }
 ```
 
-to `status: "human-reviewed"`, `reviewer: "Paweł Cyroń"`, and the actual ISO
-review date. A rejected case must be corrected or replaced and reviewed again;
-do not move another case between development and holdout.
+na `status: "human-reviewed"`, `reviewer: "Paweł Cyroń"` oraz rzeczywistą datę
+przeglądu w formacie ISO. Odrzucony przypadek musi zostać poprawiony albo zastąpiony
+i ponownie poddany przeglądowi; nie przenoś innego przypadku między częścią
+deweloperską a holdoutem.
 
-The holdout stays `unfrozen-candidates` until every case passes review and all
-integrity and leakage checks are green. Freezing is a separate final step:
-record the owner, date, `all-cases` scope, candidate digest, and frozen digest
-in the separate approval manifest. The generator verifies that manifest,
-applies the review metadata, checks every reserved asset for leakage, and only
-then writes frozen JSON and XML. Issue #114 must produce no holdout score.
-After the first quality-gate access, corrections require a new corpus version.
+Holdout pozostaje w stanie `unfrozen-candidates`, dopóki każdy przypadek nie
+przejdzie przeglądu, a wszystkie kontrole integralności i wycieku nie będą zielone.
+Zamrożenie jest osobnym krokiem końcowym: zapisz właściciela, datę, zakres
+`all-cases`, skrót kandydata i skrót zamrożony w osobnym manifeście
+zatwierdzenia. Generator weryfikuje ten manifest, stosuje metadane przeglądu,
+sprawdza każdy zastrzeżony zasób pod kątem wycieku, a dopiero potem zapisuje
+zamrożone JSON i XML. Issue #114 nie może wytworzyć wyniku holdoutu. Po pierwszym
+dostępie bramki jakości korekty wymagają nowej wersji korpusu.
 
-## Freeze record
+## Zapis zamrożenia
 
-- Owner reviewer: Paweł Cyroń
-- Review date: 2026-07-22
-- Frozen state: `frozen`
-- Canonical JSON SHA-256:
+- Recenzent właścicielski: Paweł Cyroń
+- Data przeglądu: 2026-07-22
+- Stan zamrożony: `frozen`
+- SHA-256 kanonicznego JSON-u:
   `2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982`
-- Holdout score produced by issue #114: no
+- Wynik holdoutu wytworzony przez issue #114: nie

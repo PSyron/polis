@@ -57,6 +57,16 @@
       "prefixes": []
     },
     {
+      "id": "frozen-baseline-evidence",
+      "disposition": "retain_research_evidence",
+      "wave": "protected",
+      "paths": [
+        "docs/performance-baseline.md",
+        "docs/quality-baseline.md"
+      ],
+      "prefixes": []
+    },
+    {
       "id": "current-polish-governance",
       "disposition": "maintain_polish",
       "wave": "governance",

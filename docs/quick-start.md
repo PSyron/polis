@@ -1,22 +1,24 @@
-# Quick-start for Polis
+# Szybki start z Polis
 
-This project is runtime-first and offline: the default analyzer runs in-process
-and does not send input to external services. No tested local model has
-qualified for production correction or suggestions.
+Ten projekt stawia runtime na pierwszym miejscu i działa offline: domyślny
+analizator działa w procesie i nie wysyła danych wejściowych do usług
+zewnętrznych. Żaden przetestowany model lokalny nie został zakwalifikowany do
+poprawek ani sugestii produkcyjnych.
 
-The default installation contains no production model or LanguageTool
-dependency. LanguageTool is an optional local adapter with narrow, sentence-only
-coverage; enable it only through an explicit caller-supplied loopback service or
-the separately built vendored executable. Polis does not include DOCX/ODT/RTF
-adapters, a GUI, or stylistic rewriting.
+Domyślna instalacja nie zawiera modelu produkcyjnego ani zależności od
+LanguageTool. LanguageTool jest opcjonalnym adapterem lokalnym o wąskim zakresie
+ograniczonym do pojedynczych zdań; włączaj go wyłącznie przez jawnie dostarczoną
+przez wywołującego usługę na interfejsie loopback albo osobno zbudowany plik
+wykonywalny z dostarczonych źródeł. Polis nie zawiera adapterów DOCX/ODT/RTF,
+GUI ani przepisywania stylistycznego.
 
-## Install dependencies
+## Instalacja zależności
 
 ```console
 uv sync --locked --extra dev
 ```
 
-## API usage
+## Użycie API
 
 ```python
 from polis import Analyzer, AnalyzerConfig, AnalysisOptions
@@ -29,14 +31,14 @@ filtered = analyzer.analyze("Witaj, świecie.", options=options)
 print(len(filtered.issues))
 ```
 
-## CLI usage
+## Użycie CLI
 
 ```console
 python -m polis.cli analyze --json "Witaj,świecie."
 printf 'Witaj,świecie.' | python -m polis.cli analyze --stdin --json
 ```
 
-## Apply selected findings
+## Stosowanie wybranych znalezisk
 
 ```python
 result = analyzer.analyze("Witaj,świecie.")
@@ -45,12 +47,14 @@ corrected = result.apply((first,))
 print(corrected)
 ```
 
-Automatic correction is conservative: only covered, high-confidence,
-non-conflicting deterministic findings are applied. Model and contextual
-findings remain reviewable until the caller selects them explicitly.
+Automatyczna korekta jest zachowawcza: stosowane są wyłącznie objęte polityką,
+deterministyczne znaleziska o wysokiej pewności i bez konfliktów. Znaleziska
+pochodzące od modelu oraz znaleziska kontekstowe podlegają przeglądowi, dopóki
+wywołujący nie wybierze ich jawnie.
 
-Research corpora, benchmark runners, and holdout workflows are repository-only
-development assets. Run them through the commands in the research workflow
-guide, not as part of the default runtime quick start. `polis.evaluation`
-remains an import-compatible evaluator namespace for the current 0.x line; it
-is not the primary analysis API.
+Korpusy badawcze, narzędzia uruchamiające benchmarki i procesy dotyczące
+holdoutów są zasobami programistycznymi dostępnymi wyłącznie w repozytorium.
+Uruchamiaj je za pomocą poleceń z przewodnika po procesie badawczym, a nie w
+ramach domyślnego szybkiego startu runtime'u. `polis.evaluation` zachowuje
+zgodność importów jako przestrzeń nazw ewaluatora w bieżącej linii 0.x; nie jest
+głównym API analizy.

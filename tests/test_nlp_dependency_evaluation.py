@@ -500,7 +500,8 @@ class NlpDependencyExperimentTests(unittest.TestCase):
         index = INDEX.read_text(encoding="utf-8")
         self.assertIn(
             "| [ADR-0002](decisions/0002-polish-nlp-dependency-strategy.md) | "
-            "Accepted | Standard-library-first Polish NLP dependency strategy |",
+            "Zaakceptowany | Strategia zależności NLP dla polszczyzny oparta "
+            "najpierw na bibliotece standardowej |",
             index,
         )
 

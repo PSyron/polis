@@ -1,104 +1,112 @@
-# Sentence safety corpus v2 role-review checklist
+# Lista kontrolna przeglądu roli dla korpusu bezpieczeństwa zdań v2
 
-This checklist governs all 240 records in
-`polis_polish_correction_safety_corpus_v2`. Candidate generation and automatic
-validation cannot grant approval. Under the accepted clarification in issue
-#119, the `Polis architecture owner` role may approve the complete candidate
-digest and change records from `pending-human-review` to `human-reviewed`.
-The role record is an authorization boundary, not personal attribution.
+Ta lista kontrolna reguluje wszystkie 240 rekordów w
+`polis_polish_correction_safety_corpus_v2`. Generowanie kandydatów i automatyczna
+walidacja nie mogą udzielić zatwierdzenia. Zgodnie z zaakceptowanym
+doprecyzowaniem w issue #119 rola `Polis architecture owner` może zatwierdzić
+pełny skrót kandydata i zmienić rekordy z `pending-human-review` na
+`human-reviewed`. Zapis roli jest granicą upoważnienia, a nie wskazaniem osoby.
 
-Review the canonical JSON file. For every record, confirm each item below
-before recording all-case approval.
+Wykonaj przegląd kanonicznego pliku JSON. Dla każdego rekordu potwierdź wszystkie
+poniższe punkty przed zapisaniem zatwierdzenia wszystkich przypadków.
 
-## Correctness
+## Poprawność
 
-- The input is a plausible Polish sentence and contains the declared problem,
-  or is wholly correct when the stratum is `hard_negative`.
-- The expected output is grammatical and preserves the original meaning,
-  register, capitalization, and unaffected formatting.
+- Wejście jest wiarygodnym polskim zdaniem i zawiera deklarowany problem albo
+  jest w pełni poprawne, gdy warstwą jest `hard_negative`.
+- Oczekiwane wyjście jest gramatyczne i zachowuje oryginalne znaczenie, rejestr,
+  wielkość liter oraz nieobjęte zmianą formatowanie.
 
-## Category
+## Kategoria
 
-- The declared stratum is the primary phenomenon exercised by the case.
-- Positive cases belong to exactly one of `inflection`, `syntax`, or
-  `punctuation`; protected cases belong to `hard_negative`.
+- Zadeklarowana warstwa jest głównym zjawiskiem sprawdzanym przez przypadek.
+- Przypadki pozytywne należą do dokładnie jednej z kategorii `inflection`,
+  `syntax` albo `punctuation`; przypadki chronione należą do `hard_negative`.
 
-## Minimality
+## Minimalność
 
-- Every positive expected output changes only the smallest justified fragment.
-- The suggestion does not rewrite correct surrounding text.
-- Every hard negative has no edit and keeps the input unchanged.
+- Każde pozytywne oczekiwane wyjście zmienia wyłącznie najmniejszy uzasadniony
+  fragment.
+- Sugestia nie przepisuje poprawnego otaczającego tekstu.
+- Każdy trudny przypadek negatywny nie ma edycji i zachowuje wejście bez zmian.
 
-## Offsets
+## Przesunięcia
 
-- Every edit uses a half-open Unicode `[start, end)` range in the original
-  input.
-- `input[start:end]` exactly equals the recorded original fragment.
-- Entity spans cover exactly the recorded controlled surface.
+- Każda edycja używa półotwartego zakresu Unicode `[start, end)` w oryginalnym
+  wejściu.
+- `input[start:end]` jest dokładnie równe zapisanemu oryginalnemu fragmentowi.
+- Zakresy encji pokrywają dokładnie zapisaną kontrolowaną formę powierzchniową.
 
-## Reconstruction
+## Rekonstrukcja
 
-- Applying the declared edit to the original input reconstructs the expected
-  output exactly.
-- Edits do not overlap and do not depend on a previously modified string.
+- Zastosowanie zadeklarowanej edycji do oryginalnego wejścia dokładnie odtwarza
+  oczekiwane wyjście.
+- Edycje nie nakładają się i nie zależą od wcześniej zmodyfikowanego napisu.
 
-## Proper-name behavior
+## Obsługa nazw własnych
 
-- Personal and place names retain intentional spelling, capitalization, and
-  inflection.
-- Every controlled name surface has a complete entity span and canonical
-  identifier.
-- No ordinary capitalized sentence-initial word is mislabeled as an entity.
+- Nazwy osób i miejsc zachowują zamierzoną pisownię, wielkość liter i odmianę.
+- Każda kontrolowana forma powierzchniowa nazwy ma kompletny zakres encji
+  i kanoniczny identyfikator.
+- Żaden zwykły wyraz rozpoczynający zdanie wielką literą nie jest błędnie
+  oznaczony jako encja.
 
-## Syntax and word order
+## Składnia i szyk wyrazów
 
-- Subject–predicate agreement, government, negation, and quantification are
-  evaluated in the full sentence context.
-- Marked but grammatical word order is not normalized merely for style.
+- Zgodność podmiotu z orzeczeniem, rekcja, negacja i kwantyfikacja są oceniane
+  w kontekście pełnego zdania.
+- Nacechowany, ale gramatyczny szyk wyrazów nie jest normalizowany wyłącznie ze
+  względów stylistycznych.
 
-## Provenance
+## Proweniencja
 
-- The sentence is project-authored synthetic Polish created for issue #119.
-- It was not copied, paraphrased, or derived from corpus v3, safety corpus v1,
-  prompt examples, fine-tuning assets, E2E fixtures, or private text.
+- Zdanie jest autorskim, syntetycznym polskim tekstem projektu utworzonym dla
+  issue #119.
+- Nie zostało skopiowane, sparafrazowane ani wyprowadzone z korpusu v3, korpusu
+  bezpieczeństwa v1, przykładów promptów, zasobów do dostrajania, danych testowych
+  E2E ani tekstu prywatnego.
 
-## Licensing
+## Licencjonowanie
 
-- The case may be released under CC0-1.0.
-- No third-party quotation, dataset record, or restricted text is embedded.
+- Przypadek może zostać wydany na licencji CC0-1.0.
+- Nie osadzono cytatu podmiotu trzeciego, rekordu zbioru danych ani tekstu
+  objętego ograniczeniami.
 
-## Isolation
+## Izolacja
 
-- The development/holdout assignment remains unchanged during review.
-- The case introduces no reused input, normalized template, entity
-  combination, canonical entity identifier, or near-duplicate linguistic
-  family from a reserved asset.
-- Case-level safety-corpus-v1 holdout content or outcomes did not inform the
-  candidate.
+- Przypisanie do części deweloperskiej lub holdoutu pozostaje bez zmian podczas
+  przeglądu.
+- Przypadek nie wprowadza ponownie użytego wejścia, znormalizowanego szablonu,
+  kombinacji encji, kanonicznego identyfikatora encji ani rodziny bliskich
+  duplikatów językowych z zastrzeżonego zasobu.
+- Treść ani wyniki holdoutu korpusu bezpieczeństwa v1 na poziomie przypadku nie
+  wpłynęły na kandydata.
 
-## Approval and freeze
+## Zatwierdzenie i zamrożenie
 
-Approval is all-or-nothing and must name:
+Zatwierdzenie obejmuje wszystko albo nic i musi wskazywać:
 
-- corpus ID `polis_polish_correction_safety_corpus_v2`;
-- all 240 cases;
-- candidate canonical JSON SHA-256;
-- reviewer role `Polis architecture owner`;
-- ISO-8601 review date;
-- checklist version `safety-corpus-review-v2`.
+- identyfikator korpusu `polis_polish_correction_safety_corpus_v2`;
+- wszystkie 240 przypadków;
+- SHA-256 kanonicznego JSON-u kandydata;
+- rolę recenzenta `Polis architecture owner`;
+- datę przeglądu w formacie ISO-8601;
+- wersję listy kontrolnej `safety-corpus-review-v2`.
 
-Do not create the approval manifest, set `holdout_state` to `frozen`, add
-`human-reviewed` metadata, or record a frozen digest until every case passes
-this checklist. This review produces no development or holdout quality score
-and does not authorize holdout access.
+Nie twórz manifestu zatwierdzenia, nie ustawiaj `holdout_state` na `frozen`, nie
+dodawaj metadanych `human-reviewed` ani nie zapisuj zamrożonego skrótu, dopóki
+każdy przypadek nie przejdzie tej listy kontrolnej. Ten przegląd nie wytwarza wyniku
+jakości dla części deweloperskiej ani holdoutu i nie upoważnia do dostępu do
+holdoutu.
 
-## Recorded approval
+## Zapisane zatwierdzenie
 
-The `Polis architecture owner` completed the exhaustive all-case review on
-2026-08-02 using checklist version `safety-corpus-review-v2`. Approval binds
-candidate canonical JSON SHA-256
+Rola `Polis architecture owner` ukończyła wyczerpujący przegląd wszystkich
+przypadków 2026-08-02, korzystając z wersji listy kontrolnej
+`safety-corpus-review-v2`. Zatwierdzenie wiąże SHA-256 kanonicznego JSON-u
+kandydata
 `c64f009f14f0cde8390a46acc24660305534576bc897f70e281ffebbbbca6f53`
-to frozen canonical JSON SHA-256
+z SHA-256 zamrożonego kanonicznego JSON-u
 `53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
-The approval covers all 240 cases and produces no development or holdout
-quality score.
+Zatwierdzenie obejmuje wszystkie 240 przypadków i nie wytwarza wyniku jakości
+dla części deweloperskiej ani holdoutu.

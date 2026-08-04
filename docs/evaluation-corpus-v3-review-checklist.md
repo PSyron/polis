@@ -1,40 +1,46 @@
-# Polish correction corpus v3 review checklist
+# Lista kontrolna przeglądu polskiego korpusu korekt v3
 
-Corpus v3 contains model-drafted CC0-1.0 candidates. Every case starts as
-`pending-human-review`; it is neither gold data nor a frozen holdout. Only
-Paweł Cyroń may record the approval required by the schema-v3 review policy.
+Korpus v3 zawiera kandydatów CC0-1.0 przygotowanych przez model. Każdy przypadek
+zaczyna ze stanem `pending-human-review`; nie jest ani danymi wzorcowymi, ani
+zamrożonym holdoutem. Wyłącznie Paweł Cyroń może zapisać zatwierdzenie wymagane
+przez politykę przeglądu schematu v3.
 
-Review one case at a time in both canonical JSON and rendered Polish text.
-Approve a case only after every item below is satisfied:
+Wykonuj przegląd po jednym przypadku naraz, zarówno w kanonicznym JSON-ie, jak
+i w wyrenderowanym polskim tekście. Zatwierdź przypadek dopiero po spełnieniu
+każdego z poniższych punktów:
 
-- [ ] **Correctness:** the input contains exactly the claimed grammatical or
-  punctuation problem, or is genuinely correct when it is a hard negative.
-- [ ] **Category:** the stratum, finding category, tags, and protected
-  phenomenon describe the linguistic behavior rather than a stylistic
-  preference.
-- [ ] **Minimality:** every proposed edit is the smallest justified change and
-  preserves meaning, tone, capitalization, and unaffected formatting.
-- [ ] **Offsets:** every `[start, end)` range selects the declared `original`
-  fragment using Python Unicode code-point indexing.
-- [ ] **Reconstruction:** applying all edits from right to left yields the exact
-  `expected_output`, with no overlap or ambiguous insertion order.
-- [ ] **Proper-name behavior:** names, surnames, place names, and indeclinable
-  forms are inflected or protected correctly for their context.
-- [ ] **Syntax and word order:** an error case is ungrammatical rather than
-  merely marked; a protected marked-order case remains unchanged.
-- [ ] **Provenance:** the case is synthetic, contains no private or copied text,
-  and retains its complete candidate provenance record.
-- [ ] **Licensing:** the candidate can be released as CC0-1.0 and contains no
-  third-party passage or restricted personal data.
-- [ ] **Isolation:** the input, canonical entity combination, and normalized
-  template do not occur elsewhere in the corpus, prompt examples, or any
-  training asset; entity spans select every exact surface from the controlled
-  catalog, map inflected variants to one identity, and reproduce the normalized
-  template. Short sibling templates that differ by only one token are one
-  family and must not cross records or splits.
+- [ ] **Poprawność:** wejście zawiera dokładnie deklarowany problem gramatyczny
+  lub interpunkcyjny albo jest rzeczywiście poprawne, gdy stanowi trudny
+  przypadek negatywny.
+- [ ] **Kategoria:** warstwa, kategoria znaleziska, tagi i chronione zjawisko
+  opisują zachowanie językowe, a nie preferencję stylistyczną.
+- [ ] **Minimalność:** każda proponowana edycja jest najmniejszą uzasadnioną
+  zmianą i zachowuje znaczenie, ton, wielkość liter oraz nieobjęte zmianą
+  formatowanie.
+- [ ] **Przesunięcia:** każdy zakres `[start, end)` wybiera zadeklarowany fragment
+  `original` z użyciem indeksowania punktów kodowych Unicode w Pythonie.
+- [ ] **Rekonstrukcja:** zastosowanie wszystkich edycji od prawej do lewej daje
+  dokładny `expected_output`, bez nakładania się zakresów ani niejednoznacznej
+  kolejności wstawień.
+- [ ] **Obsługa nazw własnych:** imiona, nazwiska, nazwy miejsc i formy
+  nieodmienne są poprawnie odmieniane albo chronione w swoim kontekście.
+- [ ] **Składnia i szyk wyrazów:** przypadek błędny jest niegramatyczny, a nie
+  jedynie nacechowany; chroniony przypadek z nacechowanym szykiem pozostaje bez
+  zmian.
+- [ ] **Proweniencja:** przypadek jest syntetyczny, nie zawiera prywatnego ani
+  skopiowanego tekstu i zachowuje pełny zapis proweniencji kandydata.
+- [ ] **Licencjonowanie:** kandydat może zostać wydany jako CC0-1.0 i nie zawiera
+  fragmentu podmiotu trzeciego ani objętych ograniczeniami danych osobowych.
+- [ ] **Izolacja:** wejście, kanoniczna kombinacja encji i znormalizowany szablon
+  nie występują nigdzie indziej w korpusie, przykładach promptów ani żadnym
+  zasobie treningowym; zakresy encji wybierają każdą dokładną formę
+  powierzchniową z kontrolowanego katalogu, mapują warianty fleksyjne na jedną
+  tożsamość i odtwarzają znormalizowany szablon. Krótkie szablony siostrzane
+  różniące się tylko jednym tokenem należą do jednej rodziny i nie mogą
+  przekraczać granic rekordów ani podziałów.
 
-After completing the checklist, Paweł Cyroń may change only that case's review
-record from:
+Po ukończeniu listy kontrolnej Paweł Cyroń może zmienić wyłącznie zapis
+przeglądu danego przypadku z:
 
 ```json
 {
@@ -45,12 +51,14 @@ record from:
 }
 ```
 
-to `status: "human-reviewed"`, `reviewer: "Paweł Cyroń"`, and an ISO review
-date. A rejected candidate must be corrected and reviewed again or removed and
-replaced without moving another case between development and holdout.
+na `status: "human-reviewed"`, `reviewer: "Paweł Cyroń"` oraz datę przeglądu
+w formacie ISO. Odrzucony kandydat musi zostać poprawiony i ponownie poddany
+przeglądowi albo usunięty i zastąpiony bez przenoszenia innego przypadku między
+częścią deweloperską a holdoutem.
 
-The holdout remains `unfrozen-candidates` until all 240 cases pass review and
-all integrity checks are green. Freezing is a separate, explicit change: set
-`holdout_state` to `frozen`, regenerate the equivalent XML, record the JSON
-SHA-256, and run the full fast test suite. After freezing, changes require a new
-corpus version; do not repair a benchmarked holdout in place.
+Holdout pozostaje w stanie `unfrozen-candidates`, dopóki wszystkie 240 przypadków
+nie przejdą przeglądu, a wszystkie kontrole integralności nie będą zielone.
+Zamrożenie jest osobną, jawną zmianą: ustaw `holdout_state` na `frozen`, ponownie
+wygeneruj równoważny XML, zapisz SHA-256 JSON-u i uruchom pełny szybki zestaw
+testów. Po zamrożeniu zmiany wymagają nowej wersji korpusu; nie naprawiaj
+holdoutu użytego w benchmarku w miejscu.

@@ -235,27 +235,28 @@ def test_candidate_documentation_records_identity_boundaries_and_review() -> Non
     )
 
     for item in (
-        "Correctness",
-        "Category",
-        "Minimality",
-        "Offsets",
-        "Reconstruction",
-        "Proper-name behavior",
-        "Syntax and word order",
-        "Provenance",
-        "Licensing",
-        "Isolation",
+        "Poprawność",
+        "Kategoria",
+        "Minimalność",
+        "Przesunięcia",
+        "Rekonstrukcja",
+        "Obsługa nazw własnych",
+        "Składnia i szyk wyrazów",
+        "Proweniencja",
+        "Licencjonowanie",
+        "Izolacja",
     ):
         assert item in checklist
     assert "Paweł Cyroń" in checklist
     assert "polis_polish_correction_safety_corpus_v1" in combined
     assert "frozen" in combined
     assert "CC0-1.0" in combined
-    assert "corpus v3" in combined
+    assert "korpus v3" in combined.casefold()
     assert "#85" in combined
+    assert "Wynik holdoutu wytworzony przez issue #114: nie" in checklist
+    assert "SHA-256 kanonicznego JSON-u" in checklist
     assert "nie tworzy wyniku holdoutu" in combined
     assert "documentation-contract" not in combined
-    assert "digest" in combined.casefold()
 
 
 def test_owner_review_regressions_have_grammatical_expected_text() -> None:

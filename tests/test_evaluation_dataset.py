@@ -233,14 +233,14 @@ def test_dataset_asset_is_distributed_with_the_package() -> None:
 
 
 def test_dataset_documentation_states_stewardship_requirements() -> None:
-    documentation = DOCUMENTATION.read_text(encoding="utf-8")
+    documentation = " ".join(DOCUMENTATION.read_text(encoding="utf-8").split())
 
     for required_text in (
         "CC0-1.0",
         "human-reviewed",
-        "private",
-        "model-generated",
-        "anonym",
+        "prywatnego",
+        "wygenerowanego przez model",
+        "anonimizację",
         "experiments/nlp_dependencies",
     ):
         assert required_text in documentation
