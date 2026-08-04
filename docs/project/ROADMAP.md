@@ -22,51 +22,51 @@ kontrole integracyjne przechodzą, a znane ograniczenia są udokumentowane.
 
 ## Aktywna ścieżka produktu
 
-`#120 -> #84 -> #95`
+`#185 -> #188 -> #191 -> atomowe issue porządkowe v1`
 
-Bramkami wydania produktu są kontrakty, prywatność, zachowanie deterministyczne,
-wersjonowana polityka automatycznych poprawek, pakowanie, instalacja offline
-i tożsamość wydania. Dostarczanie produktu jest zgodne z kartą runtime-first
-z ADR-0020 i nie wymaga modelu, procesu Java, usługi sieciowej, korpusu
-badawczego ani zużytego holdoutu.
+ADR-0022 przyjmuje konserwatywny zakres: v1 poprawia wyłącznie jednoznaczną
+lokalną formę, nie zmienia znaczenia i nie poprawia zgodności czasów ani
+aspektu. Wspierany produkt nie obejmuje LLM, pełnego LanguageTool, procesu Java,
+kontekstowego wnioskowania semantycznego ani rozbudowy katalogu M6.
 
-#84 to praca P0 nad bezpieczeństwem produktu, niezależna od #76. Nowe
-uprawnienia do automatycznych poprawek nadal wymagają bezpośredniego dowodu
-zachowania źródła, zanim wejdą do wersjonowanej polityki automatycznych
-poprawek, lecz dowód ten jest wymaganiem bezpieczeństwa produktu, a nie
-zależnością wydania od badań nad modelem.
+#185 zatwierdziło kierunek. #188 zachowało pełny stan na
+`feature/v2-research-archive` przy SHA
+`ca27d2df5416fdce24fff9f0a1b99e8c55bfe8e8`; szczegóły zapisuje
+[manifest archiwum](v2-research-archive-manifest.md). #191 przyjmuje ADR-0022 i
+dokładną powłokę dowodową. Żadne usuwanie z `main` nie może poprzedzać tej
+sekwencji.
 
-#95 to utwardzanie P1 wykonywane po #84. Strzałka `#120 -> #84 -> #95` zapisuje
-kolejność; nie oznacza, że #95 blokuje bieżące wydanie runtime'u. Wspólna
-przynależność do milestone'u `Runtime 0.x Hardening` nie czyni z #95 blokady
-wydania, chyba że stanowi tak osobne zaakceptowane issue. Ta praca jest
-ukończona.
+Kolejne issue osobno usuwają wykonywalne badania, vendor, niewspierane ścieżki
+runtime'u, osierocone protokoły, nieaktualne CI i dokumentację. Każdy krok
+zachowuje dokładnie zinwentaryzowane dowody na `main`, a pełny kod pozostaje w
+archiwum. ADR-0019 nadal chroni zgodność `polis.evaluation` w linii 0.x.
 
-Bieżące prace nad architekturą produktu tworzą sekwencję katalogu reguł M6:
+Historyczny graf karty runtime-first miał postać `#120 -> #84 -> #95`.
+#84 to praca P0 nad bezpieczeństwem produktu, a #95 to utwardzanie P1.
+Strzałka `#120 -> #84 -> #95` zapisuje kolejność; nie oznacza, że #95 blokuje
+bieżące wydanie runtime'u. Wspólna przynależność do milestone'u
+`Runtime 0.x Hardening` nie czyni z #95 blokady wydania, chyba że stanowi tak
+osobne zaakceptowane issue. Ten zakończony graf nie zastępuje aktywnej
+sekwencji ADR-0022.
 
-`#149 -> #150 -> #152 -> #153`
+## Opcjonalna ścieżka badawcza (archiwum)
 
-`#90 + #149 + #150 -> #151`
+Historyczny graf miał postać
+`#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90`.
+Wyniki badań nie blokują wydań runtime'u. ADR-0022 nie utrzymuje tego grafu jako
+aktywnego backlogu v1.
 
-`#151 + #152 + #153 -> #154 -> #155`
+## Przyszła architektura produktu (archiwum)
 
-#151 celowo czeka na otwartą ścieżkę dowodową #90, aby wybór źródła nie
-zdestabilizował tego eksperymentu. Ta ochrona między ścieżkami nie czyni z M6
-ani z opcjonalnych badań warunku wstępnego wydania runtime'u. M6 pozostaje
-przyszłą architekturą produktu i nie blokuje bieżących wydań runtime'u.
+#96–#100 oraz #151–#155 zapisywały plan M6. ADR-0022 zastępuje jego realizację
+w v1; powrót wymaga nowej decyzji v2.
 
-Osobną migracją dokumentacji do modelu Polish-first zarządza #158 oraz
-[roadmapa dokumentacji](DOCUMENTATION-ROADMAP.md). Migracja nie zmienia
-zależności ani kryteriów akceptacji #149–#155.
+## Badania i architektura v2
 
-## Opcjonalna ścieżka badawcza
-
-`#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90`
-
-Wyniki badań nie blokują wydań runtime'u. Ten graf nie ma krawędzi zależności
-produktu ani terminu wykonania; porządkuje opcjonalne badania nad modelem,
-korpusem, pokryciem większościowym i odtwarzaniem kwalifikacji, nie nadając ich
-wynikom mocy wiążącej dla wspieranego runtime'u.
+Dawne grafy #76, #85–#90, #96–#100 i #151–#155 nie są aktywną roadmapą v1.
+LLM, szeroki LanguageTool, większościowe benchmarki zdań oraz rozbudowa katalogu
+mogą wrócić wyłącznie w jednym nieblokującym trackerze v2 po nowym uzasadnieniu.
+Nie tworzą zależności produktu ani terminu wydania.
 
 #146 uruchomiło 80 przypadków deweloperskich w dwóch stabilnych powtórzeniach
 przy niezmienionych bramkach sentence-only i nie uzyskało kwalifikacji. SHA-256
@@ -74,28 +74,22 @@ raportu zbiorczego to
 `7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
 Nie istnieje zamrożona bramka, znacznik nadal nie istnieje, a holdout nie został
 zarezerwowany, zmaterializowany ani uruchomiony. Ponowne uruchomienie i
-dostrajanie są zabronione. #76 pozostaje otwarte, a Task 6 jest zabronione. Te
-opcjonalne badania nie kwalifikują modelu produkcyjnego ani zachowania dla
-akapitów.
-
-## Przyszła architektura produktu
-
-#96–#100 pozostają pracami M6 nad architekturą produktu i nie blokują bieżących
-wydań runtime'u.
+dostrajanie są zabronione. #76 nie uzyskało kwalifikacji. Te historyczne
+badania nie kwalifikują modelu produkcyjnego ani zachowania dla akapitów.
 
 ## Zastąpiona ścieżka wydawnicza M5
 
 #43, #64, #66, #92 i #93 zostały zastąpione przez ADR-0020 jako obowiązujące
-źródło decyzji o ścieżce wydawniczej. Ich kryteria akceptacji nie są tutaj
-przedstawiane jako ukończone. Pozostają audytowalne jako historyczne metadane
-issues i dowody planowania.
+źródło decyzji o ścieżce wydawniczej, a ADR-0022 zawęziło wspierany zakres v1.
+Ich kryteria akceptacji nie są tutaj przedstawiane jako ukończone. Pozostają
+audytowalne jako historyczne metadane issues i dowody planowania.
 
 ## Archiwalny rejestr dostarczania M0–M5
 
 Poniższy historyczny rejestr dostarczania M0–M5 zachowano jako dowód archiwalny.
 Obejmuje prace ukończone, otwarte, odrzucone i zastąpione. Tabele zależności
 w tej sekcji zapisują stan rozumienia procesu dostarczania w chwili ich
-utworzenia; nie są aktywnym grafem wydania produktu zgodnym z ADR-0020. Treść
+utworzenia; nie są aktywnym grafem wydania produktu zgodnym z ADR-0022. Treść
 archiwalnych tabel i dowodów pozostaje w oryginalnym języku.
 
 ### M0 — Fundamenty i decyzje (archiwum)
