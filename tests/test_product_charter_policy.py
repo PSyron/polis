@@ -398,6 +398,12 @@ def test_release_docs_do_not_require_model_research() -> None:
 
     joined = "\n".join(documents.values())
     assert "optional model research never blocks a runtime release" in joined
+    prerelease = " ".join(documents["prerelease-candidate.md"].split())
+    assert (
+        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+        in prerelease
+    )
+    assert "documentation-contract" not in documents["prerelease-candidate.md"]
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
 
@@ -1339,12 +1345,20 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
     path: Path,
 ) -> None:
     document = " ".join(path.read_text(encoding="utf-8").split())
+    if path.name == "prerelease-candidate.md":
+        required_phrases = (
+            "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
+            "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "
+            "sieciowej, korpusu badawczego ani zużytego holdoutu",
+        )
+    else:
+        required_phrases = (
+            "optional model research never blocks a runtime release",
+            "does not require a model, Java process, network service, research "
+            "corpus, or consumed holdout",
+        )
 
-    for phrase in (
-        "optional model research never blocks a runtime release",
-        "does not require a model, Java process, network service, research "
-        "corpus, or consumed holdout",
-    ):
+    for phrase in required_phrases:
         assert phrase in document
 
     assert_no_runtime_release_dependency_conflict(document)
