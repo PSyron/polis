@@ -12,7 +12,10 @@ from polis.core import Category
 from polis.correction import policy as correction_policy
 
 ROOT = Path(__file__).resolve().parents[1]
+ARCHITECTURE_PATH = ROOT / "docs" / "architecture"
+DECISION_PATH = ARCHITECTURE_PATH / "decisions" / "0021-rule-catalog-ownership.md"
 INVENTORY_PATH = ROOT / "docs" / "architecture" / "rule-catalog-inventory.json"
+INVENTORY_DOCUMENT_PATH = ARCHITECTURE_PATH / "rule-catalog-inventory.md"
 CONSTRUCTION_OWNER = "polis.analyzer._make_default_registry"
 
 
@@ -149,6 +152,15 @@ def test_rule_catalog_inventory_matches_runtime_and_correction_policy() -> None:
         )
 
     assert documented_runtime_rows == _runtime_catalog_rows()
+
+
+def test_rule_catalog_decision_and_inventory_link_to_each_other() -> None:
+    assert DECISION_PATH.is_file()
+    decision = DECISION_PATH.read_text(encoding="utf-8")
+    inventory = INVENTORY_DOCUMENT_PATH.read_text(encoding="utf-8")
+
+    assert "../rule-catalog-inventory.md" in decision
+    assert "decisions/0021-rule-catalog-ownership.md" in inventory
 
 
 def test_rule_catalog_inventory_records_non_catalog_boundaries() -> None:
