@@ -1,21 +1,22 @@
-# Runtime-first distribution verification
+# Weryfikacja dystrybucji runtime-first
 
-This document records the reproducible commands used to produce and validate the
-PyPI-ready distribution artifacts.
+Ten dokument zapisuje odtwarzalne polecenia służące do tworzenia i walidacji
+artefaktów dystrybucji gotowych do publikacji w PyPI.
 
-## Release artifact generation
+## Tworzenie artefaktów wydania
 
-From a clean `main` checkout:
+Z czystego checkoutu gałęzi `main` uruchom:
 
 ```console
 python -m build --no-isolation --outdir dist
 python scripts/verify_distribution_artifacts.py --dist dist
 ```
 
-`python -m build` must emit exactly one wheel and one source archive.
+`python -m build` musi utworzyć dokładnie jeden plik wheel i jedno archiwum
+źródłowe.
 
-After the build and before any upload, create one immutable manifest from those
-exact two files:
+Po zbudowaniu, ale przed jakimkolwiek wysłaniem artefaktów, utwórz jeden
+niezmienny manifest z dokładnie tych dwóch plików:
 
 ```console
 python scripts/release_identity.py manifest \
@@ -23,88 +24,93 @@ python scripts/release_identity.py manifest \
   --output dist/release-manifest.json
 ```
 
-The command rejects artifacts whose filename or embedded package metadata does
-not equal the canonical `pyproject.toml` version. It records each SHA-256 in the
-manifest; do not run another build before upload.
+Polecenie odrzuca artefakty, których nazwa pliku lub osadzone metadane pakietu
+nie odpowiadają kanonicznej wersji z `pyproject.toml`. Zapisuje w manifeście
+SHA-256 każdego pliku; przed wysłaniem nie uruchamiaj kolejnego budowania.
 
-## Artifact metadata and content checks
+## Kontrole metadanych i zawartości artefaktów
 
-- Verify metadata keys:
-  - `License-Expression` is `MIT`
-  - `License-File` is `LICENSE`
-- Verify packaged long description uses markdown and package text is present.
-- Verify artifact contents:
-  - includes `LICENSE` in wheel and sdist
-  - includes `PKG-INFO` / wheel `METADATA`
-  - includes the `src/polis` runtime and only explicitly allow-listed package data
-  - limits the sdist to the supported runtime source, packaging metadata, README,
-    license, Hatch-included VCS exclusion metadata, the example TOML config,
-    release notes, and selected product documentation: public API, quick start,
-    privacy/offline operation, compatibility, distribution/prerelease
-    verification, limitations, customization, rule/segmentation contracts, LLM
-    contracts and quality gates, dependency-license review, and accepted
-    runtime/packaging ADRs
-  - excludes repository-only tests, experiments, fine-tuning data, vendored
-    LanguageTool/build output, SDD planning records, research scripts,
-    benchmark reports, evaluation-corpus checklists, and historical project
-    planning records
-  - excludes `.jar`, Maven repositories, `target/`, and model-weight artifact
-    extensions
+- Sprawdź klucze metadanych:
+  - wartością `License-Expression` jest `MIT`;
+  - wartością `License-File` jest `LICENSE`.
+- Sprawdź, czy długi opis pakietu używa Markdown i czy zawiera tekst pakietu.
+- Sprawdź zawartość artefaktów:
+  - `LICENSE` znajduje się w wheel i sdist;
+  - obecne są `PKG-INFO` w sdist oraz `METADATA` w wheel;
+  - obecny jest runtime `src/polis` i wyłącznie jawnie dozwolone dane pakietu;
+  - zawartość sdist ogranicza się do wspieranego źródła runtime'u, metadanych
+    pakowania, README, licencji, dołączanych przez Hatch metadanych wykluczeń
+    VCS, przykładowej konfiguracji TOML, informacji o wydaniu i wybranej
+    dokumentacji produktu: publicznego API, szybkiego startu, prywatności i pracy
+    offline, zgodności, weryfikacji dystrybucji i kandydata do wydania,
+    ograniczeń, personalizacji, kontraktów reguł i segmentacji, kontraktów i
+    bramek jakości LLM, przeglądu licencji zależności oraz zaakceptowanych ADR-ów
+    runtime'u i pakowania;
+  - wykluczone są repozytoryjne testy, eksperymenty, dane do fine-tuningu,
+    dostarczony LanguageTool i wynik jego budowania, zapisy planowania SDD,
+    skrypty badawcze, raporty benchmarków, listy kontrolne korpusów ewaluacyjnych
+    oraz historyczne zapisy planowania projektu;
+  - wykluczone są `.jar`, repozytoria Maven, `target/` oraz rozszerzenia
+    artefaktów wag modeli.
 
-The wheel and source distribution contain the supported offline runtime, not the
-research workspace. The lightweight `polis.evaluation` modules remain available
-for the current 0.x import-compatibility guarantee, while large corpora,
-holdouts, reports, experiments, training assets, tests, and vendored Java
-artifacts are not shipped. LanguageTool is therefore an optional local build or
-caller-supplied loopback service, never a default Python dependency.
+Wheel i dystrybucja źródłowa zawierają wspierany runtime offline, a nie
+przestrzeń roboczą badań. Lekkie moduły `polis.evaluation` pozostają dostępne ze
+względu na gwarancję zgodności importów w bieżącej linii 0.x, natomiast duże
+korpusy, holdouty, raporty, eksperymenty, zasoby treningowe, testy i dostarczone
+artefakty Java nie są dystrybuowane. LanguageTool jest zatem opcjonalnym
+komponentem budowanym lokalnie albo usługą na interfejsie loopback dostarczaną
+przez wywołującego, nigdy domyślną zależnością Pythona.
 
-## Clean-install smoke test
+## Test dymny czystej instalacji
 
-The installed CLI owns a UTF-8 process boundary for stdin, stdout, and stderr. The
-automated smoke check starts it with `PYTHONIOENCODING=cp1252`, passes Polish text,
-decodes output as UTF-8, and verifies the exact text. This reproduces a legacy
-Windows inherited-codec environment while keeping direct Python calls to `run()`
-caller-owned. Text lines retain platform-native line endings (`LF` on POSIX and
-`CRLF` on Windows); the cross-platform process contract fixes their encoding, not
-the operating system's newline convention.
+Zainstalowany interfejs CLI kontroluje granicę procesu UTF-8 dla stdin, stdout i
+stderr. Automatyczny test dymny uruchamia go z `PYTHONIOENCODING=cp1252`,
+przekazuje polski tekst, dekoduje wyjście jako UTF-8 i sprawdza tekst znak w
+znak. Odtwarza to starsze środowisko Windows z odziedziczonym kodekiem,
+jednocześnie pozostawiając odpowiedzialność za bezpośrednie wywołania Pythona do
+`run()` po stronie wywołującego. Wiersze tekstu zachowują natywne dla platformy
+zakończenia (`LF` w systemach POSIX i `CRLF` w Windows); międzyplatformowy
+kontrakt procesu ustala ich kodowanie, a nie systemową konwencję końca wiersza.
 
-Run the portable verifier from the repository root:
+Uruchom przenośny walidator z katalogu głównego repozytorium:
 
 ```console
 python scripts/verify_distribution_install.py --dist dist
 ```
 
-The script verifies both the wheel and sdist. It creates temporary environments with
-the platform's correct `bin` or `Scripts` layout and sets the inherited CP1252
-environment through Python, so the same command is valid in POSIX shells, Windows
-PowerShell, and `cmd.exe`.
+Skrypt sprawdza zarówno wheel, jak i sdist. Tworzy środowiska tymczasowe z
+właściwym dla platformy układem `bin` albo `Scripts` oraz ustawia odziedziczone
+środowisko CP1252 przez Pythona, dlatego to samo polecenie działa w powłokach
+POSIX, Windows PowerShell i `cmd.exe`.
 
-## Checks covered by tests
+## Kontrole objęte testami
 
-- `tests/test_distribution_artifacts.py` verifies metadata and allow-listed file
-  contents in built artifacts, including the absence of Java/vendor build output
-  from wheel and sdist.
-- `tests/test_release_distribution_installation.py` verifies isolated wheel/sdist
-  installation and import/CLI smoke behavior, including the inherited-CP1252 UTF-8
-  process boundary.
-- `tests/test_privacy_dependency_audit.py` and `tests/test_dependency_licenses.py`
-  validate release-audit constraints required before publication.
+- `tests/test_distribution_artifacts.py` sprawdza metadane i zawartość plików z
+  listy dozwolonej w zbudowanych artefaktach, w tym brak wyniku budowania Java i
+  dostarczonych komponentów w wheel i sdist.
+- `tests/test_release_distribution_installation.py` sprawdza izolowaną
+  instalację wheel i sdist oraz zachowanie testów dymnych importu i CLI, w tym
+  granicę procesu UTF-8 przy odziedziczonym CP1252.
+- `tests/test_privacy_dependency_audit.py` i `tests/test_dependency_licenses.py`
+  walidują ograniczenia audytu wydania wymagane przed publikacją.
 
-Default Polis analysis remains separate from optional local LanguageTool
-support: the Python distribution artifacts do not contain OpenJDK, LanguageTool
-binaries, Maven caches, or generated JARs.
+Domyślna analiza Polis pozostaje oddzielona od opcjonalnego lokalnego wsparcia
+LanguageTool: artefakty dystrybucji Pythona nie zawierają OpenJDK, plików
+wykonywalnych LanguageTool, pamięci podręcznych Maven ani wygenerowanych plików
+JAR.
 
-## Supported matrix notes
+## Uwagi o wspieranej macierzy
 
-Issue #31 requires clean installation and smoke verification for the supported
-release configurations. Current supported matrix is tracked in
-`docs/architecture/decisions/0001-python-platform-licensing-policy.md`; this check
-is executed for each environment in CI/milestone release workflow.
+Issue #31 wymaga czystej instalacji i weryfikacji testem dymnym dla wspieranych
+konfiguracji wydania. Bieżąca wspierana macierz jest zapisana w
+`docs/architecture/decisions/0001-python-platform-licensing-policy.md`; ta
+kontrola jest wykonywana dla każdego środowiska w CI i procesie wydania
+milestone'u.
 
-## Publication checklist output
+## Dane wyjściowe listy kontrolnej publikacji
 
-Keep command outputs, wheel/sdist names, and SHA-256 checksums with the release notes.
-Use:
+Zachowaj wraz z informacjami o wydaniu dane wyjściowe poleceń, nazwy wheel i
+sdist oraz sumy kontrolne SHA-256. Użyj:
 
 ```console
 python - <<'PY'
@@ -117,10 +123,10 @@ for name in sorted(Path('dist').glob('*')):
 PY
 ```
 
-Upload only the two files listed in `dist/release-manifest.json`. After GitHub
-Release and package-index publication, obtain the reported artifact digests in
-a JSON object mapping filename to lowercase SHA-256, then compare them with the
-same manifest:
+Wyślij wyłącznie dwa pliki wymienione w `dist/release-manifest.json`. Po
+publikacji GitHub Release oraz publikacji w indeksie pakietów pobierz zgłoszone
+skróty artefaktów jako obiekt JSON mapujący nazwy plików na zapisane małymi
+literami SHA-256, a następnie porównaj je z tym samym manifestem:
 
 ```console
 python scripts/release_identity.py verify-published \
@@ -128,7 +134,8 @@ python scripts/release_identity.py verify-published \
   --published-digests published-digests.json
 ```
 
-The comparison requires an exact filename/digest set. A mismatch is an
-append-only release incident: do not move a tag or replace a published asset.
-Record an erratum that cites the immutable tag and the published digests instead.
-`docs/release-notes/0.1.0-erratum.md` is the precedent for this procedure.
+Porównanie wymaga dokładnie tego samego zbioru nazw plików i skrótów.
+Niezgodność jest incydentem wydania korygowanym wyłącznie przez dopisanie:
+nie przenoś tagu ani nie zastępuj opublikowanego artefaktu. Zapisz erratum, które
+wskazuje niezmienny tag i opublikowane skróty.
+`docs/release-notes/0.1.0-erratum.md` stanowi precedens dla tej procedury.

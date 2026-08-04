@@ -18,7 +18,7 @@ def test_every_locked_package_has_a_license_review_entry() -> None:
         (package["name"], package["version"]) for package in lock_data["package"]
     }
     review = LICENSE_REVIEW.read_text(encoding="utf-8")
-    locked_review = review.split("## External bootstrap tool", maxsplit=1)[0]
+    locked_review = review.split("## Zewnętrzne narzędzie inicjujące", maxsplit=1)[0]
     reviewed_packages = set(
         re.findall(r"^\| `([^`]+)` \| ([^ |]+) \|", locked_review, re.MULTILINE)
     )
@@ -35,3 +35,7 @@ def test_external_uv_bootstrap_tool_is_pinned_and_reviewed() -> None:
     assert "https://astral.sh/uv/0.11.2/install.sh" in readme
     assert "https://astral.sh/uv/0.11.2/install.ps1" in readme
     assert "| `uv` | 0.11.2 | Apache-2.0 OR MIT |" in review
+    assert "workflow oparty na lockfile" in review
+    assert "środowiska z lockfile" in review
+    assert "pakiety przypięte w lockfile" in review
+    assert "documentation-contract" not in review

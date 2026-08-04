@@ -412,8 +412,12 @@ def test_release_docs_do_not_require_model_research() -> None:
         "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
         in normalized_documents["limitations.md"]
     )
-    assert "documentation-contract" not in documents["README.md"]
-    assert "documentation-contract" not in documents["limitations.md"]
+    assert (
+        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+        in normalized_documents["prerelease-candidate.md"]
+    )
+    for name in ("README.md", "limitations.md", "prerelease-candidate.md"):
+        assert "documentation-contract" not in documents[name]
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
 
@@ -1361,7 +1365,7 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
             "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
             "badawczego ani zużytego holdoutu",
         )
-    elif path.name in {"README.md", "limitations.md"}:
+    elif path.name in {"README.md", "limitations.md", "prerelease-candidate.md"}:
         required_phrases = (
             "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
             "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "

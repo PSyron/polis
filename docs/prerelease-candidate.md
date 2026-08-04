@@ -1,41 +1,44 @@
-# Prerelease candidate verification
+# Weryfikacja kandydata do wydania
 
-Use this checklist to produce and validate an installable `M3-06` prerelease candidate.
-Runtime prerelease verification covers the supported offline runtime and does
-not execute or depend on model research, optional model qualification, research
-corpora, or consumed holdouts, and optional model research never blocks a
-runtime release. The runtime release path does not require a model, Java
-process, network service, research corpus, or consumed holdout.
+Użyj tej listy kontrolnej, aby utworzyć i zweryfikować możliwego do
+zainstalowania kandydata do wydania w ramach `M3-06`. Weryfikacja kandydata
+runtime'u obejmuje wspierany runtime offline i nie uruchamia badań nad modelem,
+opcjonalnej kwalifikacji modelu, korpusów badawczych ani zużytych holdoutów oraz
+od nich nie zależy; opcjonalne badania nad modelem nigdy nie blokują wydania
+runtime'u. Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi
+sieciowej, korpusu badawczego ani zużytego holdoutu.
 
-## 1) Prepare artifact
+## 1) Przygotowanie artefaktu
 
 ```console
 uv run --locked --extra dev python scripts/verify_prerelease_candidate.py \
   --source-commit "$(git rev-parse HEAD)"
 ```
 
-This runs:
+Polecenie wykonuje:
 
-- fast quality tests,
-- ruff checks,
-- strict mypy,
-- wheel + sdist build,
-- artifact metadata checks,
-- offline smoke verification,
-- one release manifest for the exact wheel and sdist it just built.
+- szybkie testy jakości;
+- kontrole ruff;
+- rygorystyczne mypy;
+- budowanie wheel i sdist;
+- kontrole metadanych artefaktów;
+- test dymny offline;
+- jeden manifest wydania dla dokładnie tych plików wheel i sdist, które właśnie
+  zbudowało.
 
-The script prints hashes for both artifacts and writes
-`dist/release-manifest.json`. Before any candidate is published, retain that
-exact build-once artifact set with its source commit:
+Skrypt wypisuje skróty obu artefaktów i zapisuje
+`dist/release-manifest.json`. Zanim kandydat zostanie opublikowany, zachowaj ten
+jednokrotnie zbudowany, dokładny zestaw artefaktów wraz z jego commitem
+źródłowym.
 
-The manifest binds the authoritative `pyproject.toml` version, matching artifact
-names and embedded metadata, and SHA-256 digests. Do not rebuild after this
-step: upload only the files named in `dist/release-manifest.json`.
+Manifest wiąże autorytatywną wersję z `pyproject.toml`, zgodne nazwy artefaktów i
+osadzone metadane oraz skróty SHA-256. Po tym kroku nie buduj artefaktów
+ponownie: wyślij wyłącznie pliki nazwane w `dist/release-manifest.json`.
 
-Candidate naming is an explicit release-only operation. Supply the observed
-local/remote tags, GitHub release tags, and package-index versions through the
-release-only collector. Its fast tests use injected fakes and do not call a
-network:
+Nadanie nazwy kandydatowi jest jawną operacją wykonywaną wyłącznie podczas
+wydania. Przekaż zaobserwowane tagi lokalne i zdalne, tagi wydań GitHub oraz
+wersje z indeksu pakietów do kolektora przeznaczonego wyłącznie dla wydania.
+Jego szybkie testy używają wstrzykniętych atrap i nie łączą się z siecią:
 
 ```console
 uv run --locked --extra dev python scripts/release_identity.py candidate \
@@ -45,15 +48,16 @@ uv run --locked --extra dev python scripts/release_identity.py candidate \
   --package-index-url https://pypi.org/pypi/polis-nlp/json
 ```
 
-An existing local or remote tag, GitHub release, package-index version, or a
-version no greater than the highest observed GitHub/package-index publication
-is a release blocker. The supplied `--latest-published` value is cross-checked
-against those observations; it cannot lower that boundary.
+Istniejący tag lokalny lub zdalny, wydanie GitHub, wersja w indeksie pakietów
+albo wersja nie większa od najwyższej zaobserwowanej publikacji GitHub lub w
+indeksie pakietów blokuje wydanie. Podana wartość `--latest-published` jest
+sprawdzana względem tych obserwacji i nie może obniżyć tej granicy.
 
-For milestone M4-03 distribution checks (wheel/sdist clean install and release
-publication checklist), continue with `docs/distribution-verification.md`.
+Aby przeprowadzić kontrole dystrybucji milestone'u M4-03 — czystą instalację
+wheel i sdist oraz listę kontrolną publikacji wydania — przejdź do
+`docs/distribution-verification.md`.
 
-## 2) Install artifacts in clean test location (manual)
+## 2) Ręczna instalacja artefaktów w czystej lokalizacji testowej
 
 ```console
 python -m build --no-isolation
@@ -65,28 +69,30 @@ print(polis.AnalyzerConfig())
 PY
 ```
 
-## 3) Record evidence
+## 3) Zapis dowodów
 
-Store command output, the build-once manifest, artifact names, and hashes in
-milestone notes. Include:
+Zapisz dane wyjściowe poleceń, manifest jednokrotnie zbudowanych artefaktów,
+nazwy artefaktów i skróty w notatkach milestone'u. Uwzględnij:
 
-- `python -m build` command output,
-- `scripts/verify_distribution_artifacts.py` result,
-- offline verification output (`tests/test_offline_verification.py`),
-- public issue references.
+- dane wyjściowe polecenia `python -m build`;
+- wynik `scripts/verify_distribution_artifacts.py`;
+- wynik weryfikacji offline (`tests/test_offline_verification.py`);
+- odwołania do publicznych issue.
 
-For every existing tag, run the byte-exact historical-evidence check before
-preparing a new release:
+Dla każdego istniejącego tagu, przed przygotowaniem nowego wydania, uruchom
+kontrolę historycznych dowodów porównującą dokładne bajty:
 
 ```console
 uv run --locked --extra dev python scripts/release_identity.py verify-history \
   --tag v0.1.0 --version 0.1.0
 ```
 
-Fast CI runs the equivalent all-tag check through the release-identity tests;
-use `verify-all-history` when running the check manually.
+Szybkie CI uruchamia równoważną kontrolę wszystkich tagów przez testy tożsamości
+wydania; podczas ręcznego sprawdzania użyj `verify-all-history`.
 
-## Known limits
+## Znane ograniczenia
 
-- This checklist is scoped to local checks and current repository assumptions.
-- Release publication and external upload are outside `M3-06`.
+- Ta lista kontrolna ogranicza się do kontroli lokalnych i bieżących założeń
+  repozytorium.
+- Publikacja wydania i wysyłanie do usług zewnętrznych pozostają poza zakresem
+  `M3-06`.

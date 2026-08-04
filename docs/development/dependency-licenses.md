@@ -1,97 +1,102 @@
-# Build and development dependency license review
+# Przegląd licencji zależności budowania i rozwoju
 
-- Review date: 2026-07-20
-- Owner: Paweł Cyroń
-- Scope: the complete `uv.lock` graph for the `dev` extra, including the local
-  project and build backend
-- Decision: approved for build and development use under the obligations below
+- Data przeglądu: 2026-07-20
+- Właściciel: Paweł Cyroń
+- Zakres: pełny graf z `uv.lock` dla opcjonalnej grupy `dev`, w tym projekt
+  lokalny i backend budowania
+- Decyzja: zatwierdzono do użycia przy budowaniu i rozwoju z zachowaniem
+  poniższych obowiązków
 
-The exact versions and artifact hashes are recorded in `uv.lock`. The Evidence
-column links to the immutable version-specific PyPI JSON used to verify package
-identity and published license metadata. Repository license files were checked
-where PyPI exposes only a legacy classifier.
+Dokładne wersje i skróty artefaktów zapisano w `uv.lock`. Kolumna Dowody zawiera
+odnośniki do niezmiennego, właściwego dla wersji dokumentu JSON z PyPI, którego
+użyto do weryfikacji tożsamości pakietu i opublikowanych metadanych licencji.
+Pliki licencji w repozytoriach sprawdzono tam, gdzie PyPI udostępnia wyłącznie
+historyczny klasyfikator.
 
-| Package | Version | SPDX expression | Role | Evidence and obligations |
+| Pakiet | Wersja | Wyrażenie SPDX | Rola | Dowody i obowiązki |
 | --- | --- | --- | --- | --- |
-| `ast-serialize` | 0.6.0 | MIT | mypy transitive | [PyPI metadata](https://pypi.org/pypi/ast-serialize/0.6.0/json); preserve the copyright and MIT notice if redistributed. |
-| `build` | 1.5.0 | MIT | direct development | [PyPI metadata](https://pypi.org/pypi/build/1.5.0/json); preserve the copyright and MIT notice if redistributed. |
-| `colorama` | 0.4.6 | BSD-3-Clause | build transitive on Windows | [PyPI metadata](https://pypi.org/pypi/colorama/0.4.6/json); preserve copyright, conditions, and disclaimer; do not use contributor names for endorsement. |
-| `hatchling` | 1.31.0 | MIT | direct build and development | [PyPI metadata](https://pypi.org/pypi/hatchling/1.31.0/json); preserve the copyright and MIT notice if redistributed. |
-| `iniconfig` | 2.3.0 | MIT | pytest transitive | [PyPI metadata](https://pypi.org/pypi/iniconfig/2.3.0/json); preserve the copyright and MIT notice if redistributed. |
-| `librt` | 0.13.0 | MIT | mypy transitive | [PyPI metadata](https://pypi.org/pypi/librt/0.13.0/json); preserve the copyright and MIT notice if redistributed. |
-| `mypy` | 2.3.0 | MIT | direct development | [PyPI metadata](https://pypi.org/pypi/mypy/2.3.0/json); preserve the copyright and MIT notice if redistributed. |
-| `mypy-extensions` | 1.1.0 | MIT | mypy transitive | [PyPI metadata](https://pypi.org/pypi/mypy-extensions/1.1.0/json); preserve the copyright and MIT notice if redistributed. |
-| `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | build, Hatchling, and pytest transitive | [PyPI metadata](https://pypi.org/pypi/packaging/26.2/json); the compound expression receives explicit approval under the BSD-2-Clause option. Preserve its copyright, license conditions, and disclaimer if redistributed. |
-| `pathspec` | 1.1.1 | MPL-2.0 | Hatchling and mypy transitive | [PyPI metadata](https://pypi.org/pypi/pathspec/1.1.1/json); MPL-2.0 is explicitly approved for this build/development-only dependency. Preserve notices and license text; if modified covered files are distributed, make their source available under MPL-2.0. Polis does not modify or bundle it. |
-| `pluggy` | 1.6.0 | MIT | pytest transitive | [PyPI metadata](https://pypi.org/pypi/pluggy/1.6.0/json); preserve the copyright and MIT notice if redistributed. |
-| `polis-nlp` | 0.2.0.dev0 | MIT | local project | `pyproject.toml` and `LICENSE`; project-authored code and documentation remain MIT-licensed. |
-| `pygments` | 2.20.0 | BSD-2-Clause | pytest transitive | [PyPI metadata](https://pypi.org/pypi/pygments/2.20.0/json); preserve copyright, license conditions, and disclaimer if redistributed. |
-| `pyproject-hooks` | 1.2.0 | MIT | build transitive | [PyPI metadata](https://pypi.org/pypi/pyproject-hooks/1.2.0/json); preserve the copyright and MIT notice if redistributed. |
-| `pytest` | 9.1.1 | MIT | direct development | [PyPI metadata](https://pypi.org/pypi/pytest/9.1.1/json); preserve the copyright and MIT notice if redistributed. |
-| `ruff` | 0.15.22 | MIT | direct development | [PyPI metadata](https://pypi.org/pypi/ruff/0.15.22/json); preserve the copyright and MIT notice if redistributed. |
-| `trove-classifiers` | 2026.6.1.19 | Apache-2.0 | Hatchling transitive | [PyPI metadata](https://pypi.org/pypi/trove-classifiers/2026.6.1.19/json); preserve the license and notices, and mark modified files if redistributed. |
-| `typing-extensions` | 4.16.0 | PSF-2.0 | mypy transitive | [PyPI metadata](https://pypi.org/pypi/typing-extensions/4.16.0/json); preserve the PSF license and notices if redistributed. |
+| `ast-serialize` | 0.6.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/ast-serialize/0.6.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `build` | 1.5.0 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/build/1.5.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `colorama` | 0.4.6 | BSD-3-Clause | zależność przechodnia budowania w Windows | [Metadane PyPI](https://pypi.org/pypi/colorama/0.4.6/json); zachowaj prawa autorskie, warunki i wyłączenie odpowiedzialności; nie używaj nazw współtwórców do promowania produktu. |
+| `hatchling` | 1.31.0 | MIT | bezpośrednia zależność budowania i rozwoju | [Metadane PyPI](https://pypi.org/pypi/hatchling/1.31.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `iniconfig` | 2.3.0 | MIT | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/iniconfig/2.3.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `librt` | 0.13.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/librt/0.13.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `mypy` | 2.3.0 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/mypy/2.3.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `mypy-extensions` | 1.1.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/mypy-extensions/1.1.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | zależność przechodnia build, Hatchling i pytest | [Metadane PyPI](https://pypi.org/pypi/packaging/26.2/json); złożone wyrażenie zostało jawnie zatwierdzone w wariancie BSD-2-Clause. W razie redystrybucji zachowaj prawa autorskie, warunki licencji i wyłączenie odpowiedzialności. |
+| `pathspec` | 1.1.1 | MPL-2.0 | zależność przechodnia Hatchling i mypy | [Metadane PyPI](https://pypi.org/pypi/pathspec/1.1.1/json); MPL-2.0 jest jawnie zatwierdzona dla tej zależności używanej wyłącznie do budowania i rozwoju. Zachowaj noty i tekst licencji; jeśli zmodyfikowane pliki objęte licencją są rozpowszechniane, udostępnij ich źródła na MPL-2.0. Polis nie modyfikuje tego pakietu ani go nie dołącza. |
+| `pluggy` | 1.6.0 | MIT | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pluggy/1.6.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `polis-nlp` | 0.2.0.dev0 | MIT | projekt lokalny | `pyproject.toml` i `LICENSE`; kod i dokumentacja autorstwa projektu pozostają na licencji MIT. |
+| `pygments` | 2.20.0 | BSD-2-Clause | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pygments/2.20.0/json); w razie redystrybucji zachowaj prawa autorskie, warunki licencji i wyłączenie odpowiedzialności. |
+| `pyproject-hooks` | 1.2.0 | MIT | zależność przechodnia build | [Metadane PyPI](https://pypi.org/pypi/pyproject-hooks/1.2.0/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `pytest` | 9.1.1 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/pytest/9.1.1/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `ruff` | 0.15.22 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/ruff/0.15.22/json); w razie redystrybucji zachowaj informację o prawach autorskich i notę MIT. |
+| `trove-classifiers` | 2026.6.1.19 | Apache-2.0 | zależność przechodnia Hatchling | [Metadane PyPI](https://pypi.org/pypi/trove-classifiers/2026.6.1.19/json); w razie redystrybucji zachowaj licencję i noty oraz oznacz zmodyfikowane pliki. |
+| `typing-extensions` | 4.16.0 | PSF-2.0 | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/typing-extensions/4.16.0/json); w razie redystrybucji zachowaj licencję PSF i noty. |
 
-## External bootstrap tool
+## Zewnętrzne narzędzie inicjujące
 
-uv cannot be part of the graph it resolves, so it is reviewed and pinned
-separately. `tool.uv.required-version` rejects any version other than 0.11.2,
-and the README installs that exact release.
+uv nie może należeć do grafu, który samo rozwiązuje, dlatego podlega osobnemu
+przeglądowi i przypięciu. `tool.uv.required-version` odrzuca każdą wersję inną
+niż 0.11.2, a README instaluje dokładnie to wydanie.
 
-| Tool | Version | SPDX expression | Role | Evidence and obligations |
+| Narzędzie | Wersja | Wyrażenie SPDX | Rola | Dowody i obowiązki |
 | --- | --- | --- | --- | --- |
-| `uv` | 0.11.2 | Apache-2.0 OR MIT | environment bootstrap and locked workflow | [PyPI metadata](https://pypi.org/pypi/uv/0.11.2/json) and [upstream licensing](https://github.com/astral-sh/uv/tree/0.11.2#license); the compound expression receives explicit approval under the MIT option. Preserve the copyright and MIT license notice if redistributed. |
+| `uv` | 0.11.2 | Apache-2.0 OR MIT | inicjowanie środowiska i workflow oparty na lockfile | [Metadane PyPI](https://pypi.org/pypi/uv/0.11.2/json) i [licencja upstream](https://github.com/astral-sh/uv/tree/0.11.2#license); złożone wyrażenie zostało jawnie zatwierdzone w wariancie MIT. W razie redystrybucji zachowaj informację o prawach autorskich i notę licencji MIT. |
 
-## CI workflow actions
+## Akcje workflow CI
 
-The fast workflow uses only the following external actions. Each is pinned to
-the immutable commit published by its reviewed major release and is
-MIT-licensed. The action commits are not Python dependencies and do not change
+Szybki workflow używa wyłącznie poniższych akcji zewnętrznych. Każda jest
+przypięta do niezmiennego commita opublikowanego przez sprawdzoną wersję główną
+i objęta licencją MIT. Commity akcji nie są zależnościami Pythona i nie zmieniają
 `uv.lock`.
 
-| Action | Commit | SPDX expression | Role | Evidence and obligations |
+| Akcja | Commit | Wyrażenie SPDX | Rola | Dowody i obowiązki |
 | --- | --- | --- | --- | --- |
-| `actions/checkout` | `34e114876b0b11c390a56381ad16ebd13914f8d5` | MIT | Check out the proposed source revision. | [License](https://github.com/actions/checkout/blob/34e114876b0b11c390a56381ad16ebd13914f8d5/LICENSE); preserve notices if redistributed. |
-| `actions/setup-python` | `ece7cb06caefa5fff74198d8649806c4678c61a1` | MIT | Install the matrix-selected CPython interpreter; its [pinned input schema](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/action.yml) accepts `x86`, `x64`, or `arm64`, so ADR `x86_64` maps to `x64`. | [License](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/LICENSE); preserve notices if redistributed. |
-| `astral-sh/setup-uv` | `37802adc94f370d6bfd71619e3f0bf239e1f3b78` | MIT | Install uv 0.11.2 and cache the locked environment. | [License](https://github.com/astral-sh/setup-uv/blob/37802adc94f370d6bfd71619e3f0bf239e1f3b78/LICENSE); preserve notices if redistributed. |
+| `actions/checkout` | `34e114876b0b11c390a56381ad16ebd13914f8d5` | MIT | Pobranie proponowanej rewizji źródeł. | [Licencja](https://github.com/actions/checkout/blob/34e114876b0b11c390a56381ad16ebd13914f8d5/LICENSE); w razie redystrybucji zachowaj noty. |
+| `actions/setup-python` | `ece7cb06caefa5fff74198d8649806c4678c61a1` | MIT | Instalacja interpretera CPython wybranego przez macierz; jego [przypięty schemat danych wejściowych](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/action.yml) przyjmuje `x86`, `x64` lub `arm64`, dlatego `x86_64` z ADR jest mapowane na `x64`. | [Licencja](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/LICENSE); w razie redystrybucji zachowaj noty. |
+| `astral-sh/setup-uv` | `37802adc94f370d6bfd71619e3f0bf239e1f3b78` | MIT | Instalacja uv 0.11.2 i buforowanie środowiska z lockfile. | [Licencja](https://github.com/astral-sh/setup-uv/blob/37802adc94f370d6bfd71619e3f0bf239e1f3b78/LICENSE); w razie redystrybucji zachowaj noty. |
 
-## Adoption decision
+## Decyzja o przyjęciu
 
-All locked packages except `pathspec` and `packaging` use a single SPDX license
-already allowed by ADR-0001. `packaging` combines two allowed licenses with
-`OR`; Polis adopts it under BSD-2-Clause. The external uv bootstrap tool also
-uses a compound expression, `Apache-2.0 OR MIT`, and is explicitly adopted
-under the MIT option. `pathspec` uses MPL-2.0, which is outside the default
-allowlist; it is adopted only as an unmodified transitive build/development
-dependency and is not included in Polis distribution artifacts. These explicit
-decisions satisfy ADR-0001's dedicated-review requirement. A change to any
-reviewed expression, role, version, or redistribution model requires a new
-review.
+Wszystkie pakiety przypięte w lockfile oprócz `pathspec` i `packaging` używają jednego
+identyfikatora SPDX dozwolonego już przez ADR-0001. `packaging` łączy dwie
+dozwolone licencje operatorem `OR`; Polis przyjmuje go w wariancie
+BSD-2-Clause. Zewnętrzne narzędzie inicjujące uv również używa złożonego
+wyrażenia `Apache-2.0 OR MIT` i zostaje jawnie przyjęte w wariancie MIT.
+`pathspec` używa MPL-2.0, która znajduje się poza domyślną listą dozwolonych
+licencji; zostaje przyjęta wyłącznie jako niezmodyfikowana zależność przechodnia
+budowania i rozwoju i nie jest dołączana do artefaktów dystrybucji Polis. Te
+jawne decyzje spełniają wymaganie osobnego przeglądu z ADR-0001. Zmiana
+któregokolwiek sprawdzonego wyrażenia, roli, wersji lub modelu redystrybucji
+wymaga nowego przeglądu.
 
-## Optional external rule engine
+## Opcjonalny zewnętrzny silnik reguł
 
-LanguageTool 6.8 is supported as an optional local process but is not present in
-`pyproject.toml`, `uv.lock`, wheels, or source distributions. Its open-source
-core and Polish grammar rules are licensed under LGPL-2.1-or-later. The
-default Python runtime does not require it. When enabled, the loopback adapter
-communicates with an unmodified, separately installed process over HTTP and
-does not redistribute its binaries. OpenJDK 17 is likewise supplied by the
-local package manager rather than Polis.
+LanguageTool 6.8 jest wspierany jako opcjonalny proces lokalny, lecz nie znajduje
+się w `pyproject.toml`, `uv.lock`, wheel ani dystrybucjach źródłowych. Jego
+otwartoźródłowy rdzeń i polskie reguły gramatyczne są objęte licencją
+LGPL-2.1-or-later. Domyślny runtime Pythona go nie wymaga. Po włączeniu adapter
+loopback komunikuje się przez HTTP z niezmodyfikowanym, osobno zainstalowanym
+procesem i nie redystrybuuje jego plików wykonywalnych. OpenJDK 17 jest podobnie
+dostarczany przez lokalny menedżer pakietów, a nie przez Polis.
 
-For M4, this repository carries the unmodified LanguageTool 6.8 core and Polish
-`src/main` trees in `third_party/languagetool-pl`, together with exact
-provenance, the LGPL text, and a machine-readable inclusion manifest. The
-project-authored stdio bridge links against locally built, uncombined core and
-Polish JARs only when a caller explicitly builds and points Polis at the
-vendored runner. Its Maven cache, runtime libraries, and Java build products
-remain ignored local artifacts; the entire directory is excluded from Python
-wheel and sdist output. Those artifacts are outside the reviewed MIT Python
-distribution boundary and do not become Python production dependencies.
+Na potrzeby M4 repozytorium zawiera niezmodyfikowany rdzeń LanguageTool 6.8 i
+polskie drzewa `src/main` w `third_party/languagetool-pl`, wraz z dokładnym
+pochodzeniem, tekstem LGPL i maszynowo czytelnym manifestem zawartości. Most
+stdio autorstwa projektu łączy się z lokalnie zbudowanymi, niepołączonymi
+plikami JAR rdzenia i części polskiej tylko wtedy, gdy wywołujący jawnie buduje
+dostarczony runner i wskazuje go Polis. Pamięć podręczna Maven, biblioteki
+runtime'u i wyniki budowania Java pozostają ignorowanymi artefaktami lokalnymi;
+cały katalog jest wykluczony z wyjścia wheel i sdist Pythona. Artefakty te
+znajdują się poza granicą sprawdzonej dystrybucji Pythona na licencji MIT i nie
+stają się zależnościami produkcyjnymi Pythona.
 
-The Polish morphology resource preserves its BSD-2-Clause notice. The Hunspell
-resource preserves its upstream GPL/LGPL/MPL/CC-SA-1.0 options and Apache-2.0
-frequency-data notice. These resource-specific notices are referenced from the
-module manifest and `NOTICE`; they are not collapsed into the core LGPL label.
+Polski zasób morfologiczny zachowuje notę BSD-2-Clause. Zasób Hunspell zachowuje
+upstreamowe warianty GPL/LGPL/MPL/CC-SA-1.0 i notę Apache-2.0 dotyczącą danych
+częstotliwości. Te noty właściwe dla zasobów są wskazane w manifeście modułu i
+`NOTICE`; nie są sprowadzane do oznaczenia LGPL rdzenia.
 
-Any proposal to bundle, modify, or redistribute LanguageTool or a JVM requires
-a new license and distribution review; ADR-0006 does not approve bundling.
+Każda propozycja dołączenia, zmodyfikowania lub redystrybucji LanguageTool albo
+JVM wymaga nowego przeglądu licencji i dystrybucji; ADR-0006 nie zatwierdza
+dołączania.
