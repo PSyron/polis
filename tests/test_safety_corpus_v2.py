@@ -430,7 +430,7 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
     dataset_v2 = _normalized_prose(
         _markdown_section(
             (ROOT / "docs" / "evaluation-dataset.md").read_text(encoding="utf-8"),
-            "## Independent sentence safety corpus v2 candidates",
+            "## Kandydaci niezależnego korpusu bezpieczeństwa zdań v2",
         )
     )
     quality_gates_v2 = _normalized_prose(
@@ -472,42 +472,47 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
     )
 
     for required in (
-        "all 240 records",
+        "wszystkie 240 rekordów",
         _V2_REQUIRED_REVIEWER,
-        "project-authored synthetic Polish",
+        "autorskim, syntetycznym polskim tekstem projektu",
         "CC0-1.0",
-        "corpus v3",
-        "safety corpus v1",
-        "prompt examples",
-        "fine-tuning assets",
-        "E2E fixtures",
-        _expected_prose(
-            "Case-level safety-corpus-v1 holdout content or outcomes did not inform",
-            "the candidate.",
+        "korpusu v3",
+        "korpusu bezpieczeństwa v1",
+        "przykładów promptów",
+        "zasobów do dostrajania",
+        "danych testowych E2E",
+        (
+            "Treść ani wyniki holdoutu korpusu bezpieczeństwa v1 na poziomie "
+            "przypadku nie wpłynęły na kandydata."
         ),
-        "does not authorize holdout access",
+        "nie upoważnia do dostępu do holdoutu",
         _V2_CANDIDATE_DIGEST,
         _V2_FROZEN_DIGEST,
     ):
         assert required in checklist
-    assert "all-case review" in checklist
+    assert "Zatwierdzenie obejmuje wszystko albo nic" in checklist
     assert (
-        f"candidate canonical JSON SHA-256 `{_V2_CANDIDATE_DIGEST}` to frozen "
-        f"canonical JSON SHA-256 `{_V2_FROZEN_DIGEST}`"
+        f"SHA-256 kanonicznego JSON-u kandydata `{_V2_CANDIDATE_DIGEST}` "
+        f"z SHA-256 zamrożonego kanonicznego JSON-u `{_V2_FROZEN_DIGEST}`"
     ) in checklist
 
     for required in (
         SAFETY_CORPUS_V2_ID,
-        "240 newly project-authored synthetic Polish CC0-1.0 cases",
+        (
+            "240 nowych, autorskich, syntetycznych polskich przypadków projektu "
+            "na licencji CC0-1.0"
+        ),
         _V2_REQUIRED_REVIEWER,
         _V2_CANDIDATE_DIGEST,
         _V2_FROZEN_DIGEST,
-        "no development or holdout quality score",
-        "does not change the thresholds",
-        "failed #115 verdict",
-        "separate follow-up issue may run a one-shot installed-package gate for #76",
-        "does not authorize or execute that gate",
-        "#85 and #90",
+        "nie wytwarza wyniku jakości dla części deweloperskiej ani holdoutu",
+        "nie zmienia progów ani negatywnego werdyktu #115",
+        (
+            "Osobne kolejne issue może uruchomić jednorazową bramkę "
+            "zainstalowanego pakietu dla #76"
+        ),
+        "to zadanie nie upoważnia do tej bramki ani jej nie wykonuje",
+        "#85 i #90",
     ):
         assert required in dataset_v2
 

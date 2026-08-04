@@ -1010,23 +1010,23 @@ def test_review_and_change_control_documentation_is_complete() -> None:
 
     for required in (
         "pending-human-review",
-        "development",
+        "deweloperskich",
         "holdout",
         "unfrozen",
-        "training",
-        "leakage",
+        "treningu",
+        "wycieku",
         "CC0-1.0",
-        "change control",
+        "Kontrola wycieku i zmian",
     ):
         assert required.casefold() in guide.casefold()
     for required in (
-        "correctness",
-        "category",
-        "minimality",
-        "offsets",
-        "proper-name",
-        "provenance",
-        "licensing",
+        "poprawność",
+        "kategoria",
+        "minimalność",
+        "przesunięcia",
+        "obsługa nazw własnych",
+        "proweniencja",
+        "licencjonowanie",
         "Paweł Cyroń",
     ):
         assert required.casefold() in checklist.casefold()
