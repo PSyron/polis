@@ -1,10 +1,11 @@
-# Segmentation guarantees
+# Gwarancje segmentacji
 
-## Purpose
+## Przeznaczenie
 
-`polis.segmentation` provides stable span objects for paragraph and sentence segmentation.
-Each span stores the half-open offsets `[start, end)` into the original input and
-an exact `text` slice from that range.
+`polis.segmentation` udostępnia stabilne obiekty zakresów dla segmentacji akapitów
+i zdań. Każdy zakres przechowuje przesunięcia w konwencji półotwartej
+`[start, end)` względem oryginalnego wejścia oraz dokładny wycinek `text` z tego
+zakresu.
 
 ## API
 
@@ -14,40 +15,44 @@ an exact `text` slice from that range.
 - `Paragraph(start: int, end: int, text: str)`
 - `Sentence(start: int, end: int, text: str)`
 
-`text` is expected to be the original UTF-8 decoded Python string. Offsets are
-Python index offsets in Unicode code points.
+Oczekuje się, że `text` jest oryginalnym napisem Pythona zdekodowanym z UTF-8.
+Przesunięcia są indeksami Pythona liczonymi w punktach kodowych Unicode.
 
-## Parsing behavior
+## Zachowanie parsera
 
-- Paragraphs are split by blank-line boundaries (CRLF and mixed whitespace line
-  endings included).
-- Sentence boundaries are detected with punctuation (`.`, `?`, `!`) and simple
-  closers such as punctuation, quotes, and right brackets.
-- Abbreviations in a compact heuristic list (`np`, `itd`, `itp`, `m.in`, `dr`, ...)
-  are not split as final sentence boundaries.
-- Decimal points (digit dot digit), like `3.14`, are not treated as sentence ends.
-- Segment slices are concatenated back to the original input in implementation order.
+- Akapity są rozdzielane na granicach pustych wierszy (w tym przy zakończeniach
+  wierszy CRLF i z mieszaną białą spacją).
+- Granice zdań są wykrywane na podstawie znaków interpunkcyjnych (`.`, `?`, `!`)
+  i prostych znaków zamykających, takich jak interpunkcja, cudzysłowy i prawe
+  nawiasy.
+- Skróty z niewielkiej listy heurystycznej (`np`, `itd`, `itp`, `m.in`, `dr`, ...)
+  nie są dzielone jako końcowe granice zdań.
+- Kropki dziesiętne (cyfra, kropka, cyfra), na przykład `3.14`, nie są traktowane
+  jako końce zdań.
+- Wycinki segmentów po połączeniu w kolejności implementacji odtwarzają oryginalne
+  wejście.
 
-## Generated structural guardrail
+## Generowana bariera strukturalna
 
-Issue #125 runs the bounded synthetic Unicode generator from issue #123 through
-both segmenters. It checks ordered, contiguous, bounded Unicode code-point
-half-open spans `[start, end)`, exact source slices, and exact reconstruction
-of the original source. The 64-case run covers the generator's declared ASCII,
-Polish-diacritic, non-BMP, combining-mark, LF, CRLF, punctuation, and quote
-families, including its explicit empty-input case.
+Issue #125 uruchamia ograniczony syntetyczny generator Unicode z issue #123 dla
+obu segmenterów. Sprawdza uporządkowane, ciągłe i ograniczone zakresy punktów
+kodowych Unicode w konwencji półotwartej `[start, end)`, dokładne wycinki źródła
+oraz dokładne odtworzenie oryginalnego źródła. Przebieg obejmujący 64 przypadki
+pokrywa zadeklarowane przez generator rodziny ASCII, polskich znaków
+diakrytycznych, znaków spoza BMP, znaków łączących, LF, CRLF, interpunkcji
+i cudzysłowów, w tym jawny przypadek pustego wejścia.
 
-Failures report only a stable invariant identifier and deterministic replay
-metadata, never the generated source text. This is a structural guardrail: it
-does not change segmentation heuristics, replace authored linguistic
-regressions, or claim linguistic coverage. See
-[`docs/development/generative-invariants.md`](development/generative-invariants.md)
-for the generator and replay contract.
+Błędy zgłaszają wyłącznie stabilny identyfikator niezmiennika oraz
+deterministyczne metadane powtórzenia, nigdy wygenerowany tekst źródłowy. Jest to
+bariera strukturalna: nie zmienia heurystyk segmentacji, nie zastępuje autorskich
+regresji językowych ani nie deklaruje pokrycia językowego. Kontrakt generatora
+i powtórzenia opisuje
+[`docs/development/generative-invariants.md`](development/generative-invariants.md).
 
-## Limitations and known caveats
+## Ograniczenia i znane zastrzeżenia
 
-- This is a deterministic heuristic, not a full language model.
-- Multi-space and mixed punctuation edge cases should be covered by dedicated
-  tests as we extend coverage.
-- The heuristic does not promise to resolve every ambiguous sentence break in
-  polish prose, only those required for milestone `M1-01`.
+- Jest to deterministyczna heurystyka, a nie pełny model językowy.
+- W miarę rozszerzania pokrycia przypadki brzegowe z wieloma spacjami i mieszaną
+  interpunkcją powinny otrzymywać dedykowane testy.
+- Heurystyka nie obiecuje rozstrzygać każdej niejednoznacznej granicy zdania
+  w polskiej prozie, a jedynie te wymagane dla milestone'u `M1-01`.

@@ -38,6 +38,14 @@ def test_vendored_stdio_public_documentation_covers_operation_and_removal() -> N
         assert required_text in documentation
 
 
+def test_runtime_guides_preserve_formal_source_policy_contract_name() -> None:
+    for relative_path in ("docs/public-api.md", "docs/rules.md"):
+        guide = _read(relative_path)
+
+        assert "source-policy `1.1`" in guide
+        assert "source-policy `1.2`" in guide
+
+
 def test_vendored_stdio_performance_documentation_matches_measured_report() -> None:
     report = json.loads(REPORT.read_text(encoding="utf-8"))
     summary = report["summary"]

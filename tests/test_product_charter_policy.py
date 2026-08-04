@@ -401,7 +401,9 @@ def test_release_docs_do_not_require_model_research() -> None:
     normalized_documents = {
         name: " ".join(content.split()) for name, content in documents.items()
     }
-    assert "optional model research never blocks a runtime release" in joined
+    assert "optional model research never blocks a runtime release" in "\n".join(
+        normalized_documents.values()
+    )
     assert (
         "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
         in normalized_documents["README.md"]
@@ -1353,7 +1355,13 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
     path: Path,
 ) -> None:
     document = " ".join(path.read_text(encoding="utf-8").split())
-    if path.name in {"README.md", "limitations.md"}:
+    if path.name == "compatibility.md":
+        required_phrases = (
+            "opcjonalne badania modeli nigdy nie blokują wydania runtime'u",
+            "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
+            "badawczego ani zużytego holdoutu",
+        )
+    elif path.name in {"README.md", "limitations.md"}:
         required_phrases = (
             "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
             "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "
