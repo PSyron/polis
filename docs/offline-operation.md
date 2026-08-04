@@ -1,54 +1,61 @@
-# Offline operation verification
+# Weryfikacja pracy offline
 
-This project is designed to run analysis without external network access.
+Projekt jest przeznaczony do analizy bez dostępu do sieci zewnętrznej.
+Analizowany tekst nie opuszcza urządzenia użytkownika.
 
-## Supported offline configuration
+## Wspierana konfiguracja offline
 
-- Default runtime uses `Analyzer` and the deterministic rule registry entirely
-  in-process. With `AnalyzerConfig(use_local_heuristic_backend=False)` and no
-  optional LanguageTool sections, Polis does not require Java, a LanguageTool
-  process, a model, or network access.
-- Optional mock backend uses local prompt parsing and local transport (`MockHeuristicBackend`).
-- The specialist engine is disabled unless a caller explicitly injects both a
-  router and backend. The #60 engine performs no I/O itself; the injected
-  adapter remains responsible for proving local-only transport.
-- Optional loopback HTTP LanguageTool support connects only to a separately
-  started LanguageTool 6.8 server on a numeric loopback address. It never uses
-  a public LanguageTool API, DNS name, proxy, or redirect.
-- Optional vendored stdio LanguageTool mode directly starts one persistent
-  local child from an explicit absolute path. It opens no socket and performs
-  no implicit download or update.
-- Dependency installation uses locked `uv` files from the repository.
+- Domyślny runtime używa `Analyzer` i rejestru reguł deterministycznych w całości
+  w jednym procesie. Przy `AnalyzerConfig(use_local_heuristic_backend=False)`
+  i bez opcjonalnych sekcji LanguageTool Polis nie wymaga Java, procesu
+  LanguageTool, modelu ani dostępu do sieci.
+- Opcjonalny mock backend używa lokalnego parsowania promptu i lokalnego
+  transportu (`MockHeuristicBackend`).
+- Silnik specjalistyczny pozostaje wyłączony, dopóki wywołujący jawnie nie
+  wstrzyknie jednocześnie routera i backendu. Silnik #60 sam nie wykonuje I/O;
+  wstrzyknięty adapter nadal odpowiada za wykazanie transportu wyłącznie
+  lokalnego.
+- Opcjonalna obsługa LanguageTool przez loopback HTTP łączy się wyłącznie
+  z osobno uruchomionym serwerem LanguageTool 6.8 pod numerycznym adresem pętli
+  zwrotnej. Nigdy nie używa publicznego API LanguageTool, nazwy DNS, proxy ani
+  przekierowania.
+- Opcjonalny tryb LanguageTool przez dołączone stdio uruchamia bezpośrednio jeden
+  stale działający lokalny proces potomny z jawnej ścieżki bezwzględnej. Nie
+  otwiera gniazd ani nie wykonuje niejawnego pobierania lub aktualizacji.
+- Instalacja zależności używa plików lock `uv` z repozytorium.
 
-## Verification command
+## Polecenie weryfikacyjne
 
-Run this to verify analysis when outbound network is blocked:
+Uruchom poniższe polecenie, aby zweryfikować analizę przy zablokowanym ruchu
+wychodzącym:
 
 ```console
 pytest -q tests/test_offline_verification.py
 ```
 
-The test fixture blocks `socket.create_connection` so any accidental outbound network
-use causes the test to fail before analysis starts.
+Fixtura testowa blokuje `socket.create_connection`, dlatego każda przypadkowa
+próba użycia sieci wychodzącej powoduje niepowodzenie testu, zanim rozpocznie
+się analiza.
 
-## Expected outcomes
+## Oczekiwane wyniki
 
-- Analyzer succeeds in default deterministic mode
-  (`use_local_heuristic_backend = false`) without starting optional
-  LanguageTool support.
-- Analyzer succeeds with config-based local mock backend enabled.
-- No private input text is logged by these checks.
+- Analyzer działa poprawnie w domyślnym trybie deterministycznym
+  (`use_local_heuristic_backend = false`) bez uruchamiania opcjonalnej obsługi
+  LanguageTool.
+- Analyzer działa poprawnie po włączeniu lokalnego mock backendu przez
+  konfigurację.
+- Kontrole nie zapisują w logach prywatnego tekstu wejściowego.
 
-## Optional vendored LanguageTool sentence path
+## Opcjonalna ścieżka zdaniowa dołączonego LanguageTool
 
-Build the pinned subset during explicit dependency preparation:
+Zbuduj przypięty podzbiór podczas jawnego przygotowania zależności:
 
 ```console
 cd third_party/languagetool-pl
 ./scripts/build.sh
 ```
 
-Then configure one sentence-only stdio session:
+Następnie skonfiguruj jedną sesję stdio działającą wyłącznie dla zdań:
 
 ```toml
 [vendored_language_tool]
@@ -56,24 +63,25 @@ stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_st
 timeout_seconds = 2.0
 ```
 
-The analyzer starts the process lazily and reuses it for qualified punctuation
-checks and contextual synthesis. Close analyzer-owned processes with a context
-manager or `Analyzer.close()`. Source-policy `1.1` keeps qualified comma
-insertions automatic and contextual inflection reviewable. A missing executable,
-timeout, malformed or oversized response, broken pipe, or stopped process fails
-closed without removing built-in deterministic findings or placing analyzed
-text in an error.
+Analyzer uruchamia proces leniwie i używa go ponownie do zakwalifikowanych
+kontroli interpunkcji oraz syntezy kontekstowej. Procesy należące do analizatora
+zamykaj przez menedżer kontekstu albo `Analyzer.close()`. Source-policy `1.1`
+zachowuje automatyczne stosowanie zakwalifikowanych wstawień przecinka, a
+fleksję kontekstową pozostawia do review. Brak pliku wykonywalnego, timeout,
+wadliwa albo zbyt duża odpowiedź, przerwany potok lub zatrzymany proces powodują
+bezpieczne odrzucenie (fail-closed), bez usuwania wbudowanych znalezisk
+deterministycznych i bez umieszczania analizowanego tekstu w błędzie.
 
-The runner binds no port and opens no network socket. Removing
-`[vendored_language_tool]` disables the process. Do not combine this section
-with either optional mode below. The vendored source tree, Maven cache, JARs,
-and generated Java build output are repository build artifacts and are excluded
-from Polis wheels and source distributions.
+Runner nie wiąże żadnego portu i nie otwiera gniazd sieciowych. Usunięcie
+`[vendored_language_tool]` wyłącza proces. Nie łącz tej sekcji z żadnym z dwóch
+poniższych trybów opcjonalnych. Dołączone drzewo źródeł, cache Mavena, pliki JAR
+i wygenerowane wyniki budowania Java są artefaktami budowania repozytorium oraz
+są wykluczone z wheel i dystrybucji źródłowych Polis.
 
-## Optional loopback LanguageTool compatibility mode
+## Opcjonalny tryb zgodności LanguageTool przez pętlę zwrotną
 
-Start a separately installed LanguageTool 6.8 server bound to loopback, then
-enable it explicitly:
+Uruchom osobno zainstalowany serwer LanguageTool 6.8 nasłuchujący na interfejsie
+pętli zwrotnej, a następnie włącz go jawnie:
 
 ```toml
 [language_tool]
@@ -81,17 +89,18 @@ base_url = "http://127.0.0.1:8081"
 timeout_seconds = 1.0
 ```
 
-Omit the entire section to disable the adapter. Configuration does not start or
-download the server. Before sending analyzed text, Polis makes a fixed-text
-preflight request and requires server name `LanguageTool` and version `6.8`.
-Only reviewed comma findings from `BRAK_PRZECINKA_KTORY`,
+Pomiń całą sekcję, aby wyłączyć adapter. Konfiguracja nie uruchamia ani nie
+pobiera serwera. Przed wysłaniem analizowanego tekstu Polis wykonuje żądanie
+preflight ze stałym tekstem i wymaga nazwy serwera `LanguageTool` oraz wersji
+`6.8`. Zachowywane są wyłącznie poddane review znaleziska przecinkowe z
+`BRAK_PRZECINKA_KTORY`,
 `BRAK_PRZECINKA_SPOJNIK_PROSTY`, `BRAK_PRZECINKA_ZE`,
-`BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` are retained. A local
-sidecar failure produces no optional findings and does not discard findings
-from in-process rules.
+`BRAK_PRZECINKA_ZEBY` i `WOLACZ_BEZ_PRZECINKA`. Awaria lokalnego sidecara nie
+tworzy opcjonalnych znalezisk i nie odrzuca znalezisk z reguł działających
+w procesie Polis.
 
-The legacy contextual inflection path uses the source-built stdio runner
-directly, but starts a process per eligible sentence:
+Starsza ścieżka fleksji kontekstowej używa bezpośrednio runnera stdio zbudowanego
+ze źródeł, lecz uruchamia osobny proces dla każdego kwalifikującego się zdania:
 
 ```toml
 [contextual_inflection]
@@ -99,25 +108,27 @@ stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_st
 timeout_seconds = 2.0
 ```
 
-The path must be absolute and executable. Each call starts that local process,
-uses the tag-preserving `synthesize_context` operation, and closes it after the
-sentence response. Failures produce no inflection suggestion. Suggestions are
-never automatically applied. Multi-sentence input is outside this rule's scope
-and causes no contextual morphology process call.
+Ścieżka musi być bezwzględna i wykonywalna. Każde wywołanie uruchamia ten lokalny
+proces, używa zachowującej tagi operacji `synthesize_context` i zamyka proces po
+otrzymaniu odpowiedzi dla zdania. Awarie nie tworzą sugestii fleksyjnej.
+Sugestie nigdy nie są stosowane automatycznie. Wejście wielozdaniowe znajduje
+się poza zakresem tej reguły i nie powoduje wywołania procesu morfologii
+kontekstowej.
 
-## Supported configuration limits
+## Granice wspieranej konfiguracji
 
-This verification does not start or validate separately installed runtimes.
-For external backends, add an explicit offline policy and integration test for that
-runtime before calling it supported.
-No real specialist model is enabled by the current supported configuration.
+Ta weryfikacja nie uruchamia ani nie waliduje osobno zainstalowanych runtime'ów.
+Zanim zewnętrzny backend zostanie uznany za wspierany, dodaj dla jego runtime'u
+jawną politykę offline i test integracyjny.
+Obecna wspierana konfiguracja nie włącza żadnego rzeczywistego modelu
+specjalistycznego.
 
-For source-level reproducibility audits, this repository includes
-`third_party/languagetool-pl` with pinned LanguageTool provenance and local build
-scripts. This directory is explicitly excluded from packaged artifacts.
+Na potrzeby audytów odtwarzalności na poziomie źródeł repozytorium zawiera
+`third_party/languagetool-pl` z przypiętą proweniencją LanguageTool i lokalnymi
+skryptami budowania. Ten katalog jest jawnie wykluczony z pakowanych artefaktów.
 
-After one online dependency-preparation build, the vendored subset can be
-rebuilt and exercised without network access:
+Po jednorazowym przygotowaniu i zbudowaniu zależności z dostępem do sieci
+dołączony podzbiór można ponownie budować i uruchamiać bez dostępu do sieci:
 
 ```console
 cd third_party/languagetool-pl
@@ -125,5 +136,6 @@ POLIS_LT_OFFLINE=1 ./scripts/build.sh
 ./scripts/run_stdio.sh
 ```
 
-The stdio process does not bind a port. It loads the checked-in Polish 6.8
-rules and resources and returns only the five corpus-qualified comma rule IDs.
+Proces stdio nie wiąże portu. Ładuje zapisane w repozytorium polskie reguły
+i zasoby 6.8 oraz zwraca wyłącznie identyfikatory pięciu reguł przecinkowych
+zakwalifikowanych na korpusie.

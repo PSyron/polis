@@ -1,21 +1,21 @@
-# Adding deterministic rules
+# Dodawanie reguł deterministycznych
 
-`polis.rules` owns deterministic rule registration and execution.
+`polis.rules` odpowiada za rejestrowanie i wykonywanie reguł deterministycznych.
 
-A registry entry is a `RuleRegistration` with:
+Wpis rejestru to `RuleRegistration` zawierający:
 
-- `rule`: object implementing the `polis.core.Rule` protocol
-- `categories`: explicit categories this rule may emit
+- `rule`: obiekt implementujący protokół `polis.core.Rule`;
+- `categories`: jawne kategorie, które ta reguła może emitować.
 
-The registry enforces:
+Rejestr wymusza:
 
-- one registration per unique `rule.source`
-- stable rule execution order as registered
-- category-based rule filtering
-- output validation against the declared categories
-- duplicate finding-id detection
+- jedną rejestrację dla każdego unikatowego `rule.source`;
+- stabilną kolejność wykonywania reguł zgodną z kolejnością rejestracji;
+- filtrowanie reguł według kategorii;
+- walidację wyjścia względem zadeklarowanych kategorii;
+- wykrywanie powielonych identyfikatorów znalezisk.
 
-Use this minimal pattern:
+Użyj następującego minimalnego wzorca:
 
 ```python
 from polis.core import Category, AnalysisOptions
@@ -33,127 +33,135 @@ registry = DeterministicRuleRegistry(
 findings = registry.find("Tekst do analizy", options=AnalysisOptions(categories=None))
 ```
 
-`source` must be stable and unique per registered rule (for example
-`rule:agreement`), because finding identifiers are built from `category`,
-`source`, `start`, `end`, and `original`.
+`source` musi być stabilne i unikatowe dla każdej zarejestrowanej reguły (na
+przykład `rule:agreement`), ponieważ identyfikatory znalezisk powstają z
+`category`, `source`, `start`, `end` oraz `original`.
 
-## Spelling rule helpers
+## Reguły pomocnicze pisowni
 
-The first deterministic spelling rules are implemented as small, exact-pattern
-helpers in `polis.rules.spelling`.
+Pierwsze deterministyczne reguły pisowni są zaimplementowane jako niewielkie
+reguły pomocnicze z dokładnym dopasowaniem wzorca w `polis.rules.spelling`.
 
-- `SpellingZebyRule` fixes `zeby` -> `żeby`.
-- `SpellingWlasnieRule` fixes `wlasnie` -> `właśnie`.
-- `SpellingJestesRule` fixes `jestes` -> `jesteś`.
+- `SpellingZebyRule` poprawia `zeby` -> `żeby`.
+- `SpellingWlasnieRule` poprawia `wlasnie` -> `właśnie`.
+- `SpellingJestesRule` poprawia `jestes` -> `jesteś`.
 
-These rules are intentionally conservative: they only match full word boundaries,
-use category gating (`Category.SPELLING`), and keep casing for title-case and
-all-uppercase tokens.
+Reguły te są celowo konserwatywne: dopasowują wyłącznie pełne granice wyrazów,
+korzystają z bramkowania kategorią (`Category.SPELLING`) i zachowują wielkość
+liter dla tokenów zapisanych od wielkiej litery oraz samymi wielkimi literami.
 
-Difficult negatives are documented in tests and include correct words
-(`właśnie`, `jesteś`) and longer strings that merely contain the typo fragment
-(`wlasniew`, `zebyj`).
+Trudne przypadki negatywne są udokumentowane w testach i obejmują poprawne słowa
+(`właśnie`, `jesteś`) oraz dłuższe napisy, które jedynie zawierają fragment
+literówki (`wlasniew`, `zebyj`).
 
-## Agreement rules
+## Reguły zgodności
 
-`AgreementCopulaRule` performs a focused, high-precision check for common
-copula mismatches in fixed pronoun+verb patterns.
+`AgreementCopulaRule` wykonuje ukierunkowaną kontrolę o wysokiej precyzji dla
+częstych niezgodności łącznika w stałych wzorcach zaimek+czasownik.
 
-- `AgreementCopulaRule` (`Category.AGREEMENT`) fixes obvious cases such as
-  `ona jestem` -> `ona jest`.
+- `AgreementCopulaRule` (`Category.AGREEMENT`) poprawia oczywiste przypadki,
+  takie jak `ona jestem` -> `ona jest`.
 
-This rule intentionally prefers precision over broad coverage: it is limited to a
-small set of subjects and first-person verb variants so behavior stays predictable.
+Reguła celowo przedkłada precyzję nad szerokie pokrycie: jest ograniczona do
+niewielkiego zestawu podmiotów i wariantów czasownika w pierwszej osobie, dzięki
+czemu jej zachowanie pozostaje przewidywalne.
 
-## Syntax and punctuation rules
+## Reguły składni i interpunkcji
 
-Selected syntax and punctuation helpers are in `polis.rules.syntax` and are split
-by category:
+Wybrane reguły pomocnicze składni i interpunkcji znajdują się w
+`polis.rules.syntax` i są podzielone według kategorii:
 
-- `SyntaxCommaSpacingRule` (`Category.PUNCTUATION`) inserts missing spaces after
-  commas, and skips common abbreviation fragments like `itp,` and `m.in,`.
-- `SyntaxListSpacingRule` (`Category.SYNTAX`) inserts missing space after a line
-  list marker (`1.`, `-`, `*`) when the next token starts immediately.
-- `SyntaxQuoteSpacingRule` (`Category.PUNCTUATION`) adds a missing space after an
-  opening quotation mark that is attached directly to a word.
-- `SyntaxMissingReflexiveRule` (`Category.SYNTAX`) suggests a minimal `się`
-  insertion for sentence-initial `On/Ona/Ono boi …` and
-  `Nie spodziewaliśmy …` constructions.
-- `SyntaxMissingCorrelativeRule` (`Category.SYNTAX`) suggests a minimal `tym`
-  insertion for sentence-initial `Im …, bardziej …` constructions.
+- `SyntaxCommaSpacingRule` (`Category.PUNCTUATION`) wstawia brakujące spacje po
+  przecinkach i pomija częste fragmenty skrótów, takie jak `itp,` i `m.in,`.
+- `SyntaxListSpacingRule` (`Category.SYNTAX`) wstawia brakującą spację po znaczniku
+  listy na początku wiersza (`1.`, `-`, `*`), gdy kolejny token zaczyna się
+  bezpośrednio po nim.
+- `SyntaxQuoteSpacingRule` (`Category.PUNCTUATION`) dodaje brakującą spację po
+  otwierającym cudzysłowie bezpośrednio połączonym ze słowem.
+- `SyntaxMissingReflexiveRule` (`Category.SYNTAX`) sugeruje minimalne wstawienie
+  `się` w rozpoczynających zdanie konstrukcjach `On/Ona/Ono boi …` oraz
+  `Nie spodziewaliśmy …`.
+- `SyntaxMissingCorrelativeRule` (`Category.SYNTAX`) sugeruje minimalne wstawienie
+  `tym` w rozpoczynających zdanie konstrukcjach `Im …, bardziej …`.
 
-The two residual syntax rules require exactly one sentence, inspect no model or
-gold data, and abstain on multi-sentence input. Their sources are
-`rule:syntax.missing_reflexive` and `rule:syntax.missing_correlative`. Their
-one-shot holdout contained no eligible construction, so it could not establish
-non-vacuous precision. Both findings remain reviewable and are excluded from
-automatic source-policy `1.2`.
+Obie rezydualne reguły składni wymagają dokładnie jednego zdania, nie sprawdzają
+modelu ani danych wzorcowych i wstrzymują się dla wejścia wielozdaniowego. Ich źródła
+to `rule:syntax.missing_reflexive` i `rule:syntax.missing_correlative`. Ich
+jednorazowy holdout nie zawierał żadnej kwalifikującej się konstrukcji, więc nie
+mógł wykazać nietrywialnej precyzji. Oba znaleziska pozostają do przeglądu i są
+wyłączone z automatycznego kontraktu source-policy `1.2`.
 
-All syntax rules support category filtering through the shared
-`options.categories` mechanism and return deterministic findings with stable
-IDs.
+Wszystkie reguły składni obsługują filtrowanie kategorii przez wspólny mechanizm
+`options.categories` i zwracają deterministyczne znaleziska ze stabilnymi
+identyfikatorami.
 
-## Optional LanguageTool punctuation rule
+## Opcjonalna reguła interpunkcyjna LanguageTool
 
-`LocalLanguageToolRule` is registered only when `[language_tool]` is configured.
-It accepts a separately installed local LanguageTool 6.8 server and maps only
+`LocalLanguageToolRule` jest rejestrowana tylko po skonfigurowaniu
+`[language_tool]`. Przyjmuje osobno zainstalowany lokalny serwer LanguageTool 6.8
+i mapuje wyłącznie
 `BRAK_PRZECINKA_KTORY`, `BRAK_PRZECINKA_SPOJNIK_PROSTY`,
-`BRAK_PRZECINKA_ZE`, `BRAK_PRZECINKA_ZEBY`, and `WOLACZ_BEZ_PRZECINKA` to
-minimal comma insertions with source `rule:languagetool.pl` and confidence
-`0.85`. Active source-policy version `1.2` permits these findings to be applied
-automatically only when the installed behavior is
-`check.allowlisted_comma` / `pl-6.8-five-rule-comma/1.0`, the complete policy
-key matches, and they do not conflict. Policy `1.1` remains the historical
-qualification record for this five-ID allowlist.
+`BRAK_PRZECINKA_ZE`, `BRAK_PRZECINKA_ZEBY` oraz `WOLACZ_BEZ_PRZECINKA`
+na minimalne wstawienia przecinka ze źródłem `rule:languagetool.pl` i pewnością
+`0.85`. Aktywny kontrakt source-policy `1.2` zezwala na automatyczne stosowanie
+tych znalezisk tylko wtedy, gdy zainstalowane zachowanie to
+`check.allowlisted_comma` / `pl-6.8-five-rule-comma/1.0`, pełny klucz polityki
+jest zgodny i znaleziska nie kolidują. Kontrakt source-policy `1.1` pozostaje
+historycznym zapisem kwalifikacji tej listy dozwolonych pięciu identyfikatorów.
 
-The rule converts Java UTF-16 offsets to Python code-point offsets, minimizes
-wide replacements, rejects ambiguous alternatives and conflicting findings,
-and drops every unknown rule or non-comma change. The four-rule #70 selection
-(three newly exposed IDs plus the already enabled `BRAK_PRZECINKA_ZE`) retained
-precision `1.00` with 5 true-positive edits and no protected-negative changes
-on its 142-sentence holdout. General LanguageTool spelling, grammar, style, and
-morphology findings are intentionally excluded.
+Reguła przelicza przesunięcia Java UTF-16 na przesunięcia punktów kodowych
+Pythona, minimalizuje szerokie zastąpienia, odrzuca niejednoznaczne alternatywy
+i kolidujące znaleziska oraz porzuca każdą nieznaną regułę lub zmianę inną niż
+przecinek. Wybór czterech reguł z #70 (trzy nowo udostępnione identyfikatory oraz
+już włączony `BRAK_PRZECINKA_ZE`) zachował precyzję `1.00`: 5 prawdziwie
+pozytywnych edycji i zero zmian chronionych przypadków negatywnych na
+142-zdaniowym holdoucie. Ogólne znaleziska LanguageTool dotyczące pisowni,
+gramatyki, stylu i morfologii są celowo wyłączone.
 
-For two reviewed paired-comma constructions, an accepted opening finding may
-also produce its closing comma. Relative-clause completion requires the exact
-lexical anchor `Name która mieszka obok`, followed by a separate feminine
-past-tense matrix predicate. Parenthetical completion requires `Name proszę`,
-followed by one of the previously reviewed imperative anchors `zamknij` or
-`zadzwoń`. Both shapes must occupy one complete sentence and require the
-matching qualified LanguageTool rule; neither runs as a standalone corpus
-lookup. Other relative clauses, parentheticals, quotations, URLs, numbers, and
-multi-sentence shapes abstain until separately qualified. Both insertions keep
-the original Unicode half-open offsets and the `rule:languagetool.pl`
-source-policy channel.
+Dla dwóch zweryfikowanych konstrukcji z parą przecinków zaakceptowane znalezisko
+otwierające może również utworzyć przecinek zamykający. Domknięcie zdania
+względnego wymaga dokładnej kotwicy leksykalnej `Name która mieszka obok`, po
+której występuje osobny żeński predykat zdania głównego w czasie przeszłym.
+Domknięcie wtrącenia wymaga `Name proszę`, po którym występuje jedna z wcześniej
+zweryfikowanych kotwic trybu rozkazującego: `zamknij` lub `zadzwoń`. Oba kształty
+muszą obejmować jedno pełne zdanie i wymagają odpowiadającej zakwalifikowanej
+reguły LanguageTool; żaden nie działa jako samodzielne wyszukiwanie w korpusie.
+Inne zdania względne, wtrącenia, cytaty, adresy URL, liczby i kształty
+wielozdaniowe wstrzymują się do osobnej kwalifikacji. Oba wstawienia zachowują
+oryginalne przesunięcia Unicode w konwencji półotwartej oraz kanał source-policy
+`rule:languagetool.pl`.
 
-## Contextual inflection suggestion rule
+## Reguła sugestii fleksji kontekstowej
 
-`ContextualInflectionRule` implements the four evidence kinds frozen by
-ADR-0015: adjacent-name agreement, genitive after `bez`, dative after
-`przygląd… się`, and dative after `podzięk…`. It calls an injected
-`ContextMorphologyTransport`, validates every complete tag and content-derived
-`ltpl:` candidate ID, and emits only a unique finite form. Ambiguity,
-unsupported morphology, conflicts, malformed responses, and transport failures
-return no finding. Input containing zero or multiple sentences is rejected
-before the local transport is called.
+`ContextualInflectionRule` implementuje cztery rodzaje dowodów zamrożone przez
+ADR-0015: zgodność sąsiadujących nazw własnych, dopełniacz po `bez`, celownik po
+`przygląd… się` oraz celownik po `podzięk…`. Wywołuje wstrzyknięty
+`ContextMorphologyTransport`, waliduje każdy kompletny tag i pochodzący z treści
+identyfikator kandydata `ltpl:` oraz emituje wyłącznie unikatową formę ze
+skończonego zbioru. Niejednoznaczność, niewspierana morfologia, konflikty,
+niepoprawne odpowiedzi i awarie transportu nie zwracają znaleziska. Wejście
+zawierające zero lub wiele zdań jest odrzucane przed wywołaniem lokalnego
+transportu.
 
-Findings use `Category.INFLECTION`, source
-`rule:languagetool.contextual_inflection`, confidence `0.95`, and original
-Unicode `[start, end)` offsets. They are suggestion-only and excluded from
-automatic source-policy `1.2`.
+Znaleziska używają `Category.INFLECTION`, źródła
+`rule:languagetool.contextual_inflection`, pewności `0.95` oraz oryginalnych
+przesunięć Unicode `[start, end)`. Są wyłącznie sugestiami i są wyłączone
+z automatycznego kontraktu source-policy `1.2`.
 
-## Automatic-policy behavior identities
+## Tożsamości zachowań polityki automatycznej
 
-The active automatic-correction source-policy is `1.2`. It preserves the nine
-behaviors qualified under historical policy `1.1`, but identifies each one by
-the complete key `(source, category, operation, behavior_version,
-source_policy_version)`. A source name, category, or confidence value alone is
-not sufficient. The policy reads operation and behavior-version metadata from
-the registered deterministic rule; missing or changed metadata leaves a finding
-reviewable. Any behavior-version change requires new direct evidence and a new
-exact policy entry. Model findings are always reviewable.
+Aktywny kontrakt source-policy automatycznej korekty ma wersję `1.2`. Zachowuje
+dziewięć zachowań zakwalifikowanych według historycznego kontraktu source-policy
+`1.1`, lecz każde
+identyfikuje pełnym kluczem `(source, category, operation, behavior_version,
+source_policy_version)`. Sama nazwa źródła, kategoria lub wartość pewności nie
+wystarcza. Polityka odczytuje metadane operacji i wersji zachowania
+z zarejestrowanej reguły deterministycznej; brakujące lub zmienione metadane
+pozostawiają znalezisko do przeglądu. Każda zmiana wersji zachowania wymaga nowego
+bezpośredniego dowodu i nowego dokładnego wpisu polityki. Znaleziska modelu
+zawsze podlegają przeglądowi.
 
-| Source | Category | Operation | Behavior version | Source-policy version |
+| Źródło | Kategoria | Operacja | Wersja zachowania | Wersja source-policy |
 | --- | --- | --- | --- | --- |
 | `rule:agreement.copula` | `agreement` | `replace.copula_form` | `agreement-copula/1.0` | `1.2` |
 | `rule:spelling.jestes` | `spelling` | `replace.common_typo` | `spelling-jestes/1.0` | `1.2` |
@@ -165,31 +173,34 @@ exact policy entry. Model findings are always reviewable.
 | `rule:syntax.sentence_space` | `punctuation` | `normalize.sentence_spacing` | `syntax-sentence-space/1.0` | `1.2` |
 | `rule:languagetool.pl` | `punctuation` | `check.allowlisted_comma` | `pl-6.8-five-rule-comma/1.0` | `1.2` |
 
-## Analysis normalization
+## Normalizacja analizy
 
-Normalization is performed in `polis.analysis` by the following deterministic
-steps:
+Normalizacja jest wykonywana w `polis.analysis` przez następujące
+deterministyczne kroki:
 
-1. `filter_findings` removes findings outside the requested category set and
-   below `minimum_confidence`.
-2. `deduplicate_findings` keeps one canonical representative for each
-   stable finding identifier.
-3. `prioritize_findings` sorts findings by source text position, then by
-   confidence and tie-breakers to make output deterministic.
-4. `normalize_findings` runs the full pipeline and is the standard helper for
-   the public path.
+1. `filter_findings` usuwa znaleziska spoza żądanego zestawu kategorii oraz
+   poniżej `minimum_confidence`.
+2. `deduplicate_findings` zachowuje jednego kanonicznego reprezentanta dla
+   każdego stabilnego identyfikatora znaleziska.
+3. `prioritize_findings` sortuje znaleziska według pozycji w tekście źródłowym,
+   następnie według pewności i kryteriów rozstrzygających remisy, aby wyjście
+   było deterministyczne.
+4. `normalize_findings` uruchamia cały potok i jest standardową funkcją pomocniczą
+   dla ścieżki publicznej.
 
-The same rules apply to any analyzer output before presentation.
+Te same reguły mają zastosowanie do każdego wyjścia analizatora przed jego
+prezentacją.
 
-## Deterministic correction application
+## Deterministyczne stosowanie korekt
 
-`polis.analysis` and `polis.core` validate selected finding ids and apply
-replacements right-to-left using helpers in `polis.correction`.
+`polis.analysis` i `polis.core` walidują identyfikatory wybranych znalezisk
+i stosują zastąpienia od prawej do lewej za pomocą funkcji pomocniczych
+z `polis.correction`.
 
-- `findings_conflict` encodes span-level compatibility.
-- `validate_non_conflicting_corrections` raises on invalid selection sets.
-- `sort_findings_for_application` applies compatible findings in stable right-to-
-  left order.
+- `findings_conflict` koduje kompatybilność na poziomie zakresów.
+- `validate_non_conflicting_corrections` zgłasza wyjątek dla niepoprawnych
+  zestawów wyboru.
+- `sort_findings_for_application` stosuje kompatybilne znaleziska w stabilnej
+  kolejności od prawej do lewej.
 
-`AnalysisResult.apply` is the public API for explicit selection-only
-correction.
+`AnalysisResult.apply` jest publicznym API korekty wyłącznie przez jawny wybór.
