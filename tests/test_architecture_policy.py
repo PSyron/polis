@@ -1,3 +1,4 @@
+import re
 import unittest
 from pathlib import Path
 
@@ -11,9 +12,66 @@ class ArchitecturePolicyTests(unittest.TestCase):
         index = INDEX.read_text(encoding="utf-8")
         self.assertIn(
             "| [ADR-0001](decisions/0001-python-platform-licensing-policy.md) | "
-            "Accepted | Python, platform, licensing, and asset policy |",
+            "Zaakceptowany | Polityka wersji Pythona, platform, licencji i zasobów |",
             index,
         )
+
+    def test_architecture_index_covers_every_accepted_adr_exactly_once(self) -> None:
+        index = INDEX.read_text(encoding="utf-8")
+        accepted = {
+            path.name
+            for path in (INDEX.parent / "decisions").glob("*.md")
+            if "Status: Accepted" in path.read_text(encoding="utf-8")
+        }
+        linked = re.findall(r"\(decisions/([^)]+\.md)\)", index)
+
+        self.assertEqual(len(accepted), 20)
+        self.assertEqual(set(linked), accepted)
+        self.assertEqual(len(linked), len(set(linked)))
+        self.assertNotIn("<!--", index)
+
+    def test_architecture_guides_preserve_source_policy_identifier(self) -> None:
+        guides = (
+            "contextual-inflection-routing-design.md",
+            "languagetool-rule-inventory-design.md",
+            "protocols.md",
+        )
+
+        for relative_path in guides:
+            with self.subTest(relative_path=relative_path):
+                content = (INDEX.parent / relative_path).read_text(encoding="utf-8")
+                self.assertIn("source-policy", content)
+
+    def test_architecture_guides_use_polish_review_and_evaluation_prose(self) -> None:
+        guides = " ".join(
+            "\n".join(
+                (INDEX.parent / relative_path).read_text(encoding="utf-8")
+                for relative_path in (
+                    "README.md",
+                    "contextual-inflection-routing-design.md",
+                    "finetuning-dataset.md",
+                    "languagetool-rule-inventory-design.md",
+                    "rule-catalog-inventory.md",
+                    "sentence-category-routing-design.md",
+                )
+            ).split()
+        )
+
+        for phrase in (
+            "do przeglądu",
+            "modułu oceniającego",
+            "zbiór deweloperski",
+            "zapisywane w repozytorium",
+        ):
+            self.assertIn(phrase, guides)
+        for phrase in (
+            "poddanych review",
+            "stan review",
+            "scorera",
+            "commitowane",
+            "Development używa",
+        ):
+            self.assertNotIn(phrase, guides)
 
     def test_adr_records_python_and_platform_contract(self) -> None:
         adr = ADR.read_text(encoding="utf-8")

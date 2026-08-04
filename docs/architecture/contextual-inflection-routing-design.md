@@ -1,76 +1,85 @@
-# Contextual Polish Inflection Routing Design
+# Projekt routingu kontekstowej fleksji polszczyzny
 
-- Status: Accepted for issue #71
-- Date: 2026-07-22
-- Owner: Paweł Cyroń
+- Status: zaakceptowany dla issue #71
+- Data: 2026-07-22
+- Właściciel: Paweł Cyroń
 
-## Objective
+## Cel
 
-Select a finite LanguageTool form for a narrowly detected inflection target in
-one Polish sentence. Detection and selection receive source text, token spans,
-and local morphology only. Case identifiers, corpus strata, tags, expected
-outputs, and gold spans remain scorer-only.
+Wybrać skończoną formę LanguageTool dla wąsko wykrytego celu fleksyjnego w
+jednym polskim zdaniu. Wykrywanie i wybór otrzymują wyłącznie tekst źródłowy,
+zakresy tokenów i lokalną morfologię. Identyfikatory przypadków, warstwy korpusu,
+tagi, oczekiwane wyniki i zakresy gold pozostają dostępne wyłącznie dla modułu
+oceniającego.
 
-## Alternatives
+## Alternatywy
 
-1. **Explicit government and adjacent-name agreement — selected.** Detect a
-   small closed set of contextual relations and select only a unique finite
-   form satisfying their morphological constraints.
-2. **Ask a compact model to choose from all forms.** Deferred because the
-   deterministic constraints can first reduce ambiguity and establish a safe
-   baseline without model weights or prompt variance.
-3. **Rank forms by corpus frequency.** Rejected because frequency alone does
-   not establish government or agreement and no approved local frequency
-   resource is currently part of the runtime.
+1. **Jawne wymaganie przypadka i zgoda sąsiadujących imion i nazwisk — wybrane.**
+   Wykrywa mały zamknięty zbiór relacji kontekstowych i wybiera wyłącznie
+   unikalną skończoną formę spełniającą ich ograniczenia morfologiczne.
+2. **Polecenie kompaktowemu modelowi wyboru spośród wszystkich form.** Odłożone,
+   ponieważ ograniczenia deterministyczne mogą najpierw zmniejszyć
+   niejednoznaczność i ustanowić bezpieczny baseline bez wag modelu ani
+   zmienności promptu.
+3. **Ranking form według częstości korpusowej.** Odrzucony, ponieważ sama
+   częstość nie ustala wymaganego przypadka ani zgody, a runtime nie zawiera
+   obecnie zatwierdzonego lokalnego zasobu częstości.
 
-## Source-only evidence
+## Dowody wyłącznie ze źródła
 
-The router recognizes only these sentence-local patterns:
+Router rozpoznaje wyłącznie następujące wzorce lokalne dla zdania:
 
-- two adjacent capitalized word tokens: the second token is a surname target
-  when its current morphology does not overlap the first token's current case,
-  number, and compatible gender;
-- `bez` followed by one noun or an adjective-noun pair: the phrase requires
-  singular genitive while preserving the head noun's number and gender;
-- a source form beginning with `przygląd` followed by `się` and one noun or an
-  adjective-noun pair: the phrase requires singular dative;
-- a source form beginning with `podzięk` followed by one capitalized token:
-  the token is a first-name target requiring singular dative.
+- dwa sąsiadujące tokeny słowne rozpoczynające się wielką literą: drugi token
+  jest docelowym nazwiskiem, gdy jego obecna morfologia nie pokrywa się z
+  obecnym przypadkiem i liczbą pierwszego tokenu ani ze zgodnym rodzajem;
+- `bez`, po którym występuje jeden rzeczownik albo para przymiotnik–rzeczownik:
+  fraza wymaga dopełniacza liczby pojedynczej przy zachowaniu liczby i rodzaju
+  rzeczownika nadrzędnego;
+- forma źródłowa zaczynająca się od `przygląd`, po której występują `się` oraz
+  jeden rzeczownik albo para przymiotnik–rzeczownik: fraza wymaga celownika
+  liczby pojedynczej;
+- forma źródłowa zaczynająca się od `podzięk`, po której występuje jeden token
+  rozpoczynający się wielką literą: token jest docelowym imieniem wymagającym
+  celownika liczby pojedynczej.
 
-Tokenization and target spans are derived from source text before any corpus
-wrapper is consulted. Unsupported punctuation layouts, more than two phrase
-tokens, missing analyses, indeclinable forms, plural ambiguity, incompatible
-lemmas, and non-unique selections cause abstention.
+Tokenizacja i zakresy celu powstają z tekstu źródłowego przed użyciem wrappera
+korpusu. Nieobsługiwane układy interpunkcji, więcej niż dwa tokeny frazy, brak
+analiz, formy nieodmienne, niejednoznaczność liczby mnogiej, niezgodne lematy
+i nieunikalne wybory powodują wstrzymanie się od sugestii.
 
-## Candidate constraints
+## Ograniczenia kandydatów
 
-The existing local `synthesize` operation supplies every candidate. A proposal
-must preserve the requested Unicode half-open span, cite its `ltpl:` candidate
-ID, differ from the source surface, and be the only distinct form satisfying
-the evidence. Adjectives additionally preserve positive degree and agree with
-the selected noun in case, number, and gender. Surnames preserve the adjacent
-first name's current case and number and require compatible gender.
+Istniejąca lokalna operacja `synthesize` dostarcza każdego kandydata. Propozycja
+musi zachować żądany półotwarty zakres Unicode, wskazywać identyfikator kandydata
+`ltpl:`, różnić się od formy źródłowej i być jedyną odrębną formą spełniającą
+dowody. Przymiotniki dodatkowo zachowują stopień równy i zgadzają się z wybranym
+rzeczownikiem pod względem przypadka, liczby i rodzaju. Nazwiska zachowują obecny
+przypadek i liczbę sąsiadującego imienia oraz wymagają zgodnego rodzaju.
 
-The unchanged source form is used only to infer its visible morphological
-features. Gold never chooses a target, feature, candidate, or abstention.
+Niezmieniona forma źródłowa służy wyłącznie do wywnioskowania jej widocznych cech
+morfologicznych. Gold nigdy nie wybiera celu, cechy, kandydata ani wstrzymania.
 
-## Evaluation and holdout
+## Ewaluacja i holdout
 
-Development evaluates all 69 corpus-v3 sentences, not only known inflection
-cases. Metrics include target detection, candidate provenance, exact edit
-TP/FP/FN, protected-negative suggestions, class recall for first names,
-surnames, and ordinary words, abstentions, warm p95, process RSS, and runtime
-disk size. Raw sentences and synthesis responses are not committed.
+Zbiór deweloperski (`development`) obejmuje wszystkie 69 zdań corpus-v3, a nie
+tylko znane przypadki fleksyjne. Metryki obejmują wykrywanie celu, proweniencję
+kandydatów, TP/FP/FN
+dokładnych edycji, sugestie dla chronionych przykładów negatywnych, recall klas
+dla imion, nazwisk i zwykłych słów, wstrzymania, warm p95, RSS procesu oraz
+rozmiar runtime'u na dysku. Surowe zdania i odpowiedzi syntezy nie są zapisywane
+w repozytorium.
 
-A development candidate requires edit precision at least 0.90, supported
-inflection recall at least 0.25, zero protected-negative suggestions, valid
-non-conflicting applications, and warm p95 at most 50 ms beyond the warm local
-process. The router and configuration are frozen before one holdout run. A
-failed development result leaves holdout unopened.
+Kandydat oceniany na zbiorze deweloperskim wymaga precyzji edycji co najmniej
+0.90, recall wspieranej fleksji co najmniej 0.25, zera sugestii dla chronionych
+przykładów negatywnych,
+poprawnych niekolidujących zastosowań oraz warm p95 najwyżej 50 ms ponad
+rozgrzany proces lokalny. Router i konfiguracja są zamrażane przed jednym
+uruchomieniem holdoutu. Nieudany wynik na zbiorze deweloperskim pozostawia
+holdout nieotwarty.
 
-## Production boundary
+## Granica produkcyjna
 
-The experiment is suggestion-only and is not registered in the analyzer. A
-passing result requires a separate source-policy decision before automatic
-correction. Paragraphs, generated forms, cloud calls, and unconstrained
-rewriting are excluded.
+Eksperyment działa wyłącznie jako źródło sugestii i nie jest zarejestrowany w
+analizatorze. Wynik przechodzący bramki wymaga osobnej decyzji source-policy
+przed automatyczną korektą. Akapity, generowane formy, wywołania chmurowe i
+nieograniczone przepisywanie są wykluczone.

@@ -72,7 +72,7 @@ def test_architecture_index_lists_the_accepted_api_contract() -> None:
 
     assert (
         "| [ADR-0003](decisions/0003-public-api-and-exception-contract.md) | "
-        "Accepted | Public API and exception contract |"
+        "Zaakceptowany | Kontrakt publicznego API i wyjątków |"
     ) in index
 
 
