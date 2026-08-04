@@ -4,7 +4,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / "docs/architecture/decisions/0001-python-platform-licensing-policy.md"
+CONSERVATIVE_V1_ADR = (
+    ROOT / "docs/architecture/decisions/0022-conservative-v1-product-scope.md"
+)
 INDEX = ROOT / "docs/architecture/README.md"
+PROMPT = ROOT / "PROMPT.md"
 RULE_CATALOG_ADR = "decisions/0021-rule-catalog-ownership.md"
 
 
@@ -26,7 +30,7 @@ class ArchitecturePolicyTests(unittest.TestCase):
         }
         linked = re.findall(r"\(decisions/([^)]+\.md)\)", index)
 
-        self.assertEqual(len(accepted), 21)
+        self.assertEqual(len(accepted), 22)
         self.assertEqual(set(linked), accepted)
         self.assertEqual(len(linked), len(set(linked)))
         self.assertNotIn("<!--", index)
@@ -35,6 +39,65 @@ class ArchitecturePolicyTests(unittest.TestCase):
         index = INDEX.read_text(encoding="utf-8")
 
         self.assertIn(f"({RULE_CATALOG_ADR})", index)
+
+    def test_conservative_v1_decision_is_indexed_and_traceable(self) -> None:
+        adr = CONSERVATIVE_V1_ADR.read_text(encoding="utf-8")
+        index = INDEX.read_text(encoding="utf-8")
+
+        self.assertIn("Status: Accepted", adr)
+        self.assertIn("#185", adr)
+        self.assertIn("../../project/v2-research-archive-manifest.md", adr)
+        self.assertIn(
+            "decisions/0022-conservative-v1-product-scope.md",
+            index,
+        )
+
+    def test_conservative_v1_decides_every_legacy_configuration_surface(self) -> None:
+        adr = CONSERVATIVE_V1_ADR.read_text(encoding="utf-8")
+
+        for surface in (
+            "use_local_heuristic_backend",
+            "language_tool_url",
+            "language_tool_timeout_seconds",
+            "contextual_inflection_stdio_path",
+            "contextual_inflection_timeout_seconds",
+            "vendored_language_tool_stdio_path",
+            "vendored_language_tool_timeout_seconds",
+            "AnalyzerConfig.from_toml",
+            "AnalyzerConfig.from_config",
+            "[backend]",
+            "use_mock",
+            "[language_tool]",
+            "base_url",
+            "[contextual_inflection]",
+            "[vendored_language_tool]",
+            "stdio_path",
+            "timeout_seconds",
+        ):
+            with self.subTest(surface=surface):
+                self.assertIn(f"`{surface}`", adr)
+
+        for contract in (
+            "is not supported in Polis v1",
+            "retryable=False",
+            "LocalGenerationBackend",
+            "LocalFindingBackend",
+            "MonotonicClock",
+            "SourceKind.LLM",
+            "SuggestionOutcome",
+            "polis.evaluation",
+            "ADR-0019",
+            "ADR-0021",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, adr)
+
+    def test_prompt_excludes_semantic_and_tense_aspect_corrections(self) -> None:
+        prompt = " ".join(PROMPT.read_text(encoding="utf-8").split()).casefold()
+
+        self.assertIn("nie zmienia znaczenia", prompt)
+        self.assertIn("zgodność czasów i aspektu", prompt)
+        self.assertIn("w razie wątpliwości nie sugeruje zmiany", prompt)
 
     def test_architecture_guides_preserve_source_policy_identifier(self) -> None:
         guides = (

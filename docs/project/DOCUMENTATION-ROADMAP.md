@@ -9,16 +9,21 @@ Migracja nie może zmieniać zachowania runtime'u, kontraktów maszynowych ani
 historycznych dowodów. Kod, identyfikatory, importy, schematy, flagi CLI, klucze
 konfiguracji, literały protokołów oraz metadane GitHub pozostają po angielsku.
 
-Repozytorium nadal obejmuje zarówno produkt, jak i badania. Wheel i sdist
-zachowują ścisłą granicę runtime-first i nie otrzymują materiałów badawczych bez
-osobnej, jawnej decyzji.
+Repozytorium zachowuje wspierany produkt i dokładną powłokę dowodową badań.
+Pełny wykonywalny stan sprzed sprzątania jest dostępny na
+`feature/v2-research-archive` zgodnie z
+[manifestem archiwum](v2-research-archive-manifest.md). Wheel i sdist zachowują
+ścisłą granicę runtime-first.
 
 ## Inwentarz i kolejność reguł
 
 Maszynowym źródłem klasyfikacji jest
 [`documentation-migration-inventory.json`](documentation-migration-inventory.json).
-Reguły są uporządkowane, a pierwsze dopasowanie rozstrzyga klasyfikację. Dzięki
-temu węższe reguły ochronne zawsze wygrywają z ogólną regułą dla `docs/`.
+Reguły są uporządkowane, a pierwsze dopasowanie rozstrzyga klasyfikację. Każdy
+chroniony dowód ma dokładny wpis `paths`; reguły ochronne nie używają prefiksów.
+Dzięki temu dowód zawsze wygrywa z ogólną regułą dla `docs/`, a wykonywalny plik
+pod `experiments/`, `data/` lub `third_party/` nie zyskuje ochrony tylko przez
+położenie w katalogu.
 
 Walidator analizuje wyłącznie ścieżki zwrócone przez `git ls-files`; nie otwiera,
 nie kopiuje i nie haszuje treści dokumentów:
@@ -40,16 +45,20 @@ Każdy śledzony plik Markdown musi otrzymać jedną efektywną dyspozycję:
 
 ## Nienaruszalne granice
 
-- `docs/superpowers/**` pozostaje historycznym zapisem planów i specyfikacji.
-- `experiments/**` i `data/**` pozostają materiałem badawczym w oryginalnym
-  języku, dopóki osobne issue nie wykaże bezpiecznej potrzeby zmiany.
-- `third_party/**` zachowuje upstreamowe treści, licencje i noty.
-- Zaakceptowane ADR-y pod `docs/architecture/decisions/**` pozostają w
-  oryginalnym języku, ponieważ po akceptacji są niezmienne. Polski indeks może
-  streszczać ich decyzje, ale nie zastępuje oryginałów.
-- `CHANGELOG.md` i opublikowane wpisy pod `docs/release-notes/**` zachowują
-  oryginalne bajty wymagane przez kontrolę tożsamości wydania. Korekty są
-  dopisywane jako errata, nie przez tłumaczenie historii.
+- Każdy istniejący plan i każda specyfikacja w `docs/superpowers/` ma dokładny
+  chroniony wpis i pozostaje historycznym zapisem pracy.
+- W `experiments/` i `data/` pozostają tylko dokładnie wymienione pliki
+  dowodowe klas zatwierdzonych w ADR-0022. Wykonywalne runnery nie są chronione
+  samym prefiksem i mogą zostać usunięte w osobnym issue.
+- W `third_party/languagetool-pl/` dokładnie wymienione licencje, noty,
+  manifest, benchmark, README i patch pozostają dowodem upstream. Źródła
+  vendorowe nie są chronione samym prefiksem.
+- Każdy zaakceptowany ADR ma dokładny chroniony wpis i pozostaje niezmienny.
+  Polski indeks może streszczać decyzję, ale nie zastępuje oryginału.
+- `CHANGELOG.md` i każdy opublikowany wpis release notes mają dokładne chronione
+  wpisy. Korekty są dopisywane jako errata, nie przez zmianę historii.
+- Trzy zamrożone checklisty przeglądu korpusów są chronione przez dokładne
+  ścieżki zapisane w inwentarzu.
 - Zużyte holdouty, zamrożone raporty, manifesty, digesty i dowody wydania nie są
   modyfikowane, ponownie uruchamiane ani reinterpretowane przez migrację języka.
 - Tłumaczenie nie zmienia kodu, API, source policy, progów jakości ani zawartości

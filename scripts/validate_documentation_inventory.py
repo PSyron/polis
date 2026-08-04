@@ -42,6 +42,45 @@ _ALLOWED_WAVES: Final[frozenset[str]] = frozenset(
         "runtime-and-research-guides",
     }
 )
+_PROTECTED_DISPOSITIONS: Final[frozenset[str]] = frozenset(
+    {
+        "retain_historical_evidence",
+        "retain_research_evidence",
+        "retain_upstream_original",
+    }
+)
+_EVIDENCE_ROOTS: Final[tuple[str, ...]] = (
+    "data/",
+    "experiments/",
+    "src/polis/evaluation/",
+    "third_party/languagetool-pl/",
+)
+_EVIDENCE_FILENAMES: Final[frozenset[str]] = frozenset(
+    {
+        "README.md",
+        "config.json",
+        "report.json",
+        "results.json",
+        "assembly.json",
+        "cases.json",
+        "holdout.started",
+        "evaluated_source.json",
+        "pre_evaluation_inputs.patch",
+        "LICENSE-LGPL-2.1.txt",
+        "NOTICE",
+        "UPSTREAM.md",
+        "BENCHMARK.md",
+        "manifest.json",
+        "0001-reproducible-build-metadata.patch",
+    }
+)
+_FROZEN_REVIEW_CHECKLISTS: Final[frozenset[str]] = frozenset(
+    {
+        "docs/evaluation-corpus-v3-review-checklist.md",
+        "docs/evaluation-safety-corpus-v1-review-checklist.md",
+        "docs/evaluation-safety-corpus-v2-review-checklist.md",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,11 +185,14 @@ def load_inventory(path: Path) -> DocumentationInventory:
     )
 
 
-def tracked_markdown_paths(root: Path) -> tuple[str, ...]:
-    """Return Git-tracked Markdown paths without reading their content."""
+def tracked_paths(root: Path, *pathspecs: str) -> tuple[str, ...]:
+    """Return Git-tracked paths without reading their content."""
 
+    command = ["git", "-C", str(root), "ls-files", "-z"]
+    if pathspecs:
+        command.extend(("--", *pathspecs))
     result = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z", "--", "*.md"],
+        command,
         check=False,
         capture_output=True,
     )
@@ -161,6 +203,31 @@ def tracked_markdown_paths(root: Path) -> tuple[str, ...]:
     )
 
 
+def tracked_markdown_paths(root: Path) -> tuple[str, ...]:
+    """Return Git-tracked Markdown paths without reading their content."""
+
+    return tracked_paths(root, "*.md")
+
+
+def _required_protected_disposition(path: str) -> str | None:
+    if path == "CHANGELOG.md" or path.startswith(
+        ("docs/architecture/decisions/", "docs/release-notes/", "docs/superpowers/")
+    ):
+        return "retain_historical_evidence"
+    if path in _FROZEN_REVIEW_CHECKLISTS:
+        return "retain_research_evidence"
+    if not path.startswith(_EVIDENCE_ROOTS):
+        return None
+    filename = path.rsplit("/", maxsplit=1)[-1]
+    if filename not in _EVIDENCE_FILENAMES and not (
+        filename.startswith("frozen_") and filename.endswith(".json")
+    ):
+        return None
+    if path.startswith("third_party/languagetool-pl/"):
+        return "retain_upstream_original"
+    return "retain_research_evidence"
+
+
 def classify_path(
     path: str,
     rules: tuple[InventoryRule, ...],
@@ -168,6 +235,49 @@ def classify_path(
     """Return the first matching rule; order is explicit policy precedence."""
 
     return next((rule for rule in rules if rule.matches(path)), None)
+
+
+def protected_rule_errors(inventory: DocumentationInventory) -> list[str]:
+    """Require protected rules to use unshadowed exact path matches only."""
+
+    errors: list[str] = []
+    for rule in inventory.rules:
+        if rule.disposition not in _PROTECTED_DISPOSITIONS:
+            continue
+        if rule.prefixes:
+            errors.append(f"protected rule must not use prefixes: {rule.id}")
+        for path in rule.paths:
+            effective = classify_path(path, inventory.rules)
+            if effective is not rule:
+                effective_id = "<unclassified>" if effective is None else effective.id
+                errors.append(
+                    "protected exact path is shadowed by an earlier rule: "
+                    f"{rule.id}: {path} -> {effective_id}"
+                )
+    return errors
+
+
+def required_protected_artifact_errors(
+    root: Path,
+    inventory: DocumentationInventory,
+) -> list[str]:
+    """Discover required artifacts independently from inventory declarations."""
+
+    errors: list[str] = []
+    for path in tracked_paths(root):
+        required = _required_protected_disposition(path)
+        if required is None:
+            continue
+        effective = classify_path(path, inventory.rules)
+        if (
+            effective is None
+            or path not in effective.paths
+            or effective.disposition != required
+        ):
+            errors.append(
+                f"required protected artifact must use an exact {required} rule: {path}"
+            )
+    return errors
 
 
 def classify_inventory(
@@ -193,6 +303,8 @@ def validate_inventory(root: Path, inventory_path: Path) -> list[str]:
     try:
         inventory = load_inventory(inventory_path)
         _, errors = classify_inventory(root, inventory)
+        errors.extend(protected_rule_errors(inventory))
+        errors.extend(required_protected_artifact_errors(root, inventory))
     except ValueError as exc:
         return [str(exc)]
     return errors
@@ -232,6 +344,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         inventory = load_inventory(inventory_path)
         classifications, errors = classify_inventory(root, inventory)
+        errors.extend(protected_rule_errors(inventory))
+        errors.extend(required_protected_artifact_errors(root, inventory))
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
