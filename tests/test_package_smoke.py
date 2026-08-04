@@ -83,8 +83,9 @@ def test_readme_states_runtime_first_product_boundary() -> None:
     required_phrases = (
         "offline",
         "LanguageTool",
-        "No tested local model has qualified",
+        "Żaden przetestowany model lokalny nie został zakwalifikowany",
     )
 
     for phrase in required_phrases:
         assert phrase in readme
+    assert "documentation-contract" not in readme
