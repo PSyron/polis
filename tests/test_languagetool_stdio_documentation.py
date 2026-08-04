@@ -38,6 +38,19 @@ def test_vendored_stdio_public_documentation_covers_operation_and_removal() -> N
         assert required_text in documentation
 
 
+def test_polish_offline_document_names_uv_lock_files_precisely() -> None:
+    offline_documentation = _read("docs/offline-operation.md")
+
+    assert "plików lock `uv`" in offline_documentation
+
+
+def test_polish_offline_document_has_no_english_sentence_only_gloss() -> None:
+    offline_documentation = _read("docs/offline-operation.md")
+
+    assert "działającą wyłącznie dla zdań" in offline_documentation
+    assert "(sentence-only)" not in offline_documentation
+
+
 def test_vendored_stdio_performance_documentation_matches_measured_report() -> None:
     report = json.loads(REPORT.read_text(encoding="utf-8"))
     summary = report["summary"]
