@@ -1,95 +1,98 @@
-# Rule catalog inventory
+# Inwentarz katalogu reguł
 
-Status: evidence for issue #148 and input to the ownership decision in #149.
+Status: dowód dla issue #148 i dane wejściowe do decyzji o własności w #149.
 
-The machine-readable source for this snapshot is
-[`rule-catalog-inventory.json`](rule-catalog-inventory.json). A test compares its
-12 catalog candidates with the standard analyzer's default and optional runtime
-registrations and with every entry in automatic correction policy `1.2`.
+Maszynowo czytelnym źródłem tego snapshotu jest
+[`rule-catalog-inventory.json`](rule-catalog-inventory.json). Test porównuje 12
+kandydatów katalogu z domyślnymi i opcjonalnymi rejestracjami runtime'u
+standardowego analizatora oraz z każdym wpisem polityki automatycznych poprawek
+`1.2`.
 
-This inventory changes no runtime behavior or public contract. It records the
-current composition root, including fail-closed policy gaps, before catalog
-ownership and selection precedence are decided.
+Ten inwentarz nie zmienia zachowania runtime'u ani publicznego kontraktu.
+Zapisuje obecny composition root, w tym luki polityki fail-closed, przed
+rozstrzygnięciem własności katalogu i pierwszeństwa wyboru.
 
-## Current boundary
+## Obecna granica
 
-The standard analyzer constructs ten deterministic rules by default and two
-additional local rules only when their transports are configured or injected.
-All 12 use `SourceKind.RULE`, expose an operation and behavior version, and are
-therefore current catalog candidates.
+Standardowy analizator tworzy domyślnie dziesięć reguł deterministycznych oraz
+dwie dodatkowe reguły lokalne tylko wtedy, gdy ich transporty są skonfigurowane
+lub wstrzyknięte. Wszystkie 12 używają `SourceKind.RULE`, udostępniają operację
+i wersję zachowania, dlatego są obecnymi kandydatami katalogu.
 
-`availability` distinguishes default registration from optional registration.
-It does not claim that a local dependency is installed, healthy, or executing.
-Both optional rules may share the vendored LanguageTool stdio session, or use
-their separate injected/configured transports, without changing their source
-identity.
+`availability` odróżnia rejestrację domyślną od opcjonalnej. Nie twierdzi, że
+lokalna zależność jest zainstalowana, sprawna ani uruchomiona. Obie opcjonalne
+reguły mogą współdzielić dołączoną sesję stdio LanguageTool albo używać osobnych
+wstrzykniętych lub skonfigurowanych transportów bez zmiany tożsamości źródła.
 
-The automatic-correction object records policy evidence rather than granting
-permission. `eligible` means an exact source, category, operation, behavior
-version, policy version, and confidence threshold entry exists today.
-`fail_closed_review_only` means no exact policy entry exists; the finding remains
-review-only. In particular, the two residual syntax rules and contextual
-inflection are not automatically applied.
+Obiekt automatycznej korekty zapisuje dowód polityki, zamiast nadawać
+uprawnienie. `eligible` oznacza, że obecnie istnieje dokładny wpis źródła,
+kategorii, operacji, wersji zachowania, wersji polityki i progu pewności.
+`fail_closed_review_only` oznacza, że dokładny wpis polityki nie istnieje;
+znalezisko pozostaje tylko do przeglądu. W szczególności dwie reguły składni
+szczątkowej i fleksja kontekstowa nie są stosowane automatycznie.
 
-## Category distinction
+## Rozróżnienie kategorii
 
-There are currently two different category facts:
+Obecnie istnieją dwa różne fakty dotyczące kategorii:
 
-- `category` is the single category the rule implementation can emit;
-- `registry_categories` is the selection scope stored in `RuleRegistration`.
+- `category` jest jedyną kategorią, którą może emitować implementacja reguły;
+- `registry_categories` jest zakresem wyboru zapisanym w `RuleRegistration`.
 
-For all ten default rules, `registry_categories` is `null`. The registry therefore
-selects them for any non-empty category request and each rule filters itself.
-The two optional rules have explicit singleton registration scopes. The inventory
-preserves both facts because #149 must decide which one a future catalog owns.
+Dla wszystkich dziesięciu reguł domyślnych `registry_categories` ma wartość
+`null`. Rejestr wybiera je zatem dla każdego niepustego żądania kategorii, a
+każda reguła filtruje się samodzielnie. Dwie reguły opcjonalne mają jawne
+jednoelementowe zakresy rejestracji. Inwentarz zachowuje oba fakty, ponieważ #149
+musi zdecydować, który z nich będzie należeć do przyszłego katalogu.
 
-## Construction and consumers
+## Konstrukcja i odbiorcy
 
-`Analyzer` is the composition root and `polis.analyzer._make_default_registry`
-constructs every standard registration. Runtime analysis consumes the registry
-through `find()`. Correction additionally consumes `source_behavior()` to make an
-exact, fail-closed policy decision. A finding's source also contributes to its
-stable identifier.
+`Analyzer` jest composition root, a `polis.analyzer._make_default_registry`
+tworzy każdą standardową rejestrację. Analiza runtime'u korzysta z rejestru przez
+`find()`. Korekta dodatkowo używa `source_behavior()`, aby podjąć dokładną
+decyzję polityki fail-closed. Źródło znaleziska uczestniczy także w tworzeniu
+jego stabilnego identyfikatora.
 
-There is no production consumer for a human-readable rule description today.
-The roles in the JSON snapshot are documentation for #149 and must not be treated
-as a reason to add a runtime abstraction before a consumer exists.
+Obecnie nie istnieje produkcyjny odbiorca czytelnego dla człowieka opisu reguły.
+Role w snapshotcie JSON są dokumentacją dla #149 i nie wolno traktować ich jako
+powodu dodania abstrakcji runtime'u przed powstaniem odbiorcy.
 
-## Explicit exclusions
+## Jawne wykluczenia
 
-- LLM and finding backends emit dynamic `llm:` sources, are not registered in
-  `DeterministicRuleRegistry`, and are always ineligible for automatic correction.
-- HTTP/stdio transports and process sessions support rule execution but do not
-  emit findings as independent rule sources.
-- `TypoSpellingRule` and manually supplied `RuleRegistration` values are extension
-  mechanisms, not concrete sources in the standard analyzer.
-- Synthetic test rules, typed examples, and documentation-only examples are not
-  production runtime registrations.
+- LLM i backendy znalezisk emitują dynamiczne źródła `llm:`, nie są
+  zarejestrowane w `DeterministicRuleRegistry` i zawsze nie kwalifikują się do
+  automatycznej korekty.
+- Transporty HTTP/stdio i sesje procesów wspierają wykonanie reguł, ale nie
+  emitują znalezisk jako niezależne źródła reguł.
+- `TypoSpellingRule` i ręcznie przekazane wartości `RuleRegistration` są
+  mechanizmami rozszerzeń, a nie konkretnymi źródłami standardowego analizatora.
+- Syntetyczne reguły testowe, typowane przykłady i przykłady wyłącznie
+  dokumentacyjne nie są produkcyjnymi rejestracjami runtime'u.
 
-## Questions carried into #149
+## Pytania przekazane do #149
 
-1. Does the catalog own only the 12 curated standard sources, or also custom
-   registrations?
-2. Is the source of truth the catalog, each rule implementation, or the
-   registration at the composition root?
-3. Does catalog category metadata represent emitted categories, selection scope,
-   or both?
-4. Is registration order a compatibility guarantee?
-5. How should `available`, `enabled by default`, `configured`, and transport
-   health remain distinct?
-6. Should one optional source keep one catalog entry across injected, HTTP, and
-   vendored stdio transports?
-7. How can the catalog reference policy evidence without becoming an automatic
-   correction allowlist?
-8. Are descriptions stable user-facing metadata or documentation only?
-9. How should versioned custom rules and the non-versioned generic
-   `TypoSpellingRule` boundary be represented?
-10. Should future inspection expose the curated catalog, the effective configured
-    registry, or both?
+1. Czy katalog jest właścicielem wyłącznie 12 dobranych standardowych źródeł,
+   czy także rejestracji niestandardowych?
+2. Czy źródłem prawdy jest katalog, każda implementacja reguły, czy rejestracja
+   w composition root?
+3. Czy metadane kategorii katalogu reprezentują emitowane kategorie, zakres
+   wyboru, czy oba fakty?
+4. Czy kolejność rejestracji jest gwarancją zgodności?
+5. Jak zachować rozróżnienie między `available`, `enabled by default`,
+   `configured` i stanem transportu?
+6. Czy jedno opcjonalne źródło powinno zachować jeden wpis katalogu dla
+   transportów wstrzykniętych, HTTP i dołączonego stdio?
+7. Jak katalog może odwoływać się do dowodów polityki, nie stając się allowlistą
+   automatycznych poprawek?
+8. Czy opisy są stabilnymi metadanymi widocznymi dla użytkownika, czy wyłącznie
+   dokumentacją?
+9. Jak reprezentować granicę między wersjonowanymi regułami niestandardowymi a
+   niewersjonowaną ogólną `TypoSpellingRule`?
+10. Czy przyszła inspekcja powinna udostępniać dobrany katalog, efektywny
+    skonfigurowany rejestr, czy oba?
 
-## Validation and privacy
+## Walidacja i prywatność
 
-`tests/test_rule_catalog_inventory.py` constructs registries with transports that
-raise if any text analysis is attempted. It compares only source and metadata
-identities. The test uses no corpus, model, holdout, network request, or private
-text, and failures contain catalog metadata only.
+`tests/test_rule_catalog_inventory.py` tworzy rejestry z transportami, które
+zgłaszają błąd przy każdej próbie analizy tekstu. Porównuje wyłącznie tożsamości
+źródeł i metadanych. Test nie używa korpusu, modelu, holdoutu, żądania sieciowego
+ani prywatnego tekstu, a awarie zawierają wyłącznie metadane katalogu.

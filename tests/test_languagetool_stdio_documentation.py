@@ -31,11 +31,32 @@ def test_vendored_stdio_public_documentation_covers_operation_and_removal() -> N
         "Analyzer.close()",
         "sentence-only",
         "source-policy `1.1`",
-        "one persistent",
-        "does not download",
-        "Removing `[vendored_language_tool]`",
+        "jeden trwały proces",
+        "nie pobiera ani nie aktualizuje artefaktów Java",
+        "Usunięcie `[vendored_language_tool]` wyłącza współdzielony proces",
     ):
         assert required_text in documentation
+
+
+def test_polish_offline_document_names_uv_lock_files_precisely() -> None:
+    offline_documentation = _read("docs/offline-operation.md")
+
+    assert "plików lock `uv`" in offline_documentation
+
+
+def test_polish_offline_document_has_no_english_sentence_only_gloss() -> None:
+    offline_documentation = _read("docs/offline-operation.md")
+
+    assert "działającą wyłącznie dla zdań" in offline_documentation
+    assert "(sentence-only)" not in offline_documentation
+
+
+def test_runtime_guides_preserve_formal_source_policy_contract_name() -> None:
+    for relative_path in ("docs/public-api.md", "docs/rules.md"):
+        guide = _read(relative_path)
+
+        assert "source-policy `1.1`" in guide
+        assert "source-policy `1.2`" in guide
 
 
 def test_vendored_stdio_performance_documentation_matches_measured_report() -> None:

@@ -453,16 +453,22 @@ def test_crlf_configured_checkout_preserves_declared_bytes_and_hashes(
 def test_platform_specific_release_checks_have_versioned_owners() -> None:
     compatibility = COMPATIBILITY_POLICY.read_text(encoding="utf-8")
     distribution = DISTRIBUTION_VERIFICATION.read_text(encoding="utf-8")
+    normalized_distribution = " ".join(distribution.split())
 
-    assert "Platform verification profile 1.0" in compatibility
+    assert "Profil weryfikacji platform 1.0" in compatibility
     assert "`tests/test_cli.py`" in compatibility
     assert "`tests/test_languagetool_vendor_artifacts.py`" in compatibility
-    assert "POSIX executable bits" in compatibility
-    assert "macOS network-denial evidence" in compatibility
-    assert "separate release-gate verification" in compatibility
+    assert "Bity wykonywalności POSIX" in compatibility
+    assert "Dowód odmowy sieci w macOS" in compatibility
+    assert "osobną weryfikację bramki wydania" in compatibility
     assert "`PYTHONIOENCODING=cp1252`" in distribution
     assert "`tests/test_release_distribution_installation.py`" in distribution
-    assert "platform-native line endings" in distribution
+    assert "natywne dla platformy zakończenia" in normalized_distribution
+    assert (
+        "starsze środowisko Windows z odziedziczonym kodekiem"
+        in normalized_distribution
+    )
+    assert "documentation-contract" not in distribution
     assert "python scripts/verify_distribution_install.py --dist dist" in distribution
 
 

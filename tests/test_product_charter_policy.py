@@ -352,20 +352,21 @@ def test_roadmap_separates_product_delivery_from_optional_research() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
 
     for heading in (
-        "## Active product lane",
-        "## Optional research lane",
-        "## Future product architecture",
-        "## Historical delivery record",
+        "## Aktywna ścieżka produktu",
+        "## Opcjonalna ścieżka badawcza",
+        "## Przyszła architektura produktu",
+        "## Archiwalny rejestr dostarczania M0–M5",
     ):
         assert heading in roadmap
 
     for phrase in (
         "#120 -> #84 -> #95",
         "#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90",
-        "Research outcomes do not block runtime releases",
+        "Wyniki badań nie blokują wydań runtime'u",
     ):
         assert phrase in roadmap
 
+    assert "<!--" not in roadmap
     assert "#76 -> #84" not in roadmap
     assert "M5 majority-error graph from umbrella #93 is authoritative" not in roadmap
 
@@ -374,12 +375,12 @@ def test_roadmap_records_product_safety_priority_without_blocking_on_p1() -> Non
     roadmap = " ".join(ROADMAP.read_text(encoding="utf-8").split())
 
     for phrase in (
-        "#84 is P0 product-safety work",
-        "#95 is P1 hardening",
-        "The `#120 -> #84 -> #95` arrow records sequencing; it does not mean "
-        "that #95 blocks the current runtime release.",
-        "Shared `Runtime 0.x Hardening` milestone membership does not make #95 "
-        "a release blocker unless a separate accepted issue says so.",
+        "#84 to praca P0 nad bezpieczeństwem produktu",
+        "#95 to utwardzanie P1",
+        "Strzałka `#120 -> #84 -> #95` zapisuje kolejność; nie oznacza, że #95 "
+        "blokuje bieżące wydanie runtime'u.",
+        "Wspólna przynależność do milestone'u `Runtime 0.x Hardening` nie czyni "
+        "z #95 blokady wydania, chyba że stanowi tak osobne zaakceptowane issue.",
     ):
         assert phrase in roadmap
 
@@ -397,7 +398,26 @@ def test_release_docs_do_not_require_model_research() -> None:
     }
 
     joined = "\n".join(documents.values())
-    assert "optional model research never blocks a runtime release" in joined
+    normalized_documents = {
+        name: " ".join(content.split()) for name, content in documents.items()
+    }
+    assert "optional model research never blocks a runtime release" in "\n".join(
+        normalized_documents.values()
+    )
+    assert (
+        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+        in normalized_documents["README.md"]
+    )
+    assert (
+        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+        in normalized_documents["limitations.md"]
+    )
+    assert (
+        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+        in normalized_documents["prerelease-candidate.md"]
+    )
+    for name in ("README.md", "limitations.md", "prerelease-candidate.md"):
+        assert "documentation-contract" not in documents[name]
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
 
@@ -1339,12 +1359,26 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
     path: Path,
 ) -> None:
     document = " ".join(path.read_text(encoding="utf-8").split())
+    if path.name == "compatibility.md":
+        required_phrases = (
+            "opcjonalne badania modeli nigdy nie blokują wydania runtime'u",
+            "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
+            "badawczego ani zużytego holdoutu",
+        )
+    elif path.name in {"README.md", "limitations.md", "prerelease-candidate.md"}:
+        required_phrases = (
+            "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
+            "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "
+            "sieciowej, korpusu badawczego ani zużytego holdoutu",
+        )
+    else:
+        required_phrases = (
+            "optional model research never blocks a runtime release",
+            "does not require a model, Java process, network service, research "
+            "corpus, or consumed holdout",
+        )
 
-    for phrase in (
-        "optional model research never blocks a runtime release",
-        "does not require a model, Java process, network service, research "
-        "corpus, or consumed holdout",
-    ):
+    for phrase in required_phrases:
         assert phrase in document
 
     assert_no_runtime_release_dependency_conflict(document)

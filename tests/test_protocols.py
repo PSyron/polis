@@ -148,11 +148,13 @@ def test_protocol_documentation_records_lifecycle_and_failure_ownership() -> Non
     ):
         assert heading in documentation
     for statement in (
-        "No partial `AnalysisResult` is returned.",
-        "Cancellation and deadline ownership belongs to the orchestrator.",
-        "Retry policy is intentionally not a protocol yet.",
+        "Nie jest zwracany częściowy `AnalysisResult`.",
+        "Anulowanie i termin wykonania należą do orkiestratora.",
+        "Polityka ponowień celowo nie jest jeszcze protokołem.",
     ):
         assert statement in documentation
+    assert "documentation-contract" not in documentation
+    assert "<!--" not in documentation
 
 
 def test_pipeline_uses_no_private_shadow_backend_protocol() -> None:

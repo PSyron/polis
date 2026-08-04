@@ -1,12 +1,13 @@
-# Customization guides
+# Przewodniki personalizacji
 
-`polis` exposes stable extension points for deterministic rules and local-generation
-backends. The runtime `Analyzer` is intentionally narrow today; advanced
-composition currently goes through the internal pipeline helpers.
+`polis` udostępnia stabilne punkty rozszerzeń dla reguł deterministycznych
+i backendów generowania lokalnego. Runtime'owy `Analyzer` jest obecnie celowo
+wąski; zaawansowana kompozycja korzysta obecnie z wewnętrznych funkcji
+pomocniczych potoku.
 
-## Add a custom deterministic rule
+## Dodawanie własnej reguły deterministycznej
 
-Implement `polis.core.Rule` and register it in `DeterministicRuleRegistry`.
+Zaimplementuj `polis.core.Rule` i zarejestruj ją w `DeterministicRuleRegistry`.
 
 ```python
 from polis.core import AnalysisOptions, Category, Confidence, Finding, Source, SourceKind, Severity
@@ -56,18 +57,18 @@ result = analyze_text(
 )
 ```
 
-Rules should be deterministic and lightweight; keep one responsibility per rule and
-prefer stable source identifiers.
+Reguły powinny być deterministyczne i lekkie; zachowuj jedną odpowiedzialność na
+regułę i preferuj stabilne identyfikatory źródeł.
 
-## Add a custom local backend
+## Dodawanie własnego lokalnego backendu
 
-For local finding sources used in the pipeline, implement
-`polis.core.LocalFindingBackend` with:
+Dla lokalnych źródeł znalezisk używanych w potoku zaimplementuj
+`polis.core.LocalFindingBackend` z:
 
-- `name` attribute
+- atrybutem `name`;
 - `generate_findings(text, policy=None, clock=None, sleep=..., operation=...)`
 
-Returning an empty tuple is a valid backend behavior.
+Zwrócenie pustej krotki jest prawidłowym zachowaniem backendu.
 
 ```python
 import asyncio
@@ -105,37 +106,41 @@ async def run_analysis() -> None:
 asyncio.run(run_analysis())
 ```
 
-For validated structured backend responses, prefer `polis.llm.adapter.MockHeuristicBackend`
-plus a dedicated transport implementation.
+Dla zwalidowanych ustrukturyzowanych odpowiedzi backendu preferuj
+`polis.llm.adapter.MockHeuristicBackend` wraz z dedykowaną implementacją
+transportu.
 
-## Add a specialist suggestion backend
+## Dodawanie specjalistycznego backendu sugestii
 
-Issue #60 exposes `HybridSuggestionEngine` for role-separated #59 contracts. A
-specialist backend implements `name` and asynchronous
-`generate(request: PromptRequest) -> str`; a deterministic router returns
-`SyntaxTask` or `InflectionTask` values for unresolved sentence-local work.
-Inject the composed engine with `Analyzer(config, specialist_engine=engine)`.
+Issue #60 udostępnia `HybridSuggestionEngine` dla kontraktów #59 z rozdzielonymi
+rolami. Specjalistyczny backend implementuje `name` oraz asynchroniczne
+`generate(request: PromptRequest) -> str`; deterministyczny router zwraca
+wartości `SyntaxTask` albo `InflectionTask` dla nierozstrzygniętej pracy lokalnej
+względem zdania. Skomponowany silnik wstrzyknij przez
+`Analyzer(config, specialist_engine=engine)`.
 
-The router, not the model, decides which operation is eligible. Candidate tasks
-must use a finite candidate set containing the original surface form. Syntax
-tasks can declare protected name spans; URLs, numbers, and quotations are
-protected by the engine. The default analyzer injects neither component and
-makes no specialist calls. A custom adapter must remain local, must not download
-artifacts implicitly, and must preserve request roles and native chat templating.
+To router, a nie model, decyduje, która operacja się kwalifikuje. Zadania
+kandydackie muszą korzystać ze skończonego zbioru kandydatów zawierającego
+oryginalną formę powierzchniową. Zadania składniowe mogą deklarować chronione
+zakresy nazw własnych; adresy URL, liczby i cytaty są chronione przez silnik.
+Domyślny analizator nie wstrzykuje żadnego z tych komponentów i nie wykonuje
+wywołań specjalistycznych. Własny adapter musi pozostać lokalny, nie może
+niejawnie pobierać artefaktów oraz musi zachowywać role żądania i natywne
+szablony czatu.
 
-## Enable the vendored sentence layer
+## Włączanie warstwy zdaniowej dostarczanej ze źródłami
 
-The preferred sentence-only configuration shares one persistent local process
-between the five reviewed comma rules and contextual inflection candidate
-generation. Build the pinned subset explicitly first; Polis does not download
-or update Java artifacts:
+Preferowana konfiguracja wyłącznie zdaniowa współdzieli jeden trwały proces
+lokalny między pięcioma zweryfikowanymi regułami przecinkowymi a generowaniem
+kandydatów fleksji kontekstowej. Najpierw jawnie zbuduj przypięty podzbiór; Polis
+nie pobiera ani nie aktualizuje artefaktów Java:
 
 ```console
 cd third_party/languagetool-pl
 ./scripts/build.sh
 ```
 
-Then use the absolute executable path:
+Następnie użyj bezwzględnej ścieżki do pliku wykonywalnego:
 
 ```toml
 [vendored_language_tool]
@@ -143,21 +148,25 @@ stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_st
 timeout_seconds = 2.0
 ```
 
-Construct the analyzer with `Analyzer.from_config(...)` and close it through a
-`with` block or `Analyzer.close()`. Repeated sentence calls reuse one JVM.
-Source-policy `1.1` automatically applies only qualified punctuation findings;
-contextual inflection findings stay reviewable and require explicit
-`apply_suggestions()` selection. The path, timeout, malformed response, and
-process failures are bounded and preserve built-in deterministic findings.
+Utwórz analizator za pomocą `Analyzer.from_config(...)` i zamknij go przez blok
+`with` albo `Analyzer.close()`. Powtarzane wywołania zdaniowe ponownie używają
+jednej JVM. Kontrakt source-policy `1.1` automatycznie stosuje wyłącznie
+zakwalifikowane znaleziska interpunkcyjne; znaleziska fleksji kontekstowej
+pozostają do przeglądu
+i wymagają jawnego wyboru przez `apply_suggestions()`. Awarie ścieżki, timeoutu,
+niepoprawnej odpowiedzi i procesu są ograniczone i zachowują wbudowane
+znaleziska deterministyczne.
 
-Removing `[vendored_language_tool]` disables the shared process. The configured
-path must be absolute and executable. This section is mutually exclusive with
-the legacy `[language_tool]` and `[contextual_inflection]` modes below.
+Usunięcie `[vendored_language_tool]` wyłącza współdzielony proces.
+Skonfigurowana ścieżka musi być bezwzględna i wykonywalna. Ta sekcja wzajemnie
+wyklucza się z poniższymi starszymi trybami `[language_tool]`
+i `[contextual_inflection]`.
 
-## Enable the reviewed LanguageTool HTTP layer
+## Włączanie zweryfikowanej warstwy HTTP LanguageTool
 
-This compatibility mode is optional and disabled by default. Run a separately installed
-LanguageTool 6.8 server on numeric loopback and add:
+Ten tryb kompatybilności jest opcjonalny i domyślnie wyłączony. Uruchom osobno
+zainstalowany serwer LanguageTool 6.8 na numerycznym adresie pętli zwrotnej
+i dodaj:
 
 ```toml
 [language_tool]
@@ -165,21 +174,23 @@ base_url = "http://127.0.0.1:8081"
 timeout_seconds = 1.0
 ```
 
-The endpoint must use plain HTTP, an explicit port, and literal `127.0.0.0/8`
-or `::1`; hostnames, credentials, paths, queries, proxies, redirects, other
-versions, and remote services are rejected. The adapter keeps only five
-explicitly reviewed Polish comma rule IDs. Source-policy version `1.1`
-automatically applies their non-conflicting comma insertions; every other
-LanguageTool rule remains filtered out.
+Endpoint musi używać zwykłego HTTP, jawnego portu i literału `127.0.0.0/8` albo
+`::1`; nazwy hostów, dane uwierzytelniające, ścieżki, zapytania, proxy,
+przekierowania, inne wersje i usługi zdalne są odrzucane. Adapter zachowuje tylko
+pięć jawnie zweryfikowanych identyfikatorów polskich reguł przecinkowych. Wersja
+Source-policy `1.1` automatycznie stosuje ich niekolidujące wstawienia
+przecinków; każda inna reguła LanguageTool pozostaje odfiltrowana.
 
-The call is synchronous and may wait for `timeout_seconds`, including through
-`analyze_async()`. If the optional server is unavailable or returns invalid
-data, analysis continues with the built-in rules and no LanguageTool findings.
-Removing `[language_tool]` fully removes the adapter from the analyzer registry.
+Wywołanie jest synchroniczne i może czekać przez `timeout_seconds`, również
+przez `analyze_async()`. Jeśli opcjonalny serwer jest niedostępny albo zwraca
+niepoprawne dane, analiza jest kontynuowana z wbudowanymi regułami i bez
+znalezisk LanguageTool. Usunięcie `[language_tool]` całkowicie usuwa adapter
+z rejestru analizatora.
 
-## Enable per-call contextual inflection suggestions
+## Włączanie sugestii fleksji kontekstowej dla każdego wywołania
 
-Build the pinned local module, then point Polis at its absolute stdio runner:
+Zbuduj przypięty moduł lokalny, a następnie wskaż Polis bezwzględną ścieżkę do
+jego programu obsługującego stdio:
 
 ```toml
 [contextual_inflection]
@@ -187,20 +198,21 @@ stdio_path = "/absolute/path/to/polis/third_party/languagetool-pl/scripts/run_st
 timeout_seconds = 2.0
 ```
 
-The executable is invoked directly without a shell and receives one sentence
-through stdin in a new process for each eligible call. It returns only finite
-local candidates. Qualified surname and
-narrow government findings remain reviewable: `correct()` does not apply them,
-and callers must select their IDs through `apply_suggestions()`. Omission of
-the section disables all contextual morphology I/O. Multi-sentence input also
-skips this rule without starting the process.
+Plik wykonywalny jest wywoływany bezpośrednio, bez powłoki, i dla każdego
+kwalifikującego się wywołania otrzymuje jedno zdanie przez standardowe wejście
+w nowym procesie. Zwraca wyłącznie skończony zbiór lokalnych kandydatów. Zakwalifikowane
+znaleziska nazwisk i wąskiej rekcji pozostają do przeglądu:
+`correct()` ich nie stosuje, a wywołujący muszą wybrać ich identyfikatory przez
+`apply_suggestions()`. Pominięcie sekcji wyłącza wszystkie operacje wejścia
+i wyjścia morfologii kontekstowej. Wejście wielozdaniowe również pomija tę regułę bez uruchamiania
+procesu.
 
-The same configuration works with the sentence-oriented CLI example:
+Ta sama konfiguracja działa ze zdaniowym przykładem CLI:
 
 ```console
 python -m polis.cli --config examples/polis.toml analyze --json \
   "Rozmawiałem z Janem Nowak po przerwie."
 ```
 
-The JSON output contains a reviewable `Nowakiem` suggestion. The CLI does not
-apply it unless its finding ID is passed explicitly with `--apply`.
+Wyjście JSON zawiera sugestię `Nowakiem` wymagającą przeglądu. CLI nie stosuje jej,
+dopóki identyfikator znaleziska nie zostanie jawnie przekazany przez `--apply`.

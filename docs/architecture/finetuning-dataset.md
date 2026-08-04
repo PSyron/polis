@@ -1,43 +1,45 @@
-# Fine-tuning dataset architecture
+# Architektura zbioru danych do fine-tuningu
 
 Issue: #62
 
-## Decision
+## Decyzja
 
-Polis keeps fine-tuning data separate from correction corpus v3. The dataset is
-project-authored, licensed under CC0-1.0, generated deterministically from a
-small registry of reviewed linguistic transformations, and committed as JSONL.
-Corpus v3 remains evaluation-only.
+Polis utrzymuje dane do fine-tuningu oddzielnie od correction corpus v3. Zbiór
+danych został stworzony w projekcie, jest objęty licencją CC0-1.0,
+deterministycznie generowany z małego rejestru sprawdzonych transformacji
+językowych i zapisywany w repozytorium jako JSONL. Corpus v3 pozostaje
+przeznaczony wyłącznie do ewaluacji.
 
-The dataset has two disjoint splits:
+Zbiór danych ma dwa rozłączne podziały:
 
-- `train`: 1,200 records, 300 per category;
-- `validation`: 240 records, 60 per category.
+- `train`: 1,200 rekordów, po 300 na kategorię;
+- `validation`: 240 rekordów, po 60 na kategorię.
 
-The categories are `inflection`, `syntax`, `punctuation`, and `no_change`.
-Inflection records use the finite-candidate protocol. The other categories use
-the corrected-text specialist protocol. Each record retains the source text,
-structured target, prompt messages, official Bielik ChatML serialization,
-transformation identity, entity spans, provenance, and transformation review
-state.
+Kategorie to `inflection`, `syntax`, `punctuation` i `no_change`. Rekordy
+fleksyjne używają protokołu skończonego zbioru kandydatów. Pozostałe kategorie
+używają specjalistycznego protokołu poprawionego tekstu. Każdy rekord zachowuje
+tekst źródłowy, ustrukturyzowany cel, wiadomości promptu, oficjalną serializację
+Bielik ChatML, tożsamość transformacji, zakresy encji, proweniencję i stan
+przeglądu transformacji.
 
-## Safety and isolation
+## Bezpieczeństwo i izolacja
 
-Generation and loading fail closed when records are duplicated, malformed,
-unbalanced, incorrectly licensed, model-authored, or unsafe. Positive examples
-must make a minimal category-appropriate change. No-change examples must remain
-unchanged and collectively cover correct inflection, proper names, marked word
-order, punctuation, numbers, URLs, and quotations.
+Generowanie i ładowanie działają fail-closed, gdy rekordy są zduplikowane,
+wadliwe, niezbalansowane, nieprawidłowo licencjonowane, stworzone przez model
+albo niebezpieczne. Przykłady pozytywne muszą wprowadzać minimalną zmianę
+odpowiednią dla kategorii. Przykłady bez zmian muszą pozostać niezmienione i
+łącznie obejmować poprawną fleksję, nazwy własne, nacechowany szyk wyrazów,
+interpunkcję, liczby, adresy URL i cytaty.
 
-The existing corpus-v3 isolation gate rejects exact and normalized text,
-normalized template, and entity-combination overlap across both evaluation
-splits. Train and validation additionally use disjoint transformation templates
-and entity identities.
+Istniejąca bramka izolacji corpus-v3 odrzuca między oboma podziałami
+ewaluacyjnymi nakładanie się tekstu dokładnego i znormalizowanego,
+znormalizowanego szablonu oraz kombinacji encji. Train i validation używają
+dodatkowo rozłącznych szablonów transformacji i tożsamości encji.
 
-## Chat formatting
+## Formatowanie czatu
 
-Messages use the selected specialist contracts and serialize with the official
-Bielik 1.5B v3 ChatML template:
+Wiadomości używają wybranych kontraktów specjalistycznych i są serializowane za
+pomocą oficjalnego szablonu Bielik 1.5B v3 ChatML:
 
 ```text
 <s><|im_start|>system
@@ -48,19 +50,20 @@ Bielik 1.5B v3 ChatML template:
 ...<|im_end|>
 ```
 
-The stored ChatML string is an audit artifact. Training integrations should
-prefer the structured `messages` field and the tokenizer's
-`apply_chat_template` implementation.
+Zapisany ciąg ChatML jest artefaktem audytowym. Integracje treningowe powinny
+preferować ustrukturyzowane pole `messages` i implementację tokenizera
+`apply_chat_template`.
 
-Reference implementation and tokenizer contract:
+Implementacja referencyjna i kontrakt tokenizera:
 
-- [Bielik-1.5B-v3.0-Instruct model card](https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct)
-- [official tokenizer configuration](https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct/blob/main/tokenizer_config.json)
+- [karta modelu Bielik-1.5B-v3.0-Instruct](https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct)
+- [oficjalna konfiguracja tokenizera](https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct/blob/main/tokenizer_config.json)
 
-## Alternatives rejected
+## Odrzucone alternatywy
 
-- Reusing corpus v3 would invalidate evaluation and violates its training-use
-  policy.
-- Treating model output as gold would make the target unreviewed and circular.
-- Storing only rendered ChatML would discard the structured prompt contract and
-  make validation brittle.
+- Ponowne użycie corpus v3 unieważniłoby ewaluację i naruszyłoby jego politykę
+  użycia do treningu.
+- Traktowanie wyniku modelu jako gold uczyniłoby cel niesprawdzonym i
+  cyklicznym.
+- Przechowywanie wyłącznie wyrenderowanego ChatML odrzuciłoby ustrukturyzowany
+  kontrakt promptu i uczyniłoby walidację kruchą.

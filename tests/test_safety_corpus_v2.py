@@ -442,8 +442,8 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
     limitations_v2 = _normalized_prose(
         _markdown_region(
             (ROOT / "docs" / "limitations.md").read_text(encoding="utf-8"),
-            "- Issue #119 prepares `polis_polish_correction_safety_corpus_v2`",
-            "- No DOCX/ODT/RTF document adapters",
+            "- Issue #119 przygotowuje `polis_polish_correction_safety_corpus_v2`",
+            "- Adaptery dokumentów DOCX/ODT/RTF",
         )
     )
     roadmap_v2 = _normalized_prose(
@@ -532,10 +532,10 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
 
     for required in (
         _V2_FROZEN_DIGEST,
-        "does not reverse the failed #115 verdict",
-        "does not qualify #76",
-        "A separate one-shot gate is still required",
-        "separate from #85 and #90",
+        "nie odwraca nieudanego wyniku #115",
+        "nie kwalifikuje #76",
+        "Nadal wymagana jest osobna jednorazowa bramka",
+        "odrębna od #85 i #90",
     ):
         assert required in limitations_v2
 
