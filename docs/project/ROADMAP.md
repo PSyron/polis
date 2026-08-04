@@ -1,39 +1,48 @@
-# Polis Roadmap
+# Roadmapa Polis
 
-`PROMPT.md` is the product source of truth. This roadmap defines delivery order; GitHub issues hold executable acceptance criteria. A milestone is complete only when all its issues are closed, integration checks pass, and known limitations are documented.
+`PROMPT.md` jest źródłem prawdy o produkcie. Ta roadmapa określa kolejność
+dostarczania, a GitHub issues zawierają wykonywalne kryteria akceptacji.
+Milestone jest ukończony dopiero wtedy, gdy wszystkie jego issues są zamknięte,
+kontrole integracyjne przechodzą, a znane ograniczenia są udokumentowane.
 
-## Delivery Rules
+## Zasady dostarczania
 
-- Start an issue only after all listed dependencies are closed.
-- Each issue produces one independently verifiable outcome and one focused commit during the single-contributor phase.
-- Every issue requires one milestone plus one `type:*`, one `area:*`, and one `priority:*` label.
-- A blocked issue receives `status:blocked` and a comment naming the unresolved dependency.
-- Use native GitHub `blocked_by` links when available; repeat the dependency in
-  the issue body so the delivery order remains explicit if native links are
-  unavailable or not exported.
-- Quality thresholds are derived from the measured baseline, not selected in advance.
+- Rozpoczynaj issue dopiero po zamknięciu wszystkich wymienionych zależności.
+- W fazie pracy jednego autora każde issue daje jeden niezależnie weryfikowalny
+  rezultat i jeden skupiony commit.
+- Każde issue wymaga jednego milestone'u oraz po jednej etykiecie `type:*`,
+  `area:*` i `priority:*`.
+- Zablokowane issue otrzymuje `status:blocked` i komentarz wskazujący
+  nierozstrzygniętą zależność.
+- Używaj natywnych powiązań GitHub `blocked_by`, gdy są dostępne; powtórz
+  zależność w opisie issue, aby kolejność dostarczania pozostała jawna, jeśli
+  natywne powiązania są niedostępne albo nie zostały wyeksportowane.
+- Progi jakości wynikają ze zmierzonego baseline'u, a nie z wartości wybranych
+  z góry.
 
-## Active product lane
+## Aktywna ścieżka produktu
 
 `#120 -> #84 -> #95`
 
-The product release gates are contracts, privacy, deterministic behavior,
-versioned automatic policy, packaging, offline installation, and release
-identity. Product delivery follows ADR-0020's runtime-first charter and does
-not require a model, Java process, network service, research corpus, or
-consumed holdout.
+Bramkami wydania produktu są kontrakty, prywatność, zachowanie deterministyczne,
+wersjonowana polityka automatycznych poprawek, pakowanie, instalacja offline
+i tożsamość wydania. Dostarczanie produktu jest zgodne z kartą runtime-first
+z ADR-0020 i nie wymaga modelu, procesu Java, usługi sieciowej, korpusu
+badawczego ani zużytego holdoutu.
 
-#84 is P0 product-safety work and is independent from #76. New automatic
-privileges still need direct source behavior evidence before they can enter the
-versioned automatic policy, but that evidence is a product safety requirement,
-not a model-research release dependency.
+#84 to praca P0 nad bezpieczeństwem produktu, niezależna od #76. Nowe
+uprawnienia do automatycznych poprawek nadal wymagają bezpośredniego dowodu
+zachowania źródła, zanim wejdą do wersjonowanej polityki automatycznych
+poprawek, lecz dowód ten jest wymaganiem bezpieczeństwa produktu, a nie
+zależnością wydania od badań nad modelem.
 
-#95 is P1 hardening after #84. The `#120 -> #84 -> #95` arrow records
-sequencing; it does not mean that #95 blocks the current runtime release. Shared
-`Runtime 0.x Hardening` milestone membership does not make #95 a release blocker
-unless a separate accepted issue says so. This work is complete.
+#95 to utwardzanie P1 wykonywane po #84. Strzałka `#120 -> #84 -> #95` zapisuje
+kolejność; nie oznacza, że #95 blokuje bieżące wydanie runtime'u. Wspólna
+przynależność do milestone'u `Runtime 0.x Hardening` nie czyni z #95 blokady
+wydania, chyba że stanowi tak osobne zaakceptowane issue. Ta praca jest
+ukończona.
 
-Current product architecture work is the M6 rule-catalog sequence:
+Bieżące prace nad architekturą produktu tworzą sekwencję katalogu reguł M6:
 
 `#149 -> #150 -> #152 -> #153`
 
@@ -41,53 +50,57 @@ Current product architecture work is the M6 rule-catalog sequence:
 
 `#151 + #152 + #153 -> #154 -> #155`
 
-#151 intentionally waits for the open #90 evidence path so source selection
-cannot destabilize that experiment. This cross-lane guard does not make M6 or
-optional research a runtime-release prerequisite. M6 remains future product
-architecture and does not block current runtime releases.
+#151 celowo czeka na otwartą ścieżkę dowodową #90, aby wybór źródła nie
+zdestabilizował tego eksperymentu. Ta ochrona między ścieżkami nie czyni z M6
+ani z opcjonalnych badań warunku wstępnego wydania runtime'u. M6 pozostaje
+przyszłą architekturą produktu i nie blokuje bieżących wydań runtime'u.
 
-The separate Polish-first documentation migration is governed by #158 and the
-[documentation roadmap](DOCUMENTATION-ROADMAP.md). It does not change the
-dependencies or acceptance criteria of #149-#155.
+Osobną migracją dokumentacji do modelu Polish-first zarządza #158 oraz
+[roadmapa dokumentacji](DOCUMENTATION-ROADMAP.md). Migracja nie zmienia
+zależności ani kryteriów akceptacji #149–#155.
 
-## Optional research lane
+## Opcjonalna ścieżka badawcza
 
 `#119 -> #76 -> (#85 + #86) -> #87 -> (#88 + #89) -> #90`
 
-Research outcomes do not block runtime releases. This graph has no product
-dependency edge and no due date; it organizes optional model, corpus,
-majority-coverage, and qualification-replay research without making those
-outcomes authoritative for the supported runtime.
+Wyniki badań nie blokują wydań runtime'u. Ten graf nie ma krawędzi zależności
+produktu ani terminu wykonania; porządkuje opcjonalne badania nad modelem,
+korpusem, pokryciem większościowym i odtwarzaniem kwalifikacji, nie nadając ich
+wynikom mocy wiążącej dla wspieranego runtime'u.
 
-#146 ran 80 development cases in two stable repetitions under the unchanged
-sentence-only gates and was not qualified. The aggregate report SHA-256 is
+#146 uruchomiło 80 przypadków deweloperskich w dwóch stabilnych powtórzeniach
+przy niezmienionych bramkach sentence-only i nie uzyskało kwalifikacji. SHA-256
+raportu zbiorczego to
 `7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
-There is no frozen gate, the marker remains absent, and the holdout was not
-reserved, materialized, or run. No rerun or tuning is permitted. #76 remains
-open and Task 6 is forbidden. This optional research does not qualify a
-production model and does not qualify paragraph behavior.
+Nie istnieje zamrożona bramka, znacznik nadal nie istnieje, a holdout nie został
+zarezerwowany, zmaterializowany ani uruchomiony. Ponowne uruchomienie i
+dostrajanie są zabronione. #76 pozostaje otwarte, a Task 6 jest zabronione. Te
+opcjonalne badania nie kwalifikują modelu produkcyjnego ani zachowania dla
+akapitów.
 
-## Future product architecture
+## Przyszła architektura produktu
 
-#96–#100 remain M6 product architecture work and do not block current runtime
-releases.
+#96–#100 pozostają pracami M6 nad architekturą produktu i nie blokują bieżących
+wydań runtime'u.
 
-## Superseded M5 release train
+## Zastąpiona ścieżka wydawnicza M5
 
-#43, #64, #66, #92, and #93 are superseded by ADR-0020 as active release-train
-authority. Their acceptance criteria are not represented as completed here.
-They remain auditable as historical issue metadata and planning evidence.
+#43, #64, #66, #92 i #93 zostały zastąpione przez ADR-0020 jako obowiązujące
+źródło decyzji o ścieżce wydawniczej. Ich kryteria akceptacji nie są tutaj
+przedstawiane jako ukończone. Pozostają audytowalne jako historyczne metadane
+issues i dowody planowania.
 
-## Historical delivery record
+## Archiwalny rejestr dostarczania M0–M5
 
-The historical M0–M5 delivery record below is retained as historical evidence.
-It includes completed, open, rejected, and superseded work. Dependency tables in
-this section record the delivery understanding at the time they were written;
-they are not the active product-release graph under ADR-0020.
+Poniższy historyczny rejestr dostarczania M0–M5 zachowano jako dowód archiwalny.
+Obejmuje prace ukończone, otwarte, odrzucone i zastąpione. Tabele zależności
+w tej sekcji zapisują stan rozumienia procesu dostarczania w chwili ich
+utworzenia; nie są aktywnym grafem wydania produktu zgodnym z ADR-0020. Treść
+archiwalnych tabel i dowodów pozostaje w oryginalnym języku.
 
-### M0 - Foundation and Decisions
+### M0 — Fundamenty i decyzje (archiwum)
 
-| Key | Outcome | Labels | Depends on |
+| Klucz | Rezultat | Etykiety | Zależy od |
 | --- | --- | --- | --- |
 | M0-01 | Define supported Python versions, platforms, and licensing policy | `type:decision`, `area:packaging`, `priority:P0` | - |
 | M0-02 | Evaluate Polish NLP dependencies and record the architecture decision | `type:research`, `area:rules`, `priority:P0` | M0-01 |
@@ -98,9 +111,9 @@ they are not the active product-release graph under ADR-0020.
 | M0-07 | Define analyzer, rule, and LLM backend protocols | `type:feature`, `area:core`, `priority:P0` | M0-05, M0-06 |
 | M0-08 | Create the initial licensed evaluation dataset | `type:test`, `area:evaluation`, `priority:P0` | M0-03, M0-05 |
 
-### M1 - Deterministic Core
+### M1 — Rdzeń deterministyczny (archiwum)
 
-| Key | Outcome | Labels | Depends on |
+| Klucz | Rezultat | Etykiety | Zależy od |
 | --- | --- | --- | --- |
 | M1-01 | Segment paragraphs and sentences with stable character offsets | `type:feature`, `area:segmentation`, `priority:P0` | M0-02, M0-03, M0-05 |
 | M1-02 | Implement the deterministic rule registry | `type:feature`, `area:rules`, `priority:P0` | M0-07 |
@@ -111,9 +124,9 @@ they are not the active product-release graph under ADR-0020.
 | M1-07 | Detect conflicting corrections | `type:feature`, `area:correction`, `priority:P0` | M0-05 |
 | M1-08 | Apply selected non-conflicting corrections deterministically | `type:feature`, `area:correction`, `priority:P0` | M1-07 |
 
-### M2 - Local LLM
+### M2 — Lokalny LLM (archiwum)
 
-| Key | Outcome | Labels | Depends on |
+| Klucz | Rezultat | Etykiety | Zależy od |
 | --- | --- | --- | --- |
 | M2-01 | Benchmark candidate runtimes and models; select the first backend | `type:research`, `area:llm`, `priority:P0` | M0-07, M0-08 |
 | M2-02 | Define versioned prompts and the LLM response schema | `type:feature`, `area:llm`, `priority:P0` | M0-05, M0-07 |
@@ -122,9 +135,9 @@ they are not the active product-release graph under ADR-0020.
 | M2-05 | Integrate LLM findings with the analysis pipeline | `type:feature`, `area:analysis`, `priority:P0` | M1-06, M2-04 |
 | M2-06 | Verify and document fully offline operation | `type:docs`, `area:llm`, `priority:P1` | M2-03, M2-05 |
 
-### M3 - MVP Quality
+### M3 — Jakość MVP (archiwum)
 
-| Key | Outcome | Labels | Depends on |
+| Klucz | Rezultat | Etykiety | Zależy od |
 | --- | --- | --- | --- |
 | M3-01 | Expand the evaluation dataset with positive and hard-negative cases | `type:test`, `area:evaluation`, `priority:P0` | M1-03, M1-04, M1-05, M2-05 |
 | M3-02 | Establish the quality baseline and measurable release gates | `type:test`, `area:evaluation`, `priority:P0` | M3-01 |
@@ -133,22 +146,22 @@ they are not the active product-release graph under ADR-0020.
 | M3-05 | Add a thin CLI and executable examples | `type:feature`, `area:cli`, `priority:P1` | M0-06, M2-05 |
 | M3-06 | Build and verify the first prerelease candidate | `type:chore`, `area:packaging`, `priority:P0` | M3-02, M3-03, M3-04, M3-05 |
 
-### M4 - Release Stabilization
+### M4 — Stabilizacja wydania (archiwum)
 
-| Key | Outcome | Labels | Depends on |
+| Klucz | Rezultat | Etykiety | Zależy od |
 | --- | --- | --- | --- |
 | M4-01 | Audit compatibility and define semantic-versioning guarantees | `type:decision`, `area:packaging`, `priority:P1` | M3-06 |
 | M4-02 | Audit privacy, dependencies, and packaged artifacts | `type:chore`, `area:packaging`, `priority:P0` | M3-06 |
 | M4-03 | Produce and validate the PyPI distribution | `type:chore`, `area:packaging`, `priority:P0` | M4-01, M4-02 |
 | M4-04 | Publish version 0.1.0 with release notes and documented limitations | `type:chore`, `area:packaging`, `priority:P0` | M4-03 |
 
-### M5 - Hybrid Polish Correction
+### M5 — Hybrydowa korekta polszczyzny (archiwum)
 
 M5 keeps automatic deterministic corrections separate from reviewable model
 suggestions. ADR-0008 is the policy gate for every behavior change in this
 milestone.
 
-| Key | Issue | Outcome | Depends on |
+| Klucz | Issue | Rezultat | Zależy od |
 | --- | ---: | --- | --- |
 | M5-00 | #65 | Record the hybrid correction architecture and M5 policy | #54 |
 | M5-01 | #55 | Repair real-model benchmark integrity and evidence reporting | #54, #65 |
@@ -192,7 +205,7 @@ milestone.
 | M5-12aa | #94 | Synchronize the M5 roadmap with the closure tracker | - |
 | M5-12ab | #119 | Create sentence safety corpus v2 for independent #76 requalification | completed #114 and #115 evidence |
 
-The primary dependency flow is:
+Archiwalny główny przepływ zależności:
 
 `#54 -> #65 -> #55 -> #56`.
 
@@ -237,7 +250,7 @@ Fine-tuning is an experiment after the prompt-only baseline. A rejected adapter
 is a valid #63 outcome, but #43 cannot proceed until another exact configuration
 passes the accepted suggestion gates.
 
-### Historical critical path evidence
+### Archiwalny dowód ścieżki krytycznej
 
 M0-01 -> M0-03 -> M0-05 -> M0-06 -> M0-07 -> M1-02 -> M1-06 -> M2-05 -> M3-01 -> M3-02 -> M3-06 -> M4-03 -> M4-04
 
