@@ -89,10 +89,16 @@ def test_quality_gates_split_automatic_corrections_from_suggestions() -> None:
 def test_hybrid_policy_is_linked_without_claiming_qualification() -> None:
     architecture_index = ARCHITECTURE_INDEX.read_text(encoding="utf-8")
     limitations = LIMITATIONS.read_text(encoding="utf-8")
+    normalized_limitations = " ".join(limitations.split())
 
     assert "0008-hybrid-correction-policy.md" in architecture_index
     assert "ADR-0008" in limitations
-    assert "No tested local model has qualified" in limitations
+    assert "Żaden przetestowany model lokalny nie został zakwalifikowany" in limitations
     assert (
-        "five-rule LanguageTool subset is not a general Polish corrector" in limitations
+        "podzbiór pięciu reguł LanguageTool nie jest ogólnym korektorem języka "
+        "polskiego" in normalized_limitations
     )
+    assert "source-policy 1.1" in limitations
+    assert "source-policy 1.2" in limitations
+    assert "Task 6" in limitations
+    assert "documentation-contract" not in limitations
