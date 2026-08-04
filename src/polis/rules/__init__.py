@@ -8,6 +8,14 @@ from dataclasses import dataclass
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
 from polis.rules.agreement import AgreementCopulaRule
+from polis.rules.catalog import (
+    DuplicateRuleMetadataError,
+    InvalidRuleMetadataError,
+    RuleAvailability,
+    RuleCatalog,
+    RuleCatalogError,
+    RuleMetadata,
+)
 from polis.rules.contextual_inflection import (
     ContextMorphologyTransport,
     ContextualInflectionRule,
@@ -191,7 +199,9 @@ __all__ = [
     "ContextualInflectionRule",
     "ContextualInflectionRuleConfig",
     "DuplicateFindingError",
+    "DuplicateRuleMetadataError",
     "DuplicateRuleSourceError",
+    "InvalidRuleMetadataError",
     "IncompatibleRuleOutputError",
     "LanguageToolRuleConfig",
     "LanguageToolTransport",
@@ -211,5 +221,9 @@ __all__ = [
     "SyntaxQuoteSpacingRule",
     "SyntaxSentenceSpacingRule",
     "RuleRegistration",
+    "RuleAvailability",
+    "RuleCatalog",
+    "RuleCatalogError",
+    "RuleMetadata",
     "RuleRegistryError",
 ]
