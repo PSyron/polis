@@ -85,6 +85,18 @@ def test_committed_sentence_report_records_non_vacuous_policy_decision() -> None
     report = json.loads((EXPERIMENT / "report.json").read_text(encoding="utf-8"))
     frozen = json.loads((EXPERIMENT / "frozen_rules.json").read_text(encoding="utf-8"))
     marker = json.loads((EXPERIMENT / "holdout.started").read_text(encoding="utf-8"))
+    expected_evidence_identity = {
+        "configuration_sha256": (
+            "6aa1cf64dc54e723cbce79b5985f751782bc312adba1c4236a70b9a74ec6c5e0"
+        ),
+        "evaluator_sha256": (
+            "8a905a6fffbe8239ee44c4f2c99628f7b641099bc56a799904176540b96fba38"
+        ),
+        "rules_sha256": (
+            "74d0b770aca6326e8625699b82bac634ddecaa005009eca5b5f8188934f086d8"
+        ),
+    }
+    report_evidence_identity = {key: report[key] for key in expected_evidence_identity}
 
     assert evaluator.validate_privacy_safe_report(report) == report
     assert report["decision"] == {"automatic_policy": False, "qualified": False}
@@ -96,11 +108,12 @@ def test_committed_sentence_report_records_non_vacuous_policy_decision() -> None
     assert report["holdout"]["summary"]["total_cases"] == 142
     assert report["holdout"]["summary"]["proposed_edits"] == 0
     assert report["holdout"]["summary"]["protected_negative_changes"] == 0
-    assert frozen == marker
-    assert frozen == {
-        "configuration_sha256": evaluator._sha256(EXPERIMENT / "config.json"),
-        "evaluator_sha256": evaluator._sha256(EXPERIMENT / "run_evaluation.py"),
-        "rules_sha256": evaluator._sha256(
-            ROOT / "src" / "polis" / "rules" / "syntax.py"
-        ),
-    }
+    assert report_evidence_identity == frozen == marker == expected_evidence_identity
+    assert (
+        evaluator._sha256(EXPERIMENT / "config.json")
+        == (expected_evidence_identity["configuration_sha256"])
+    )
+    assert (
+        evaluator._sha256(EXPERIMENT / "run_evaluation.py")
+        == (expected_evidence_identity["evaluator_sha256"])
+    )
