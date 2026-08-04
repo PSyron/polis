@@ -2634,6 +2634,9 @@ def test_v2_documentation_freezes_the_irreversible_sentence_only_boundary() -> N
         )
     )
     combined = readme + documentation
+    dataset = " ".join(
+        Path("docs/evaluation-dataset.md").read_text(encoding="utf-8").split()
+    )
 
     for command in ("--preflight", "--development", "--verify-development"):
         assert command in readme
@@ -2650,18 +2653,21 @@ def test_v2_documentation_freezes_the_irreversible_sentence_only_boundary() -> N
         "no recovery command",
     ):
         assert required in combined
-    assert "does not qualify a production model" in combined
-    assert "does not qualify paragraph behavior" in combined
+    assert "nie kwalifikują modelu produkcyjnego ani zachowania akapitowego" in dataset
 
     for required in (
-        "80 development cases",
-        "two stable repetitions",
-        "not qualified",
+        "80 przypadkach deweloperskich",
+        "dwoma stabilnymi powtórzeniami",
+        "brak kwalifikacji",
         "7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141",
-        "no frozen gate",
-        "holdout was not reserved, materialized, or run",
-        "#76 remains open",
-        "Task 6 is forbidden",
+        "Nie ma zamrożonej bramki",
+        "holdout nie został zarezerwowany, zmaterializowany ani uruchomiony",
+        "#76 pozostaje otwarte",
+        "Task 6 jest zabroniony",
+    ):
+        assert required in dataset
+
+    for required in (
         "post-evaluation audit tests",
         "pre-evaluation test blob",
     ):

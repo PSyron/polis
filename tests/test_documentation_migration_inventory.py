@@ -112,6 +112,8 @@ def test_production_inventory_protects_immutable_and_upstream_documents() -> Non
     expected = {
         "CHANGELOG.md": "retain_historical_evidence",
         "data/finetuning/bielik_1_5b_v1/README.md": "retain_research_evidence",
+        "docs/performance-baseline.md": "retain_research_evidence",
+        "docs/quality-baseline.md": "retain_research_evidence",
         "docs/release-notes/0.1.0.md": "retain_historical_evidence",
         "docs/superpowers/plans/2026-07-20-issue-1-policy.md": (
             "retain_historical_evidence"
@@ -128,6 +130,28 @@ def test_production_inventory_protects_immutable_and_upstream_documents() -> Non
         assert _effective_disposition(inventory, path) == (
             "retain_historical_evidence"
         ), path
+
+
+def test_frozen_baselines_use_an_earlier_protected_inventory_rule() -> None:
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    protected_paths = {
+        "docs/performance-baseline.md",
+        "docs/quality-baseline.md",
+    }
+    matching_rules = [
+        rule for rule in inventory["rules"] if protected_paths & set(rule["paths"])
+    ]
+
+    assert len(matching_rules) == 1
+    protected_rule = matching_rules[0]
+    assert set(protected_rule["paths"]) == protected_paths
+    assert protected_rule["disposition"] == "retain_research_evidence"
+    assert protected_rule["wave"] == "protected"
+    assert inventory["rules"].index(protected_rule) < next(
+        index
+        for index, rule in enumerate(inventory["rules"])
+        if "docs/" in rule["prefixes"]
+    )
 
 
 def test_validator_rejects_unknown_dispositions(tmp_path: Path) -> None:
