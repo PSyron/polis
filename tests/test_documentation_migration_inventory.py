@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "validate_documentation_inventory.py"
 INVENTORY = ROOT / "docs" / "project" / "documentation-migration-inventory.json"
@@ -18,6 +20,45 @@ POLICY_DOCUMENTS = (
     ROOT / "docs" / "project" / "DOCUMENTATION-ROADMAP.md",
 )
 MARKDOWN_LINK = re.compile(r"\[[^]]+\]\(([^)]+)\)")
+EVIDENCE_ROOTS = (
+    "data/",
+    "experiments/",
+    "src/polis/evaluation/",
+    "third_party/languagetool-pl/",
+)
+PROTECTED_EVIDENCE_FILENAMES = frozenset(
+    {
+        "README.md",
+        "config.json",
+        "report.json",
+        "results.json",
+        "assembly.json",
+        "cases.json",
+        "holdout.started",
+        "evaluated_source.json",
+        "pre_evaluation_inputs.patch",
+        "LICENSE-LGPL-2.1.txt",
+        "NOTICE",
+        "UPSTREAM.md",
+        "BENCHMARK.md",
+        "manifest.json",
+        "0001-reproducible-build-metadata.patch",
+    }
+)
+PROTECTED_DISPOSITIONS = frozenset(
+    {
+        "retain_historical_evidence",
+        "retain_research_evidence",
+        "retain_upstream_original",
+    }
+)
+FROZEN_REVIEW_CHECKLISTS = frozenset(
+    {
+        "docs/evaluation-corpus-v3-review-checklist.md",
+        "docs/evaluation-safety-corpus-v1-review-checklist.md",
+        "docs/evaluation-safety-corpus-v2-review-checklist.md",
+    }
+)
 
 
 def _run_validator(
@@ -82,6 +123,25 @@ def _effective_disposition(inventory: dict[str, Any], path: str) -> str | None:
     return None
 
 
+def _tracked_paths(*pathspecs: str) -> set[str]:
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", *pathspecs],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    )
+    return {path.decode("utf-8") for path in result.stdout.split(b"\0") if path}
+
+
+def _protected_exact_paths(inventory: dict[str, Any]) -> set[str]:
+    return {
+        path
+        for rule in inventory["rules"]
+        if rule["disposition"] in PROTECTED_DISPOSITIONS
+        for path in rule["paths"]
+    }
+
+
 def test_repository_markdown_inventory_is_complete() -> None:
     result = _run_validator(ROOT, INVENTORY)
 
@@ -130,6 +190,57 @@ def test_production_inventory_protects_immutable_and_upstream_documents() -> Non
         assert _effective_disposition(inventory, path) == (
             "retain_historical_evidence"
         ), path
+
+
+def test_production_inventory_uses_exact_evidence_paths_before_removable_trees() -> (
+    None
+):
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    exact_paths = _protected_exact_paths(inventory)
+    tracked_candidates = {
+        path
+        for path in _tracked_paths(*EVIDENCE_ROOTS)
+        if Path(path).name in PROTECTED_EVIDENCE_FILENAMES
+        or Path(path).name.startswith("frozen_")
+        and Path(path).suffix == ".json"
+    }
+    historical_paths = (
+        _tracked_paths("docs/architecture/decisions/")
+        | _tracked_paths("docs/release-notes/")
+        | _tracked_paths("docs/superpowers/")
+        | {"CHANGELOG.md"}
+    )
+
+    assert tracked_candidates | historical_paths | FROZEN_REVIEW_CHECKLISTS <= (
+        exact_paths
+    )
+    assert all(
+        not rule["prefixes"]
+        for rule in inventory["rules"]
+        if rule["disposition"] in PROTECTED_DISPOSITIONS
+    )
+    assert (
+        _effective_disposition(
+            inventory, "experiments/contextual_inflection_routing/run.py"
+        )
+        is None
+    )
+    assert (
+        _effective_disposition(
+            inventory,
+            "third_party/languagetool-pl/src/main/java/org/example/Rule.java",
+        )
+        is None
+    )
+
+
+def test_frozen_review_checklists_are_protected_exact_paths() -> None:
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    exact_paths = _protected_exact_paths(inventory)
+
+    assert FROZEN_REVIEW_CHECKLISTS <= exact_paths
+    for path in FROZEN_REVIEW_CHECKLISTS:
+        assert _effective_disposition(inventory, path) == "retain_research_evidence"
 
 
 def test_frozen_baselines_use_an_earlier_protected_inventory_rule() -> None:
@@ -225,8 +336,8 @@ def test_validator_uses_specific_protected_rules_before_broad_docs_rules(
                 "id": "historical-plans",
                 "disposition": "retain_historical_evidence",
                 "wave": "protected",
-                "paths": [],
-                "prefixes": ["docs/superpowers/"],
+                "paths": ["docs/superpowers/plans/example.md"],
+                "prefixes": [],
             },
             {
                 "id": "maintained-docs",
@@ -245,3 +356,72 @@ def test_validator_uses_specific_protected_rules_before_broad_docs_rules(
         "retain_historical_evidence": 1,
         "translate_polish": 1,
     }
+
+
+@pytest.mark.parametrize("disposition", sorted(PROTECTED_DISPOSITIONS))
+def test_validator_rejects_prefixes_on_every_protected_disposition(
+    disposition: str,
+    tmp_path: Path,
+) -> None:
+    _initialize_repository(tmp_path, ("notes/example.md",))
+    inventory = _write_inventory(
+        tmp_path,
+        rules=[
+            {
+                "id": "protected-prefix",
+                "disposition": disposition,
+                "wave": "protected",
+                "paths": [],
+                "prefixes": ["notes/"],
+            }
+        ],
+    )
+
+    result = _run_validator(tmp_path, inventory)
+
+    assert result.returncode == 1
+    assert "protected rule must not use prefixes: protected-prefix" in result.stderr
+
+
+@pytest.mark.parametrize("disposition", sorted(PROTECTED_DISPOSITIONS))
+@pytest.mark.parametrize(
+    "protected_path",
+    (
+        "docs/performance-baseline.md",
+        "docs/quality-baseline.md",
+        "docs/project/v2-research-archive-manifest.md",
+    ),
+)
+def test_validator_rejects_every_protected_exact_path_shadowed_by_a_prefix(
+    disposition: str,
+    protected_path: str,
+    tmp_path: Path,
+) -> None:
+    _initialize_repository(tmp_path, (protected_path,))
+    inventory = _write_inventory(
+        tmp_path,
+        rules=[
+            {
+                "id": "broad-docs",
+                "disposition": "translate_polish",
+                "wave": "runtime-and-research-guides",
+                "paths": [],
+                "prefixes": ["docs/"],
+            },
+            {
+                "id": "protected-exact",
+                "disposition": disposition,
+                "wave": "protected",
+                "paths": [protected_path],
+                "prefixes": [],
+            },
+        ],
+    )
+
+    result = _run_validator(tmp_path, inventory)
+
+    assert result.returncode == 1
+    assert (
+        "protected exact path is shadowed by an earlier rule: "
+        f"protected-exact: {protected_path} -> broad-docs"
+    ) in result.stderr

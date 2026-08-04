@@ -42,6 +42,13 @@ _ALLOWED_WAVES: Final[frozenset[str]] = frozenset(
         "runtime-and-research-guides",
     }
 )
+_PROTECTED_DISPOSITIONS: Final[frozenset[str]] = frozenset(
+    {
+        "retain_historical_evidence",
+        "retain_research_evidence",
+        "retain_upstream_original",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -170,6 +177,26 @@ def classify_path(
     return next((rule for rule in rules if rule.matches(path)), None)
 
 
+def protected_rule_errors(inventory: DocumentationInventory) -> list[str]:
+    """Require protected rules to use unshadowed exact path matches only."""
+
+    errors: list[str] = []
+    for rule in inventory.rules:
+        if rule.disposition not in _PROTECTED_DISPOSITIONS:
+            continue
+        if rule.prefixes:
+            errors.append(f"protected rule must not use prefixes: {rule.id}")
+        for path in rule.paths:
+            effective = classify_path(path, inventory.rules)
+            if effective is not rule:
+                effective_id = "<unclassified>" if effective is None else effective.id
+                errors.append(
+                    "protected exact path is shadowed by an earlier rule: "
+                    f"{rule.id}: {path} -> {effective_id}"
+                )
+    return errors
+
+
 def classify_inventory(
     root: Path,
     inventory: DocumentationInventory,
@@ -193,6 +220,7 @@ def validate_inventory(root: Path, inventory_path: Path) -> list[str]:
     try:
         inventory = load_inventory(inventory_path)
         _, errors = classify_inventory(root, inventory)
+        errors.extend(protected_rule_errors(inventory))
     except ValueError as exc:
         return [str(exc)]
     return errors
@@ -232,6 +260,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         inventory = load_inventory(inventory_path)
         classifications, errors = classify_inventory(root, inventory)
+        errors.extend(protected_rule_errors(inventory))
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
