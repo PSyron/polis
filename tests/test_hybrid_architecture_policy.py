@@ -77,13 +77,14 @@ def test_m5_risk_register_covers_hybrid_evidence_and_runtime_risks() -> None:
 def test_quality_gates_split_automatic_corrections_from_suggestions() -> None:
     gates = QUALITY_GATES.read_text(encoding="utf-8")
 
-    assert "## Automatic-correction gates" in gates
-    assert "exact edit precision: **1.00**" in gates
-    assert "correction accuracy: **1.00**" in gates
-    assert "## Suggestion gates" in gates
-    assert "exact edit precision: at least **0.90**" in gates
-    assert "valid structured outcomes: **100%**" in gates
-    assert "protected hard negatives: **0** findings" in gates
+    assert "## Bramki automatycznej korekty" in gates
+    assert "precision dokładnej edycji: **1.00**" in gates
+    assert "trafność korekty: **1.00**" in gates
+    assert "## Bramki sugestii" in gates
+    assert "precision dokładnej edycji: co najmniej **0.90**" in gates
+    assert "prawidłowe wyniki ustrukturyzowane: **100%**" in gates
+    assert "chronione trudne przypadki negatywne: **0** znalezisk" in gates
+    assert "documentation-contract" not in gates
 
 
 def test_hybrid_policy_is_linked_without_claiming_qualification() -> None:

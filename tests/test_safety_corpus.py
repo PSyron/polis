@@ -253,7 +253,8 @@ def test_candidate_documentation_records_identity_boundaries_and_review() -> Non
     assert "CC0-1.0" in combined
     assert "corpus v3" in combined
     assert "#85" in combined
-    assert "no holdout score" in combined
+    assert "nie tworzy wyniku holdoutu" in combined
+    assert "documentation-contract" not in combined
     assert "digest" in combined.casefold()
 
 

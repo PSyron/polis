@@ -2634,10 +2634,33 @@ def test_v2_documentation_freezes_the_irreversible_sentence_only_boundary() -> N
         )
     )
     combined = readme + documentation
+    quality_gates = " ".join(
+        Path("docs/llm-quality-gates.md").read_text(encoding="utf-8").split()
+    )
 
     for command in ("--preflight", "--development", "--verify-development"):
         assert command in readme
     assert readme.count("--holdout") >= 1
+    for required in (
+        "#146",
+        "ograniczone do zdań",
+        "każdą powyższą bramkę bez zmian",
+        "opcjonalne badanie",
+        "autonomiczna autoryzacja",
+        "niezależnego przeglądu",
+        "80 przypadków deweloperskich",
+        "dwóch stabilnych powtórzeniach",
+        "nie zostały zakwalifikowane",
+        "7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141",
+        "Nie istnieje zamrożona bramka",
+        "holdout nie został zarezerwowany, zmaterializowany ani uruchomiony",
+        "#76 pozostaje otwarte",
+        "`Task 6` jest zabronione",
+        "nie kwalifikuje modelu produkcyjnego ani zachowania dla akapitów",
+    ):
+        assert required in quality_gates
+    assert "documentation-contract" not in quality_gates
+
     for required in (
         "#146",
         "sentence-only",
@@ -2650,18 +2673,7 @@ def test_v2_documentation_freezes_the_irreversible_sentence_only_boundary() -> N
         "no recovery command",
     ):
         assert required in combined
-    assert "does not qualify a production model" in combined
-    assert "does not qualify paragraph behavior" in combined
-
     for required in (
-        "80 development cases",
-        "two stable repetitions",
-        "not qualified",
-        "7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141",
-        "no frozen gate",
-        "holdout was not reserved, materialized, or run",
-        "#76 remains open",
-        "Task 6 is forbidden",
         "post-evaluation audit tests",
         "pre-evaluation test blob",
     ):
