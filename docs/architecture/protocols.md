@@ -1,103 +1,111 @@
-# Analyzer and Local Backend Protocols
+# Protokoły analizatora i lokalnego backendu
 
-The runtime protocols in `polis.core.protocols` define implementation seams;
-they do not implement analysis. They use the existing immutable
-`AnalysisOptions`, `AnalysisResult`, `Finding`, and `Source` models, so future
-implementations cannot introduce a competing result or finding format.
+Protokoły runtime'u w `polis.core.protocols` definiują granice implementacji;
+nie implementują analizy. Używają istniejących niezmiennych modeli
+`AnalysisOptions`, `AnalysisResult`, `Finding` i `Source`, dzięki czemu przyszłe
+implementacje nie mogą wprowadzić konkurencyjnego formatu wyniku ani znaleziska.
 
 ## DeterministicAnalyzer
 
-`DeterministicAnalyzer` owns one deterministic source and synchronously returns
-a tuple of validated `Finding` values for one input and effective options. It
-is created by a future composition root, has no shared mutable call state, and
-returns findings in its own deterministic order. It does not call local
-generation, merge other output, apply corrections, retry work, or return an
-incomplete result. A future orchestrator owns conversion of operational
-failures into the controlled errors in ADR-0003.
+`DeterministicAnalyzer` jest właścicielem jednego źródła deterministycznego i
+synchronicznie zwraca krotkę zwalidowanych wartości `Finding` dla jednego wejścia
+i efektywnych opcji. Tworzy go przyszły composition root; nie ma współdzielonego
+mutowalnego stanu wywołania i zwraca znaleziska we własnej deterministycznej
+kolejności. Nie wywołuje lokalnego generowania, nie scala innych wyników, nie
+stosuje poprawek ani nie ponawia pracy. Nie jest zwracany częściowy
+`AnalysisResult`. Przyszły
+orkiestrator odpowiada za przekształcanie awarii operacyjnych w kontrolowane
+błędy z ADR-0003.
 
 ## Rule
 
-`Rule` is a separately registered synchronous deterministic analyzer entry. Its
-stable source must identify a rule and it returns only its own validated
-findings. Rule construction, lifecycle, and ordering are owned by a registry;
-a rule does not select other rules or make cross-rule failure decisions.
+`Rule` jest osobno rejestrowanym synchronicznym wpisem analizatora
+deterministycznego. Jego stabilne źródło musi identyfikować regułę, a sam wpis
+zwraca wyłącznie własne zwalidowane znaleziska. Rejestr odpowiada za tworzenie,
+cykl życia i kolejność reguł; reguła nie wybiera innych reguł ani nie podejmuje
+decyzji o awariach między regułami.
 
 ## RuleRegistry
 
-`RuleRegistry` executes the configured rules in deterministic order for one
-analysis call. Its lifecycle is configuration before an analysis call and
-read-only use during the call. It owns category selection and validates the
-output of registered rules; it does not call local generation or merge
-local-backend findings.
+`RuleRegistry` wykonuje skonfigurowane reguły w deterministycznej kolejności dla
+jednego wywołania analizy. Jego cykl życia obejmuje konfigurację przed wywołaniem
+analizy i użycie tylko do odczytu w trakcie wywołania. Odpowiada za wybór
+kategorii i waliduje wyniki zarejestrowanych reguł; nie wywołuje lokalnego
+generowania ani nie scala znalezisk lokalnego backendu.
 
 ## LocalGenerationBackend
 
-`LocalGenerationBackend` is asynchronous because a future analysis boundary
-must be able to await local generation without owning an event loop. It accepts
-one already-constructed prompt and returns raw response text. The backend name
-is a safe stable identifier for controlled error context; it is not a model
-name requirement.
+`LocalGenerationBackend` jest asynchroniczny, ponieważ przyszła granica analizy
+musi móc oczekiwać na lokalne generowanie bez posiadania pętli zdarzeń. Przyjmuje
+jeden już skonstruowany prompt i zwraca surowy tekst odpowiedzi. Nazwa backendu
+jest bezpiecznym stabilnym identyfikatorem kontekstu kontrolowanego błędu; nie
+jest wymaganiem dotyczącym nazwy modelu.
 
-Cancellation and deadline ownership belongs to the orchestrator. The backend
-does not create a timeout, retry, response validator, finding, or analysis
-result. It remains a local implementation boundary: this protocol does not
-authorize a network call, model-server dependency, or model download.
+Anulowanie i termin wykonania należą do orkiestratora. Backend nie tworzy
+timeoutu, ponowienia, walidatora odpowiedzi, znaleziska ani wyniku analizy.
+Pozostaje lokalną granicą implementacji: ten protokół nie zezwala na wywołanie
+sieciowe, zależność od serwera modeli ani pobranie modelu.
 
-The legacy finding path passes one flat prompt through this protocol for
-compatibility. The specialist path from #59 exposes a model-independent
-`PromptRequest` in `polis.llm`: two ordered role messages, a closed response
-schema, protocol and schema versions, deterministic generation settings, and
-explicit limits. A future runtime adapter must apply its native chat template
-to those messages instead of flattening them. Neither request shape contains a
-runtime or model name, and adding specialist orchestration does not silently
-reinterpret the existing flat finding contract.
+Starsza ścieżka znalezisk przekazuje przez ten protokół jeden płaski prompt dla
+zachowania zgodności. Ścieżka specjalistyczna z #59 udostępnia niezależny od
+modelu `PromptRequest` w `polis.llm`: dwie uporządkowane wiadomości ról,
+zamknięty schemat odpowiedzi, wersje protokołu i schematu, deterministyczne
+ustawienia generowania oraz jawne limity. Przyszły adapter runtime'u musi
+zastosować do tych wiadomości własny natywny szablon czatu zamiast je spłaszczać.
+Żaden z kształtów żądania nie zawiera nazwy runtime'u ani modelu, a dodanie
+orkiestracji specjalistycznej nie reinterpretuje po cichu istniejącego kontraktu
+płaskiego znaleziska.
 
-Issue #60 adds `HybridSuggestionEngine` in `polis.analysis.hybrid`. It consumes
-an injected deterministic task router and specialist backend, never a model or
-server name. Tasks use sentence-local offsets; accepted edits are translated
-once into original paragraph offsets. Unchanged output stops after one call,
-changed output receives one accept/reject verifier call, and every resulting
-finding is suggestion-only. Optional failures return explicit safe status while
-the analyzer retains deterministic findings and source-policy corrections.
+Issue #60 dodaje `HybridSuggestionEngine` w `polis.analysis.hybrid`. Silnik
+korzysta z wstrzykniętego deterministycznego routera zadań i backendu
+specjalistycznego, nigdy z nazwy modelu ani serwera. Zadania używają offsetów
+lokalnych dla zdania; zaakceptowane edycje są raz tłumaczone na offsety
+oryginalnego akapitu. Niezmieniony wynik kończy się po jednym wywołaniu,
+zmieniony wynik otrzymuje jedno wywołanie weryfikatora accept/reject, a każde
+wynikowe znalezisko pozostaje wyłącznie sugestią. Opcjonalne awarie zwracają
+jawny bezpieczny status, podczas gdy analizator zachowuje znaleziska
+deterministyczne i poprawki objęte source-policy.
 
 ## LocalFindingBackend
 
-`LocalFindingBackend` is the separate composed local boundary used by the
-analysis pipeline. It accepts a text fragment and returns validated,
-fragment-local findings. Its implementation owns prompt construction,
-raw-response validation, and validation of an implementation-specific retry
-policy. The pipeline owns fragment iteration, forwarding the injected clock and
-sleep callable, translation to original-text offsets, and canonical public
-error context.
+`LocalFindingBackend` jest osobną złożoną granicą lokalną używaną przez pipeline
+analizy. Przyjmuje fragment tekstu i zwraca zwalidowane znaleziska lokalne dla
+fragmentu. Jego implementacja odpowiada za budowę promptu, walidację surowej
+odpowiedzi i walidację polityki ponowień właściwej dla implementacji. Pipeline
+odpowiada za iterację fragmentów, przekazywanie wstrzykniętego zegara i funkcji
+sleep, tłumaczenie na offsety oryginalnego tekstu oraz kanoniczny publiczny
+kontekst błędu.
 
-It does not replace `LocalGenerationBackend`: that protocol remains the raw
-prompt-to-response boundary. Keeping both contracts separate lets adapters
-expose only the operation their consumer needs without coupling core to a
-specific model server or retry-policy implementation.
+Nie zastępuje `LocalGenerationBackend`: tamten protokół pozostaje surową granicą
+prompt-to-response. Rozdzielenie obu kontraktów pozwala adapterom udostępniać
+wyłącznie operację potrzebną ich odbiorcy bez wiązania core z konkretnym
+serwerem modeli ani implementacją retry policy.
 
 ## MonotonicClock
 
-`MonotonicClock` is the only time dependency required at this stage. A future
-orchestrator injects it to calculate one analysis deadline consistently and
-test deterministically. Rules and local backends do not own independent clocks
-or deadline policies.
+`MonotonicClock` jest jedyną zależnością czasu wymaganą na tym etapie. Przyszły
+orkiestrator wstrzykuje go, aby spójnie obliczyć jeden termin analizy i testować
+deterministycznie. Reguły i lokalne backendy nie mają własnych niezależnych
+zegarów ani polityk terminów.
 
 ## AnalysisOrchestrator
 
-`AnalysisOrchestrator` describes the synchronous and event-loop-safe future
-entry points. Both consume `str` text and effective `AnalysisOptions`, and both
-return the existing `AnalysisResult` type. The orchestrator owns dependency
-lifecycle, option forwarding, canonical ordering, result validation, filtering,
-deadline enforcement, cancellation, and translation to the ADR-0003 controlled
-error hierarchy.
+`AnalysisOrchestrator` opisuje przyszłe synchroniczne i bezpieczne dla pętli
+zdarzeń punkty wejścia. Oba przyjmują tekst `str` i efektywne `AnalysisOptions`
+oraz zwracają istniejący typ `AnalysisResult`. Orkiestrator odpowiada za cykl
+życia zależności, przekazywanie opcji, kanoniczną kolejność, walidację wyniku,
+filtrowanie, egzekwowanie terminu, anulowanie i tłumaczenie na kontrolowaną
+hierarchię błędów z ADR-0003.
 
-No partial `AnalysisResult` is returned. When any configured deterministic
-component or local backend fails, the future implementation raises the relevant
-controlled error rather than returning a result that conceals missing work.
+Nie jest zwracany częściowy `AnalysisResult`. Gdy dowolny skonfigurowany
+komponent deterministyczny lub lokalny backend ulegnie awarii, przyszła
+implementacja zgłasza odpowiedni kontrolowany błąd zamiast zwracać wynik
+ukrywający brakującą pracę.
 
-Retry policy is intentionally not a protocol yet. There is no implemented
-retry behavior or complete runtime exception hierarchy to parameterize, and a
-premature retry abstraction would assign error-classification policy before its
-owner exists. When retry behavior is introduced, a dedicated issue must define
-its deterministic inputs, cancellation behavior, deadline interaction, and
-ADR-0003 error translation.
+Polityka ponowień celowo nie jest jeszcze protokołem. Nie istnieje zaimplementowane
+zachowanie ponowień ani kompletna hierarchia wyjątków runtime'u, którą można by
+sparametryzować, a przedwczesna abstrakcja ponowień przypisałaby politykę
+klasyfikacji błędów, zanim istnieje jej właściciel. Gdy zachowanie ponowień
+zostanie wprowadzone, dedykowane issue musi zdefiniować jego deterministyczne
+wejścia, zachowanie anulowania, interakcję z terminem i tłumaczenie błędów
+ADR-0003.

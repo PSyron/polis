@@ -1,63 +1,69 @@
-# LanguageTool Polish Rule Inventory Design
+# Projekt inwentarza polskich reguł LanguageTool
 
-- Status: Accepted for issue #70
-- Date: 2026-07-22
-- Owner: Paweł Cyroń
+- Status: zaakceptowany dla issue #70
+- Data: 2026-07-22
+- Właściciel: Paweł Cyroń
 
-## Objective
+## Cel
 
-Discover which additional upstream LanguageTool 6.8 Polish rules can safely
-improve correction of one sentence. Inspection must not broaden the existing
-production `check` operation or its two-rule allowlist.
+Ustalić, które dodatkowe upstreamowe polskie reguły LanguageTool 6.8 mogą
+bezpiecznie poprawić korektę jednego zdania. Inspekcja nie może rozszerzać
+istniejącej produkcyjnej operacji `check` ani jej allowlisty dwóch reguł.
 
-## Alternatives
+## Alternatywy
 
-1. **Separate inspection operation — selected.** Add an explicit `inspect`
-   request to the local stdio bridge. It returns all upstream Polish matches to
-   an experiment, while `check` continues filtering exactly the two existing
-   rule IDs.
-2. **Temporarily widen `check`.** Rejected because experiment configuration
-   could leak into production behavior and invalidate the existing source
-   policy.
-3. **Parse Polish grammar XML statically.** Rejected because rule definitions
-   alone do not measure tagger behavior, offsets, replacements, conflicts, or
-   protected negatives on real sentences.
+1. **Osobna operacja inspekcji — wybrana.** Dodaje jawne żądanie `inspect` do
+   lokalnego mostu stdio. Zwraca eksperymentowi wszystkie upstreamowe polskie
+   dopasowania, podczas gdy `check` nadal filtruje dokładnie dwa istniejące
+   identyfikatory reguł.
+2. **Tymczasowe rozszerzenie `check`.** Odrzucone, ponieważ konfiguracja
+   eksperymentu mogłaby przeniknąć do zachowania produkcyjnego i unieważnić
+   istniejący kontrakt source-policy.
+3. **Statyczne parsowanie XML polskiej gramatyki.** Odrzucone, ponieważ same
+   definicje reguł nie mierzą zachowania taggera, offsetów, zamienników,
+   konfliktów ani chronionych przykładów negatywnych w rzeczywistych zdaniach.
 
-## Protocol isolation
+## Izolacja protokołu
 
-`{"operation":"inspect","language":"pl-PL","text":"..."}` is accepted only
-by the vendored stdio process. Its response includes `operation=inspect`, pinned
-software identity, and unfiltered upstream matches. The default operation stays
-`check`, keeps its current response shape, and emits only
-`BRAK_PRZECINKA_ZE` and `BRAK_PRZECINKA_ZEBY`. Synthesis is unchanged.
+`{"operation":"inspect","language":"pl-PL","text":"..."}` jest przyjmowane
+wyłącznie przez dołączony proces stdio. Odpowiedź zawiera `operation=inspect`,
+przypiętą tożsamość oprogramowania i nieprzefiltrowane dopasowania upstream.
+Domyślną operacją pozostaje `check`, która zachowuje obecny kształt odpowiedzi
+i emituje wyłącznie `BRAK_PRZECINKA_ZE` oraz `BRAK_PRZECINKA_ZEBY`. Synteza
+pozostaje niezmieniona.
 
-The bridge never receives corpus IDs, labels, tags, expected output, or gold
-spans. Python sends only sentence source text. Raw inspection responses stay in
-an ignored private work directory; committed evidence contains rule IDs,
-counts, hashes, timings, and resource measurements only.
+Most nigdy nie otrzymuje identyfikatorów korpusu, etykiet, tagów, oczekiwanego
+wyniku ani zakresów gold. Python wysyła wyłącznie tekst źródłowy zdania. Surowe
+odpowiedzi inspekcji pozostają w ignorowanym prywatnym katalogu roboczym; dowody
+zapisane w repozytorium zawierają tylko identyfikatory reguł, liczności, hashe,
+czasy i pomiary zasobów.
 
-## Scoring and selection
+## Ocena i wybór
 
-Development contains the 69 sentence cases from corpus v3. Every replacement
-from every rule match is normalized to a Unicode code-point half-open edit. A
-rule cannot choose the best replacement using gold: all distinct proposed edits
-count. Rules without usable replacements are inventoried but cannot qualify.
+Zbiór deweloperski (`development`) zawiera 69 przypadków zdaniowych z corpus v3.
+Każdy zamiennik z każdego dopasowania reguły jest normalizowany do półotwartej
+edycji w punktach
+kodowych Unicode. Reguła nie może wybierać najlepszego zamiennika z użyciem
+gold: liczą się wszystkie odrębne proponowane edycje. Reguły bez użytecznych
+zamienników trafiają do inwentarza, ale nie mogą uzyskać kwalifikacji.
 
-Per-rule TP, FP, FN, exact outputs, protected-negative changes, and categories
-are reported. A candidate rule ID requires at least one exact TP, precision
-1.00, and zero edits on protected negatives. The combined candidate allowlist
-must also retain precision 1.00, have no conflicts or protected changes, and
-produce only application-valid edits. No production source-policy changes are
-made by this research issue.
+Raportowane są TP, FP, FN, dokładne wyniki, zmiany chronionych przykładów
+negatywnych i kategorie dla każdej reguły. Kandydujący identyfikator reguły
+wymaga co najmniej jednego dokładnego TP, precision 1.00 i zera edycji
+chronionych przykładów negatywnych. Połączona allowlista kandydatów musi także
+zachować precision 1.00, nie mieć konfliktów ani chronionych zmian i tworzyć
+wyłącznie edycje poprawne przy zastosowaniu. To badawcze issue nie wprowadza
+zmian produkcyjnego kontraktu source-policy.
 
-The allowlist is frozen with the corpus, bridge, configuration, and candidate
-rule hashes before holdout. Holdout may run once only if development yields a
-non-empty qualifying allowlist. Otherwise it remains unopened.
+Allowlista jest zamrażana wraz z korpusem, mostem, konfiguracją i hashami reguł
+kandydujących przed holdoutem. Holdout może zostać uruchomiony raz i tylko wtedy,
+gdy zbiór deweloperski da niepustą kwalifikującą się allowlistę. W przeciwnym
+razie pozostaje nieotwarty.
 
-## Verification
+## Weryfikacja
 
-Fast tests cover operation isolation, closed request/response shapes, Unicode
-offsets, all-replacement scoring, gold-independent inputs, deterministic
-selection, report privacy, and holdout-once reservation. Slow tests build and
-run the real vendored module. Repository-wide quality, distribution, and
-offline integration checks remain required.
+Szybkie testy obejmują izolację operacji, zamknięte kształty żądań i odpowiedzi,
+offsety Unicode, ocenę wszystkich zamienników, wejścia niezależne od gold,
+deterministyczny wybór, prywatność raportu i jednorazową rezerwację holdoutu.
+Wolne testy budują i uruchamiają rzeczywisty dołączony moduł. Nadal wymagane są
+ogólnorepozytoryjne kontrole jakości, dystrybucji i integracji offline.
