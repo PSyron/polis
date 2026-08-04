@@ -401,23 +401,22 @@ def test_release_docs_do_not_require_model_research() -> None:
     normalized_documents = {
         name: " ".join(content.split()) for name, content in documents.items()
     }
-    assert "optional model research never blocks a runtime release" in "\n".join(
-        normalized_documents.values()
-    )
-    assert (
-        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
-        in normalized_documents["README.md"]
-    )
-    assert (
-        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
-        in normalized_documents["limitations.md"]
-    )
-    assert (
-        "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
-        in normalized_documents["prerelease-candidate.md"]
-    )
-    for name in ("README.md", "limitations.md", "prerelease-candidate.md"):
+    for name in (
+        "README.md",
+        "limitations.md",
+        "llm-quality-gates.md",
+        "prerelease-candidate.md",
+    ):
+        assert (
+            "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+            in normalized_documents[name]
+        )
         assert "documentation-contract" not in documents[name]
+    assert (
+        "opcjonalne badania modeli nigdy nie blokują wydania runtime'u"
+        in normalized_documents["compatibility.md"]
+    )
+    assert "documentation-contract" not in documents["compatibility.md"]
     assert "tracked by M5 and [#43]" not in joined
     assert "until later M5 selection" not in joined
 
@@ -1365,19 +1364,12 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
             "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
             "badawczego ani zużytego holdoutu",
         )
-    elif path.name in {"README.md", "limitations.md", "prerelease-candidate.md"}:
+    else:
         required_phrases = (
             "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
             "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "
             "sieciowej, korpusu badawczego ani zużytego holdoutu",
         )
-    else:
-        required_phrases = (
-            "optional model research never blocks a runtime release",
-            "does not require a model, Java process, network service, research "
-            "corpus, or consumed holdout",
-        )
-
     for phrase in required_phrases:
         assert phrase in document
 

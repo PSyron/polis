@@ -1,16 +1,17 @@
-# Deterministic structural invariants
+# Deterministyczne niezmienniki strukturalne
 
-Issue #123 provides the shared, test-only generator required before the
-structural-property children of issue #95. It uses a repository-owned,
-versioned SHA-256 index rather than a mutable random stream: every synthetic
-case follows from its generator version, seed, and case index, so it can be
-replayed independently on every supported platform.
+Issue #123 dostarcza wspólny generator przeznaczony wyłącznie do testów,
+wymagany przed issue potomnymi #95 dotyczącymi właściwości strukturalnych.
+Generator używa należącego do repozytorium wersjonowanego indeksu SHA-256
+zamiast mutowalnego strumienia losowego: każdy przypadek syntetyczny wynika z
+wersji generatora, ziarna i indeksu przypadku, dzięki czemu można go niezależnie
+odtworzyć na każdej wspieranej platformie.
 
-## Bounded generator contract
+## Kontrakt ograniczonego generatora
 
-The current generator is `unicode-structural-v1`. Its default seed is `95001`,
-its default budget is 64 cases, and its hard maximum is 256 cases. The
-supported Unicode families are:
+Bieżący generator to `unicode-structural-v1`. Jego domyślne ziarno to `95001`,
+domyślny budżet wynosi 64 przypadki, a sztywne maksimum — 256 przypadków.
+Wspierane rodziny Unicode to:
 
 - `ascii`
 - `polish_diacritics`
@@ -21,15 +22,15 @@ supported Unicode families are:
 - `punctuation`
 - `quotes`
 
-For example, a property failure that reports
-`generator=unicode-structural-v1 seed=95001 case=7` identifies the case to
-select from `generate_unicode_text_cases(seed=95001, count=8)[7]`. The replay
-metadata deliberately identifies the case without printing its text.
+Przykładowo błąd właściwości raportujący
+`generator=unicode-structural-v1 seed=95001 case=7` identyfikuje przypadek do
+wybrania z `generate_unicode_text_cases(seed=95001, count=8)[7]`. Metadane
+odtworzenia celowo identyfikują przypadek bez wypisywania jego tekstu.
 
-## Fast CI contract and safe replay
+## Kontrakt szybkiego CI i bezpieczne odtwarzanie
 
-Every supported Fast CI matrix job supplies the complete generated-invariant
-configuration on the existing `Run pytest suite` step:
+Każde zadanie wspieranej macierzy szybkiego CI dostarcza pełną konfigurację
+wygenerowanych niezmienników w istniejącym kroku `Run pytest suite`:
 
 ```yaml
 env:
@@ -38,93 +39,99 @@ env:
   POLIS_GENERATIVE_CASES: 64
 ```
 
-That step retains its single filtered pytest command, so research, slow, and
-model tests remain excluded. The test-only no-argument generator consumes these
-values: with no configuration it uses its existing defaults; when any value is
-present it fails closed unless all three values are present, the version is
-exact, the seed is an unsigned 64-bit integer, and the budget is from 1 through
-256. The Fast CI workflow policy further pins the accepted version, seed, and
-64-case budget, rejects missing, duplicate, misplaced, invalid, or excessive
-metadata, and retains the existing 10-minute job timeout on every supported
-matrix job.
+Ten krok zachowuje pojedyncze filtrowane polecenie pytest, dlatego testy
+badawcze, wolne i modelowe pozostają wykluczone. Bezargumentowy generator
+przeznaczony wyłącznie do testów używa tych wartości: bez konfiguracji korzysta
+ze swoich istniejących wartości domyślnych; jeśli jakakolwiek wartość jest
+obecna, działa fail-closed, chyba że podano wszystkie trzy wartości, wersja jest
+dokładna, ziarno jest 64-bitową liczbą całkowitą bez znaku, a budżet mieści się
+od 1 do 256. Polityka workflow szybkiego CI dodatkowo przypina akceptowaną
+wersję, ziarno i budżet 64 przypadków, odrzuca brakujące, powielone, niewłaściwie
+umieszczone, nieprawidłowe lub nadmierne metadane oraz zachowuje istniejący
+10-minutowy limit czasu zadania dla każdego elementu wspieranej macierzy.
 
-To replay a structural failure, retain only the safe metadata in its failure
-message (`generator`, `seed`, and `case`) and run the affected property module
-with the same complete configuration. For example, a failure reported as
-`generator=unicode-structural-v1 seed=95001 case=7` in segmentation can be
-replayed without putting text into the command or output:
+Aby odtworzyć błąd strukturalny, zachowaj w jego komunikacie wyłącznie bezpieczne
+metadane (`generator`, `seed` i `case`) i uruchom właściwy moduł właściwości z tą
+samą pełną konfiguracją. Na przykład błąd segmentacji zgłoszony jako
+`generator=unicode-structural-v1 seed=95001 case=7` można odtworzyć bez
+umieszczania tekstu w poleceniu ani danych wyjściowych:
 
 ```console
 POLIS_GENERATIVE_GENERATOR_VERSION=unicode-structural-v1 POLIS_GENERATIVE_SEED=95001 POLIS_GENERATIVE_CASES=64 uv run --locked --extra dev pytest tests/test_segmentation_properties.py -v
 ```
 
-The 64-case budget is intentional: it includes the reported case while also
-retaining coverage of every declared family. Do not reduce it to a case index
-or copy generated text, source fragments, prompts, or analyzed documents into
-a command, CI log, issue, or report.
+Budżet 64 przypadków jest celowy: obejmuje zgłoszony przypadek, a zarazem
+zachowuje pokrycie każdej zadeklarowanej rodziny. Nie zmniejszaj go do indeksu
+przypadku ani nie kopiuj wygenerowanego tekstu, fragmentów źródłowych, promptów
+lub analizowanych dokumentów do polecenia, logu CI, issue lub raportu.
 
-## Rejected alternatives
+## Odrzucone alternatywy
 
-Hypothesis was not selected because it would add and govern a development
-dependency before this repository has a consumer for shrinking or persisted
-examples. Its counterexample reporting is also broader than this helper's
-seed-only failure contract.
+Nie wybrano Hypothesis, ponieważ dodałby zależność deweloperską i wymagałby
+zarządzania nią, zanim repozytorium będzie miało zastosowanie dla zmniejszania
+przypadków albo utrwalonych przykładów. Raportowanie kontrprzykładów jest też
+szersze niż kontrakt błędów tego narzędzia pomocniczego, ograniczony do ziarna.
 
-`random.Random` was not selected because a mutable pseudo-random stream would
-require pinning the full call sequence to make drift explicit. It does not give
-the independently indexed replay contract supplied by the SHA-256 derivation.
+Nie wybrano `random.Random`, ponieważ mutowalny strumień pseudolosowy wymagałby
+przypięcia pełnej sekwencji wywołań, aby dryf był jawny. Nie zapewnia on
+niezależnie indeksowanego kontraktu odtwarzania oferowanego przez wyprowadzenie
+SHA-256.
 
-## Safe failures and scope boundary
+## Bezpieczne błędy i granica zakresu
 
-Every generated structural property must call
-`assert_structural_invariant(condition, invariant=..., replay=...)` with a
-safe invariant identifier. A false condition reports only that identifier and
-replay metadata; generated text must not appear in object representations or
-failure messages.
+Każda wygenerowana właściwość strukturalna musi wywoływać
+`assert_structural_invariant(condition, invariant=..., replay=...)` z bezpiecznym
+identyfikatorem niezmiennika. Fałszywy warunek raportuje wyłącznie ten
+identyfikator i metadane odtworzenia; wygenerowany tekst nie może wystąpić w
+reprezentacjach obiektów ani komunikatach błędów.
 
-These generated structural invariants provide bounded structural breadth only.
-They do not replace authored regression tests or corpus gates, and they make no
-claim about Polish linguistic quality. The harness must not receive private
-text, run model or holdout evaluation, or become unbounded CI fuzzing.
+Wygenerowane niezmienniki strukturalne zapewniają wyłącznie ograniczoną
+różnorodność strukturalną. Nie zastępują autorskich testów regresyjnych ani
+bramek korpusów i nie stanowią deklaracji jakości języka polskiego. Harness nie
+może otrzymywać prywatnego tekstu, uruchamiać ewaluacji modelu lub holdoutu ani
+stać się nieograniczonym fuzzingiem CI.
 
-## Completed structural invariants and residual risks
+## Ukończone niezmienniki strukturalne i ryzyka rezydualne
 
-The completed #95 child suites use the same synthetic 64-case source for:
+Ukończone zestawy issue potomnych #95 używają tego samego syntetycznego źródła
+64 przypadków do sprawdzania:
 
-- paragraph and sentence segmentation bounds, contiguity, slices, coverage,
-  and exact reconstruction;
-- public finding/result bounds, original slices, normalization, stable IDs, and
-  canonical JSON fidelity;
-- correction conflict symmetry, deterministic normalization, right-to-left
-  application, and fail-closed invalid selections;
-- rule-registry ordering, duplicate handling, and synchronous/asynchronous
-  registration parity; and
-- synchronous/asynchronous analysis-pipeline result, offset translation, and
-  controlled-failure parity.
+- granic segmentacji akapitów i zdań, ciągłości, wycinków, pokrycia i dokładnej
+  rekonstrukcji;
+- granic publicznych znalezisk i wyników, oryginalnych wycinków, normalizacji,
+  stabilnych identyfikatorów i wierności kanonicznego JSON;
+- symetrii konfliktów korekt, deterministycznej normalizacji, stosowania od
+  prawej do lewej i odrzucania nieprawidłowych wyborów w trybie fail-closed;
+- kolejności rejestru reguł, obsługi duplikatów oraz parytetu rejestracji
+  synchronicznej i asynchronicznej;
+- parytetu wyniku, translacji offsetów i kontrolowanych błędów synchronicznego i
+  asynchronicznego pipeline'u analizy.
 
-Together these checks provide structural evidence over all eight catalogued
-families: `ascii`, `polish_diacritics`, `non_bmp`, `combining_marks`, `lf`,
-`crlf`, `punctuation`, and `quotes`. They do not establish exhaustive Unicode
-coverage, Polish grammar, spelling, style, recall, precision, or corpus
-performance. Authored regressions and versioned corpus gates remain the
-authoritative linguistic evidence. The bounded generator has no shrinking,
-does not use live models or holdouts, and can miss interactions beyond its
-synthetic catalog; any discovered defect requires a separate regression-first
-issue.
+Łącznie kontrole te dostarczają dowodów strukturalnych dla wszystkich ośmiu
+skatalogowanych rodzin: `ascii`, `polish_diacritics`, `non_bmp`,
+`combining_marks`, `lf`, `crlf`, `punctuation` i `quotes`. Nie ustanawiają
+wyczerpującego pokrycia Unicode, gramatyki, ortografii lub stylu języka polskiego,
+recall, precision ani wydajności na korpusie. Autorskie regresje i wersjonowane
+bramki korpusów pozostają autorytatywnymi dowodami językowymi. Ograniczony
+generator nie zmniejsza przypadków, nie używa aktywnych modeli ani holdoutów i
+może pominąć interakcje poza swoim syntetycznym katalogiem; każda odkryta wada
+wymaga osobnego issue zaczynającego od regresji.
 
-## Correction properties
+## Właściwości korekty
 
-Issue #129 applies the same 64-case synthetic source to correction conflict
-and application properties. Its independent ADR-0003 oracle checks symmetric
-conflicts for overlapping replacements, duplicate insertions, and an insertion
-at every closed boundary of a replacement. A digest derived from each replay
-identity varies compatible replacement, deletion, and insertion positions
-while retaining insertions strictly outside replacements. Every non-empty
-selected subset must normalize deterministically, apply independently of every
-selected-ID order, and equal a separately derived right-to-left reconstruction.
+Issue #129 stosuje to samo syntetyczne źródło 64 przypadków do właściwości
+konfliktów i stosowania korekt. Jego niezależna wyrocznia ADR-0003 sprawdza
+symetryczne konflikty dla nakładających się zastąpień, powielonych wstawek i
+wstawki na każdej domkniętej granicy zastąpienia. Skrót wyprowadzony z każdej
+tożsamości odtworzenia zmienia zgodne pozycje zastąpień, usunięć i wstawek,
+jednocześnie utrzymując wstawki ściśle poza zastąpieniami. Każdy niepusty
+wybrany podzbiór musi normalizować się deterministycznie, stosować niezależnie od
+każdej kolejności wybranych identyfikatorów i być równy osobno wyprowadzonej
+rekonstrukcji od prawej do lewej.
 
-The property also submits conflicting, stale, unknown, duplicate, and
-uncorrectable selections. Each must fail before output, leave the immutable
-result unchanged, and report a failing property through only its invariant and
-the #123 replay metadata. This is bounded structural contract coverage, not a
-claim about correction quality, corpus performance, models, or evaluation.
+Właściwość przekazuje również wybory konfliktowe, nieaktualne, nieznane,
+powielone i niemożliwe do poprawienia. Każdy z nich musi zakończyć się błędem
+przed utworzeniem wyjścia, pozostawić niezmienny wynik bez zmian i raportować
+niezaliczoną właściwość wyłącznie przez jej niezmiennik oraz metadane odtworzenia
+z #123. Jest to ograniczone pokrycie kontraktu strukturalnego, a nie deklaracja
+jakości korekt, wydajności korpusu, modeli lub ewaluacji.

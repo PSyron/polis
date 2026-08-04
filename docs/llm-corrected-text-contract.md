@@ -1,109 +1,118 @@
-# Specialist correction contracts
+# Kontrakty korekty specjalistycznej
 
-This document defines the versioned specialist-model correction contracts from
-issue #59. ADR-0009 did not qualify any tested model, so these interfaces remain
-experimental and suggestion-only. They do not authorize automatic application.
+Ten dokument definiuje wersjonowane kontrakty korekty przez model
+specjalistyczny z issue #59. ADR-0009 nie zakwalifikował żadnego testowanego
+modelu, dlatego te interfejsy pozostają eksperymentalne i zwracają wyłącznie
+sugestie. Nie zezwalają na ich automatyczne stosowanie.
 
-## Shared constraints
+## Wspólne ograniczenia
 
-- Input text and candidate data are serialized as one canonical JSON object
-  inside `<INPUT_JSON_START>` and `</INPUT_JSON_END>`, not concatenated as
-  instructions. Literal angle brackets in data are Unicode-escaped so user text
-  cannot terminate the envelope.
-- Prompts use separate system and user messages.
-- Prompt requests include explicit operational limits:
-  - maximum input text size: `8192` characters,
-  - corrected-text raw response: `16384` characters,
-  - candidate-selection raw response: `512` characters,
-  - verifier raw response: `128` characters,
-  - corrected or proposed text value: `8192` characters.
-- Response schemas are versioned and strictly validated.
-- No model output that is not valid JSON for the requested schema is accepted.
-- Private text is kept out of exception diagnostics.
-- A runtime applies its model's official chat template to `messages`; the
-  contract does not flatten roles or name a runtime or model.
+- Tekst wejściowy i dane kandydatów są serializowane jako jeden kanoniczny
+  obiekt JSON wewnątrz `<INPUT_JSON_START>` i `</INPUT_JSON_END>`, a nie łączone
+  z instrukcjami. Dosłowne nawiasy ostre w danych są kodowane znakami ucieczki
+  Unicode, aby tekst użytkownika nie mógł zakończyć koperty.
+- Prompty używają osobnych wiadomości systemowej i użytkownika.
+- Żądania promptu zawierają jawne ograniczenia operacyjne:
+  - maksymalny rozmiar tekstu wejściowego: `8192` znaków;
+  - surowa odpowiedź z poprawionym tekstem: `16384` znaki;
+  - surowa odpowiedź wyboru kandydata: `512` znaków;
+  - surowa odpowiedź weryfikatora: `128` znaków;
+  - wartość poprawionego lub proponowanego tekstu: `8192` znaków.
+- Schematy odpowiedzi są wersjonowane i rygorystycznie walidowane.
+- Nie jest akceptowane żadne wyjście modelu, które nie jest prawidłowym JSON-em
+  zgodnym z żądanym schematem.
+- Prywatny tekst nie trafia do diagnostyki wyjątków.
+- Runtime stosuje oficjalny szablon rozmowy swojego modelu do `messages`;
+  kontrakt nie spłaszcza ról ani nie wskazuje runtime'u lub modelu.
 
-## Corrected-text operation (`specialist-corrected-text`)
+## Operacja poprawionego tekstu (`specialist-corrected-text`)
 
-`build_specialist_corrected_text_prompt_request(text, focus)` builds a prompt with:
+`build_specialist_corrected_text_prompt_request(text, focus)` buduje prompt o
+następujących właściwościach:
 
-- protocol id: `specialist-corrected-text`
-- protocol version: `1.0`
-- system focus: exactly one of `inflection`, `syntax`, `punctuation`
-- response schema version: `1`
-- response schema:
+- identyfikator protokołu: `specialist-corrected-text`;
+- wersja protokołu: `1.0`;
+- zakres systemowy: dokładnie jeden z `inflection`, `syntax`, `punctuation`;
+- wersja schematu odpowiedzi: `1`;
+- schemat odpowiedzi:
 
 ```json
 {"required":["corrected_text"],"type":"object","properties":{"corrected_text":{"type":"string"}},"additionalProperties":false}
 ```
 
-Failure modes:
+Tryby niepowodzenia:
 
-- Missing/extra top-level fields.
-- Too many rewrite spans.
-- No token overlap with source text.
-- Response type mismatch.
-- Raw or corrected-text length overflow.
-- A rewrite overlapping caller-supplied protected source spans.
-- A word change in punctuation focus or a non-word change in inflection focus.
+- Brakujące lub dodatkowe pola najwyższego poziomu.
+- Zbyt wiele zakresów przepisania.
+- Brak wspólnych tokenów z tekstem źródłowym.
+- Niezgodność typu odpowiedzi.
+- Przekroczenie długości odpowiedzi surowej lub poprawionego tekstu.
+- Przepisanie nakładające się na chronione zakresy źródła podane przez
+  wywołującego.
+- Zmiana słowa przy zakresie interpunkcyjnym albo zmiana elementu niebędącego
+  słowem przy zakresie fleksyjnym.
 
-`validate_corrected_text_response(raw, source_text=..., focus=...)` requires the
-same explicit focus; callers cannot validate a response under an unspecified
-specialist category.
+`validate_corrected_text_response(raw, source_text=..., focus=...)` wymaga tego
+samego jawnego zakresu; wywołujący nie mogą walidować odpowiedzi bez określonej
+kategorii specjalistycznej.
 
-## Inflection candidate-selection operation (`specialist-candidate-selection`)
+## Operacja wyboru kandydata fleksyjnego (`specialist-candidate-selection`)
 
-`build_inflection_candidate_prompt_request(text, candidates)` expects either:
+`build_inflection_candidate_prompt_request(text, candidates)` oczekuje jednego
+z dwóch wyników:
 
 - `{"unchanged": true}`
 - `{"candidate_id": "..."}`
 
-where `candidate_id` must be supplied by the caller and must belong to the
-provided candidate list.
+`candidate_id` musi zostać dostarczony przez wywołującego i należeć do podanej
+listy kandydatów.
 
-All supplied candidates must describe the same positive source span. IDs and
-forms are unique, lemma and feature values are typed and non-empty when present,
-features are unique, offsets refer to the original Python string, and the
-original surface form is included. Forms and morphology remain data only; their
-presence does not claim contextual correctness.
+Wszyscy dostarczeni kandydaci muszą opisywać ten sam dodatni zakres źródłowy.
+Identyfikatory i formy są unikatowe, wartości lematu i cech są typowane oraz —
+jeśli występują — niepuste, cechy są unikatowe, offsety odnoszą się do
+oryginalnego łańcucha Pythona, a oryginalna forma powierzchniowa jest dołączona.
+Formy i morfologia pozostają wyłącznie danymi; ich obecność nie stanowi
+deklaracji poprawności kontekstowej.
 
-Failure modes:
+Tryby niepowodzenia:
 
-- Duplicate/missing candidate IDs.
-- Duplicate forms or features, mixed spans, invalid offsets, or no unchanged
-  surface candidate.
-- Candidate IDs not in the provided set.
-- Invalid payload shape.
+- Powielone lub brakujące identyfikatory kandydatów.
+- Powielone formy lub cechy, mieszane zakresy, nieprawidłowe offsety albo brak
+  kandydata zachowującego formę powierzchniową bez zmian.
+- Identyfikatory kandydatów spoza dostarczonego zbioru.
+- Nieprawidłowy kształt danych.
 
-## Proposal-verifier operation (`specialist-proposal-verifier`)
+## Operacja weryfikatora propozycji (`specialist-proposal-verifier`)
 
-`build_proposal_verifier_prompt_request(source_text, proposal_text)` accepts only:
+`build_proposal_verifier_prompt_request(source_text, proposal_text)` akceptuje
+wyłącznie:
 
 - `{"decision": "accept"}`
 - `{"decision": "reject"}`
 
-Failure modes:
+Tryby niepowodzenia:
 
-- Invalid decision value.
-- Extra fields in response.
-- Any attempt to return replacement content.
+- Nieprawidłowa wartość decyzji.
+- Dodatkowe pola w odpowiedzi.
+- Jakakolwiek próba zwrócenia treści zastępczej.
 
-## Derived edits
+## Wyprowadzone edycje
 
-`derive_text_edits(source_text, corrected_text)` converts model output into
-deterministic non-overlapping half-open Python Unicode code-point spans against
-the original text. It rejects excessive rewrites, edits touching optionally
-protected name-like tokens, and edits overlapping explicit caller-supplied
-protected spans.
+`derive_text_edits(source_text, corrected_text)` przekształca wyjście modelu w
+deterministyczne, nienakładające się, półotwarte zakresy punktów kodowych Unicode
+Pythona względem tekstu oryginalnego. Odrzuca nadmierne przepisywanie, edycje
+dotykające opcjonalnie chronionych tokenów przypominających nazwy oraz edycje
+nakładające się na jawne zakresy chronione podane przez wywołującego.
 
-## Failure surface for extensions
+## Powierzchnia błędów rozszerzeń
 
-Specialist prompt builders and validators are intentionally conservative. Raw
-JSON and source data are never included in validation messages. A backend
-adapter maps these privacy-safe contract failures to
-`InvalidBackendResponseError` with its own safe backend identifier and operation
-context before callers can consume a suggestion.
+Konstruktory promptów specjalistycznych i walidatory są celowo zachowawcze.
+Surowy JSON i dane źródłowe nigdy nie trafiają do komunikatów walidacji. Adapter
+backendu mapuje te bezpieczne dla prywatności błędy kontraktu na
+`InvalidBackendResponseError` z własnym bezpiecznym identyfikatorem backendu i
+kontekstem operacji, zanim wywołujący będą mogli użyć sugestii.
 
-The older general finding contract remains readable without reinterpretation.
-New specialist orchestration uses only the operations above and must preserve
-their role separation, versions, schemas, limits, and suggestion-only status.
+Starszy ogólny kontrakt znaleziska pozostaje możliwy do odczytania bez
+reinterpretacji. Nowa orkiestracja specjalistyczna używa wyłącznie powyższych
+operacji i musi zachować ich rozdział ról, wersje, schematy, limity i status
+wyłącznie sugestii.

@@ -1,21 +1,23 @@
-# Prompt and LLM response contract (M2-02)
+# Kontrakt promptu i odpowiedzi LLM (M2-02)
 
-M2-02 defines a strict boundary for local-backend prompts and responses.
+M2-02 definiuje ścisłą granicę promptów i odpowiedzi lokalnego backendu.
 
-## Prompt contract
+## Kontrakt promptu
 
-- Prompt contract version: `3`.
-- Text is always embedded as JSON data under `text` inside the payload; model
-  instructions are never concatenated with raw untrusted content.
-- Allowed output schema is declared in the prompt (`response_schema_version: 1`).
-- The backend receives exactly these top-level fields:
+- Wersja kontraktu promptu: `3`.
+- Tekst jest zawsze osadzony jako dane JSON w polu `text` wewnątrz danych
+  wejściowych; instrukcje modelu nigdy nie są łączone z surową, niezaufaną
+  treścią.
+- Dozwolony schemat wyjściowy jest zadeklarowany w prompcie
+  (`response_schema_version: 1`).
+- Backend otrzymuje dokładnie następujące pola najwyższego poziomu:
   - `prompt_version`
   - `response_schema_version`
   - `max_findings`
   - `allowed_categories`
   - `text`
 
-### Prompt example
+### Przykład promptu
 
 ```text
 You are a local, offline Polish text-quality backend.
@@ -46,14 +48,15 @@ Return an empty findings array when no safe, supported issue is found.
 </INPUT_JSON_END>
 ```
 
-## Response schema contract
+## Kontrakt schematu odpowiedzi
 
-The response is a JSON object with only these top-level fields:
+Odpowiedź jest obiektem JSON zawierającym wyłącznie następujące pola najwyższego
+poziomu:
 
-- `schema_version` (currently `1`)
-- `findings` (array)
+- `schema_version` (obecnie `1`)
+- `findings` (tablica)
 
-Each finding must include exactly these fields:
+Każde znalezisko musi zawierać dokładnie następujące pola:
 
 - `start`, `end`
 - `category`
@@ -64,75 +67,90 @@ Each finding must include exactly these fields:
 - `suggestion`
 - `confidence`
 
-Invalid extra fields are rejected.
+Nieprawidłowe pola dodatkowe są odrzucane.
 
-Validation rules:
+Reguły walidacji:
 
-- `category` must be one of the model `Category` values.
-- `severity` must be one of the model `Severity` values.
-- `start`, `end` must describe a valid range inside the original text.
-- `original` must exactly match `text[start:end]`.
-- `suggestion` must be `null` or a string (empty string is allowed for deletion).
-- `confidence` must be a finite number in `[0.0, 1.0]` and is validated by
-  the shared `Confidence` model.
-- findings are converted into `Finding.create(...)` records to preserve shared
-  stable identifiers and offsets.
+- `category` musi być jedną z wartości modelu `Category`.
+- `severity` musi być jedną z wartości modelu `Severity`.
+- `start` i `end` muszą opisywać prawidłowy zakres wewnątrz oryginalnego tekstu.
+- `original` musi dokładnie odpowiadać `text[start:end]`.
+- `suggestion` musi być wartością `null` albo łańcuchem; pusty łańcuch jest
+  dozwolony jako usunięcie.
+- `confidence` musi być skończoną liczbą z przedziału `[0.0, 1.0]` i podlega
+  walidacji przez wspólny model `Confidence`.
+- Znaleziska są przekształcane w rekordy `Finding.create(...)`, aby zachować
+  wspólne stabilne identyfikatory i offsety.
 
-## Compatibility rules
+## Reguły zgodności
 
-- Prompt and response versions are independent. The prompt version is `3` because
-  it explicitly describes every output field and the analysis task; the response
-  schema remains `1`.
-- Any response with `schema_version` different from `1` is rejected and requires
-  a migration adapter to maintain compatibility.
+- Wersje promptu i odpowiedzi są niezależne. Wersja promptu to `3`, ponieważ
+  jawnie opisuje każde pole wyjściowe i zadanie analizy; schemat odpowiedzi
+  pozostaje w wersji `1`.
+- Każda odpowiedź z `schema_version` inną niż `1` jest odrzucana i wymaga
+  adaptera migracji w celu zachowania zgodności.
 
-`M2-02` is complete when prompt and schema snapshots are tested for regression,
-adversarial inputs are rejected, and strict positive-schema tests pass.
+`M2-02` jest ukończone, gdy snapshoty promptu i schematu mają testy regresyjne,
+adwersarialne dane wejściowe są odrzucane, a rygorystyczne pozytywne testy
+schematu przechodzą.
 
-## Local backend adapter (M2-03)
+## Adapter lokalnego backendu (M2-03)
 
-`M2-03` uses **`mock-heu`** as the selected default adapter implementation.
+`M2-03` używa **`mock-heu`** jako wybranej domyślnej implementacji adaptera.
 
-- Backend: `MockHeuristicBackend` with `MockHeuristicTransport`.
-- Entry point: `create_default_local_backend()`.
-- Prompt path: one strict payload wrapped in `<INPUT_JSON_START>` / `<INPUT_JSON_END>`.
-- Boundaries:
-  - Maximum prompt length: 25,000 characters.
-  - Maximum response length: 25,000 characters.
-  - No transport is contacted until the local transport receives a prompt string.
-- Configuration:
-  - `allowed_categories`: optional `frozenset[Category]` to limit suggestions.
-  - `max_findings`: per-call hard cap for emitted findings.
-  - `name`: stable backend identifier (`mock-heu`).
+- Backend: `MockHeuristicBackend` z `MockHeuristicTransport`.
+- Punkt wejścia: `create_default_local_backend()`.
+- Ścieżka promptu: jedne rygorystyczne dane wejściowe opakowane w
+  `<INPUT_JSON_START>` / `<INPUT_JSON_END>`.
+- Granice:
+  - maksymalna długość promptu: 25,000 znaków;
+  - maksymalna długość odpowiedzi: 25,000 znaków;
+  - żaden transport nie jest wywoływany, dopóki lokalny transport nie otrzyma
+    łańcucha promptu.
+- Konfiguracja:
+  - `allowed_categories`: opcjonalny `frozenset[Category]` ograniczający sugestie;
+  - `max_findings`: sztywny limit znalezisk zwracanych w jednym wywołaniu;
+  - `name`: stabilny identyfikator backendu (`mock-heu`).
 
-Current runtime requirements:
+Bieżące wymagania runtime'u:
 
-- No additional installation, no model download, and no external network access.
-- Deterministic behavior with no mutable model state.
+- Brak dodatkowej instalacji, pobierania modelu i zewnętrznego dostępu do sieci.
+- Zachowanie deterministyczne bez mutowalnego stanu modelu.
 
-Validation behavior:
+Zachowanie walidacji:
 
-- `prompt` is rejected when the transport is unavailable.
-- Empty or malformed non-string backend responses are rejected.
-- Oversized prompts/responses are rejected with controlled validation exceptions.
-- The transport receives plain prompt text and returns raw model-like JSON only.
+- `prompt` jest odrzucany, gdy transport jest niedostępny.
+- Puste lub zniekształcone odpowiedzi backendu niebędące łańcuchiem są
+  odrzucane.
+- Zbyt duże prompty lub odpowiedzi są odrzucane za pomocą kontrolowanych
+  wyjątków walidacji.
+- Transport otrzymuje zwykły tekst promptu i zwraca wyłącznie surowy JSON
+  przypominający wyjście modelu.
 
-## Response resilience and failure policy (M2-04)
+## Odporność odpowiedzi i polityka błędów (M2-04)
 
-`M2-04` hardens local generation for production-safe behavior:
+`M2-04` wzmacnia generowanie lokalne, aby jego zachowanie było bezpieczne w
+produkcji:
 
-- `MockHeuristicBackend.generate_findings(...)` uses a retryable execution helper.
-- Retries are governed by `BackendRetryPolicy`:
-  - `timeout_seconds` (default: `1.0`)
-  - `max_attempts` (default: `3`)
-  - `retry_delays` (default: `(0.0, 0.1, 0.1)`)
-- Retry attempts are deterministic and injectable:
-  - a caller can provide `sleep` and `clock` to deterministically test delays and deadlines.
-- Failure mapping:
-  - `BackendUnavailableError` with `retryable=True` is retried up to policy budget.
-  - `asyncio.TimeoutError` maps to `AnalysisTimeoutError` and is retryable.
-  - Invalid backend payloads map to `InvalidBackendResponseError` and are terminal.
-  - Unknown exceptions become `InvalidBackendResponseError` (non-retryable).
-- Validation errors are redacted:
-  - raw user text is not emitted in exception messages.
-  - diagnostics carry only operational metadata (`operation`, `backend`) for incident triage.
+- `MockHeuristicBackend.generate_findings(...)` używa narzędzia pomocniczego do
+  wykonania z możliwością ponowienia.
+- Ponowieniami zarządza `BackendRetryPolicy`:
+  - `timeout_seconds` (wartość domyślna: `1.0`)
+  - `max_attempts` (wartość domyślna: `3`)
+  - `retry_delays` (wartość domyślna: `(0.0, 0.1, 0.1)`)
+- Próby ponowienia są deterministyczne i umożliwiają wstrzykiwanie zależności:
+  - wywołujący może dostarczyć `sleep` i `clock`, aby deterministycznie testować
+    opóźnienia i terminy.
+- Mapowanie błędów:
+  - `BackendUnavailableError` z `retryable=True` jest ponawiany do wyczerpania
+    budżetu polityki;
+  - `asyncio.TimeoutError` jest mapowany na `AnalysisTimeoutError` i umożliwia
+    ponowienie;
+  - nieprawidłowe dane backendu są mapowane na `InvalidBackendResponseError` i
+    kończą operację;
+  - nieznane wyjątki stają się `InvalidBackendResponseError` bez możliwości
+    ponowienia.
+- Błędy walidacji są anonimizowane:
+  - surowy tekst użytkownika nie trafia do komunikatów wyjątków;
+  - diagnostyka zawiera wyłącznie metadane operacyjne (`operation`, `backend`)
+    służące do analizy incydentu.

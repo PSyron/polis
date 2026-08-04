@@ -436,7 +436,7 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
     quality_gates_v2 = _normalized_prose(
         _markdown_region(
             (ROOT / "docs" / "llm-quality-gates.md").read_text(encoding="utf-8"),
-            "Issue #119 creates `polis_polish_correction_safety_corpus_v2`",
+            "Issue #119 tworzy `polis_polish_correction_safety_corpus_v2`",
         )
     )
     limitations_v2 = _normalized_prose(
@@ -518,15 +518,13 @@ def test_v2_documentation_scopes_review_and_runtime_boundaries() -> None:
 
     for required in (
         _V2_FROZEN_DIGEST,
-        "no development or holdout quality score",
-        "does not itself qualify #76",
-        _expected_prose(
-            "A separate follow-up issue must first pass development and may then",
-            "reserve the new holdout once",
-        ),
-        "unchanged automatic and reviewable gates",
-        "separate from corpus v4 in #85",
-        "gate in #90",
+        "nie dają wyniku jakości zbioru deweloperskiego ani holdoutu",
+        "samo w sobie nie kwalifikuje #76",
+        "Osobne kolejne issue musi najpierw zaliczyć fazę deweloperską",
+        "jednokrotnie zarezerwować nowy holdout",
+        "niezmienionych bramkach automatycznych i kanału do przeglądu",
+        "oddzielona od corpus-v4 w #85",
+        "bramki większościowego pokrycia zainstalowanego pakietu w #90",
     ):
         assert required in quality_gates_v2
 

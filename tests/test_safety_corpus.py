@@ -251,10 +251,12 @@ def test_candidate_documentation_records_identity_boundaries_and_review() -> Non
     assert "polis_polish_correction_safety_corpus_v1" in combined
     assert "frozen" in combined
     assert "CC0-1.0" in combined
-    assert "corpus v3" in combined
+    assert "korpus v3" in combined.casefold()
     assert "#85" in combined
     assert "Wynik holdoutu wytworzony przez issue #114: nie" in checklist
     assert "SHA-256 kanonicznego JSON-u" in checklist
+    assert "nie tworzy wyniku holdoutu" in combined
+    assert "documentation-contract" not in combined
 
 
 def test_owner_review_regressions_have_grammatical_expected_text() -> None:

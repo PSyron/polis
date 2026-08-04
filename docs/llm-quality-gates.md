@@ -1,132 +1,149 @@
-# Hybrid correction quality gates
+# Bramki jakości korekty hybrydowej
 
-ADR-0008 separates automatic deterministic corrections from reviewable model
-suggestions. Each path is measured independently against exact original-text
-edits on a frozen holdout. Fluency, JSON validity, speed, model confidence, or a
-strong aggregate score cannot compensate for a failed path-specific gate.
+ADR-0008 oddziela automatyczne poprawki deterministyczne od sugestii modelu
+podlegających przeglądowi. Każda ścieżka jest mierzona niezależnie względem
+dokładnych edycji tekstu oryginalnego na zamrożonym holdoucie. Płynność,
+poprawność JSON, szybkość, pewność modelu ani silny wynik zbiorczy nie mogą
+zrekompensować niezaliczonej bramki właściwej dla ścieżki.
 
-## Shared safety gates
+## Wspólne bramki bezpieczeństwa
 
-- Protected hard negatives include correct inflection, names and surnames,
-  marked but grammatical word order, numbers, URLs, quotations, and unaffected
-  formatting.
-- All analyzed text remains local after explicit artifact preparation. A model
-  runtime is direct local inference or uses a numeric loopback endpoint only.
-- Gold answers cannot be embedded in benchmark execution, prompt examples,
-  training records, or corpus-specific lookup branches.
-- Recall, F1, complete-output accuracy, latency, throughput, memory, and calls
-  per case are reported per category even when they are not release gates.
+- Chronione trudne przypadki negatywne obejmują poprawną fleksję, imiona i
+  nazwiska, nacechowany, ale gramatyczny szyk, liczby, adresy URL, cytaty i
+  formatowanie nieobjęte zmianą.
+- Po jawnym przygotowaniu artefaktów cały analizowany tekst pozostaje lokalny.
+  Runtime modelu wykonuje bezpośrednią inferencję lokalną albo używa wyłącznie
+  numerycznego endpointu loopback.
+- Odpowiedzi referencyjne (gold) nie mogą być osadzane w wykonywanym benchmarku,
+  przykładach promptów, rekordach treningowych ani gałęziach wyszukiwania
+  właściwych dla korpusu.
+- Recall, F1, trafność kompletnego wyjścia, opóźnienie, przepustowość, pamięć i
+  liczba wywołań na przypadek są raportowane dla każdej kategorii, nawet gdy nie
+  stanowią bramek wydania.
 
-Failure of a shared safety or privacy gate rejects the exact source, operation,
-runtime, and artifact configuration under test.
+Niezaliczenie wspólnej bramki bezpieczeństwa lub prywatności odrzuca dokładną
+testowaną konfigurację źródła, operacji, runtime'u i artefaktu.
 
-## Automatic-correction gates
+## Bramki automatycznej korekty
 
-Automatic eligibility is evaluated per deterministic source, category,
-operation, behavior version, and source-policy version:
+Uprawnienie do automatycznego zastosowania jest oceniane dla każdej kombinacji
+deterministycznego źródła, kategorii, operacji, wersji zachowania i wersji
+polityki źródeł:
 
-- exact edit precision: **1.00**;
-- correction accuracy: **1.00**;
-- protected hard negatives: **0** changed cases.
+- precision dokładnej edycji: **1.00**;
+- trafność korekty: **1.00**;
+- chronione trudne przypadki negatywne: **0** zmienionych przypadków.
 
-Passing these metrics does not itself change runtime policy. The exact behavior
-must also be added to the versioned automatic-correction source policy. The
-active `1.2` policy enforces the full immutable key `(source, category,
-operation, behavior_version, source_policy_version)` and checks confidence only
-after that key matches. Rule provenance, engine identity, a source name, or
-confidence alone never grants eligibility. A behavior-version change requires
-new direct evidence and a separate exact policy entry; model findings remain
-reviewable regardless of evidence or confidence.
+Zaliczenie tych metryk samo w sobie nie zmienia polityki runtime'u. Dokładne
+zachowanie musi również zostać dodane do wersjonowanej polityki źródeł
+automatycznej korekty. Aktywna polityka `1.2` wymusza pełny niezmienny klucz
+`(source, category, operation, behavior_version, source_policy_version)` i
+sprawdza pewność dopiero po dopasowaniu tego klucza. Pochodzenie reguły,
+tożsamość silnika, nazwa źródła ani sama pewność nigdy nie nadają uprawnienia.
+Zmiana wersji zachowania wymaga nowych bezpośrednich dowodów i osobnego,
+dokładnego wpisu polityki; znaleziska modelu pozostają do przeglądu niezależnie
+od dowodów lub pewności.
 
-## Suggestion gates
+## Bramki sugestii
 
-Suggestion and model gates are promotion evidence for an optional extension.
-They are not product release gates, and optional model research never blocks a
-runtime release. The runtime release path does not require a model, Java
-process, network service, research corpus, or consumed holdout.
+Bramki sugestii i modelu są dowodami na potrzeby promowania opcjonalnego
+rozszerzenia. Nie są bramkami wydania produktu, a opcjonalne badania nad modelem
+nigdy nie blokują wydania runtime'u. Ścieżka wydania runtime'u nie wymaga
+modelu, procesu Java, usługi sieciowej, korpusu badawczego ani zużytego holdoutu.
 
-Model-dependent edits remain suggestion-only for the first hybrid release,
-including finite-candidate selections and verifier-accepted proposals:
+Edycje zależne od modelu pozostają wyłącznie sugestiami w pierwszym wydaniu
+hybrydowym, w tym wybory ze skończonego zbioru kandydatów i propozycje
+zaakceptowane przez weryfikator:
 
-- exact edit precision: at least **0.90**;
-- valid structured outcomes: **100%**;
-- protected hard negatives: **0** findings.
+- precision dokładnej edycji: co najmniej **0.90**;
+- prawidłowe wyniki ustrukturyzowane: **100%**;
+- chronione trudne przypadki negatywne: **0** znalezisk.
 
-Recall is reported for `inflection`, `syntax`, and `punctuation` and guides
-later improvement. Low recall is acceptable for a conservative release; it
-never permits a lower precision, validity, or protected-negative threshold.
+Recall jest raportowany dla `inflection`, `syntax` i `punctuation` oraz kieruje
+późniejszymi usprawnieniami. Niski recall jest dopuszczalny w wydaniu
+zachowawczym; nigdy nie zezwala na obniżenie progu precision, poprawności lub
+chronionych przypadków negatywnych.
 
-## Selection evidence
+## Dowody wyboru
 
-Evidence records prompt and schema versions, exact model revision and
-quantization, runtime version, hardware class, operating system, corpus and
-split hashes, loaded memory, cold and warm latency, throughput, model calls,
-and offline verification. Development and holdout results remain separate.
+Dowody zapisują wersje promptu i schematu, dokładną rewizję i kwantyzację modelu,
+wersję runtime'u, klasę sprzętu, system operacyjny, skróty korpusu i podziału,
+zajętą pamięć, opóźnienie zimne i rozgrzane, przepustowość, liczbę wywołań modelu
+oraz weryfikację offline. Wyniki zbioru deweloperskiego i holdoutu pozostają
+oddzielone.
 
-The original LanguageTool two-rule subset and every model in ADR-0005 predate
-these M5 gates. ADR-0014 later qualified four exact LanguageTool rule IDs, and
-historical source-policy version `1.1` records the resulting five-ID allowlist.
-Active policy `1.2` preserves that qualification only for
-`check.allowlisted_comma` behavior `pl-6.8-five-rule-comma/1.0`; it does not
-broaden LanguageTool support. A model adapter may proceed only after its exact
-prompt, runtime, model, and source policies pass their applicable gates.
+Pierwotny dwuregulowy podzbiór LanguageTool i każdy model z ADR-0005 poprzedzają
+te bramki M5. ADR-0014 zakwalifikował później cztery dokładne identyfikatory
+reguł LanguageTool, a historyczna wersja polityki źródeł `1.1` zapisuje powstałą
+listę pięciu dozwolonych identyfikatorów. Aktywna polityka `1.2` zachowuje tę
+kwalifikację wyłącznie dla zachowania `check.allowlisted_comma`
+`pl-6.8-five-rule-comma/1.0`; nie poszerza wsparcia LanguageTool. Adapter modelu
+może przejść dalej dopiero po zaliczeniu odpowiednich bramek przez jego dokładny
+prompt, runtime, model i polityki źródeł.
 
-## Sentence safety re-qualification corpus
+## Korpus ponownej kwalifikacji bezpieczeństwa zdań
 
-Issue #114 introduces `polis_polish_correction_safety_corpus_v1` because the
-corpus-v3 one-shot holdout was consumed by a failed gate and cannot be repaired,
-rerun, or redrawn for re-qualification. The new 240-case CC0-1.0 corpus is
-independent from corpus v3, fine-tuning assets, prompt examples, and E2E data.
-Paweł Cyroń reviewed all cases on 2026-07-22 and the corpus is `frozen` with
-canonical JSON SHA-256
+Issue #114 wprowadza `polis_polish_correction_safety_corpus_v1`, ponieważ
+jednorazowy holdout corpus-v3 został zużyty przez nieudaną bramkę i nie może
+zostać naprawiony, ponownie uruchomiony ani wylosowany na nowo do ponownej
+kwalifikacji. Nowy 240-przypadkowy korpus na licencji CC0-1.0 jest niezależny od
+corpus-v3, zasobów fine-tuningu, przykładów promptów i danych E2E. Paweł Cyroń
+sprawdził wszystkie przypadki 2026-07-22, a korpus ma stan `frozen` i kanoniczny
+skrót JSON SHA-256
 `2fc05cd5552071ade7b392b3075d15bfaf57cf3f4b84df450c605b48d1615982`.
 
-No quality gate may select its 160 holdout cases before the frozen state, and
-no development path may load their gold answers. The frozen digest above was
-recorded before first access. Issue #114 itself performs no gate and
-produces no holdout score; a follow-up issue owns the one-shot run. This corpus
-does not replace corpus v3 and does not overlap the broader corpus work in #85.
+Żadna bramka jakości nie może wybrać jego 160 przypadków holdoutowych przed
+zamrożeniem, a żadna ścieżka deweloperska nie może załadować ich odpowiedzi
+referencyjnych (gold). Powyższy skrót zamrożonego zbioru zapisano przed pierwszym
+dostępem. Samo issue #114 nie uruchamia bramki i nie tworzy wyniku holdoutu; za
+jednorazowe uruchomienie odpowiada kolejne issue. Ten korpus nie zastępuje
+corpus-v3 ani nie nakłada się na szersze prace nad korpusem w #85.
 
-Issue #115 qualified the installed-package 80-case development phase on
-2026-07-23. Automatic edits scored `10 TP / 0 FP`, precision `1.00`, and
-correction accuracy `1.00`; reviewable edits scored `18 TP / 0 FP`, precision
-`1.00`, and correction accuracy `1.00`. Structured outcome validity was `1.00`
-and both protected-negative counts were zero. The exact development-report and
-artifact hashes are retained in the experiment's `frozen_gate.json`. The
-160-case holdout was then authorized, reserved, and executed exactly once on
-2026-07-23. Automatic edits scored `11 TP / 0 FP`, precision `1.00`, and
-correction accuracy `1.00`. Reviewable edits scored `0 TP / 2 FP`, precision
-`0.00`, and correction accuracy `1.00`; therefore the required reviewable
-precision `0.90` did not pass. Structured validity remained `1.00`, protected
-counts remained zero, and all privacy/performance gates passed. The retained
-marker makes the holdout permanently consumed, the overall decision is not
-qualified, and #76 remains open.
+Issue #115 zakwalifikowało 80-przypadkową fazę deweloperską zainstalowanego
+pakietu 2026-07-23. Automatyczne edycje uzyskały `10 TP / 0 FP`, precision `1.00`
+i trafność korekty `1.00`; edycje do przeglądu uzyskały `18 TP / 0 FP`,
+precision `1.00` i trafność korekty `1.00`. Poprawność ustrukturyzowanego wyniku
+wyniosła `1.00`, a obie liczby chronionych przypadków negatywnych były zerowe.
+Dokładne skróty raportu deweloperskiego i artefaktu zachowano w pliku
+`frozen_gate.json` eksperymentu. Następnie 160-przypadkowy holdout został
+autoryzowany, zarezerwowany i uruchomiony dokładnie raz 2026-07-23. Automatyczne
+edycje uzyskały `11 TP / 0 FP`, precision `1.00` i trafność korekty `1.00`.
+Edycje do przeglądu uzyskały `0 TP / 2 FP`, precision `0.00` i trafność korekty
+`1.00`; dlatego wymagane precision kanału do przeglądu `0.90` nie zostało
+osiągnięte. Poprawność strukturalna pozostała na poziomie `1.00`, liczby
+chronionych przypadków pozostały zerowe, a wszystkie bramki prywatności i
+wydajności zostały zaliczone. Zachowany znacznik sprawia, że holdout jest trwale
+zużyty, ogólna decyzja brzmi „niezakwalifikowane”, a #76 pozostaje otwarte.
 
-Issue #119 creates `polis_polish_correction_safety_corpus_v2` as the next
-independent qualification asset. Its 240 CC0-1.0 cases are frozen after
-exhaustive review by the authorized `Polis architecture owner` role. Frozen
-canonical JSON SHA-256 is
+Issue #119 tworzy `polis_polish_correction_safety_corpus_v2` jako kolejny
+niezależny zasób kwalifikacyjny. Jego 240 przypadków na licencji CC0-1.0 jest
+zamrożonych po pełnym przeglądzie przez uprawnioną rolę
+`Polis architecture owner`. Kanoniczny skrót JSON SHA-256 zamrożonego korpusu to
 `53cfce6b9cbe3f188290a064b34527912ea8f2a85c9ed29a67984c5ef5caaa29`.
-The corpus is mechanically isolated from both earlier corpora and all reserved
-prompt/training/E2E assets. Its creation and review produce no development or
-holdout quality score and do not expose holdout gold.
+Korpus jest mechanicznie odizolowany od obu wcześniejszych korpusów oraz
+wszystkich zarezerwowanych zasobów promptów, treningowych i E2E. Jego utworzenie
+i przegląd nie dają wyniku jakości zbioru deweloperskiego ani holdoutu i nie
+ujawniają odpowiedzi referencyjnych (gold) holdoutu.
 
-Freezing v2 does not itself qualify #76. A separate follow-up issue must first
-pass development and may then reserve the new holdout once under the unchanged
-automatic and reviewable gates. This path is separate from corpus v4 in #85
-and the majority-coverage installed-package gate in #90.
+Zamrożenie v2 samo w sobie nie kwalifikuje #76. Osobne kolejne issue musi
+najpierw zaliczyć fazę deweloperską, a następnie może jednokrotnie zarezerwować
+nowy holdout przy niezmienionych bramkach automatycznych i kanału do przeglądu.
+Ta ścieżka jest oddzielona od corpus-v4 w #85 oraz bramki większościowego pokrycia
+zainstalowanego pakietu w #90.
 
-Issue #146 owns that sentence-only one-shot execution. It is optional research.
-It does not block a runtime release and preserves every unchanged gate above.
-The accepted autonomous authorization required preflight, qualifying
-development, frozen verification, and independent review. The 80 development
-cases ran in two stable repetitions but were not qualified: automatic precision
-and correction accuracy were `1.00`, automatic recall was
-`0.3333333333333333`, and the reviewable channel proposed no edits, so its
-non-vacuous precision gate did not pass. Structured validity was `1.00` and
-both protected-negative counts were zero. Aggregate report SHA-256 is
+Issue #146 odpowiada za to jednorazowe uruchomienie ograniczone do zdań. Jest to
+opcjonalne badanie. Nie blokuje wydania runtime'u i zachowuje każdą powyższą
+bramkę bez zmian. Zaakceptowana autonomiczna autoryzacja wymagała kontroli
+wstępnej, kwalifikującej fazy deweloperskiej, weryfikacji zamrożenia i
+niezależnego przeglądu. 80 przypadków deweloperskich uruchomiono w dwóch stabilnych
+powtórzeniach, ale nie zostały zakwalifikowane: automatyczne precision i trafność
+korekty wyniosły `1.00`, automatyczny recall `0.3333333333333333`, a kanał do
+przeglądu nie zaproponował żadnych edycji, więc nie wykazał wymaganej precyzji.
+Poprawność strukturalna wyniosła `1.00`, a obie liczby chronionych
+przypadków negatywnych były zerowe. Skrót SHA-256 raportu zbiorczego to
 `7485c543a5abcfe45096cfc9334b59cf4c5dd510186c6318a44d0c38cdeb1141`.
-There is no frozen gate, the marker remains absent, and the holdout was not
-reserved, materialized, or run. No rerun or tuning is permitted. #76 remains
-open and Task 6 is forbidden. The experiment does not qualify a production
-model and does not qualify paragraph behavior.
+Nie istnieje zamrożona bramka, znacznik pozostaje nieobecny, a holdout nie został
+zarezerwowany, zmaterializowany ani uruchomiony. Ponowne uruchomienie ani
+dostrajanie nie jest dozwolone. #76 pozostaje otwarte, a `Task 6` jest
+zabronione. Eksperyment nie kwalifikuje modelu produkcyjnego ani zachowania dla
+akapitów.
