@@ -31,7 +31,24 @@ not a model-research release dependency.
 #95 is P1 hardening after #84. The `#120 -> #84 -> #95` arrow records
 sequencing; it does not mean that #95 blocks the current runtime release. Shared
 `Runtime 0.x Hardening` milestone membership does not make #95 a release blocker
-unless a separate accepted issue says so.
+unless a separate accepted issue says so. This work is complete.
+
+Current product architecture work is the M6 rule-catalog sequence:
+
+`#149 -> #150 -> #152 -> #153`
+
+`#90 + #149 + #150 -> #151`
+
+`#151 + #152 + #153 -> #154 -> #155`
+
+#151 intentionally waits for the open #90 evidence path so source selection
+cannot destabilize that experiment. This cross-lane guard does not make M6 or
+optional research a runtime-release prerequisite. M6 remains future product
+architecture and does not block current runtime releases.
+
+The separate Polish-first documentation migration is governed by #158 and the
+[documentation roadmap](DOCUMENTATION-ROADMAP.md). It does not change the
+dependencies or acceptance criteria of #149-#155.
 
 ## Optional research lane
 

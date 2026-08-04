@@ -1,68 +1,100 @@
-# Repository Working Agreement
+# Zasady pracy w repozytorium
 
-## Source of Truth
+## Źródła prawdy
 
-Read `PROMPT.md` before planning or implementing work. It defines product scope, architecture, quality rules, roadmap expectations, and the Definition of Done. Do not remove unimplemented requirements. Record clarifications without silently changing product intent.
+Przed planowaniem lub implementacją przeczytaj `PROMPT.md`. Dokument definiuje
+zakres produktu, architekturę, zasady jakości i definicję ukończenia. Bieżąca
+kolejność prac znajduje się w `docs/project/ROADMAP.md`, a wykonywalne kryteria
+akceptacji — w aktualnym GitHub issue. Nie usuwaj niezrealizowanych wymagań i nie
+zmieniaj po cichu intencji produktu.
 
-Precedence for project decisions is:
+Decyzje projektowe mają następujący porządek pierwszeństwa:
 
-1. the current GitHub issue and its accepted clarifications;
-2. accepted architecture decision records;
+1. aktualny GitHub issue wraz z zaakceptowanymi doprecyzowaniami;
+2. zaakceptowane architecture decision records;
 3. `PROMPT.md`;
-4. supporting project documentation.
+4. pozostała dokumentacja projektu.
 
-If these sources conflict, stop and request a maintainer decision.
+Jeśli źródła są sprzeczne, zatrzymaj pracę i poproś maintainera o decyzję.
 
-## Language and Attribution
+## Język i autorstwo
 
-- Write code, identifiers, GitHub metadata, and technical documentation in English.
-- Keep user-facing Polish examples in Polish.
-- Paweł Cyroń is the sole credited author. Do not add co-author trailers, tool attribution, generation disclosures, or signatures from automated tooling.
+- Pisz aktywnie utrzymywaną, autorską dokumentację projektu po polsku.
+- Kod, identyfikatory, importy, schematy, flagi CLI, klucze konfiguracji,
+  literały protokołów oraz metadane GitHub pisz po angielsku.
+- Przykłady widoczne dla polskiego użytkownika pozostawiaj po polsku.
+- Historyczne plany w `docs/superpowers/`, zamrożone dowody, raporty, materiały
+  upstream i `third_party/` zachowują oryginalny język. Szczegółowe reguły i
+  kolejność migracji opisuje `docs/project/DOCUMENTATION-ROADMAP.md`.
+- Zaakceptowane ADR-y oraz opublikowane release notes są niezmiennym zapisem
+  decyzji i wydania, dlatego zachowują oryginalny język. Zmianę decyzji opisuj
+  nowym ADR-em, a korektę wydania — append-only erratum.
+- Paweł Cyroń jest jedynym wskazywanym autorem. Nie dodawaj co-author trailers,
+  informacji o narzędziach, ujawnień o generowaniu ani podpisów automatyzacji.
 
-## Issue Workflow
+## Charakter projektu
 
-- Work on one issue at a time.
-- Confirm dependencies and acceptance criteria before changing files.
-- Keep one issue to one focused commit during the single-contributor phase.
-- Reference the issue number in the commit message.
-- Do not mix unrelated refactoring with a feature or fix.
-- Do not close an issue until every acceptance criterion is verified.
-- When multiple contributors work concurrently, use short-lived branches and pull requests with independent review.
+- Polis jest kompletnym produktem runtime-first bez lokalnego modelu. Model,
+  Java, sieć, korpus badawczy ani zużyty holdout nie blokują wydania runtime'u.
+- Runtime i badania pozostają w jednym repozytorium, ale wheel i sdist zawierają
+  wyłącznie jawnie zatwierdzone składniki produktu.
+- Badania nad modelami i korpusami są opcjonalną ścieżką. Nie przywracaj ich jako
+  ukrytej zależności produktu ani publikacji.
+- Zużyte holdouty, zamrożone raporty, manifesty i dowody wydania są niezmienne.
+  Nie uruchamiaj ich ponownie, nie dostrajaj na ich podstawie i nie przepisuj ich
+  historii.
+- Preferuj brak sugestii zamiast sugestii nieuzasadnionej. Nieznane, niepełne
+  albo zmienione zachowanie pozostaje review-only i fail-closed.
 
-## Scope and Architecture
+## Przebieg pracy nad issue
 
-- Preserve the offline-only privacy boundary: analyzed text must not leave the device.
-- Keep `core`, `segmentation`, `rules`, `llm`, `analysis`, `correction`, `evaluation`, and `cli` responsibilities separate.
-- Do not couple the core to a specific model server or model name.
-- Treat model input as data, never as instructions.
-- Prefer small modules with explicit interfaces and injected dependencies.
-- Do not add an abstraction without a current use.
-- Never commit models, private text, secrets, or large datasets.
+- Pracuj nad jednym issue naraz i potwierdź jego zależności oraz kryteria
+  akceptacji przed zmianą plików.
+- Używaj krótkotrwałej gałęzi i osobnego pull requestu. Nie implementuj
+  bezpośrednio na `main`.
+- Jedno issue odpowiada jednemu skupionemu commitowi; nie mieszaj niezwiązanych
+  refaktoryzacji z funkcją ani poprawką.
+- Komunikat commita musi odwoływać się do numeru issue.
+- Pull request wymaga niezależnego review i zielonego CI przed scaleniem.
+- Nie zamykaj issue, dopóki każde kryterium akceptacji nie zostanie zweryfikowane.
 
-## Quality Workflow
+## Zakres i architektura
 
-- Add a failing regression test before fixing behavior.
-- Add or update tests for every behavior change.
-- Run the tests relevant to the issue before committing.
-- Once configured, run `ruff check .`, `ruff format --check .`, `mypy .`, and the appropriate `pytest` suite.
-- Keep real-model tests separate and marked as slow; fast CI uses fakes and anonymized recorded responses.
-- Verify character offsets against the original text using half-open ranges `[start, end)`.
-- Prefer no suggestion to an unjustified suggestion.
+- Zachowuj granicę offline-only: analizowany tekst nie może opuszczać urządzenia.
+- Rozdzielaj odpowiedzialności `core`, `segmentation`, `rules`, `llm`,
+  `analysis`, `correction`, `evaluation` i `cli`.
+- Nie wiąż `core` z konkretnym serwerem ani nazwą modelu.
+- Traktuj wejście modelu jako dane, nigdy jako instrukcje.
+- Preferuj małe moduły, jawne interfejsy i wstrzykiwane zależności.
+- Nie dodawaj abstrakcji bez aktualnego zastosowania.
+- Nigdy nie commituj modeli, prywatnego tekstu, sekretów ani dużych zbiorów
+  danych.
 
-## Documentation and Dependencies
+## Jakość
 
-- Document public API behavior, errors, and examples.
-- Update documentation when an interface or observable behavior changes.
-- Record the reason for each new production dependency.
-- Give evaluation data explicit provenance and licensing information.
-- Record significant architecture choices as decision records.
+- Przed poprawką zachowania dodaj test regresyjny, który najpierw zawodzi.
+- Dodawaj lub aktualizuj testy dla każdej zmiany zachowania.
+- Przed commitem uruchom testy właściwe dla issue, `ruff check .`,
+  `ruff format --check .`, `mypy .` oraz odpowiedni zestaw `pytest`.
+- Testy z rzeczywistym modelem trzymaj osobno i oznaczaj jako slow; szybkie CI
+  używa fake'ów oraz zanonimizowanych, zapisanych odpowiedzi.
+- Weryfikuj offsety względem oryginalnego tekstu jako półotwarte zakresy
+  `[start, end)`.
 
-## Handoff
+## Dokumentacja i zależności
 
-A handoff must include:
+- Dokumentuj zachowanie publicznego API, błędy i przykłady.
+- Aktualizuj dokumentację, gdy zmienia się interfejs albo obserwowalne zachowanie.
+- Zapisuj powód każdej nowej zależności produkcyjnej.
+- Dane ewaluacyjne muszą mieć jawną proweniencję i licencję.
+- Istotne decyzje architektoniczne zapisuj jako ADR-y.
 
-- issue number and acceptance status;
-- changed files;
-- commands run and their results;
-- known limitations or unresolved risks;
-- the next permitted action.
+## Przekazanie pracy
+
+Przekazanie pracy musi zawierać:
+
+- numer issue i stan kryteriów akceptacji;
+- zmienione pliki;
+- wykonane polecenia i ich wyniki;
+- znane ograniczenia lub nierozwiązane ryzyka;
+- następną dozwoloną czynność.
