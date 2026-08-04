@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "issue": 158,
+  "policy_version": "1.0",
+  "rules": [
+    {
+      "id": "github-machine-facing",
+      "disposition": "retain_machine_facing_english",
+      "wave": "protected",
+      "paths": [],
+      "prefixes": [".github/"]
+    },
+    {
+      "id": "vendored-upstream",
+      "disposition": "retain_upstream_original",
+      "wave": "protected",
+      "paths": [],
+      "prefixes": ["third_party/"]
+    },
+    {
+      "id": "superpowers-history",
+      "disposition": "retain_historical_evidence",
+      "wave": "protected",
+      "paths": [],
+      "prefixes": ["docs/superpowers/"]
+    },
+    {
+      "id": "frozen-research-trees",
+      "disposition": "retain_research_evidence",
+      "wave": "protected",
+      "paths": [],
+      "prefixes": ["experiments/", "data/"]
+    },
+    {
+      "id": "immutable-release-evidence",
+      "disposition": "retain_historical_evidence",
+      "wave": "protected",
+      "paths": ["CHANGELOG.md"],
+      "prefixes": ["docs/release-notes/"]
+    },
+    {
+      "id": "accepted-architecture-decisions",
+      "disposition": "retain_historical_evidence",
+      "wave": "protected",
+      "paths": [],
+      "prefixes": ["docs/architecture/decisions/"]
+    },
+    {
+      "id": "named-historical-records",
+      "disposition": "retain_historical_evidence",
+      "wave": "protected",
+      "paths": [
+        "docs/project/issue-62-implementation-plan.md",
+        "docs/project/runtime-first-portfolio-disposition.md",
+        "task-7-guard-fix-report.md"
+      ],
+      "prefixes": []
+    },
+    {
+      "id": "current-polish-governance",
+      "disposition": "maintain_polish",
+      "wave": "governance",
+      "paths": [
+        "AGENTS.md",
+        "PROMPT.md",
+        "docs/project/DOCUMENTATION-ROADMAP.md"
+      ],
+      "prefixes": []
+    },
+    {
+      "id": "public-entry-points",
+      "disposition": "translate_polish",
+      "wave": "public-entry",
+      "paths": [
+        "README.md",
+        "docs/limitations.md",
+        "docs/quick-start.md"
+      ],
+      "prefixes": []
+    },
+    {
+      "id": "project-governance",
+      "disposition": "translate_polish",
+      "wave": "governance",
+      "paths": [
+        "docs/project/RISKS.md",
+        "docs/project/ROADMAP.md"
+      ],
+      "prefixes": []
+    },
+    {
+      "id": "maintained-architecture-guides",
+      "disposition": "translate_polish",
+      "wave": "architecture",
+      "paths": [],
+      "prefixes": ["docs/architecture/"]
+    },
+    {
+      "id": "developer-guides",
+      "disposition": "translate_polish",
+      "wave": "release-and-privacy",
+      "paths": [],
+      "prefixes": ["docs/development/"]
+    },
+    {
+      "id": "maintained-project-docs",
+      "disposition": "translate_polish",
+      "wave": "runtime-and-research-guides",
+      "paths": [],
+      "prefixes": ["docs/"]
+    }
+  ]
+}

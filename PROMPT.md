@@ -4,7 +4,16 @@
 
 Ten dokument jest źródłem prawdy dla projektu **Polis**. Traktuj go jako żywą specyfikację: aktualizuj stan realizacji i doprecyzowuj decyzje architektoniczne, ale nie usuwaj niezrealizowanych wymagań. Nie uznawaj punktu za wykonany bez kodu, testów i weryfikacji kryteriów akceptacji.
 
-Najpierw poznaj stan repozytorium i zaplanuj pracę. Następnie utwórz roadmapę, milestone'y oraz małe, atomowe GitHub Issues. Dopiero później implementuj kolejne issue. Nie próbuj zbudować całego systemu w jednym kroku.
+Najpierw poznaj stan repozytorium, przeczytaj aktualną roadmapę w
+`docs/project/ROADMAP.md` i sprawdź wykonywalne kryteria bieżącego GitHub issue.
+Planuj oraz implementuj po jednym małym, atomowym issue. Nie próbuj zbudować
+całego systemu w jednym kroku.
+
+Aktywnie utrzymywana, autorska dokumentacja projektu powstaje po polsku. Kod,
+identyfikatory, importy, schematy, flagi CLI, klucze konfiguracji, literały
+protokołów oraz metadane GitHub pozostają po angielsku. Historyczne plany,
+zamrożone dowody, raporty oraz materiały upstream zachowują oryginalny język
+zgodnie z `docs/project/DOCUMENTATION-ROADMAP.md`.
 
 ## Wizja
 
@@ -179,6 +188,12 @@ Repozytorium powinno zawierać:
 - metodologię benchmarków oraz aktualne wyniki;
 - politykę prywatności jasno stwierdzającą, że biblioteka nie wysyła tekstu do sieci.
 
+Nowe i aktywnie utrzymywane dokumenty autorskie pisz po polsku. Nie tłumacz
+mechanicznie kontraktów maszynowych, historycznych planów, zamrożonych dowodów,
+raportów, zaakceptowanych ADR-ów, opublikowanych release notes ani materiałów
+upstream. Każda migracja językowa musi zachować znaczenie kontraktów, linki,
+ścieżki, przykłady kodu i niezmienne identyfikatory.
+
 ## Planowanie w GitHub
 
 Przed implementacją:
@@ -202,6 +217,10 @@ Każde issue powinno zawierać:
 Issue powinno zwykle odpowiadać jednej niewielkiej zmianie możliwej do ukończenia w jednym skupionym cyklu pracy. Jeśli opis łączy spójnikiem „i” dwa niezależne rezultaty, rozważ podział.
 
 ## Proponowane milestone'y
+
+Poniższe milestone'y są historyczną propozycją początkową. Aktualną kolejność
+produktu i badań utrzymuje `docs/project/ROADMAP.md`, a szczegółowe kryteria
+realizacji znajdują się w GitHub issues.
 
 ### M0 — Fundament i decyzje
 
@@ -251,20 +270,23 @@ M2 nigdy nie blokuje dostarczenia runtime'u przez M3 ani M4.
 
 Milestone'y są propozycją początkową. Zmień je po analizie repozytorium, jeśli potrafisz uzasadnić prostszy lub bezpieczniejszy podział.
 
-## Workflow na początkowym etapie
+## Aktualny workflow
 
-Na etapie pracy jednego agenta dopuszczona jest praca bezpośrednio na gałęzi `main`, aby ograniczyć narzut organizacyjny. Obowiązują zasady:
+Każde issue jest realizowane na krótkotrwałej gałęzi i w osobnym pull requeście.
+Nie implementuj bezpośrednio na `main`. Obowiązują zasady:
 
 - jedno issue odpowiada jednemu commitowi;
 - jeden commit realizuje tylko jedno issue;
 - przed rozpoczęciem issue sprawdź jego kryteria akceptacji i zależności;
 - przed commitem uruchom właściwe testy, linting i kontrolę typów;
 - komunikat commita odwołuje się do numeru issue;
+- pull request wymaga niezależnego review i zielonego CI przed scaleniem;
 - issue zamykaj dopiero po weryfikacji kryteriów akceptacji;
 - nie wykonuj `force push` i nie przepisuj opublikowanej historii;
 - nie omijaj nieudanych kontroli jakości.
 
-Gdy nad repozytorium zacznie jednocześnie pracować więcej niż jeden agent albo człowiek, przejdź na krótkotrwałe gałęzie i pull requesty. Wtedy każde issue nadal odpowiada jednej zmianie, lecz przed scaleniem wymaga niezależnego przeglądu i zielonego CI.
+Prace równoległe muszą używać odrębnych gałęzi lub worktree i nie mogą
+jednocześnie modyfikować tych samych plików bez uzgodnionej własności.
 
 ## Role w pracy wieloagentowej
 
@@ -293,15 +315,14 @@ Issue jest ukończone wyłącznie wtedy, gdy:
 
 Milestone jest ukończony dopiero wtedy, gdy wszystkie wymagane issue są zamknięte, testy integracyjne przechodzą, a znane ograniczenia są udokumentowane.
 
-## Pierwsze zadanie agenta
+## Rozpoczęcie pracy przez agenta
 
-Nie rozpoczynaj od implementowania analizatora. Najpierw:
+Przed implementacją:
 
-1. Przeczytaj cały ten dokument oraz istniejące pliki repozytorium.
-2. Zidentyfikuj sprzeczności, ryzyka i brakujące decyzje blokujące MVP.
-3. Zaproponuj minimalną architekturę oraz roadmapę.
-4. Przygotuj milestone'y i listę atomowych issue wraz z kolejnością realizacji.
-5. Przedstaw plan właścicielowi projektu do zatwierdzenia.
-6. Dopiero po zatwierdzeniu planu realizuj po jednym issue, zachowując workflow i Definition of Done.
+1. Przeczytaj cały ten dokument, `AGENTS.md`, aktualną roadmapę i bieżące issue.
+2. Potwierdź zależności, kryteria akceptacji i granice chronionych danych.
+3. Sprawdź, czy plan jest atomowy i nie koliduje z równoległą pracą.
+4. Utwórz krótkotrwałą gałąź lub worktree.
+5. Realizuj zaakceptowany plan zgodnie z workflow i Definition of Done.
 
-Nie twórz masowo issue ani nie wykonuj operacji na GitHubie bez potwierdzenia właściciela, jeśli repozytorium nie zostało jeszcze skonfigurowane lub zakres planu nie został zatwierdzony.
+Nie twórz masowo issue ani nie rozszerzaj zakresu bez potwierdzenia właściciela.
