@@ -1340,11 +1340,20 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
 ) -> None:
     document = " ".join(path.read_text(encoding="utf-8").split())
 
-    for phrase in (
-        "optional model research never blocks a runtime release",
-        "does not require a model, Java process, network service, research "
-        "corpus, or consumed holdout",
-    ):
+    required_phrases = (
+        (
+            "opcjonalne badania modeli nigdy nie blokują wydania runtime'u",
+            "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
+            "badawczego ani zużytego holdoutu",
+        )
+        if path.name == "compatibility.md"
+        else (
+            "optional model research never blocks a runtime release",
+            "does not require a model, Java process, network service, research "
+            "corpus, or consumed holdout",
+        )
+    )
+    for phrase in required_phrases:
         assert phrase in document
 
     assert_no_runtime_release_dependency_conflict(document)

@@ -1,88 +1,100 @@
-# Compatibility policy and semantic versioning
+# Polityka kompatybilności i wersjonowanie semantyczne
 
-This document publishes the M4 compatibility baseline and deprecation policy.
+Ten dokument publikuje bazową kompatybilność M4 i politykę wycofywania.
 
-## Supported configurations
+## Wspierane konfiguracje
 
-`polis` is verified on the same matrix as fast CI:
+`polis` jest weryfikowany na tej samej macierzy co szybkie CI:
 
-- CPython 3.12, 3.13, 3.14 on Linux x86_64,
-- CPython 3.12, 3.14 on macOS arm64,
-- CPython 3.12, 3.14 on Windows x86_64.
+- CPython 3.12, 3.13, 3.14 w systemie Linux x86_64;
+- CPython 3.12, 3.14 w systemie macOS arm64;
+- CPython 3.12, 3.14 w systemie Windows x86_64.
 
-No optional model runtime is required for core deterministic checks. Model
-backends are optional extensions; their absence is not a degraded core-runtime
-state, and optional model research never blocks a runtime release. The runtime
-release path does not require a model, Java process, network service, research
-corpus, or consumed holdout.
+Podstawowe kontrole deterministyczne nie wymagają opcjonalnego środowiska
+uruchomieniowego modelu. Backendy modeli są opcjonalnymi rozszerzeniami; ich brak
+nie oznacza zdegradowanego stanu podstawowego runtime'u, a opcjonalne badania
+modeli nigdy nie blokują wydania runtime'u. Ścieżka wydania runtime'u nie wymaga
+modelu, procesu Java, usługi sieciowej, korpusu badawczego ani zużytego holdoutu.
 
-### Evidence and deprecation policy enforcement
+### Egzekwowanie dowodów i polityki wycofywania
 
-- Compatibility assertions are checked in `.github/workflows/fast-ci.yml` (Linux x86_64,
-  macOS arm64, Windows x86_64) on each push and PR.
-- For each release block, we verify the compatibility fixture and quality gates by
-  running `uv run --locked --extra dev python scripts/verify_prerelease_candidate.py`.
-- Any required API/schema change must update `tests/fixtures/public_api_snapshot.json`
-  and include migration notes before release.
+- Asercje kompatybilności są sprawdzane w `.github/workflows/fast-ci.yml` (Linux
+  x86_64, macOS arm64, Windows x86_64) przy każdym pushu i PR-ze.
+- Dla każdej blokady wydania weryfikujemy zestaw danych kompatybilności i bramki
+  jakości poleceniem
+  `uv run --locked --extra dev python scripts/verify_prerelease_candidate.py`.
+- Każda wymagana zmiana API lub schematu musi przed wydaniem zaktualizować
+  `tests/fixtures/public_api_snapshot.json` i zawierać noty migracyjne.
 
-## Platform verification profile 1.0
+## Profil weryfikacji platform 1.0
 
-This versioned profile assigns platform-sensitive evidence to an explicit owner.
-A check that cannot run on one platform is not silently removed: it remains owned by
-the stated platform job or by a separate release-gate verification path. Evidence
-from one operating system does not qualify another operating system.
+Ten wersjonowany profil przypisuje dowody zależne od platformy jawnemu
+właścicielowi. Kontrola, której nie można uruchomić na jednej platformie, nie
+jest po cichu usuwana: nadal odpowiada za nią wskazane zadanie platformowe albo
+osobna ścieżka weryfikacji bramki wydania. Dowód z jednego systemu operacyjnego
+nie kwalifikuje innego systemu operacyjnego.
 
-| Check | Owner | Platforms and verification path |
+| Kontrola | Właściciel | Platformy i ścieżka weryfikacji |
 | --- | --- | --- |
-| Fast deterministic suite and supported interpreter matrix | `.github/workflows/fast-ci.yml` | Linux, macOS, and Windows fast CI |
-| CLI UTF-8 process boundary, including inherited CP1252 streams | `tests/test_cli.py` and `tests/test_release_distribution_installation.py` | Every fast-CI platform; clean wheel and sdist installation repeat the boundary check |
-| Effective `text`/`eol` policy and checkout byte/hash stability | `tests/test_fast_ci_workflow.py` | Every fast-CI platform, including a CRLF-configured behavioral checkout |
-| Vendored upstream byte-exact overrides | `.gitattributes` and `tests/test_fast_ci_workflow.py` | Every fast-CI platform; `-text -eol` must remain effective |
-| POSIX executable bits for vendored launchers | `tests/test_languagetool_vendor_artifacts.py` | Linux and macOS fast CI; Windows does not model the POSIX mode bit, so the POSIX jobs retain this evidence |
-| macOS network-denial evidence (`sandbox-exec`) | sentence-release qualification owner (issue #79) | macOS release job through separate release-gate verification; Linux and Windows require their own enforced denial mechanisms before either can claim equivalent evidence |
-| POSIX process and resource evidence (`/bin/ps`, `lsof`, `sysctl`) | sentence-release qualification owner (issue #79) | Platform-native Linux/macOS release jobs; a Darwin-only command may not stand in for Linux evidence |
-| Windows pipe, process, resource, and network-denial evidence | sentence-release qualification owner (issue #79) | Windows release job with Windows-native mechanisms; POSIX `select()` on subprocess pipes and POSIX utilities are not accepted substitutes |
+| Szybki zestaw deterministyczny i macierz wspieranych interpreterów | `.github/workflows/fast-ci.yml` | Szybkie CI na Linuxie, macOS i Windowsie |
+| Granica procesu CLI dla UTF-8, w tym odziedziczone strumienie CP1252 | `tests/test_cli.py` i `tests/test_release_distribution_installation.py` | Każda platforma szybkiego CI; czysta instalacja wheel i sdist powtarza kontrolę granicy |
+| Efektywna polityka `text`/`eol` oraz stabilność bajtów i skrótów checkoutu | `tests/test_fast_ci_workflow.py` | Każda platforma szybkiego CI, w tym behawioralny checkout skonfigurowany dla CRLF |
+| Dokładne bajtowo nadpisania kodu upstream dostarczanego ze źródłami | `.gitattributes` i `tests/test_fast_ci_workflow.py` | Każda platforma szybkiego CI; `-text -eol` musi pozostać efektywne |
+| Bity wykonywalności POSIX programów uruchamiających dostarczanych ze źródłami | `tests/test_languagetool_vendor_artifacts.py` | Szybkie CI na Linuxie i macOS; Windows nie modeluje bitu trybu POSIX, więc zadania POSIX zachowują ten dowód |
+| Dowód odmowy sieci w macOS (`sandbox-exec`) | właściciel kwalifikacji wydania zdaniowego (issue #79) | Zadanie wydania na macOS przez osobną weryfikację bramki wydania; Linux i Windows wymagają własnych wymuszonych mechanizmów odmowy, zanim będą mogły deklarować równoważny dowód |
+| Dowody procesów i zasobów POSIX (`/bin/ps`, `lsof`, `sysctl`) | właściciel kwalifikacji wydania zdaniowego (issue #79) | Natywne dla platformy zadania wydania na Linuxie/macOS; polecenie wyłącznie dla Darwina nie może zastępować dowodu dla Linuxa |
+| Dowody potoków, procesów, zasobów i odmowy sieci w Windowsie | właściciel kwalifikacji wydania zdaniowego (issue #79) | Zadanie wydania na Windowsie z natywnymi mechanizmami Windows; POSIX-owe `select()` na potokach podprocesów i narzędzia POSIX nie są akceptowanymi zamiennikami |
 
-The sentence-release gate must report unsupported or unavailable platform evidence as
-a release blocker. A skip is acceptable only where the table assigns the same check
-to another required job, such as POSIX executable-bit verification on Linux/macOS.
+Bramka wydania zdaniowego musi zgłaszać niewspierany lub niedostępny dowód
+platformowy jako blokadę wydania. Pominięcie jest dopuszczalne tylko wtedy, gdy
+tabela przypisuje tę samą kontrolę innemu wymaganemu zadaniu, na przykład
+weryfikację bitów wykonywalności POSIX na Linuxie/macOS.
 
-## Public API compatibility policy
+## Polityka kompatybilności publicznego API
 
-- **Patch**: fixes, documentation-only updates, test additions, and bug fixes with no behavior-breaking effect on stable public symbols.
-- **Minor**: additive public symbols, additive enum values, safer validation messages, and new optional features.
-- **Major**: changes that break existing code using documented symbols (`polis.__all__` / `public API snapshots`) or serialized schema versions.
+- **Patch**: poprawki, aktualizacje wyłącznie dokumentacyjne, dodatki testów oraz
+  naprawy błędów bez wpływu łamiącego zachowanie stabilnych symboli publicznych.
+- **Minor**: dodawane symbole publiczne, dodawane wartości enum, bezpieczniejsze
+  komunikaty walidacji i nowe funkcje opcjonalne.
+- **Major**: zmiany łamiące istniejący kod korzystający z udokumentowanych
+  symboli (`polis.__all__` / `public API snapshots`) albo wersji serializowanych
+  schematów.
 
-## Release version policy
+## Polityka wersji wydań
 
-Release selection uses SemVer's `MAJOR.MINOR.PATCH` line: a new additive Polis
-line after `0.1.0` is `0.2.0`. Python package metadata and artifacts use the
-corresponding canonical PEP 440 forms: normal development is `0.2.0.dev0`, a
-candidate is `0.2.0rcN`, and the stable package is `0.2.0`. Every selected
-package version has the exact matching Git tag `v<version>`; abbreviated,
-local-version, equal, and lower forms are rejected by the release verifier.
+Wybór wydania używa linii wersji SemVer `MAJOR.MINOR.PATCH`: nowa, addytywna
+linia wersji Polis po `0.1.0` to `0.2.0`. Metadane i artefakty pakietu Pythona
+używają
+odpowiadających im kanonicznych postaci PEP 440: zwykły rozwój to `0.2.0.dev0`,
+kandydat to `0.2.0rcN`, a stabilny pakiet to `0.2.0`. Każda wybrana wersja
+pakietu ma dokładnie odpowiadający tag Git `v<version>`; weryfikator wydania
+odrzuca postacie skrócone, lokalne, równe i niższe.
 
-`pyproject.toml` is the authoritative package-version source. The verifier
-requires that source metadata, artifact names, embedded wheel/sdist metadata,
-manifest, release-note heading, changelog heading, and requested tag describe
-one exact identity.
+`pyproject.toml` jest autorytatywnym źródłem wersji pakietu. Weryfikator wymaga,
+aby metadane źródłowe, nazwy artefaktów, osadzone metadane wheel/sdist, manifest,
+nagłówek noty wydania, nagłówek changelogu i żądany tag opisywały jedną dokładną
+tożsamość.
 
-## Serialized data compatibility
+## Kompatybilność danych serializowanych
 
-- Public analysis JSON is currently `schema_version = 1`.
-- Any change to wire shape or identifier semantics is a **major** change and must be paired with migration guidance.
-- Policy `1.2` does not change `Finding` or analysis JSON schema version `1`.
-  Serialized findings do not carry automatic-correction authority.
-- `CorrectionResult.source_policy_version` is an additive Python API field. This
-  issue introduces no canonical `CorrectionResult` JSON schema.
-- The installed sentence-safety runner request/response protocol uses schema
-  version `2` and records the observed runtime policy version. Its protocol is
-  separate from the historical evaluation report, which remains schema version
-  `1`, byte-stable, and identified with historical policy `1.1`.
+- Publiczny JSON analizy ma obecnie `schema_version = 1`.
+- Każda zmiana kształtu danych przesyłanych po łączu lub semantyki identyfikatorów
+  jest zmianą **major** i musi otrzymać instrukcję migracji.
+- Polityka `1.2` nie zmienia `Finding` ani wersji `1` schematu JSON analizy.
+  Serializowane znaleziska nie niosą uprawnienia do automatycznej korekty.
+- `CorrectionResult.source_policy_version` jest addytywnym polem API Pythona.
+  To zadanie nie wprowadza kanonicznego schematu JSON dla `CorrectionResult`.
+- Protokół żądań i odpowiedzi zainstalowanego programu bezpieczeństwa zdaniowego
+  używa wersji `2` schematu i zapisuje zaobserwowaną wersję polityki runtime'u.
+  Jego protokół jest odrębny od historycznego raportu ewaluacji, który zachowuje
+  wersję `1` schematu, stabilność bajtową i identyfikację historyczną polityką
+  `1.1`.
 
-## How we track compatibility
+## Jak śledzimy kompatybilność
 
-- `scripts/verify_prerelease_candidate.py` executes the quality gates.
-- `tests/fixtures/public_api_snapshot.json` records stable exports and schema versions.
-- `tests/test_api_compatibility.py` fails when runtime exports or schema contracts drift without snapshot updates.
-- Any snapshot update requires explicit issue-level review and release-note notes.
+- `scripts/verify_prerelease_candidate.py` uruchamia bramki jakości.
+- `tests/fixtures/public_api_snapshot.json` zapisuje stabilne eksporty i wersje schematów.
+- `tests/test_api_compatibility.py` zgłasza błąd, gdy eksporty runtime'u lub
+  kontrakty schematów zmieniają się bez aktualizacji migawki.
+- Każda aktualizacja migawki wymaga jawnego przeglądu na poziomie issue oraz
+  not wydania.
