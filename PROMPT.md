@@ -19,13 +19,16 @@ zgodnie z `docs/project/DOCUMENTATION-ROADMAP.md`.
 
 Polis ma być otwartoźródłową biblioteką programistyczną do analizy i minimalnej korekty tekstu w języku polskim. Biblioteka przyjmuje zwykły tekst i zwraca ustrukturyzowane wyniki analizy oraz opcjonalnie tekst po zaakceptowanych poprawkach.
 
-System ma działać w pełni offline. Polis jest kompletnym produktem bez lokalnego modelu językowego. Model lokalny jest opcjonalnym rozszerzeniem, a jego badanie nie blokuje wydania runtime'u. Priorytetami są:
+System ma działać w pełni offline. Polis jest kompletnym produktem bez lokalnego
+modelu językowego. Polis v1 nie wymaga także procesu Java ani szerokiego silnika
+LanguageTool. Te mechanizmy nie są wspieranymi rozszerzeniami runtime'u v1.
+Priorytetami są:
 
 - wysoka jakość oceny polskiej fleksji, składni i zgodności gramatycznej;
 - prywatność — tekst nie może opuszczać urządzenia użytkownika;
 - przewidywalny, dobrze udokumentowany interfejs;
 - minimalne i wyjaśnione sugestie zamiast swobodnego przepisywania tekstu;
-- modularność pozwalająca wymieniać reguły, modele i środowiska uruchomieniowe;
+- małe, jawne moduły deterministycznego runtime'u;
 - szybkość odpowiednia do przetwarzania większej liczby fragmentów tekstu.
 
 ## Zakres pierwszej wersji
@@ -34,7 +37,8 @@ Biblioteka powinna:
 
 1. Przyjmować tekst jako `str` przez publiczne API Pythona.
 2. Segmentować tekst na akapity i zdania z zachowaniem przesunięć znakowych względem wejścia.
-3. Uruchamiać niezależne analizatory deterministyczne oraz dopuszczać jawnie skonfigurowane, opcjonalne rozszerzenia lokalne, w tym analizę lokalnym LLM.
+3. Uruchamiać niezależne analizatory deterministyczne bez modelu, procesu Java
+   ani sieci.
 4. Wykrywać co najmniej:
    - podejrzaną odmianę wyrazów;
    - błędy zgody rodzaju, liczby, osoby i przypadka;
@@ -50,6 +54,12 @@ Wspierana ścieżka wydania runtime'u wymaga wyłącznie domyślnych zależnośc
 nie wymaga modelu lokalnego, serwera modeli, procesu Java, sieci, korpusu
 badawczego ani zużytego holdoutu.
 
+Każda poprawka v1 wynika jednoznacznie z lokalnej formy tekstu, zachowuje
+oryginalny zakres `[start, end)` i nie zmienia znaczenia. Zgodność czasów i
+aspektu, fakty, intencja, ton, styl oraz sens wypowiedzi nie są przedmiotem
+korekty. Niepewność lub potrzeba interpretacji oznacza, że Polis w razie
+wątpliwości nie sugeruje zmiany.
+
 ## Poza zakresem
 
 Pierwsza wersja świadomie nie obejmuje:
@@ -58,6 +68,13 @@ Pierwsza wersja świadomie nie obejmuje:
 - interfejsu graficznego;
 - usługi chmurowej i wysyłania tekstu do zewnętrznych API;
 - autonomicznego przepisywania całych dokumentów;
+- korekty zmieniającej znaczenie, zgodności czasów i aspektu oraz wnioskowania
+  semantycznego o intencji autora;
+- korekty stylu, tonu i dyskursu;
+- lokalnego LLM, modelowego rankera i fine-tuningu jako części wspieranego
+  runtime'u;
+- pełnego LanguageTool, procesu Java i kontekstowej ścieżki semantycznej;
+- rozbudowy katalogu M6 bez bieżącego konsumenta v1;
 - tłumaczenia;
 - rozpoznawania nazw własnych jako głównego celu produktu;
 - trenowania modelu od zera;
@@ -111,17 +128,25 @@ Zaprojektuj system jako zestaw małych modułów o jasno określonych odpowiedzi
 - `core` — publiczne modele, konfiguracja, protokoły i orkiestracja;
 - `segmentation` — segmentacja oraz mapowanie przesunięć znakowych;
 - `rules` — deterministyczne analizatory i rejestr reguł;
-- `llm` — opcjonalna warstwa protokołu lokalnego modelu, promptów i walidacji odpowiedzi;
+- `llm` — historyczna powierzchnia badań, która nie należy do wspieranego
+  runtime'u v1 i może pozostać wyłącznie w archiwum v2;
 - `analysis` — scalanie, normalizacja, deduplikacja i priorytetyzacja znalezisk;
 - `correction` — wykrywanie kolizji i bezpieczne stosowanie wybranych poprawek;
 - `evaluation` — zestawy danych, metryki oraz regresje jakościowe;
 - `cli` — opcjonalny, cienki interfejs do ręcznego testowania biblioteki.
 
-Rdzeń nie może zależeć od konkretnego serwera modeli. Warstwa `llm` pozostaje opcjonalną warstwą protokołu backendu, promptów i walidacji dla lokalnych rozszerzeń, aby można było dodać adaptery dla Ollama, LM Studio lub bezpośredniego uruchomienia modelu. Wspieraną konfigurację modelu można wybrać dopiero po osobnym zaakceptowanym issue i zaakceptowanym ADR.
+Rdzeń nie zależy od serwera modeli ani procesu Java. Przywrócenie adaptera
+modelu, pełnego LanguageTool albo innej ścieżki v2 wymaga nowego issue, nowego
+ADR-u i kwalifikacji dokładnej konfiguracji; nie może zostać dodane jako
+niejawna zależność v1.
 
-Nie zakładaj bez weryfikacji, że konkretny wariant lub nazwa modelu jest dostępna. Przygotuj porównywalny benchmark kilku małych modeli dobrze obsługujących język polski. Bielik jest kandydatem, a nie twardym uzależnieniem architektury, a wyniki tych badań nie blokują wydania runtime'u.
+## Historyczna granica badań modelowych
 
-## Zasady działania opcjonalnego modelu
+Poniższe zasady pozostają wymaganiami bezpieczeństwa dla ewentualnych badań
+v2, a nie obietnicą ani częścią wspieranego runtime'u v1:
+
+Model lokalny jest opcjonalnym rozszerzeniem badań v2 i nie blokuje wydania
+runtime'u, ale nie jest wspieranym rozszerzeniem produktu v1.
 
 - Każda poprawka pochodząca od modelu albo wybrana przez model zawsze pozostaje sugestią wymagającą jawnej akceptacji.
 - Model otrzymuje małe, kontrolowane fragmenty tekstu i jednoznaczne zadanie.
@@ -136,7 +161,7 @@ Nie zakładaj bez weryfikacji, że konkretny wariant lub nazwa modelu jest dost�
 ## Jakość i bezpieczeństwo korekt
 
 - Preferuj brak sugestii zamiast sugestii nieuzasadnionej.
-- Nie zmieniaj znaczenia, tonu ani stylu, jeśli użytkownik nie uruchomił osobnej analizy stylistycznej.
+- Nie zmieniaj znaczenia, tonu ani stylu. Analiza stylistyczna nie należy do v1.
 - Zachowuj wielkość liter i otaczające formatowanie tekstowe, jeśli nie są źródłem błędu.
 - Wykrywaj nakładające się poprawki; nie stosuj ich automatycznie bez rozstrzygnięcia konfliktu.
 - Nie polegaj wyłącznie na samoocenie pewności przez model. Kalibruj progi na zbiorze ewaluacyjnym.
@@ -184,7 +209,7 @@ Repozytorium powinno zawierać:
 - dokument architektury i rekordy najważniejszych decyzji;
 - opis publicznego API;
 - instrukcję uruchomienia offline dla wspieranych backendów;
-- przewodnik dodawania reguły i opcjonalnego backendu LLM;
+- przewodnik dodawania deterministycznej reguły v1;
 - metodologię benchmarków oraz aktualne wyniki;
 - politykę prywatności jasno stwierdzającą, że biblioteka nie wysyła tekstu do sieci.
 
