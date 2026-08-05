@@ -2,273 +2,80 @@ from __future__ import annotations
 
 import asyncio
 
-import pytest
-
 from polis.analysis.pipeline import analyze_text, analyze_text_async
-from polis.core import (
-    AnalysisOptions,
-    AnalysisTimeoutError,
-    Category,
-    Confidence,
-    Finding,
-    InvalidBackendResponseError,
-    Source,
-)
+from polis.core import AnalysisOptions, Category, Confidence, Finding, Source
 from polis.core.models import Severity
 from polis.rules import DeterministicRuleRegistry, RuleRegistration
 
 
 class FakeRule:
-    def __init__(self, source: str, findings: tuple[Finding, ...]) -> None:
-        self.source = Source.parse(source)
-        self.findings = findings
+    source = Source.parse("rule:test")
+
+    def __init__(self, findings: tuple[Finding, ...]) -> None:
+        self._findings = findings
         self.calls: list[str] = []
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         self.calls.append(text)
-        return self.findings
+        return self._findings
 
 
-class DeterministicBackend:
-    def __init__(
-        self,
-        *,
-        responses: tuple[tuple[Finding, ...], ...],
-    ) -> None:
-        self.name = "mock"
-        self._responses = list(responses)
-        self.calls: list[str] = []
-
-    async def generate_findings(
-        self,
-        text: str,
-        *,
-        policy: object | None = None,
-        clock: object | None = None,
-        sleep: object = asyncio.sleep,
-        operation: str = "analysis.llm.generate",
-    ) -> tuple[Finding, ...]:
-        self.calls.append(text)
-        return self._responses.pop(0)
-
-
-class MalformedBackend:
-    def __init__(self) -> None:
-        self.name = "mock"
-
-    async def generate_findings(
-        self,
-        text: str,
-        *,
-        policy: object | None = None,
-        clock: object | None = None,
-        sleep: object = asyncio.sleep,
-        operation: str = "analysis.llm.generate",
-    ) -> tuple[Finding, ...]:
-        raise InvalidBackendResponseError(
-            "backend response is malformed",
-            code="backend.invalid_response",
-            retryable=False,
-            context={"operation": operation, "backend": self.name},
-        )
-
-
-class TimeoutBackend:
-    def __init__(self) -> None:
-        self.name = "mock"
-
-    async def generate_findings(
-        self,
-        text: str,
-        *,
-        policy: object | None = None,
-        clock: object | None = None,
-        sleep: object = asyncio.sleep,
-        operation: str = "analysis.llm.generate",
-    ) -> tuple[Finding, ...]:
-        raise AnalysisTimeoutError(
-            "local generation timed out",
-            code="analysis.timeout",
-            retryable=True,
-            context={"operation": operation, "backend": self.name},
-        )
-
-
-def make_finding(
+def _finding(
     *,
-    source: str,
-    category: Category,
-    start: int,
-    end: int,
-    original: str,
-    suggestion: str,
+    category: Category = Category.SPELLING,
+    confidence: float = 0.93,
 ) -> Finding:
     return Finding.create(
         category=category,
         severity=Severity.ERROR,
-        message="test",
-        explanation="test",
-        original=original,
-        suggestion=suggestion,
-        start=start,
-        end=end,
-        confidence=Confidence(0.93),
-        source=Source.parse(source),
+        message="Test.",
+        explanation="Test deterministic pipeline.",
+        original="Zeby",
+        suggestion="Żeby",
+        start=0,
+        end=4,
+        confidence=Confidence(confidence),
+        source=Source.parse("rule:test"),
     )
 
 
-def test_analyze_text_merges_rules_and_llm_findings_with_offset_translation() -> None:
-    deterministic = DeterministicBackend(
-        responses=(
-            (),
-            (
-                make_finding(
-                    source="llm:local",
-                    category=Category.PUNCTUATION,
-                    start=0,
-                    end=4,
-                    original="Zeby",
-                    suggestion="Żeby",
-                ),
-            ),
-        )
-    )
-    deterministic_rule = FakeRule(
-        "rule:test",
-        (
-            make_finding(
-                source="rule:test",
-                category=Category.SPELLING,
-                start=0,
-                end=4,
-                original="To j",
-                suggestion="To je",
-            ),
-        ),
-    )
-    registry = DeterministicRuleRegistry(
-        (RuleRegistration(rule=deterministic_rule),),
+def _registry(rule: FakeRule) -> DeterministicRuleRegistry:
+    return DeterministicRuleRegistry((RuleRegistration(rule=rule),))
+
+
+def test_analyze_text_uses_only_the_deterministic_registry() -> None:
+    rule = FakeRule((_finding(),))
+
+    result = analyze_text("Zeby wrócić.", registry=_registry(rule))
+
+    assert result == rule._findings
+    assert rule.calls == ["Zeby wrócić."]
+
+
+def test_analyze_text_async_matches_the_sync_entry_point() -> None:
+    sync_rule = FakeRule((_finding(),))
+    async_rule = FakeRule((_finding(),))
+
+    sync_result = analyze_text("Zeby wrócić.", registry=_registry(sync_rule))
+    async_result = asyncio.run(
+        analyze_text_async("Zeby wrócić.", registry=_registry(async_rule))
     )
 
-    result = analyze_text(
-        "To jest.\n\nZeby",
-        registry=registry,
-        local_backend=deterministic,
-    )
-
-    assert len(result) == 2
-    assert result[0].start == 0
-    assert result[1].start == 10
-    assert result[1].end == 14
+    assert async_result == sync_result
+    assert async_rule.calls == sync_rule.calls == ["Zeby wrócić."]
 
 
-def test_analyze_text_rejects_malformed_llm_response_by_default() -> None:
-    registry = DeterministicRuleRegistry(
-        (
-            RuleRegistration(
-                rule=FakeRule(
-                    "rule:test",
-                    (
-                        make_finding(
-                            source="rule:test",
-                            category=Category.SYNTAX,
-                            start=0,
-                            end=4,
-                            original="To j",
-                            suggestion="To je",
-                        ),
-                    ),
-                )
-            ),
-        )
-    )
-
-    with pytest.raises(InvalidBackendResponseError):
-        analyze_text(
-            "To jest.\n\nZeby",
-            registry=registry,
-            local_backend=MalformedBackend(),
-        )
-
-
-def test_analyze_text_rejects_timeout_backend_failure_by_default() -> None:
-    registry = DeterministicRuleRegistry(
-        (
-            RuleRegistration(
-                rule=FakeRule(
-                    "rule:test",
-                    (
-                        make_finding(
-                            source="rule:test",
-                            category=Category.SYNTAX,
-                            start=0,
-                            end=4,
-                            original="To j",
-                            suggestion="To je",
-                        ),
-                    ),
-                )
-            ),
-        )
-    )
-
-    with pytest.raises(AnalysisTimeoutError):
-        analyze_text(
-            "To jest.\n\nZeby",
-            registry=registry,
-            local_backend=TimeoutBackend(),
-        )
-
-
-def test_analyze_text_without_llm_uses_only_deterministic_findings() -> None:
-    registry = DeterministicRuleRegistry(
-        (
-            RuleRegistration(
-                rule=FakeRule(
-                    "rule:test",
-                    (
-                        make_finding(
-                            source="rule:test",
-                            category=Category.PUNCTUATION,
-                            start=0,
-                            end=4,
-                            original="To j",
-                            suggestion="To je",
-                        ),
-                    ),
-                )
-            ),
-        )
+def test_analyze_text_applies_analysis_options_to_deterministic_findings() -> None:
+    finding = _finding(category=Category.SPELLING, confidence=0.8)
+    options = AnalysisOptions(
+        categories=frozenset({Category.SPELLING}),
+        minimum_confidence=0.9,
     )
 
     result = analyze_text(
-        "To jest.\n\nZeby",
-        registry=registry,
-        local_backend=None,
+        "Zeby wrócić.",
+        registry=_registry(FakeRule((finding,))),
+        options=options,
     )
 
-    assert len(result) == 1
-    assert str(result[0].source) == "rule:test"
-
-
-def test_analyze_text_async_strict_mode_raises() -> None:
-    registry = DeterministicRuleRegistry(
-        (
-            RuleRegistration(
-                rule=FakeRule(
-                    "rule:test",
-                    (),
-                )
-            ),
-        )
-    )
-
-    with pytest.raises(InvalidBackendResponseError):
-        asyncio.run(
-            analyze_text_async(
-                "To jest.\n\nZeby",
-                registry=registry,
-                local_backend=MalformedBackend(),
-                ignore_backend_failures=False,
-            )
-        )
+    assert result == ()

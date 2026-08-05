@@ -169,13 +169,6 @@ _ACTIVE_POLICY_ENTRIES: Final[tuple[_AutomaticCorrectionPolicyEntry, ...]] = (
         "syntax-sentence-space/1.0",
         0.9,
     ),
-    _entry(
-        "languagetool.pl",
-        Category.PUNCTUATION,
-        "check.allowlisted_comma",
-        "pl-6.8-five-rule-comma/1.0",
-        0.85,
-    ),
 )
 
 _POLICY_BY_KEY: Final[dict[SourcePolicyKey, _AutomaticCorrectionPolicyEntry]] = {

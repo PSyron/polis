@@ -16,7 +16,7 @@ def _block_network(*_args: object, **_kwargs: object) -> object:
 
 def test_analyzer_runs_with_blocked_network(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(socket, "create_connection", _block_network)
-    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
+    analyzer = Analyzer(AnalyzerConfig())
     result = analyzer.analyze("Witaj,świecie.", options=AnalysisOptions())
 
     assert isinstance(result.text, str)
@@ -35,13 +35,13 @@ def test_default_analyzer_does_not_start_optional_languagetool(
         fail_if_started,
     )
 
-    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
+    analyzer = Analyzer(AnalyzerConfig())
     result = analyzer.analyze("Witaj, świecie.")
 
     assert result.text == "Witaj, świecie."
 
 
-def test_analyzer_with_mock_backend_runs_with_config_and_blocked_network(
+def test_analyzer_runs_with_supported_config_and_blocked_network(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(socket, "create_connection", _block_network)
@@ -51,9 +51,6 @@ def test_analyzer_with_mock_backend_runs_with_config_and_blocked_network(
         """
 [analysis]
 categories = ["spelling", "punctuation"]
-
-[backend]
-use_mock = true
 """,
         encoding="utf-8",
     )

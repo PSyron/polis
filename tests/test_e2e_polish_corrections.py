@@ -160,7 +160,7 @@ def test_end_to_end_polish_correction_corpus_fixtures(
     case_id: str,
 ) -> None:
     case = fixture[case_id]
-    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
+    analyzer = Analyzer(AnalyzerConfig())
 
     result = analyzer.analyze(case.source)
     corrected = result.apply(tuple(item.id for item in result.issues))
@@ -170,7 +170,7 @@ def test_end_to_end_polish_correction_corpus_fixtures(
 
 @pytest.mark.parametrize("fixture", [_load_json_cases(), _load_xml_cases()])
 def test_negative_cases_produce_no_findings(fixture: dict[str, E2ECase]) -> None:
-    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
+    analyzer = Analyzer(AnalyzerConfig())
 
     for case in fixture.values():
         if case.verification == "negative":

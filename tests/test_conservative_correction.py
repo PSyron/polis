@@ -69,6 +69,7 @@ def test_correct_applies_safe_rule_corrections_to_a_sentence() -> None:
     assert result.corrected_text == "Żeby jutro, powiem o tym."
     assert {finding.original for finding in result.applied_findings} == {"Zeby", ","}
     assert result.skipped_findings == ()
+    assert result.suggestion_outcomes == ()
 
 
 def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> None:
@@ -79,6 +80,23 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert result.corrected_text == "Jesteś gotowa, Aniu. Żeby zacząć, przyjdź jutro."
     assert "Aniu" in result.corrected_text
     assert len(result.applied_findings) == 3
+
+
+def test_default_analyzer_composes_exactly_the_ten_conservative_v1_rules() -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
+        "rule:agreement.copula",
+        "rule:spelling.jestes",
+        "rule:spelling.wlasnie",
+        "rule:spelling.zeby",
+        "rule:syntax.comma_space",
+        "rule:syntax.list_space",
+        "rule:syntax.missing_correlative",
+        "rule:syntax.missing_reflexive",
+        "rule:syntax.quote_space",
+        "rule:syntax.sentence_space",
+    )
 
 
 @pytest.mark.parametrize(
@@ -168,6 +186,20 @@ def test_correct_keeps_text_unchanged_without_safe_suggestions() -> None:
     assert result.skipped_findings == ()
 
 
+def test_analyzer_abstains_from_semantically_incoherent_timing() -> None:
+    text = "Gdy wrócisz, zadzwoń do mnie wczoraj."
+    analyzer = Analyzer(AnalyzerConfig())
+
+    analysis = analyzer.analyze(text)
+    correction = analyzer.correct(text)
+
+    assert analysis.issues == ()
+    assert correction.corrected_text == text
+    assert correction.applied_findings == ()
+    assert correction.skipped_findings == ()
+    assert correction.suggestion_outcomes == ()
+
+
 def test_correct_skips_a_conflicting_rule_suggestion(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -199,15 +231,15 @@ def test_correct_skips_a_conflicting_rule_suggestion(
     )
     analyzer = Analyzer(AnalyzerConfig())
 
-    async def fake_analysis_for_correction(
-        _text: str, _options: object
-    ) -> tuple[AnalysisResult, tuple[object, ...]]:
-        return AnalysisResult(text, (first, second)), ()
+    async def fake_analyze_async(
+        _text: str, *, options: AnalysisOptions | None = None
+    ) -> AnalysisResult:
+        return AnalysisResult(text, (first, second), options=options)
 
     monkeypatch.setattr(
         analyzer,
-        "_analysis_for_correction",
-        fake_analysis_for_correction,
+        "analyze_async",
+        fake_analyze_async,
     )
 
     result = analyzer.correct(text)

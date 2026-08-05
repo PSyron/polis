@@ -71,13 +71,6 @@ _AUTOMATIC_BEHAVIORS = (
         "syntax-sentence-space/1.0",
         0.9,
     ),
-    (
-        Source(SourceKind.RULE, "languagetool.pl"),
-        Category.PUNCTUATION,
-        "check.allowlisted_comma",
-        "pl-6.8-five-rule-comma/1.0",
-        0.85,
-    ),
 )
 
 
@@ -246,6 +239,19 @@ def test_llm_finding_is_ineligible_at_full_confidence() -> None:
 
     assert not is_automatic_correction_eligible(
         _finding(source, Category.SPELLING, 1.0), behavior
+    )
+
+
+def test_language_tool_behavior_is_no_longer_eligible() -> None:
+    source = Source(SourceKind.RULE, "languagetool.pl")
+    behavior = SourceBehavior(
+        source,
+        "check.allowlisted_comma",
+        "pl-6.8-five-rule-comma/1.0",
+    )
+
+    assert not is_automatic_correction_eligible(
+        _finding(source, Category.PUNCTUATION, 1.0), behavior
     )
 
 
