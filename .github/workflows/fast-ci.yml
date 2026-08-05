@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 
-# Fast suite deliberately excludes research, slow, model, benchmark, and release work.
+# Fast suite deliberately excludes research, slow, benchmark, and release work.
 jobs:
   quality:
     name: ${{ matrix.os }} / CPython ${{ matrix.python-version }}
@@ -69,7 +69,7 @@ jobs:
           POLIS_GENERATIVE_GENERATOR_VERSION: unicode-structural-v1
           POLIS_GENERATIVE_SEED: 95001
           POLIS_GENERATIVE_CASES: 64
-        run: uv run --locked --extra dev pytest -m "not research and not slow and not model"
+        run: uv run --locked --extra dev pytest -m "not research and not slow"
       - name: Run Ruff lint
         run: uv run --locked --extra dev ruff check .
       - name: Run Ruff format check

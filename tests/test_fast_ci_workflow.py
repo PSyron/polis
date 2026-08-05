@@ -4,6 +4,7 @@ import hashlib
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate_fast_ci_workflow.py"
 WORKFLOW = ROOT / ".github/workflows/fast-ci.yml"
+PYPROJECT = ROOT / "pyproject.toml"
 LICENSE_REVIEW = ROOT / "docs/development/dependency-licenses.md"
 COMPATIBILITY_POLICY = ROOT / "docs/compatibility.md"
 DISTRIBUTION_VERIFICATION = ROOT / "docs/distribution-verification.md"
@@ -21,10 +23,9 @@ BYTE_STABLE_TEXT_PATHS = (
 )
 BYTE_EXACT_UPSTREAM_PATHS = ("third_party/languagetool-pl/LICENSE-LGPL-2.1.txt",)
 FAST_PYTEST_COMMAND = (
-    'run: uv run --locked --extra dev pytest -m "not research and not slow and'
-    ' not model"'
+    'run: uv run --locked --extra dev pytest -m "not research and not slow"'
 )
-FAST_PYTEST_FILTER = 'pytest -m "not research and not slow and not model"'
+FAST_PYTEST_FILTER = 'pytest -m "not research and not slow"'
 GENERATIVE_CONFIGURATION = (
     ("POLIS_GENERATIVE_GENERATOR_VERSION", "unicode-structural-v1"),
     ("POLIS_GENERATIVE_SEED", "95001"),
@@ -59,6 +60,21 @@ def test_fast_ci_contract_requires_full_tag_history_for_release_evidence() -> No
 
     assert "fetch-depth: 0" in workflow
     assert "fetch-tags: true" in workflow
+
+
+def test_v1_static_tool_inputs_exclude_archived_experiments_and_model_marker() -> None:
+    configuration = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    marker_names = {
+        marker.partition(":")[0]
+        for marker in configuration["tool"]["pytest"]["ini_options"]["markers"]
+    }
+
+    assert (
+        "experiments/sentence_safety_gate_v2/**/*.py"
+        not in configuration["tool"]["ruff"]["include"]
+    )
+    assert configuration["tool"]["mypy"]["files"] == ["src", "tests"]
+    assert marker_names == {"research", "slow"}
 
 
 def test_fast_ci_contract_rejects_a_missing_required_matrix_entry(
@@ -323,7 +339,7 @@ def test_workflow_actions_have_an_exact_license_review() -> None:
         assert "MIT" in review
 
 
-def test_fast_pytest_filter_deselects_slow_and_model_tests(tmp_path: Path) -> None:
+def test_fast_pytest_filter_deselects_slow_and_research_tests(tmp_path: Path) -> None:
     sample = tmp_path / "test_marker_selection.py"
     sample.write_text(
         """import unittest
@@ -338,12 +354,6 @@ def test_fast_case():
 @pytest.mark.slow
 class SlowCase(unittest.TestCase):
     def test_slow_case(self):
-        self.assertTrue(True)
-
-
-@pytest.mark.model
-class ModelCase(unittest.TestCase):
-    def test_model_case(self):
         self.assertTrue(True)
 
 
@@ -364,7 +374,7 @@ class ResearchCase(unittest.TestCase):
             "-c",
             str(ROOT / "pyproject.toml"),
             "-m",
-            "not research and not slow and not model",
+            "not research and not slow",
             str(sample),
         ],
         cwd=ROOT,
@@ -374,7 +384,7 @@ class ResearchCase(unittest.TestCase):
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "1 passed, 3 deselected" in result.stdout
+    assert "1 passed, 2 deselected" in result.stdout
 
 
 def test_byte_stable_text_uses_effective_text_and_lf_attributes() -> None:

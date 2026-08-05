@@ -28,4 +28,4 @@ def test_prerelease_candidate_uses_the_product_only_pytest_marker(
 
     pytest_call = next(cmd for cmd in calls if "pytest" in cmd)
     marker_index = pytest_call.index("-m")
-    assert pytest_call[marker_index + 1] == "not research and not slow and not model"
+    assert pytest_call[marker_index + 1] == "not research and not slow"
