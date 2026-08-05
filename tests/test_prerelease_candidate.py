@@ -87,13 +87,13 @@ def _fake_uv_environment(tmp_path: Path) -> tuple[dict[str, str], Path]:
     if os.name == "nt":
         executable = bin_dir / "uv.cmd"
         executable.write_text(
-            "@echo off\r\necho uv>>%POLIS_FAKE_UV_LOG%\r\nexit /b 0\r\n",
+            "@echo off\r\necho %CD%>>%POLIS_FAKE_UV_LOG%\r\nexit /b 0\r\n",
             encoding="utf-8",
         )
     else:
         executable = bin_dir / "uv"
         executable.write_text(
-            "#!/bin/sh\nprintf 'uv\\n' >> \"$POLIS_FAKE_UV_LOG\"\n",
+            '#!/bin/sh\npwd >> "$POLIS_FAKE_UV_LOG"\n',
             encoding="utf-8",
         )
         executable.chmod(executable.stat().st_mode | 0o111)
@@ -132,7 +132,7 @@ def test_prerelease_candidate_uses_the_product_only_pytest_marker(
             str(tmp_path / "wheelhouse-manifest.json"),
         ],
     )
-    monkeypatch.setattr(prerelease, "_require_source_state", lambda _commit: None)
+    monkeypatch.setattr(prerelease, "_require_source_state", lambda _commit: tmp_path)
     monkeypatch.setattr(prerelease, "_run", lambda cmd, cwd=None: calls.append(cmd))
     monkeypatch.setattr(prerelease, "_collect_artifacts", lambda _dist: (wheel, sdist))
     monkeypatch.setattr(prerelease, "_print_hashes", lambda _wheel, _sdist: None)
@@ -202,7 +202,33 @@ def test_public_prerelease_verifier_accepts_current_head_from_clean_worktree(
     )
 
     assert result.returncode == 0, result.stderr + result.stdout
-    assert uv_log.read_text(encoding="utf-8").count("uv\n") == 8
+    assert uv_log.read_text(encoding="utf-8").splitlines() == [str(checkout)] * 8
+
+
+def test_public_prerelease_verifier_runs_children_from_preflighted_checkout(
+    tmp_path: Path,
+) -> None:
+    checkout, head = _clean_checkout(tmp_path)
+    external_cwd = tmp_path / "external-cwd"
+    external_cwd.mkdir()
+    dist = checkout / "dist"
+    dist.mkdir()
+    (dist / "polis_nlp-0.2.0.dev0-py3-none-any.whl").write_bytes(b"wheel")
+    (dist / "polis_nlp-0.2.0.dev0.tar.gz").write_bytes(b"sdist")
+    env, uv_log = _fake_uv_environment(tmp_path)
+
+    result = subprocess.run(
+        _prerelease_command(checkout, head, dist),
+        cwd=external_cwd,
+        text=True,
+        capture_output=True,
+        check=False,
+        env=env,
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert uv_log.read_text(encoding="utf-8").splitlines() == [str(checkout)] * 8
+    assert list(external_cwd.iterdir()) == []
 
 
 def test_public_prerelease_verifier_rejects_stale_source_commit_before_build(

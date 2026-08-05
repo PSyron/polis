@@ -25,13 +25,14 @@ def _git_output(root: Path, *arguments: str) -> str:
     return result.stdout.strip()
 
 
-def _require_source_state(source_commit: str) -> None:
+def _require_source_state(source_commit: str) -> Path:
     root = Path(__file__).resolve().parents[1]
     head = _git_output(root, "rev-parse", "HEAD")
     if source_commit != head:
         raise SystemExit("source commit must equal current repository HEAD")
     if _git_output(root, "status", "--porcelain", "--untracked-files=all"):
         raise SystemExit("repository worktree must be clean")
+    return root
 
 
 def _sha256(path: Path) -> str:
@@ -77,9 +78,15 @@ def main() -> None:
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--wheelhouse-manifest", type=Path, required=True)
     args = parser.parse_args()
-    _require_source_state(args.source_commit)
-    dist = args.dist
-    manifest = args.manifest or dist / "release-manifest.json"
+    root = _require_source_state(args.source_commit)
+    dist = (root / args.dist).resolve()
+    manifest = (
+        (root / args.manifest).resolve()
+        if args.manifest
+        else dist / "release-manifest.json"
+    )
+    wheelhouse = (root / args.wheelhouse).resolve()
+    wheelhouse_manifest = (root / args.wheelhouse_manifest).resolve()
 
     _run(
         [
@@ -91,10 +98,14 @@ def main() -> None:
             "pytest",
             "-m",
             "not research and not slow",
-        ]
+        ],
+        cwd=root,
     )
 
-    _run(["uv", "run", "--locked", "--extra", "dev", "ruff", "check", "."])
+    _run(
+        ["uv", "run", "--locked", "--extra", "dev", "ruff", "check", "."],
+        cwd=root,
+    )
     _run(
         [
             "uv",
@@ -106,9 +117,10 @@ def main() -> None:
             "format",
             "--check",
             ".",
-        ]
+        ],
+        cwd=root,
     )
-    _run(["uv", "run", "--locked", "--extra", "dev", "mypy", "."])
+    _run(["uv", "run", "--locked", "--extra", "dev", "mypy", "."], cwd=root)
     _run(
         [
             "uv",
@@ -122,7 +134,8 @@ def main() -> None:
             "--no-isolation",
             "--outdir",
             str(dist),
-        ]
+        ],
+        cwd=root,
     )
     _run(
         [
@@ -135,7 +148,8 @@ def main() -> None:
             "scripts/verify_distribution_artifacts.py",
             "--dist",
             str(dist),
-        ]
+        ],
+        cwd=root,
     )
     with tempfile.TemporaryDirectory(prefix="polis-prerelease-smoke-") as smoke_cwd:
         _run(
@@ -150,12 +164,13 @@ def main() -> None:
                 "--dist",
                 str(dist),
                 "--wheelhouse",
-                str(args.wheelhouse),
+                str(wheelhouse),
                 "--wheelhouse-manifest",
-                str(args.wheelhouse_manifest),
+                str(wheelhouse_manifest),
                 "--smoke-cwd",
                 smoke_cwd,
-            ]
+            ],
+            cwd=root,
         )
 
     _run(
@@ -174,7 +189,8 @@ def main() -> None:
             str(dist),
             "--output",
             str(manifest),
-        ]
+        ],
+        cwd=root,
     )
 
     wheel, sdist = _collect_artifacts(dist)
