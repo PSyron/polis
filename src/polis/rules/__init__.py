@@ -16,19 +16,6 @@ from polis.rules.catalog import (
     RuleCatalogError,
     RuleMetadata,
 )
-from polis.rules.contextual_inflection import (
-    ContextMorphologyTransport,
-    ContextualInflectionRule,
-    ContextualInflectionRuleConfig,
-    StdioContextMorphologyTransport,
-)
-from polis.rules.languagetool import (
-    LanguageToolRuleConfig,
-    LanguageToolTransport,
-    LocalLanguageToolRule,
-    LoopbackLanguageToolHttpTransport,
-)
-from polis.rules.languagetool_stdio import LocalLanguageToolStdioSession
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingWlasnieRule,
@@ -195,21 +182,12 @@ def _normalize_registrations(
 
 __all__ = [
     "DeterministicRuleRegistry",
-    "ContextMorphologyTransport",
-    "ContextualInflectionRule",
-    "ContextualInflectionRuleConfig",
     "DuplicateFindingError",
     "DuplicateRuleMetadataError",
     "DuplicateRuleSourceError",
     "InvalidRuleMetadataError",
     "IncompatibleRuleOutputError",
-    "LanguageToolRuleConfig",
-    "LanguageToolTransport",
-    "LocalLanguageToolRule",
-    "LocalLanguageToolStdioSession",
-    "LoopbackLanguageToolHttpTransport",
     "SpellingJestesRule",
-    "StdioContextMorphologyTransport",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

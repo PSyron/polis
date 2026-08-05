@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import importlib
+import importlib.util
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -72,3 +74,21 @@ def test_policy_mentions_research_fixture_path():
     )
 
     assert reasons == ""
+
+
+def test_product_rules_exclude_orphaned_languagetool_runtime() -> None:
+    for module_name in (
+        "polis.rules.languagetool",
+        "polis.rules.languagetool_stdio",
+        "polis.rules.contextual_inflection",
+    ):
+        assert importlib.util.find_spec(module_name) is None, module_name
+
+    assert not (Path(__file__).parent / "fixtures/fake_languagetool_stdio.py").exists()
+
+    for module_name in (
+        "polis.rules.agreement",
+        "polis.rules.spelling",
+        "polis.rules.syntax",
+    ):
+        assert importlib.import_module(module_name) is not None
