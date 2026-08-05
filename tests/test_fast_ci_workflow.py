@@ -55,6 +55,14 @@ def test_fast_ci_contract_is_valid() -> None:
     assert result.stdout == "fast CI workflow contract is valid\n"
 
 
+def test_fast_ci_runs_public_offline_install_and_documentation_validator() -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "scripts/prepare_build_wheelhouse.py" in workflow
+    assert "scripts/verify_distribution_install.py" in workflow
+    assert "scripts/validate_documentation_inventory.py" in workflow
+
+
 def test_fast_ci_contract_requires_full_tag_history_for_release_evidence() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
@@ -475,9 +483,10 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
     )
     assert "test_languagetool_vendor_artifacts.py" not in compatibility
     assert "`language_tool_process_start_count`" in compatibility
-    assert (
-        "uv run python scripts/verify_distribution_install.py dist/*.whl"
-        in distribution
+    assert "scripts/verify_distribution_install.py" in distribution
+    assert "--dist dist --wheelhouse build-wheelhouse" in normalized_distribution
+    assert "--wheelhouse-manifest build-wheelhouse-manifest.json" in (
+        normalized_distribution
     )
 
 

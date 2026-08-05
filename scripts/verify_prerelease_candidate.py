@@ -52,6 +52,8 @@ def main() -> None:
         default=None,
         help="Output path for the build-once release manifest",
     )
+    parser.add_argument("--wheelhouse", type=Path, required=True)
+    parser.add_argument("--wheelhouse-manifest", type=Path, required=True)
     args = parser.parse_args()
     dist = args.dist
     manifest = args.manifest or dist / "release-manifest.json"
@@ -95,6 +97,8 @@ def main() -> None:
             "-m",
             "build",
             "--no-isolation",
+            "--outdir",
+            str(dist),
         ]
     )
     _run(
@@ -117,9 +121,14 @@ def main() -> None:
             "--locked",
             "--extra",
             "dev",
-            "pytest",
-            "-q",
-            "tests/test_offline_verification.py",
+            "python",
+            "scripts/verify_distribution_install.py",
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(args.wheelhouse),
+            "--wheelhouse-manifest",
+            str(args.wheelhouse_manifest),
         ]
     )
 
