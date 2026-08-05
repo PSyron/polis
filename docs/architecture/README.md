@@ -29,6 +29,7 @@ późniejszy ADR.
 | [ADR-0020](decisions/0020-runtime-first-product-charter.md) | Zaakceptowany | Karta produktu runtime-first nadaje nadrzędność runtime'owi offline |
 | [ADR-0021](decisions/0021-rule-catalog-ownership.md) | Zaakceptowany | `polis.rules` posiada kuratorowany katalog standardowych źródeł reguł |
 | [ADR-0022](decisions/0022-conservative-v1-product-scope.md) | Zaakceptowany | Konserwatywny zakres v1 i dokładna powłoka dowodowa zastępują szerszy plan runtime'u |
+| [ADR-0023](decisions/0023-evaluation-namespace-1-0.md) | Zaakceptowany | Pełna obecna przestrzeń `polis.evaluation` pozostaje zgodna przez 1.0 |
 
 [Granica protokołów runtime'u v1](protocols.md) opisuje punkty rozdziału
 implementacji zgodne z zaakceptowanym kontraktem publicznego API.

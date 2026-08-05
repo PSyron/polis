@@ -40,6 +40,7 @@ REPOSITORY_ONLY_SDIST_MEMBERS = (
     "docs/quality-baseline.md",
 )
 REQUIRED_SDIST_MEMBERS = artifact_verifier.REQUIRED_SDIST_MEMBERS
+ADR_0023_MEMBER = "docs/architecture/decisions/0023-evaluation-namespace-1-0.md"
 EXPECTED_SOURCE_MEMBERS = tuple(
     path.relative_to(ROOT).as_posix()
     for path in sorted((ROOT / "src/polis").rglob("*"))
@@ -578,6 +579,61 @@ def test_sdist_release_surface_is_explicit_and_product_only(
         assert member in normalized
     for member in REPOSITORY_ONLY_SDIST_MEMBERS:
         assert member not in normalized
+
+
+def test_built_distributions_include_adr_0023(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+    with zipfile.ZipFile(wheel) as archive:
+        wheel_members = set(archive.namelist())
+    with tarfile.open(sdist) as archive:
+        sdist_members = {_without_sdist_root(name) for name in archive.getnames()}
+
+    assert ADR_0023_MEMBER in wheel_members
+    assert ADR_0023_MEMBER in sdist_members
+
+
+def test_public_verifier_rejects_a_missing_adr_0023(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    sdist = next(dist.glob("*.tar.gz"))
+    with tarfile.open(sdist) as archive:
+        members = {_without_sdist_root(name) for name in archive.getnames()}
+    assert ADR_0023_MEMBER in members
+
+    replacement = dist / "without-adr.tar.gz"
+    _mutate_sdist(sdist, replacement, remove=ADR_0023_MEMBER)
+    sdist.unlink()
+    replacement.rename(sdist)
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert f"missing required sdist member: {ADR_0023_MEMBER}" in result.stderr
 
 
 @pytest.mark.parametrize("member", REPOSITORY_ONLY_SDIST_MEMBERS)

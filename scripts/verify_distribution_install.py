@@ -37,6 +37,26 @@ for name, probe in probes:
     else:
         raise SystemExit(f"{name} was not blocked")
 """
+EVALUATION_EXPORTS = (
+    "BaselineResult",
+    "EvaluationDataset",
+    "QualityCounts",
+    "SAFETY_CORPUS_ID",
+    "SAFETY_CORPUS_V2_ID",
+    "SAFETY_REVIEW_CHECKLIST_VERSION",
+    "SAFETY_REVIEW_CHECKLIST_V2_VERSION",
+    "assert_no_cross_corpus_leakage",
+    "evaluate_baseline",
+    "findings_snapshot_for_run",
+    "load_dataset",
+    "load_safety_corpus_json",
+    "load_safety_corpus_xml",
+    "safety_corpus_digest",
+    "safety_entity_catalog_ids",
+    "select_safety_cases_for_purpose",
+    "validate_dataset",
+    "validate_safety_corpus",
+)
 
 
 def _venv_python(venv_dir: Path) -> Path:
@@ -130,6 +150,22 @@ def _install_and_smoke(
             ),
             f"{label} API smoke",
         )
+        exports = _require_success(
+            _run(
+                [
+                    str(python),
+                    "-c",
+                    "import polis.evaluation as evaluation; "
+                    f"expected = {EVALUATION_EXPORTS!r}; "
+                    "actual = tuple(evaluation.__all__); "
+                    "assert actual == expected, 'evaluation export contract'; "
+                    "print(f'evaluation_exports={actual!r}')",
+                ],
+                cwd=smoke_cwd,
+                env=env,
+            ),
+            f"{label} evaluation export contract",
+        )
         cli_env = env | {"PYTHONIOENCODING": "cp1252"}
         cli = _require_success(
             _run(
@@ -147,6 +183,7 @@ def _install_and_smoke(
             raise SystemExit(f"{label} CLI JSON failed Unicode contract")
         print(probe)
         print(f"artifact={label} {api}")
+        print(f"artifact={label} {exports}")
         print(cli)
 
 

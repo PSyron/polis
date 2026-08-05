@@ -7,6 +7,27 @@ from typing import Any, cast
 from polis import ANALYSIS_SCHEMA_VERSION, AnalysisResult, Analyzer, AnalyzerConfig
 from polis import __all__ as public_exports
 
+EXPECTED_EVALUATION_EXPORTS = (
+    "BaselineResult",
+    "EvaluationDataset",
+    "QualityCounts",
+    "SAFETY_CORPUS_ID",
+    "SAFETY_CORPUS_V2_ID",
+    "SAFETY_REVIEW_CHECKLIST_VERSION",
+    "SAFETY_REVIEW_CHECKLIST_V2_VERSION",
+    "assert_no_cross_corpus_leakage",
+    "evaluate_baseline",
+    "findings_snapshot_for_run",
+    "load_dataset",
+    "load_safety_corpus_json",
+    "load_safety_corpus_xml",
+    "safety_corpus_digest",
+    "safety_entity_catalog_ids",
+    "select_safety_cases_for_purpose",
+    "validate_dataset",
+    "validate_safety_corpus",
+)
+
 
 def _load_snapshot() -> dict[str, Any]:
     path = Path(__file__).resolve().parent / "fixtures" / "public_api_snapshot.json"
@@ -46,8 +67,7 @@ def test_correction_result_exposes_policy_identity_without_policy_internals() ->
     }.isdisjoint(public_exports)
 
 
-def test_evaluation_namespace_remains_compatible_for_the_0x_line() -> None:
+def test_evaluation_namespace_retains_the_literal_1_0_contract() -> None:
     import polis.evaluation as evaluation
 
-    assert callable(evaluation.load_dataset)
-    assert callable(evaluation.validate_dataset)
+    assert tuple(evaluation.__all__) == EXPECTED_EVALUATION_EXPORTS

@@ -27,6 +27,10 @@ REQUIRED_SDIST_MEMBERS = (
     "docs/privacy.md",
     "docs/public-api.md",
     "docs/quick-start.md",
+    "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
+)
+REQUIRED_WHEEL_MEMBERS = (
+    "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
 )
 EXPECTED_SOURCE_MEMBERS = tuple(
     (
@@ -64,6 +68,7 @@ ALLOWED_SDIST_MEMBERS = (
     "docs/architecture/decisions/0008-hybrid-correction-policy.md",
     "docs/architecture/decisions/0018-runtime-composition-protocols.md",
     "docs/architecture/decisions/0019-evaluation-namespace-compatibility.md",
+    "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
     "examples/polis.toml",
 )
 EXPECTED_WHEEL_METADATA_SUFFIXES = (
@@ -194,10 +199,15 @@ def _assert_explicit_wheel_surface(
             f"{artifact}: wheel metadata outside release surface: {detail}"
         )
 
+    for required in REQUIRED_WHEEL_MEMBERS:
+        if required not in names:
+            raise SystemExit(f"{artifact}: missing required wheel member: {required}")
+
     unknown = (
         set(names)
         - {name.removeprefix("src/") for name in EXPECTED_SOURCE_MEMBERS}
         - expected_metadata
+        - set(REQUIRED_WHEEL_MEMBERS)
     )
     if unknown:
         raise SystemExit(

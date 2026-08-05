@@ -48,6 +48,9 @@ required-version = "==0.11.2"
 [tool.hatch.build.targets.wheel]
 packages = ["src/polis"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"docs/architecture/decisions/0023-evaluation-namespace-1-0.md" = "docs/architecture/decisions/0023-evaluation-namespace-1-0.md"
+
 [tool.hatch.build.targets.sdist]
 ignore-vcs = true
 include = [
@@ -75,6 +78,7 @@ include = [
   "/docs/architecture/decisions/0008-hybrid-correction-policy.md",
   "/docs/architecture/decisions/0018-runtime-composition-protocols.md",
   "/docs/architecture/decisions/0019-evaluation-namespace-compatibility.md",
+  "/docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
   "/examples/polis.toml",
 ]
 
