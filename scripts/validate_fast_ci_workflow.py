@@ -35,10 +35,9 @@ GENERATIVE_ENVIRONMENT = (
     ("POLIS_GENERATIVE_CASES", str(GENERATIVE_CASES)),
 )
 FAST_PYTEST_COMMAND = (
-    'run: uv run --locked --extra dev pytest -m "not research and not slow and'
-    ' not model"'
+    'run: uv run --locked --extra dev pytest -m "not research and not slow"'
 )
-FAST_PYTEST_FILTER = 'pytest -m "not research and not slow and not model"'
+FAST_PYTEST_FILTER = 'pytest -m "not research and not slow"'
 REQUIRED_SNIPPETS = (
     "push:",
     "pull_request:",
@@ -54,10 +53,7 @@ REQUIRED_SNIPPETS = (
     "cache-dependency-glob: uv.lock",
     "fetch-depth: 0",
     "fetch-tags: true",
-    (
-        "Fast suite deliberately excludes research, slow, model, benchmark, and"
-        " release work."
-    ),
+    ("Fast suite deliberately excludes research, slow, benchmark, and release work."),
 )
 
 

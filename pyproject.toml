@@ -88,7 +88,6 @@ pythonpath = ["."]
 markers = [
   "research: tests that require research corpora, benchmark runners, recorded qualification, or optional research runtimes",
   "slow: tests excluded from per-change CI because they are resource intensive",
-  "model: tests that require a real local language model",
 ]
 
 [tool.ruff]
@@ -96,7 +95,6 @@ line-length = 88
 src = ["src"]
 include = [
   "pyproject.toml",
-  "experiments/sentence_safety_gate_v2/**/*.py",
   "scripts/**/*.py",
   "src/**/*.py",
   "tests/**/*.py",
@@ -109,7 +107,7 @@ select = ["E", "F", "I", "UP", "B"]
 "scripts/bootstrap_github.py" = ["E501"]
 
 [tool.mypy]
-files = ["experiments/sentence_safety_gate_v2", "src", "tests"]
+files = ["src", "tests"]
 exclude = ["^tests/typecheck/"]
 strict = true
 warn_unused_configs = true
