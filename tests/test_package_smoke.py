@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from hashlib import sha256
 from importlib import import_module
 from importlib.metadata import metadata, version
 from importlib.util import find_spec
@@ -126,6 +127,36 @@ def test_v1_package_boundary_has_no_finetuning_generator() -> None:
     )
 
     assert not generator_path.exists()
+
+
+def test_v1_package_boundary_has_no_rule_catalog_module() -> None:
+    assert find_spec("polis.rules.catalog") is None
+
+
+@pytest.mark.parametrize(
+    ("evidence_path", "expected_sha256"),
+    (
+        (
+            "docs/architecture/decisions/0021-rule-catalog-ownership.md",
+            "dc28d7256f81f019691487771b4d16942a3698c67f4de8bc22cdbda4bfab76a2",
+        ),
+        (
+            "docs/architecture/rule-catalog-inventory.md",
+            "b1037fb8033e4d33c9442ebc0d1a4b78ebf4526ee68c4a343dbbbcc07979835b",
+        ),
+        (
+            "docs/architecture/rule-catalog-inventory.json",
+            "1b144c18267bbca328ac20b37e27cf5fc5ffb269b5c45683edcb35fc7928e40a",
+        ),
+    ),
+)
+def test_v1_rule_catalog_evidence_is_byte_for_byte_preserved(
+    evidence_path: str, expected_sha256: str
+) -> None:
+    evidence = Path(__file__).parents[1] / evidence_path
+
+    assert evidence.is_file()
+    assert sha256(evidence.read_bytes()).hexdigest() == expected_sha256
 
 
 def test_readme_states_runtime_first_product_boundary() -> None:
