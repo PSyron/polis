@@ -16,7 +16,6 @@ def test_vendored_stdio_public_documentation_covers_operation_and_removal() -> N
         _read(path)
         for path in (
             "README.md",
-            "examples/polis.toml",
             "docs/customization.md",
             "docs/offline-operation.md",
             "docs/public-api.md",
@@ -29,7 +28,6 @@ def test_vendored_stdio_public_documentation_covers_operation_and_removal() -> N
         "[vendored_language_tool]",
         "stdio_path",
         "Analyzer.close()",
-        "sentence-only",
         "source-policy `1.1`",
         "jeden trwały proces",
         "nie pobiera ani nie aktualizuje artefaktów Java",

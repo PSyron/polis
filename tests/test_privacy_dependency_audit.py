@@ -83,7 +83,7 @@ def test_no_secret_literals_in_versioned_files() -> None:
 
 def test_analysis_diagnostics_do_not_leak_user_text_by_default() -> None:
     text = "To jest prywatny_przypadek_123"
-    result = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False)).analyze(text)
+    result = Analyzer(AnalyzerConfig()).analyze(text)
 
     with pytest.raises(UnknownFindingError) as exc_info:
         result.apply(("finding_does_not_exist",))
@@ -104,7 +104,7 @@ def test_analyzer_without_model_backends_does_not_attempt_network(
 
     monkeypatch.setattr(socket, "create_connection", _blocked)
 
-    analyzer = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))
+    analyzer = Analyzer(AnalyzerConfig())
     result = analyzer.analyze("Witaj, świecie")
     assert isinstance(result.text, str)
 

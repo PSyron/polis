@@ -88,7 +88,7 @@ def _smoke_install(venv_dir: Path, artifact: Path) -> None:
             "-c",
             (
                 "from polis import Analyzer, AnalyzerConfig; "
-                "result = Analyzer(AnalyzerConfig(use_local_heuristic_backend=False))"
+                "result = Analyzer(AnalyzerConfig())"
                 ".analyze("
                 "'Zeby nauczyc sie polskiego.'); "
                 "print(len(result.issues), result.text)"

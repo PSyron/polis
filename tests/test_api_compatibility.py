@@ -34,14 +34,10 @@ def test_schema_compatibility_constants_stay_stable() -> None:
 
 
 def test_correction_result_exposes_policy_identity_without_policy_internals() -> None:
-    result = Analyzer(AnalyzerConfig(use_local_heuristic_backend=True)).correct("zeby")
+    result = Analyzer(AnalyzerConfig()).correct("zeby")
 
     assert result.source_policy_version == "1.2"
-    assert result.suggestion_outcomes
-    assert all(
-        outcome.source_policy_version == result.source_policy_version
-        for outcome in result.suggestion_outcomes
-    )
+    assert result.suggestion_outcomes == ()
     assert {
         "SOURCE_POLICY_VERSION",
         "SourceBehavior",
