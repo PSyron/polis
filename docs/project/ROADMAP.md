@@ -22,24 +22,25 @@ kontrole integracyjne przechodzą, a znane ograniczenia są udokumentowane.
 
 ## Aktywna ścieżka produktu
 
-`#185 -> #188 -> #191 -> atomowe issue porządkowe v1`
+Konserwatywna ścieżka wydania v1 zachowuje zakres ADR-0022: poprawia wyłącznie
+jednoznaczną lokalną formę, nie zmienia znaczenia i nie obejmuje LLM, pełnego
+LanguageTool, procesu Java, kontekstowego wnioskowania semantycznego ani
+rozbudowy katalogu M6.
 
-ADR-0022 przyjmuje konserwatywny zakres: v1 poprawia wyłącznie jednoznaczną
-lokalną formę, nie zmienia znaczenia i nie poprawia zgodności czasów ani
-aspektu. Wspierany produkt nie obejmuje LLM, pełnego LanguageTool, procesu Java,
-kontekstowego wnioskowania semantycznego ani rozbudowy katalogu M6.
+- C1 — [#218](https://github.com/PSyron/polis/issues/218) jest ukończone i
+  scalone (merged/completed) przez [PR #223](https://github.com/PSyron/polis/pull/223).
+- C2 — [#219](https://github.com/PSyron/polis/issues/219) jest ukończone i
+  scalone (merged/completed) przez [PR #224](https://github.com/PSyron/polis/pull/224).
+- C3 — [#220](https://github.com/PSyron/polis/issues/220) rejestruje tę prawdziwą
+  ścieżkę roadmapy; dla tego issue nie ma jeszcze numeru PR.
+- C4 — [#221](https://github.com/PSyron/polis/issues/221) pozostaje otwartą bramą
+  release infrastructure.
+- C5 — [#222](https://github.com/PSyron/polis/issues/222) pozostaje otwartą bramą
+  finalization/publication.
 
-#185 zatwierdziło kierunek. #188 zachowało pełny stan na
-`feature/v2-research-archive` przy SHA
-`ca27d2df5416fdce24fff9f0a1b99e8c55bfe8e8`; szczegóły zapisuje
-[manifest archiwum](v2-research-archive-manifest.md). #191 przyjmuje ADR-0022 i
-dokładną powłokę dowodową. Żadne usuwanie z `main` nie może poprzedzać tej
-sekwencji.
-
-Kolejne issue osobno usuwają wykonywalne badania, vendor, niewspierane ścieżki
-runtime'u, osierocone protokoły, nieaktualne CI i dokumentację. Każdy krok
-zachowuje dokładnie zinwentaryzowane dowody na `main`, a pełny kod pozostaje w
-archiwum. ADR-0019 nadal chroni zgodność `polis.evaluation` w linii 0.x.
+Pozostałe bramy wydania to release infrastructure (#221), a następnie
+finalization/publication (#222). #195 pozostaje opcjonalną, nieblokującą ścieżką
+post-v1 i nie jest bramką tego wydania.
 
 Historyczny graf karty runtime-first miał postać `#120 -> #84 -> #95`.
 #84 to praca P0 nad bezpieczeństwem produktu, a #95 to utwardzanie P1.
