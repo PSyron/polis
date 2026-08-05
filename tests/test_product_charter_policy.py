@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 
@@ -16,6 +17,19 @@ ADR = (
 )
 ARCHITECTURE_INDEX = ROOT / "docs" / "architecture" / "README.md"
 ROADMAP = ROOT / "docs" / "project" / "ROADMAP.md"
+_ROADMAP_ACTIVE_MARKER = "## Aktywna ścieżka produktu".encode()
+_ROADMAP_OPTIONAL_MARKER = "## Opcjonalna ścieżka badawcza".encode()
+_ROADMAP_SUFFIX_MARKER = "## Zastąpiona ścieżka wydawnicza M5".encode()
+_ROADMAP_SUFFIX_SHA256 = (
+    "4b46516e6badff9a3fa9d21fc68f1b5730d99ac4189f5816410406eab455491d"
+)
+_REQUIRED_V1_ISSUE_LINKS = {
+    218: "https://github.com/PSyron/polis/issues/218",
+    219: "https://github.com/PSyron/polis/issues/219",
+    220: "https://github.com/PSyron/polis/issues/220",
+    221: "https://github.com/PSyron/polis/issues/221",
+    222: "https://github.com/PSyron/polis/issues/222",
+}
 PORTFOLIO = ROOT / "docs" / "project" / "runtime-first-portfolio-disposition.md"
 PLAN = (
     ROOT
@@ -53,6 +67,32 @@ _CURRENT_RELEASE_CLAUSE_BOUNDARY = re.compile(
 
 def _compile_concept_group(*patterns: str) -> tuple[re.Pattern[str], ...]:
     return tuple(re.compile(pattern, flags=re.IGNORECASE) for pattern in patterns)
+
+
+def _roadmap_active_and_suffix(contents: bytes) -> tuple[bytes, bytes]:
+    active_start = contents.index(_ROADMAP_ACTIVE_MARKER)
+    optional_start = contents.index(_ROADMAP_OPTIONAL_MARKER, active_start)
+    suffix_start = contents.index(_ROADMAP_SUFFIX_MARKER)
+    return contents[active_start:optional_start], contents[suffix_start:]
+
+
+def _assert_conservative_v1_roadmap(contents: bytes) -> None:
+    active, suffix = _roadmap_active_and_suffix(contents)
+    active_text = " ".join(active.decode("utf-8").split())
+
+    assert hashlib.sha256(suffix).hexdigest() == _ROADMAP_SUFFIX_SHA256
+    for issue, target in _REQUIRED_V1_ISSUE_LINKS.items():
+        assert f"[#{issue}]({target})" in active_text
+
+    assert "ukończone i scalone" in active_text
+    assert "release infrastructure" in active_text
+    assert "finalization/publication" in active_text
+    assert "#195 pozostaje opcjonalną, nieblokującą ścieżką post-v1" in active_text
+
+    pr_numbers = set(re.findall(r"/pull/(\d+)", active_text))
+    assert pr_numbers == {"223", "224"}
+    assert "[PR #223](https://github.com/PSyron/polis/pull/223)" in active_text
+    assert "[PR #224](https://github.com/PSyron/polis/pull/224)" in active_text
 
 
 _RELEASE_CONCEPTS = _compile_concept_group(
@@ -368,6 +408,47 @@ def test_roadmap_separates_product_delivery_from_optional_research() -> None:
     assert "<!--" not in roadmap
     assert "#76 -> #84" not in roadmap
     assert "M5 majority-error graph from umbrella #93 is authoritative" not in roadmap
+
+
+def test_roadmap_records_conservative_v1_release_path_and_suffix_digest() -> None:
+    _assert_conservative_v1_roadmap(ROADMAP.read_bytes())
+
+
+def test_roadmap_rejects_stale_c3_pr_absence_claim() -> None:
+    active, _ = _roadmap_active_and_suffix(ROADMAP.read_bytes())
+    active_text = " ".join(active.decode("utf-8").split())
+
+    assert "dla tego issue nie ma jeszcze numeru PR" not in active_text
+
+
+def test_roadmap_contract_rejects_one_space_suffix_mutation() -> None:
+    contents = ROADMAP.read_bytes()
+    _, suffix = _roadmap_active_and_suffix(contents)
+    mutated_suffix = suffix.replace(b"## Archiwalny", b"##  Archiwalny", 1)
+    assert mutated_suffix != suffix
+    suffix_start = contents.index(_ROADMAP_SUFFIX_MARKER)
+
+    with pytest.raises(AssertionError):
+        _assert_conservative_v1_roadmap(contents[:suffix_start] + mutated_suffix)
+
+
+def test_roadmap_contract_rejects_missing_required_issue_number() -> None:
+    contents = ROADMAP.read_bytes()
+    active, suffix = _roadmap_active_and_suffix(contents)
+    required_link = b"[#218](https://github.com/PSyron/polis/issues/218)"
+    if required_link not in active:
+        active += b"\n" + required_link
+    mutated_active = active.replace(
+        required_link, b"[#999](https://github.com/PSyron/polis/issues/999)", 1
+    )
+    assert mutated_active != active
+    active_start = contents.index(_ROADMAP_ACTIVE_MARKER)
+    optional_start = contents.index(_ROADMAP_OPTIONAL_MARKER, active_start)
+
+    with pytest.raises(AssertionError):
+        _assert_conservative_v1_roadmap(
+            contents[:active_start] + mutated_active + contents[optional_start:]
+        )
 
 
 def test_roadmap_records_product_safety_priority_without_blocking_on_p1() -> None:
