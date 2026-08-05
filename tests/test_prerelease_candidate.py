@@ -115,11 +115,17 @@ def test_run_resolves_windows_cmd_from_path(
     bin_dir.mkdir()
     uv_cmd = bin_dir / "uv.CMD"
     invocation_log = tmp_path / "uv-cmd-invocation.log"
-    uv_cmd.write_text(
-        '#!/bin/sh\nprintf "%s:%s\\n" "$PWD" "$*" > "$POLIS_FAKE_UV_LOG"\n',
-        encoding="utf-8",
-    )
-    uv_cmd.chmod(uv_cmd.stat().st_mode | 0o111)
+    if os.name == "nt":
+        uv_cmd.write_text(
+            '@echo off\r\necho %CD%:%* > "%POLIS_FAKE_UV_LOG%"\r\n',
+            encoding="utf-8",
+        )
+    else:
+        uv_cmd.write_text(
+            '#!/bin/sh\nprintf "%s:%s\\n" "$PWD" "$*" > "$POLIS_FAKE_UV_LOG"\n',
+            encoding="utf-8",
+        )
+        uv_cmd.chmod(uv_cmd.stat().st_mode | 0o111)
     monkeypatch.setenv("PATH", str(bin_dir))
     monkeypatch.setenv("PATHEXT", ".CMD")
     monkeypatch.setenv("POLIS_FAKE_UV_LOG", str(invocation_log))
