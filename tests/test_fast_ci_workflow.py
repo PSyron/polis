@@ -16,7 +16,6 @@ COMPATIBILITY_POLICY = ROOT / "docs/compatibility.md"
 DISTRIBUTION_VERIFICATION = ROOT / "docs/distribution-verification.md"
 BYTE_STABLE_TEXT_PATHS = (
     "experiments/languagetool_stdio_session/config.json",
-    "experiments/languagetool_stdio_session/run_benchmark.py",
     "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
     "third_party/languagetool-pl/manifest.json",
     "third_party/languagetool-pl/scripts/run_stdio.sh",
