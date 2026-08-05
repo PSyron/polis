@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import cast
 
 import pytest
 
@@ -17,9 +16,6 @@ from polis.core.models import Severity
 from polis.correction import SourceBehavior
 from polis.rules import (
     AgreementCopulaRule,
-    ContextMorphologyTransport,
-    ContextualInflectionRule,
-    ContextualInflectionRuleConfig,
     DeterministicRuleRegistry,
     DuplicateFindingError,
     DuplicateRuleSourceError,
@@ -114,14 +110,6 @@ def test_registry_returns_no_behavior_for_unversioned_or_unknown_sources() -> No
         (SpellingJestesRule(), "replace.common_typo", "spelling-jestes/1.0"),
         (SpellingWlasnieRule(), "replace.common_typo", "spelling-wlasnie/1.0"),
         (SpellingZebyRule(), "replace.common_typo", "spelling-zeby/1.0"),
-        (
-            ContextualInflectionRule(
-                ContextualInflectionRuleConfig(),
-                cast(ContextMorphologyTransport, object()),
-            ),
-            "synthesize.contextual_inflection",
-            "languagetool-contextual-inflection/1.0",
-        ),
         (
             SyntaxCommaSpacingRule(),
             "normalize.comma_spacing",

@@ -23,24 +23,6 @@ def test_analyzer_runs_with_blocked_network(monkeypatch: pytest.MonkeyPatch) -> 
     assert isinstance(result.issues, tuple)
 
 
-def test_default_analyzer_does_not_start_optional_languagetool(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def fail_if_started(*_args: object, **_kwargs: object) -> object:
-        raise AssertionError("optional LanguageTool must remain disabled")
-
-    monkeypatch.setattr(socket, "create_connection", _block_network)
-    monkeypatch.setattr(
-        "polis.rules.languagetool_stdio.LocalLanguageToolStdioSession.from_executable",
-        fail_if_started,
-    )
-
-    analyzer = Analyzer(AnalyzerConfig())
-    result = analyzer.analyze("Witaj, świecie.")
-
-    assert result.text == "Witaj, świecie."
-
-
 def test_analyzer_runs_with_supported_config_and_blocked_network(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

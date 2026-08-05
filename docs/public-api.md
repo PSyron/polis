@@ -143,48 +143,6 @@ zwykła konstrukcja nie wykonuje wywołań specjalistycznych. Issue #60 dostarcz
 silnik niezależny od modelu oraz politykę przetestowaną z użyciem fake'ów; to API
 nie wybiera ani nie włącza rzeczywistego modelu lub runtime'u.
 
-`AnalyzerConfig` przyjmuje również `language_tool_url` oraz
-`language_tool_timeout_seconds`. Tabela TOML `[language_tool]` mapuje swoje
-klucze `base_url` i `timeout_seconds` na te pola. Pominięcie wyłącza całe I/O
-LanguageTool oraz rejestrację.
-
-`AnalyzerConfig` przyjmuje również `contextual_inflection_stdio_path` oraz
-`contextual_inflection_timeout_seconds`. Odpowiadająca im sekcja TOML to:
-
-```toml
-[contextual_inflection]
-stdio_path = "/absolute/path/to/run_stdio.sh"
-timeout_seconds = 2.0
-```
-
-Ścieżka musi wskazywać bezwzględny plik wykonywalny. Opcjonalna reguła emituje
-znaleziska `Category.INFLECTION` na podstawie dowodów lokalnych względem źródła
-i skończonego zbioru kandydatów `synthesize_context`. Znaleziska są zwracane
-w `skipped_findings`; wywołujący mogą zastosować wybrane identyfikatory przez
-`apply_suggestions()`. Reguła wstrzymuje się bez I/O, jeśli wejście nie zawiera
-dokładnie jednego zdania. W testach lub przy osadzaniu wywołujący mogą zamiast
-tego wstrzyknąć `ContextMorphologyTransport` przez
-`Analyzer(config, contextual_inflection_transport=transport)`.
-
-Preferowana konfiguracja współdzielona używa
-`AnalyzerConfig.vendored_language_tool_stdio_path` oraz
-`AnalyzerConfig.vendored_language_tool_timeout_seconds`, mapowanych z:
-
-```toml
-[vendored_language_tool]
-stdio_path = "/absolute/path/to/run_stdio.sh"
-timeout_seconds = 2.0
-```
-
-Ten tryb wyłącznie zdaniowy tworzy jedną trwałą lokalną sesję stdio implementującą
-zarówno kontrolę LanguageTool, jak i syntezę kontekstową. Wzajemnie wyklucza się
-z `[language_tool]` i `[contextual_inflection]`. Uruchamia się leniwie, niczego
-nie pobiera, używa aktywnego kontraktu source-policy `1.2` i pozostawia fleksję
-kontekstową do przeglądu. Historyczny zapis kwalifikacji source-policy `1.1` pozostaje
-niezmieniony. Sesje należące do analizatora są kończone przez `Analyzer.close()`
-lub wyjście z menedżera kontekstu. Transporty wstrzyknięte przez wywołujących
-pozostają ich własnością i nie są zamykane przez analizator.
-
 Powyższe API analizatora jest implementowane przez cienki runtime w `polis`
 i pozostaje niewielkie z założenia. `polis.core` i `polis` bezpośrednio
 reeksportują ten sam model `AnalysisResult`, a sprawdzane przykłady dowodzą
