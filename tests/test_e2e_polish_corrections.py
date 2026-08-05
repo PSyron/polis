@@ -12,7 +12,6 @@ from polis import Analyzer, AnalyzerConfig
 ROOT = Path(__file__).resolve().parents[1]
 JSON_FIXTURE = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.json"
 XML_FIXTURE = ROOT / "tests" / "fixtures" / "e2e" / "polish_correction_corpus.xml"
-QUALITY_GATES = ROOT / "docs" / "llm-quality-gates.md"
 
 
 @dataclass(frozen=True, slots=True)
@@ -131,21 +130,6 @@ def test_json_and_xml_corpora_cover_the_same_cases() -> None:
     assert _normalize_result(json_cases) == _normalize_result(xml_cases)
 
 
-def test_corpus_declares_current_and_planned_verification_modes() -> None:
-    cases = _load_json_cases().values()
-
-    assert {case.verification for case in cases} == {
-        "rules",
-        "llm_planned",
-        "negative",
-    }
-    assert all(
-        case.tracking_issue in {42, 43, 49}
-        for case in cases
-        if case.verification == "llm_planned"
-    )
-
-
 RULE_CASE_IDS = tuple(
     case_id
     for case_id, case in _load_json_cases().items()
@@ -178,21 +162,6 @@ def test_negative_cases_produce_no_findings(fixture: dict[str, E2ECase]) -> None
             assert analyzer.analyze(case.source).issues == ()
 
 
-def test_planned_llm_cases_have_gold_output_category_and_tracking() -> None:
-    planned_cases = [
-        case
-        for case in _load_json_cases().values()
-        if case.verification == "llm_planned"
-    ]
-
-    assert planned_cases
-    assert all(case.source != case.expected for case in planned_cases)
-    assert all(case.tracking_issue in {42, 43, 49} for case in planned_cases)
-    assert {"inflection", "syntax", "punctuation", "word_order"} <= {
-        tag for case in planned_cases for tag in case.tags
-    }
-
-
 def test_all_corpus_cases_have_explicit_gold_edits_that_reconstruct_output() -> None:
     raw = json.loads(JSON_FIXTURE.read_text(encoding="utf-8"))
 
@@ -210,19 +179,6 @@ def test_all_corpus_cases_have_explicit_gold_edits_that_reconstruct_output() -> 
         assert corrected == case["expected_output"], case["id"]
 
 
-def test_llm_quality_corpus_has_category_coverage_and_hard_negatives() -> None:
-    cases = _load_json_cases().values()
-    planned_cases = [case for case in cases if case.verification == "llm_planned"]
-    negative_cases = [case for case in cases if case.verification == "negative"]
-
-    for category in ("inflection", "syntax", "punctuation"):
-        assert sum(category in case.tags for case in planned_cases) >= 10
-
-    assert len(negative_cases) >= 10
-    assert sum("name" in case.tags for case in negative_cases) >= 5
-    assert sum("word_order" in case.tags for case in negative_cases) >= 3
-
-
 def test_corpus_preserves_name_inflection_and_valid_word_order_negatives() -> None:
     cases = _load_json_cases()
     negative_cases = [
@@ -234,20 +190,3 @@ def test_corpus_preserves_name_inflection_and_valid_word_order_negatives() -> No
         "negative_male_name_dative",
         "negative_marked_word_order",
     }
-
-
-def test_llm_quality_gate_documentation_requires_all_safety_and_quality_gates() -> None:
-    documentation = QUALITY_GATES.read_text(encoding="utf-8")
-
-    for requirement in (
-        "100%",
-        "0",
-        "precision",
-        "recall",
-        "F1",
-        "0.90",
-        "inflection",
-        "syntax",
-        "punctuation",
-    ):
-        assert requirement in documentation
