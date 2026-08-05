@@ -8,14 +8,6 @@ from dataclasses import dataclass
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
 from polis.rules.agreement import AgreementCopulaRule
-from polis.rules.catalog import (
-    DuplicateRuleMetadataError,
-    InvalidRuleMetadataError,
-    RuleAvailability,
-    RuleCatalog,
-    RuleCatalogError,
-    RuleMetadata,
-)
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingWlasnieRule,
@@ -183,9 +175,7 @@ def _normalize_registrations(
 __all__ = [
     "DeterministicRuleRegistry",
     "DuplicateFindingError",
-    "DuplicateRuleMetadataError",
     "DuplicateRuleSourceError",
-    "InvalidRuleMetadataError",
     "IncompatibleRuleOutputError",
     "SpellingJestesRule",
     "SpellingWlasnieRule",
@@ -199,9 +189,5 @@ __all__ = [
     "SyntaxQuoteSpacingRule",
     "SyntaxSentenceSpacingRule",
     "RuleRegistration",
-    "RuleAvailability",
-    "RuleCatalog",
-    "RuleCatalogError",
-    "RuleMetadata",
     "RuleRegistryError",
 ]
