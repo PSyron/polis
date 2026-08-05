@@ -28,7 +28,6 @@ PLAN = (
 GOVERNED_RELEASE_DOCUMENTS = (
     pytest.param(ROOT / "README.md", id="readme"),
     pytest.param(ROOT / "docs" / "limitations.md", id="limitations"),
-    pytest.param(ROOT / "docs" / "llm-quality-gates.md", id="llm-quality-gates"),
     pytest.param(ROOT / "docs" / "prerelease-candidate.md", id="prerelease"),
     pytest.param(ROOT / "docs" / "compatibility.md", id="compatibility"),
 )
@@ -391,7 +390,6 @@ def test_release_docs_do_not_require_model_research() -> None:
         for path in (
             ROOT / "README.md",
             ROOT / "docs" / "limitations.md",
-            ROOT / "docs" / "llm-quality-gates.md",
             ROOT / "docs" / "prerelease-candidate.md",
             ROOT / "docs" / "compatibility.md",
         )
@@ -404,16 +402,15 @@ def test_release_docs_do_not_require_model_research() -> None:
     for name in (
         "README.md",
         "limitations.md",
-        "llm-quality-gates.md",
         "prerelease-candidate.md",
     ):
         assert (
-            "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
+            "Opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u"
             in normalized_documents[name]
         )
         assert "documentation-contract" not in documents[name]
     assert (
-        "opcjonalne badania modeli nigdy nie blokują wydania runtime'u"
+        "Opcjonalne badania modeli nigdy nie blokują wydania runtime'u"
         in normalized_documents["compatibility.md"]
     )
     assert "documentation-contract" not in documents["compatibility.md"]
@@ -1360,13 +1357,13 @@ def test_each_release_doc_independently_rejects_research_release_dependencies(
     document = " ".join(path.read_text(encoding="utf-8").split())
     if path.name == "compatibility.md":
         required_phrases = (
-            "opcjonalne badania modeli nigdy nie blokują wydania runtime'u",
+            "Opcjonalne badania modeli nigdy nie blokują wydania runtime'u",
             "nie wymaga modelu, procesu Java, usługi sieciowej, korpusu "
             "badawczego ani zużytego holdoutu",
         )
     else:
         required_phrases = (
-            "opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
+            "Opcjonalne badania nad modelem nigdy nie blokują wydania runtime'u",
             "Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi "
             "sieciowej, korpusu badawczego ani zużytego holdoutu",
         )

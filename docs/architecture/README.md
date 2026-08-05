@@ -30,10 +30,10 @@ późniejszy ADR.
 | [ADR-0021](decisions/0021-rule-catalog-ownership.md) | Zaakceptowany | `polis.rules` posiada kuratorowany katalog standardowych źródeł reguł |
 | [ADR-0022](decisions/0022-conservative-v1-product-scope.md) | Zaakceptowany | Konserwatywny zakres v1 i dokładna powłoka dowodowa zastępują szerszy plan runtime'u |
 
-[Granica protokołów analizatora i lokalnego backendu](protocols.md) opisuje
-punkty rozdziału implementacji runtime'u zgodne z zaakceptowanym kontraktem
-publicznego API.
+[Granica protokołów runtime'u v1](protocols.md) opisuje punkty rozdziału
+implementacji zgodne z zaakceptowanym kontraktem publicznego API.
 
-[Inwentarz katalogu reguł](rule-catalog-inventory.md) zapisuje obecne
-identyfikatory standardowych reguł runtime'u i ich dyspozycje polityki, a
-ADR-0021 rozstrzyga własność i przyszły wybór źródeł bez zmiany snapshotu.
+[Inwentarz katalogu reguł](rule-catalog-inventory.md) jest zachowanym bez zmian
+historycznym snapshotem #148/#149, a nie opisem bieżącego runtime'u v1.
+Bieżące dziesięć źródeł runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
+konserwatywny zakres określa ADR-0022.

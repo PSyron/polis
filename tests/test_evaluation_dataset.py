@@ -232,15 +232,15 @@ def test_dataset_asset_is_distributed_with_the_package() -> None:
     assert DATASET_PATH.is_file()
 
 
-def test_dataset_documentation_states_stewardship_requirements() -> None:
+def test_dataset_documentation_points_to_adr_0019_and_archive() -> None:
     documentation = " ".join(DOCUMENTATION.read_text(encoding="utf-8").split())
 
     for required_text in (
-        "CC0-1.0",
-        "human-reviewed",
-        "prywatnego",
-        "wygenerowanego przez model",
-        "anonimizację",
-        "experiments/nlp_dependencies",
+        "ADR-0019",
+        "`polis.evaluation`",
+        "`load_dataset`",
+        "`validate_dataset`",
+        "manifeście archiwum v2",
+        "Nie uruchamiaj ponownie zużytych holdoutów",
     ):
         assert required_text in documentation

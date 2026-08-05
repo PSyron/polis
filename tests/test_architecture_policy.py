@@ -99,48 +99,22 @@ class ArchitecturePolicyTests(unittest.TestCase):
         self.assertIn("zgodność czasów i aspektu", prompt)
         self.assertIn("w razie wątpliwości nie sugeruje zmiany", prompt)
 
-    def test_architecture_guides_preserve_source_policy_identifier(self) -> None:
-        guides = (
+    def test_protocol_documentation_records_v1_source_policy_boundary(self) -> None:
+        content = (INDEX.parent / "protocols.md").read_text(encoding="utf-8")
+
+        self.assertIn("source-policy", content)
+        self.assertIn("ADR-0022", content)
+        self.assertNotIn("LocalGenerationBackend", content)
+
+    def test_task_13_architecture_guides_are_removed(self) -> None:
+        for relative_path in (
             "contextual-inflection-routing-design.md",
+            "finetuning-dataset.md",
             "languagetool-rule-inventory-design.md",
-            "protocols.md",
-        )
-
-        for relative_path in guides:
+            "sentence-category-routing-design.md",
+        ):
             with self.subTest(relative_path=relative_path):
-                content = (INDEX.parent / relative_path).read_text(encoding="utf-8")
-                self.assertIn("source-policy", content)
-
-    def test_architecture_guides_use_polish_review_and_evaluation_prose(self) -> None:
-        guides = " ".join(
-            "\n".join(
-                (INDEX.parent / relative_path).read_text(encoding="utf-8")
-                for relative_path in (
-                    "README.md",
-                    "contextual-inflection-routing-design.md",
-                    "finetuning-dataset.md",
-                    "languagetool-rule-inventory-design.md",
-                    "rule-catalog-inventory.md",
-                    "sentence-category-routing-design.md",
-                )
-            ).split()
-        )
-
-        for phrase in (
-            "do przeglądu",
-            "modułu oceniającego",
-            "zbiór deweloperski",
-            "zapisywane w repozytorium",
-        ):
-            self.assertIn(phrase, guides)
-        for phrase in (
-            "poddanych review",
-            "stan review",
-            "scorera",
-            "commitowane",
-            "Development używa",
-        ):
-            self.assertNotIn(phrase, guides)
+                self.assertFalse((INDEX.parent / relative_path).exists())
 
     def test_adr_records_python_and_platform_contract(self) -> None:
         adr = ADR.read_text(encoding="utf-8")

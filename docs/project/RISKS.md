@@ -1,39 +1,12 @@
-# Ryzyka projektu i otwarte decyzje
+# Ryzyka runtime'u v1
 
-Każde ryzyko ma właściciela w roadmapie. Zamknięcie issue właściciela musi albo
-usunąć ryzyko, albo udokumentować zaakceptowane ryzyko rezydualne.
+| Ryzyko | Ograniczenie |
+| --- | --- |
+| Reguła proponuje zmianę bez lokalnego uzasadnienia | Reguły są deterministyczne; niepewność i konflikt oznaczają brak automatycznej korekty. |
+| Zmiana narusza znaczenie tekstu | v1 nie koryguje intencji, faktów, czasu, aspektu, stylu ani tonu. |
+| Nieprawidłowe przesunięcie uszkadza wybór poprawki | Wyniki używają zakresów `[start, end)` względem oryginalnego tekstu i są walidowane. |
+| Niezgodne zachowanie reguły uzyska automatyczne uprawnienie | Polityka sprawdza pełną tożsamość źródła, kategorii, operacji, wersji zachowania i polityki. |
+| Wydanie zależy od zasobu poza urządzeniem | Domyślna ścieżka jest offline i nie wymaga sieci, usługi ani procesu pomocniczego. |
+| Historia badań zostanie uznana za obietnicę produktu | Dokumentacja v1 wskazuje [archiwum v2](v2-research-archive-manifest.md); historyczne dowody nie definiują funkcji runtime'u. |
 
-<!--
-Niezmiennicze kotwice testów polityki:
-evaluation leakage; circular benchmark; morphology ambiguity;
-suggestion false positives; runtime availability; memory pressure;
-fine-tuning overfit.
--->
-
-| Ryzyko | Skutek | Mitygacja i dowody | Właściciel |
-| --- | --- | --- | --- |
-| Nieobsługiwana albo zbyt szeroka macierz wersji Pythona i platform | Błędy pakowania i nadmierny nakład pracy na kompatybilność | Przed utworzeniem szkieletu zapisać obsługiwane wersje i platformy; walidować je w CI | M0-01 |
-| Zależność NLP ma nieodpowiednią licencję, rozmiar, jakość albo zachowanie offline | Architektura rdzenia staje się kosztowna albo niezgodna z wymaganiami | Porównać realistycznych kandydatów według jawnych kryteriów i zapisać decyzję w ADR | M0-02 |
-| Publiczny model danych albo schemat JSON zmienia się po jego przyjęciu przez odbiorców | Niekompatybilne zmiany API i niestabilne identyfikatory issues | Wersjonować schemat i przetestować serializację round-trip przed wdrożeniem modułów zależnych | M0-05 |
-| Proponowane API i zachowanie błędów pozostają niejednoznaczne | Adaptery i wywołujący implementują sprzeczne założenia | Zatwierdzić przykłady, granice wyjątków, zachowanie wyników częściowych i semantykę poprawek | M0-06 |
-| Dane ewaluacyjne nie mają proweniencji albo trudnych przykładów negatywnych | Mylące wyniki jakości i ryzyko licencyjne | Zacząć od przypadków licencjonowanych albo stworzonych w projekcie i zapisać proweniencję każdego przypadku | M0-08 |
-| Wskazany runtime albo model staje się niedostępny | Badania nad opcjonalnym rozszerzeniem zatrzymują się albo wiążą ścieżkę badawczą z jednym dostawcą | Porównać wielu kandydatów, utrzymać backendy za opcjonalnym protokołem i nie czynić dostępności modelu bramką wydania produktu | #119, #76 |
-| Wynik modelu jest wadliwy, zawiera wstrzyknięcie, powstaje zbyt wolno albo ma zbyt szeroki zakres | Awarie, wycieki prywatności albo niebezpieczne poprawki | Walidować wersjonowany schemat, ograniczać zakresy, stosować timeouty i bezpiecznie odrzucać błędy | M2-02, M2-04 |
-| Oceny pewności nie są skalibrowane | Nadmierna liczba fałszywych alarmów albo myląca dotkliwość | Zmierzyć baseline i wyprowadzić progi z danych ewaluacyjnych | M3-02 |
-| Cele wydajnościowe są zgadywane | Bramki wydania są pozbawione znaczenia albo nieosiągalne | Mierzyć opóźnienie, przepustowość i pamięć w udokumentowanych konfiguracjach | M3-03 |
-| Opcjonalne CLI gromadzi logikę biznesową | Powielone zachowanie i niestabilne interfejsy | Utrzymać CLI jako cienką warstwę wywołującą publiczne API i testować przykłady end-to-end | M3-05 |
-| Prywatne teksty, modele albo wygenerowane korpusy trafiają do kontroli wersji | Incydenty dotyczące prywatności, rozmiaru repozytorium i licencji | Ignorować lokalne artefakty, audytować śledzone pliki i dokumentować diagnostykę chroniącą prywatność | M4-02 |
-| Inicjalizacja metadanych GitHub zatrzymuje się po częściowym zapisie | Zduplikowane albo niespójne metadane projektu | Wyszukiwać zasoby po dokładnej, stabilnej nazwie i zapewnić idempotentność każdej operacji | Planning bootstrap |
-| Wyciek danych ewaluacyjnych między promptem, treningiem, zbiorem deweloperskim i holdoutem | Raportowana jakość nie generalizuje, a wybór modelu jest nieważny | Obliczać i porównywać skróty każdego podziału, zamrozić holdout, zabronić zmian promptu na podstawie holdoutu i zapisać jedno końcowe uruchomienie holdoutu | #55, #56, #62, #63 |
-| Cykliczna logika benchmarku rozpoznaje tekst korpusu albo koduje oczekiwane odpowiedzi | Ewaluator mierzy wyszukiwanie odpowiedzi zamiast korekty polszczyzny | Oddzielić wykonanie benchmarku od danych wzorcowych, dodać nieznane wcześniej próby, skontrolować runnery pod kątem gałęzi swoistych dla korpusu i wymagać odtwarzalnych metadanych dowodowych | #55 |
-| Niejednoznaczność morfologiczna daje wiele poprawnych form bez rozstrzygnięcia kontekstu | Recall kandydatów wygląda dobrze, podczas gdy wybrane poprawki pozostają niebezpieczne | Raportować recall i niejednoznaczność osobno, zachować tekst bez zmian jako jednego z kandydatów i pozwolić modelowi wybierać wyłącznie spośród skończonego zbioru identyfikatorów | #58, #59 |
-| Fałszywie dodatnie sugestie zmieniają poprawne nazwy, fleksję, szyk wyrazów albo chronione tokeny | Opcjonalne sugestie zwiększają nakład przeglądu i osłabiają zaufanie użytkownika nawet bez automatycznego zastosowania | Traktować bramki sugestii i modelu jako dowód dopuszczenia opcjonalnego rozszerzenia; przed każdą przyszłą decyzją o dopuszczeniu wymagać zera znalezisk dla chronionych trudnych przykładów negatywnych oraz co najmniej 0.90 precyzji dokładnej edycji na zamrożonym holdoucie | #119, #76, #90 |
-| Dostępność runtime'u różni się między konfiguracjami MLX, GGUF i usług lokalnych | Badany model nie może działać offline na wspieranej maszynie | Wymagać jawnej lokalnej kontroli wstępnej, dokładnych metadanych runtime'u i artefaktu, braku niejawnego pobierania oraz rezultatu wyłącznie deterministycznego, gdy opcjonalna ścieżka sugestii jest niedostępna | #119, #76 |
-| Presja pamięci unieważnia pomiary opóźnienia albo czyni pipeline niepraktycznym na Apple Silicon z 16 GB pamięci | Benchmarki wybierają konfigurację, która używa swapu albo destabilizuje hosta | Mierzyć zajętą pamięć wraz z opóźnieniem zimnym i rozgrzanym, odrzucać uruchomienia pod presją i wybrać najmniejszą konfigurację, która przechodzi opcjonalne bramki badawcze | #119, #76 |
-| Nadmierne dopasowanie podczas dostrajania poprawia szablonowe przykłady deweloperskie, ale szkodzi chronionym przykładom negatywnym albo nieznanym tekstom | Adapter wydaje się lepszy od baseline'u opartego wyłącznie na prompcie, choć nie generalizuje | Trenować dopiero po baseline'ie promptu, używać niezależnie przygotowanych danych, wykonywać kontrole wycieku i ablacje oraz odrzucić adapter, jeśli nie przechodzi bramek zamrożonej walidacji i holdoutu | #62, #63 |
-| Zgodność przestrzeni nazw ewaluacji jest mylona ze wspieraną powierzchnią produktu runtime | Porządkowanie pakowania może zepsuć importy 0.x albo uczynić ewaluatory repozytorium domyślną zależnością | Zachować istniejącą przestrzeń nazw zgodności `polis.evaluation` dla 0.x, testować udokumentowane importy i utrzymać zasoby ewaluatora na jawnej ścieżce badawczej | #120, #95 |
-| Fixtury badawcze, raporty, holdouty albo dołączone wyniki kompilacji trafiają do artefaktów wydania | Dystrybucje stają się zbyt duże, wrażliwe pod względem prywatności albo mylące co do wspieranych możliwości runtime'u | Kontrolować zawartość wheel i sdist, wykluczać ścieżki używane tylko w repozytorium, zachować proweniencję w Git i nigdy nie uznawać obecności artefaktu za kwalifikację produktu | #120, #92 |
-| Bramki badawcze są traktowane jako zależności produktu | Nieudany albo opóźniony eksperyment z modelem lub pokryciem większościowym blokuje bezpieczne wydanie deterministyczne albo skłania do niepopartych twierdzeń | Zachować bezpieczeństwo runtime'u, pakowanie, kontrakty, prywatność i zachowanie deterministyczne jako bramki produktu; śledzić prace nad modelem i pokryciem jako jawne dowody bez twierdzenia o kwalifikacji modelu | #76, #85, #90, #93 |
-| Obowiązkowa zależność od modelu wraca przez dokumentację albo checklisty wydania | Wydania produktu znów wydają się blokowane przez model, proces Java, sieć, korpus badawczy albo pracę na zużytym holdoucie | Utrzymać zgodność ADR-0020, ścieżki produktu w roadmapie, ograniczeń, kompatybilności i kontroli prerelease z nadrzędnością runtime'u offline | #120, #95 |
-| Zastąpione issues są opisywane jako ukończone prace nad produktem | Fałszywe twierdzenia o ukończeniu przesłaniają kryteria akceptacji, których nie dostarczono zgodnie z kartą runtime-first | Oznaczyć #43, #64, #66, #92 i #93 jako zastąpione, a nie ukończone, oraz wymagać nowych dowodów przed każdym powiązanym twierdzeniem o uprawnieniu do automatycznych poprawek albo wydaniu | #120, #84 |
-| Metadane issues odchodzą od karty runtime-first | Etykiety, powiązania blokujące albo opisy issues mogą odtworzyć stary połączony graf wydania po poprawieniu dokumentacji | Uzgodnić metadane idempotentnie z przyjętą kartą #120 i audytować krawędzie produktu #84/#95 osobno od opcjonalnych krawędzi badawczych | #120, #84, #95 |
+Aktualne decyzje produktu ustala [ADR-0022](../architecture/decisions/0022-conservative-v1-product-scope.md).

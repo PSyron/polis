@@ -91,8 +91,8 @@ def test_protocol_module_has_no_concrete_nlp_or_model_server_import() -> None:
     }
 
 
-def test_protocol_documentation_records_lifecycle_and_failure_ownership() -> None:
-    documentation = DOCUMENTATION.read_text(encoding="utf-8")
+def test_protocol_documentation_records_v1_protocol_ownership() -> None:
+    documentation = " ".join(DOCUMENTATION.read_text(encoding="utf-8").split())
 
     for heading in (
         "## DeterministicAnalyzer",
@@ -102,8 +102,9 @@ def test_protocol_documentation_records_lifecycle_and_failure_ownership() -> Non
     ):
         assert heading in documentation
     for statement in (
-        "Nie jest zwracany częściowy `AnalysisResult`.",
-        "Polityka ponowień celowo nie jest jeszcze protokołem.",
+        "nie zwraca wyniku częściowego",
+        "source-policy",
+        "nie odpowiadają za zmianę tekstu",
     ):
         assert statement in documentation
     assert "documentation-contract" not in documentation
