@@ -107,6 +107,32 @@ def _fake_uv_environment(tmp_path: Path) -> tuple[dict[str, str], Path]:
     )
 
 
+def test_run_resolves_windows_cmd_from_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    uv_cmd = bin_dir / "uv.CMD"
+    invocation_log = tmp_path / "uv-cmd-invocation.log"
+    uv_cmd.write_text(
+        '#!/bin/sh\nprintf "%s:%s\\n" "$PWD" "$*" > "$POLIS_FAKE_UV_LOG"\n',
+        encoding="utf-8",
+    )
+    uv_cmd.chmod(uv_cmd.stat().st_mode | 0o111)
+    monkeypatch.setenv("PATH", str(bin_dir))
+    monkeypatch.setenv("PATHEXT", ".CMD")
+    monkeypatch.setenv("POLIS_FAKE_UV_LOG", str(invocation_log))
+    monkeypatch.setattr(sys, "platform", "win32")
+    monkeypatch.setattr(shutil, "_win_path_needs_curdir", lambda _cmd, _mode: False)
+
+    prerelease._run(["uv", "run", "nested-pytest"], cwd=tmp_path)
+
+    assert invocation_log.read_text(encoding="utf-8") == (
+        f"{tmp_path}:run nested-pytest\n"
+    )
+
+
 def test_prerelease_candidate_uses_the_product_only_pytest_marker(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

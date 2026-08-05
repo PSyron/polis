@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
 
 def _run(cmd: list[str], *, cwd: Path | None = None) -> None:
-    subprocess.run(cmd, cwd=cwd, check=True)
+    executable = shutil.which(cmd[0])
+    if executable is None:
+        raise SystemExit(f"could not resolve prerequisite command: {cmd[0]}")
+    subprocess.run([executable, *cmd[1:]], cwd=cwd, check=True)
 
 
 def _git_output(root: Path, *arguments: str) -> str:
