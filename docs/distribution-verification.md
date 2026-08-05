@@ -10,9 +10,11 @@ uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py \
 uv run --locked --extra dev python -m build --no-isolation --outdir dist
 uv run --locked --extra dev python scripts/verify_distribution_artifacts.py \
   --dist dist
+mkdir build-smoke-cwd
 uv run --locked --extra dev python scripts/verify_distribution_install.py \
   --dist dist --wheelhouse build-wheelhouse \
-  --wheelhouse-manifest build-wheelhouse-manifest.json
+  --wheelhouse-manifest build-wheelhouse-manifest.json \
+  --smoke-cwd build-smoke-cwd
 ```
 
 Przed publikacją utwórz niezmienny manifest dokładnie tych artefaktów:
@@ -44,15 +46,20 @@ tekst, dekoduje wynik jako UTF-8 i porównuje go znak w znak. Odtwarza to starsz
 platformy zakończenia (`LF` na POSIX i `CRLF` w Windows); kontrakt procesu
 ustala kodowanie, a nie systemową konwencję końca wiersza.
 
-`scripts/verify_distribution_install.py` sprawdza wheel i sdist, tworząc czyste
-środowiska z właściwym dla platformy układem `bin` albo `Scripts`. To samo
-polecenie działa w powłokach POSIX, Windows PowerShell i `cmd.exe`.
+`scripts/verify_distribution_install.py` wymaga `--smoke-cwd`: istniejącego,
+pustego katalogu poza checkoutem. Sprawdza wheel i sdist, tworząc czyste
+środowiska z właściwym dla platformy układem `bin` albo `Scripts`; wszystkie
+podprocesy probe/API/CLI z zainstalowanego pakietu działają dokładnie w tym
+katalogu. To samo polecenie działa w powłokach POSIX, Windows PowerShell i
+`cmd.exe`.
 Wheelhouse powstaje przed odcięciem sieci i zawiera dokładnie pięć uniwersalnych
 wheelów backendu budowania wskazanych przez `uv.lock`. Instalator następnie
 ustawia `PIP_NO_INDEX=1`, kieruje `PIP_FIND_LINKS` do zweryfikowanego
 wheelhouse i przez `sitecustomize.py` blokuje `socket.connect`,
 `socket.connect_ex` oraz `socket.create_connection`. Dopiero instalacja obu
-artefaktów po aktywowaniu tej blokady stanowi dowód pracy offline.
+artefaktów po aktywowaniu tej blokady stanowi dowód pracy offline. Przed
+ustawieniem jedynej ścieżki `PYTHONPATH` do blokera weryfikator usuwa odziedziczoną
+wartość tej zmiennej.
 
 ## Kontrole objęte testami
 

@@ -60,6 +60,7 @@ def test_fast_ci_runs_public_offline_install_and_documentation_validator() -> No
 
     assert "scripts/prepare_build_wheelhouse.py" in workflow
     assert "scripts/verify_distribution_install.py" in workflow
+    assert "--smoke-cwd" in workflow
     assert "scripts/validate_documentation_inventory.py" in workflow
 
 
@@ -488,6 +489,7 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
     assert "--wheelhouse-manifest build-wheelhouse-manifest.json" in (
         normalized_distribution
     )
+    assert "--smoke-cwd build-smoke-cwd" in normalized_distribution
 
 
 def test_vendored_upstream_text_is_exempt_from_checkout_normalization() -> None:

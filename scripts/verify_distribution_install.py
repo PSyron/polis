@@ -64,6 +64,7 @@ def _run(
 
 def _offline_environment(blocker: Path, wheelhouse: Path) -> dict[str, str]:
     env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
     env["PIP_NO_INDEX"] = "1"
     env["PIP_FIND_LINKS"] = str(wheelhouse.resolve())
     env["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
@@ -79,7 +80,12 @@ def _require_success(result: subprocess.CompletedProcess[str], label: str) -> st
 
 
 def _install_and_smoke(
-    artifact: Path, *, label: str, interpreter: Path, wheelhouse: Path
+    artifact: Path,
+    *,
+    label: str,
+    interpreter: Path,
+    wheelhouse: Path,
+    smoke_cwd: Path,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix=f"polis-install-{label}-") as workdir:
         work = Path(workdir)
@@ -96,13 +102,13 @@ def _install_and_smoke(
         python = _venv_python(venv)
         env = _offline_environment(blocker, wheelhouse)
         probe = _require_success(
-            _run([str(python), "-c", SOCKET_PROBE], cwd=work, env=env),
+            _run([str(python), "-c", SOCKET_PROBE], cwd=smoke_cwd, env=env),
             "socket denial probe",
         )
         _require_success(
             _run(
                 [str(python), "-m", "pip", "install", "--no-input", str(artifact)],
-                cwd=work,
+                cwd=smoke_cwd,
                 env=env,
             ),
             f"{label} offline installation",
@@ -119,7 +125,7 @@ def _install_and_smoke(
                     "print(f\"version={version('polis-nlp')} "
                     'issues={len(r.issues)} text={r.text}")',
                 ],
-                cwd=work,
+                cwd=smoke_cwd,
                 env=env,
             ),
             f"{label} API smoke",
@@ -128,7 +134,7 @@ def _install_and_smoke(
         cli = _require_success(
             _run(
                 [str(python), "-m", "polis.cli", "analyze", "--json", "Witaj,świecie."],
-                cwd=work,
+                cwd=smoke_cwd,
                 env=cli_env,
             ),
             f"{label} CLI smoke",
@@ -144,6 +150,22 @@ def _install_and_smoke(
         print(cli)
 
 
+def _require_empty_smoke_cwd(path: Path) -> Path:
+    smoke_cwd = path.resolve()
+    if not smoke_cwd.exists():
+        raise SystemExit(f"smoke cwd must exist: {smoke_cwd}")
+    if not smoke_cwd.is_dir():
+        raise SystemExit(f"smoke cwd must be a directory: {smoke_cwd}")
+    if any(smoke_cwd.iterdir()):
+        raise SystemExit(f"smoke cwd must be empty: {smoke_cwd}")
+    checkout = Path(__file__).resolve().parents[1]
+    try:
+        smoke_cwd.relative_to(checkout)
+    except ValueError:
+        return smoke_cwd
+    raise SystemExit(f"smoke cwd must be outside checkout: {smoke_cwd}")
+
+
 def main() -> int:
     if isinstance(sys.stdout, io.TextIOWrapper):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -151,11 +173,18 @@ def main() -> int:
     parser.add_argument("--dist", type=Path, required=True)
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--wheelhouse-manifest", type=Path, required=True)
+    parser.add_argument(
+        "--smoke-cwd",
+        type=Path,
+        required=True,
+        help="Existing empty directory used by all installed smoke subprocesses",
+    )
     parser.add_argument("--python", type=Path, action="append")
     args = parser.parse_args()
     dist = args.dist.resolve()
     wheelhouse = args.wheelhouse.resolve()
     wheelhouse_manifest = args.wheelhouse_manifest.resolve()
+    smoke_cwd = _require_empty_smoke_cwd(args.smoke_cwd)
     wheels = sorted(dist.glob("*.whl"))
     sdists = sorted(dist.glob("*.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
@@ -171,13 +200,16 @@ def main() -> int:
             label="wheel",
             interpreter=interpreter,
             wheelhouse=wheelhouse,
+            smoke_cwd=smoke_cwd,
         )
         _install_and_smoke(
             sdists[0],
             label="sdist",
             interpreter=interpreter,
             wheelhouse=wheelhouse,
+            smoke_cwd=smoke_cwd,
         )
+    print(f"smoke-cwd={smoke_cwd}")
     print("distribution installation checks passed with network denied")
     return 0
 

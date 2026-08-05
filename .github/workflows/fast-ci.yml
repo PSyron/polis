@@ -84,5 +84,7 @@ jobs:
         run: uv run --locked --extra dev python -m build --no-isolation
       - name: Verify distribution artifacts
         run: uv run --locked --extra dev python scripts/verify_distribution_artifacts.py
+      - name: Create empty distribution smoke directory
+        run: mkdir "${{ runner.temp }}/polis-install-smoke-cwd"
       - name: Verify offline distribution installation
-        run: uv run --locked --extra dev python scripts/verify_distribution_install.py --dist dist --wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" --wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json"
+        run: uv run --locked --extra dev python scripts/verify_distribution_install.py --dist dist --wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" --wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json" --smoke-cwd "${{ runner.temp }}/polis-install-smoke-cwd"

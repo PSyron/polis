@@ -5,11 +5,33 @@ from __future__ import annotations
 import argparse
 import hashlib
 import subprocess
+import tempfile
 from pathlib import Path
 
 
 def _run(cmd: list[str], *, cwd: Path | None = None) -> None:
     subprocess.run(cmd, cwd=cwd, check=True)
+
+
+def _git_output(root: Path, *arguments: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(root), *arguments],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit("could not inspect prerelease source state")
+    return result.stdout.strip()
+
+
+def _require_source_state(source_commit: str) -> None:
+    root = Path(__file__).resolve().parents[1]
+    head = _git_output(root, "rev-parse", "HEAD")
+    if source_commit != head:
+        raise SystemExit("source commit must equal current repository HEAD")
+    if _git_output(root, "status", "--porcelain", "--untracked-files=all"):
+        raise SystemExit("repository worktree must be clean")
 
 
 def _sha256(path: Path) -> str:
@@ -55,6 +77,7 @@ def main() -> None:
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--wheelhouse-manifest", type=Path, required=True)
     args = parser.parse_args()
+    _require_source_state(args.source_commit)
     dist = args.dist
     manifest = args.manifest or dist / "release-manifest.json"
 
@@ -114,23 +137,26 @@ def main() -> None:
             str(dist),
         ]
     )
-    _run(
-        [
-            "uv",
-            "run",
-            "--locked",
-            "--extra",
-            "dev",
-            "python",
-            "scripts/verify_distribution_install.py",
-            "--dist",
-            str(dist),
-            "--wheelhouse",
-            str(args.wheelhouse),
-            "--wheelhouse-manifest",
-            str(args.wheelhouse_manifest),
-        ]
-    )
+    with tempfile.TemporaryDirectory(prefix="polis-prerelease-smoke-") as smoke_cwd:
+        _run(
+            [
+                "uv",
+                "run",
+                "--locked",
+                "--extra",
+                "dev",
+                "python",
+                "scripts/verify_distribution_install.py",
+                "--dist",
+                str(dist),
+                "--wheelhouse",
+                str(args.wheelhouse),
+                "--wheelhouse-manifest",
+                str(args.wheelhouse_manifest),
+                "--smoke-cwd",
+                smoke_cwd,
+            ]
+        )
 
     _run(
         [

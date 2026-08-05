@@ -69,6 +69,12 @@ def _prepare_release_inputs(base: Path) -> tuple[Path, Path, Path]:
     return dist, wheelhouse, manifest
 
 
+def _empty_smoke_cwd(base: Path) -> Path:
+    smoke_cwd = base / "smoke-cwd"
+    smoke_cwd.mkdir(exist_ok=True)
+    return smoke_cwd
+
+
 def test_public_wheelhouse_preparer_records_exact_locked_universal_wheels(
     tmp_path: Path,
 ) -> None:
@@ -96,6 +102,19 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     tmp_path: Path,
 ) -> None:
     dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    inherited_pythonpath = tmp_path / "inherited-pythonpath"
+    inherited_pythonpath.mkdir()
+    inherited_marker = tmp_path / "inherited-pythonpath-used"
+    (inherited_pythonpath / "sitecustomize.py").write_text(
+        "import os\n"
+        "import sys\n"
+        "from pathlib import Path\n"
+        "if not sys.argv[0].endswith('verify_distribution_install.py'):\n"
+        "    Path(os.environ['POLIS_INHERITED_PYTHONPATH_MARKER']).write_text(\n"
+        "        os.getcwd(), encoding='utf-8'\n"
+        "    )\n",
+        encoding="utf-8",
+    )
 
     result = _run(
         [
@@ -107,8 +126,15 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ],
-        env=os.environ | {"PYTHONIOENCODING": "cp1252"},
+        env=os.environ
+        | {
+            "PYTHONIOENCODING": "cp1252",
+            "PYTHONPATH": str(inherited_pythonpath),
+            "POLIS_INHERITED_PYTHONPATH_MARKER": str(inherited_marker),
+        },
     )
 
     assert result.returncode == 0, result.stderr + result.stdout
@@ -120,6 +146,110 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert '"text":"Witaj,świecie."' in result.stdout
     assert "http://" not in result.stdout.lower()
     assert "https://" not in result.stdout.lower()
+    assert not inherited_marker.exists()
+
+
+def test_public_install_verifier_requires_an_explicit_empty_smoke_cwd(
+    tmp_path: Path,
+) -> None:
+    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    smoke_cwd = tmp_path / "smoke-cwd"
+    smoke_cwd.mkdir()
+
+    missing = _run(
+        [
+            sys.executable,
+            str(VERIFY_INSTALL),
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(wheelhouse),
+            "--wheelhouse-manifest",
+            str(manifest),
+        ]
+    )
+
+    assert missing.returncode != 0
+    assert "--smoke-cwd" in missing.stderr
+
+    result = _run(
+        [
+            sys.executable,
+            str(VERIFY_INSTALL),
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(wheelhouse),
+            "--wheelhouse-manifest",
+            str(manifest),
+            "--smoke-cwd",
+            str(smoke_cwd),
+        ],
+        env=os.environ | {"PYTHONIOENCODING": "cp1252"},
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert "smoke-cwd=" + str(smoke_cwd.resolve()) in result.stdout
+    assert list(smoke_cwd.iterdir()) == []
+
+
+@pytest.mark.parametrize("kind", ["missing", "file", "nonempty"])
+def test_public_install_verifier_rejects_invalid_smoke_cwd(
+    tmp_path: Path, kind: str
+) -> None:
+    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    smoke_cwd = tmp_path / "smoke-cwd"
+    if kind == "file":
+        smoke_cwd.write_text("not a directory", encoding="utf-8")
+    elif kind == "nonempty":
+        smoke_cwd.mkdir()
+        (smoke_cwd / "unexpected").write_text("content", encoding="utf-8")
+
+    result = _run(
+        [
+            sys.executable,
+            str(VERIFY_INSTALL),
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(wheelhouse),
+            "--wheelhouse-manifest",
+            str(manifest),
+            "--smoke-cwd",
+            str(smoke_cwd),
+        ]
+    )
+
+    assert result.returncode != 0
+    assert "smoke cwd" in result.stderr.lower()
+
+
+def test_public_install_verifier_rejects_smoke_cwd_inside_checkout(
+    tmp_path: Path,
+) -> None:
+    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    smoke_cwd = ROOT / f".polis-test-smoke-cwd-{tmp_path.name}"
+    smoke_cwd.mkdir()
+    try:
+        result = _run(
+            [
+                sys.executable,
+                str(VERIFY_INSTALL),
+                "--dist",
+                str(dist),
+                "--wheelhouse",
+                str(wheelhouse),
+                "--wheelhouse-manifest",
+                str(manifest),
+                "--smoke-cwd",
+                str(smoke_cwd),
+            ]
+        )
+    finally:
+        smoke_cwd.rmdir()
+
+    assert result.returncode != 0
+    assert "outside checkout" in result.stderr.lower()
 
 
 @pytest.mark.parametrize("mutation", ["missing", "tampered", "extra"])
@@ -145,6 +275,8 @@ def test_public_install_verifier_rejects_invalid_wheelhouse(
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ]
     )
 
@@ -176,6 +308,8 @@ def test_public_install_verifier_rejects_nonregular_wheelhouse_members(
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ]
     )
 
@@ -219,6 +353,8 @@ def test_public_install_verifier_rejects_malformed_cli_json(tmp_path: Path) -> N
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ]
     )
 
@@ -242,6 +378,8 @@ def test_public_install_verifier_rejects_malformed_wheelhouse_manifest(
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ]
     )
 
@@ -303,6 +441,8 @@ def test_public_install_verifier_rejects_joint_wheel_and_manifest_tampering(
             str(wheelhouse),
             "--wheelhouse-manifest",
             str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
         ]
     )
 
