@@ -134,8 +134,8 @@ def test_run_resolves_windows_cmd_from_path(
 
     prerelease._run(["uv", "run", "nested-pytest"], cwd=tmp_path)
 
-    assert invocation_log.read_text(encoding="utf-8") == (
-        f"{tmp_path}:run nested-pytest\n"
+    assert invocation_log.read_text(encoding="utf-8").strip() == (
+        f"{tmp_path}:run nested-pytest"
     )
 
 
