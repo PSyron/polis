@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import tarfile
@@ -157,6 +158,57 @@ def _rename_wheel_dist_info(source: Path, target: Path) -> None:
             changed.writestr(
                 name.replace(prefix, "evil-9.9.dist-info"), original.read(name)
             )
+
+
+def _rewrite_wheel_identity(
+    source: Path,
+    target: Path,
+    *,
+    dist_info_prefix: str | None = None,
+    metadata_changes: dict[str, str] | None = None,
+) -> None:
+    with zipfile.ZipFile(source) as original, zipfile.ZipFile(target, "w") as changed:
+        for name in original.namelist():
+            rewritten_name = name
+            if dist_info_prefix and ".dist-info/" in name:
+                rewritten_name = name.replace(
+                    name.split("/", 1)[0], dist_info_prefix, 1
+                )
+            content = original.read(name)
+            if metadata_changes and rewritten_name.endswith(".dist-info/METADATA"):
+                text = content.decode()
+                for field, value in metadata_changes.items():
+                    text = re.sub(
+                        rf"^{field}: .*$", f"{field}: {value}", text, flags=re.MULTILINE
+                    )
+                content = text.encode()
+            changed.writestr(rewritten_name, content)
+
+
+def _rewrite_sdist_identity(
+    source: Path,
+    target: Path,
+    *,
+    root: str | None = None,
+    metadata_changes: dict[str, str] | None = None,
+) -> None:
+    with tarfile.open(source) as original, tarfile.open(target, "w:gz") as changed:
+        old_root = original.getnames()[0].split("/", 1)[0]
+        new_root = root or old_root
+        for member in original.getmembers():
+            member.name = member.name.replace(old_root, new_root, 1)
+            member_file = original.extractfile(member) if member.isfile() else None
+            content = member_file.read() if member_file is not None else None
+            if metadata_changes and member.name.endswith("/PKG-INFO"):
+                assert content is not None
+                text = content.decode()
+                for field, value in metadata_changes.items():
+                    text = re.sub(
+                        rf"^{field}: .*$", f"{field}: {value}", text, flags=re.MULTILINE
+                    )
+                content = text.encode()
+                member.size = len(content)
+            changed.addfile(member, BytesIO(content) if content is not None else None)
 
 
 def _mutate_sdist(
@@ -321,6 +373,92 @@ def test_public_verifier_rejects_renamed_dist_info(tmp_path: Path) -> None:
 
     assert result.returncode != 0
     assert "dist-info directory does not match wheel" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        "wheel-renamed",
+        "wheel-metadata-name",
+        "wheel-metadata-version",
+        "sdist-root-renamed",
+        "sdist-metadata-name",
+        "sdist-metadata-version",
+        "joint-wrong-identity",
+    ),
+)
+def test_public_verifier_rejects_semantically_mismatched_identity(
+    tmp_path: Path, case: str
+) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+
+    if case == "wheel-renamed":
+        rewritten = dist / "evil-9.9-py3-none-any.whl"
+        _rewrite_wheel_identity(wheel, rewritten, dist_info_prefix="evil-9.9.dist-info")
+        wheel.unlink()
+    elif case == "wheel-metadata-name":
+        rewritten = dist / "changed.whl"
+        _rewrite_wheel_identity(wheel, rewritten, metadata_changes={"Name": "evil"})
+        wheel.unlink()
+        rewritten.rename(wheel)
+    elif case == "wheel-metadata-version":
+        rewritten = dist / "changed.whl"
+        _rewrite_wheel_identity(wheel, rewritten, metadata_changes={"Version": "9.9"})
+        wheel.unlink()
+        rewritten.rename(wheel)
+    elif case == "sdist-root-renamed":
+        rewritten = dist / "evil-9.9.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, root="evil-9.9")
+        sdist.unlink()
+    elif case == "sdist-metadata-name":
+        rewritten = dist / "changed.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, metadata_changes={"Name": "evil"})
+        sdist.unlink()
+        rewritten.rename(sdist)
+    elif case == "sdist-metadata-version":
+        rewritten = dist / "changed.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, metadata_changes={"Version": "9.9"})
+        sdist.unlink()
+        rewritten.rename(sdist)
+    else:
+        rewritten_wheel = dist / "evil-9.9-py3-none-any.whl"
+        _rewrite_wheel_identity(
+            wheel,
+            rewritten_wheel,
+            dist_info_prefix="evil-9.9.dist-info",
+            metadata_changes={"Name": "evil", "Version": "9.9"},
+        )
+        wheel.unlink()
+        rewritten_sdist = dist / "evil-9.9.tar.gz"
+        _rewrite_sdist_identity(
+            sdist,
+            rewritten_sdist,
+            root="evil-9.9",
+            metadata_changes={"Name": "evil", "Version": "9.9"},
+        )
+        sdist.unlink()
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "distribution identity mismatch" in result.stderr
 
 
 def test_public_verifier_rejects_a_duplicate_wheel_member(tmp_path: Path) -> None:
