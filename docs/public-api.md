@@ -57,9 +57,12 @@ Wszystkie kontrolowane błędy dziedziczą po `PolisError` i mają stabilne pola
 konfiguracji, analizy oraz wyboru korekt; pełną hierarchię określa
 [ADR-0003](architecture/decisions/0003-public-api-and-exception-contract.md).
 
-`polis.evaluation.load_dataset` i `polis.evaluation.validate_dataset` pozostają
-zgodne importowo w 0.x zgodnie z [ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md).
-Nie są głównym API korekty.
+`polis.evaluation` nie jest głównym API korekty. Jego pełna obecna lista
+18 eksportów — w tym `load_dataset`, `validate_dataset`, metryki, identyfikatory
+i walidatory korpusów bezpieczeństwa — pozostaje zgodna importowo do wydania
+1.0 włącznie zgodnie z [ADR-0023](architecture/decisions/0023-evaluation-namespace-1-0.md).
+Kolejność i kompletność tej listy są kontraktem kompatybilności, a nie
+zapowiedzią rozszerzenia runtime'u.
 
 ## Zgodność wyjątków
 

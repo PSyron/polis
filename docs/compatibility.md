@@ -76,6 +76,12 @@ jest addytywnym polem API Pythona i nie ma osobnego schematu JSON.
 W linii 0.x importy `polis.evaluation.load_dataset` i
 `polis.evaluation.validate_dataset` zachowują zgodność przez
 [ADR-0019](architecture/decisions/0019-evaluation-namespace-compatibility.md).
+Do wydania 1.0 włącznie [ADR-0023](architecture/decisions/0023-evaluation-namespace-1-0.md)
+utrzymuje dokładną, uporządkowaną 18-elementową listę
+`polis.evaluation.__all__`; obejmuje ona metryki, walidatory, identyfikatory
+korpusów i funkcje kontroli izolacji korpusów. To zobowiązanie importowe nie
+zmienia aktywnej bramki jakości: runtime v1 pozostaje przy konserwatywnym
+korpusie dziesięciu reguł, bliskich negatywach i trzech wstrzymaniach.
 `Analyzer.close()`, menedżer kontekstu i
 `language_tool_process_start_count` pozostają dla zgodności 0.x; runtime v1 nie
 posiada procesu, więc licznik zwraca `0`, a zamknięcie jest no-op. Dane

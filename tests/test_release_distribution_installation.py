@@ -6,7 +6,9 @@ import os
 import shutil
 import subprocess
 import sys
+import tarfile
 import zipfile
+from io import BytesIO
 from pathlib import Path
 
 import pytest
@@ -21,6 +23,7 @@ EXPECTED_PACKAGES = {
     "pluggy": "1.6.0",
     "trove-classifiers": "2026.6.1.19",
 }
+EVALUATION_INIT = "polis/evaluation/__init__.py"
 
 
 def _run(
@@ -73,6 +76,81 @@ def _empty_smoke_cwd(base: Path) -> Path:
     smoke_cwd = base / "smoke-cwd"
     smoke_cwd.mkdir(exist_ok=True)
     return smoke_cwd
+
+
+def _replace_evaluation_exports(dist: Path, replacement: str) -> None:
+    wheel = next(dist.glob("*.whl"))
+    changed_wheel = dist / "changed.whl"
+    with zipfile.ZipFile(wheel) as original:
+        with zipfile.ZipFile(changed_wheel, "w") as changed:
+            for name in original.namelist():
+                wheel_content = original.read(name)
+                if name == EVALUATION_INIT:
+                    wheel_content = replacement.encode("utf-8")
+                changed.writestr(name, wheel_content)
+    wheel.unlink()
+    changed_wheel.rename(wheel)
+
+    sdist = next(dist.glob("*.tar.gz"))
+    changed_sdist = dist / "changed.tar.gz"
+    with tarfile.open(sdist) as original:
+        with tarfile.open(changed_sdist, "w:gz") as changed:
+            for member in original.getmembers():
+                source = original.extractfile(member) if member.isfile() else None
+                tar_content: bytes | None = (
+                    source.read() if source is not None else None
+                )
+                if member.name.endswith(f"src/{EVALUATION_INIT}"):
+                    tar_content = replacement.encode("utf-8")
+                    member.size = len(tar_content)
+                changed.addfile(
+                    member,
+                    BytesIO(tar_content) if tar_content is not None else None,
+                )
+    sdist.unlink()
+    changed_sdist.rename(sdist)
+
+
+@pytest.mark.parametrize(
+    ("variant", "needle", "replacement"),
+    (
+        (
+            "seventeen",
+            '    "validate_safety_corpus",\n',
+            "",
+        ),
+        (
+            "nineteen",
+            '    "validate_safety_corpus",\n]',
+            '    "validate_safety_corpus",\n    "unexpected_public_export",\n]',
+        ),
+    ),
+)
+def test_public_install_verifier_rejects_evaluation_export_count_variants(
+    tmp_path: Path, variant: str, needle: str, replacement: str
+) -> None:
+    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    source = (ROOT / "src" / EVALUATION_INIT).read_text(encoding="utf-8")
+    assert needle in source
+    _replace_evaluation_exports(dist, source.replace(needle, replacement, 1))
+
+    result = _run(
+        [
+            sys.executable,
+            str(VERIFY_INSTALL),
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(wheelhouse),
+            "--wheelhouse-manifest",
+            str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
+        ]
+    )
+
+    assert result.returncode != 0, f"{variant}: {result.stdout}{result.stderr}"
+    assert "evaluation export contract" in result.stderr
 
 
 def test_public_wheelhouse_preparer_records_exact_locked_universal_wheels(
