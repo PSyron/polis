@@ -10,13 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_WORKFLOW = ROOT / ".github/workflows/fast-ci.yml"
 EXPECTED_MATRIX = {
-    ("ubuntu-24.04", "x86_64", "x64", "3.12"),
-    ("ubuntu-24.04", "x86_64", "x64", "3.13"),
-    ("ubuntu-24.04", "x86_64", "x64", "3.14"),
     ("macos-15", "arm64", "arm64", "3.12"),
     ("macos-15", "arm64", "arm64", "3.14"),
-    ("windows-2025", "x86_64", "x64", "3.12"),
-    ("windows-2025", "x86_64", "x64", "3.14"),
 }
 VALID_SETUP_PYTHON_ARCHITECTURES = {"x86", "x64", "arm64"}
 SETUP_PYTHON_ARCHITECTURE_BY_POLICY = {"x86_64": "x64", "arm64": "arm64"}
@@ -174,6 +169,12 @@ def validate_contract(path: Path) -> list[str]:
         errors.append(f"missing required matrix entry: {entry}")
     for entry in sorted(matrix - EXPECTED_MATRIX):
         errors.append(f"unexpected matrix entry: {entry}")
+
+    for os_name, *_ in sorted(matrix):
+        if os_name != "macos-15":
+            errors.append(
+                "intermediate Fast CI must use macOS runners only: " + os_name
+            )
 
     for _, policy_architecture, setup_python_architecture, _ in matrix:
         if setup_python_architecture not in VALID_SETUP_PYTHON_ARCHITECTURES:

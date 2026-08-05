@@ -2,11 +2,17 @@
 
 ## Wspierane konfiguracje
 
-`polis` jest weryfikowany na macierzy ADR-0001:
+`polis` pozostaje uniwersalną biblioteką Pythona, a wspierane konfiguracje
+opisuje ADR-0001:
 
 - CPython 3.12, 3.13, 3.14 w systemie Linux x86_64;
 - CPython 3.12, 3.14 w systemie macOS arm64;
 - CPython 3.12, 3.14 w systemie Windows x86_64.
+
+Pośrednie PR-y kwalifikują tę samą, uniwersalną paczkę w Fast CI wyłącznie na
+macOS arm64 (CPython 3.12 i 3.14). Linux i Windows nie są osobnymi funkcjami
+produktu; wracają wyłącznie jako jednorazowe kontrole przenośności tych samych
+bajtów w końcowej macierzy kwalifikacji wydania Todo 6.
 
 Wspierany runtime v1 jest deterministyczny i offline: nie wymaga modelu,
 procesu Java, usługi sieciowej, korpusu badawczego ani zużytego holdoutu.
@@ -16,8 +22,10 @@ ani zużytego holdoutu.
 
 ### Egzekwowanie dowodów i polityki wycofywania
 
-- Asercje kompatybilności sprawdza `.github/workflows/fast-ci.yml` na Linuxie,
-  macOS i Windowsie przy każdym pushu i pull requeście.
+- Asercje kompatybilności pośrednich PR-ów sprawdza
+  `.github/workflows/fast-ci.yml` na macOS przy każdym pushu i pull requeście;
+  Linux i Windows są sprawdzane dopiero w końcowej macierzy kwalifikacji
+  wydania Todo 6.
 - Zmiana API lub schematu aktualizuje
   `tests/fixtures/public_api_snapshot.json` i wymaga not migracyjnych.
 - `tests/test_api_compatibility.py` wykrywa nieuzgodnioną zmianę eksportów
@@ -32,7 +40,7 @@ Dowód z jednego systemu operacyjnego nie kwalifikuje innego.
 
 | Kontrola | Właściciel | Platformy i ścieżka weryfikacji |
 | --- | --- | --- |
-| Szybki zestaw deterministyczny i macierz wspieranych interpreterów | `.github/workflows/fast-ci.yml` | Szybkie CI na Linuxie, macOS i Windowsie |
+| Szybki zestaw deterministyczny i macierz wspieranych interpreterów | `.github/workflows/fast-ci.yml` | Pośrednie Fast CI na macOS; Linux i Windows w końcowej macierzy kwalifikacji wydania Todo 6 |
 | Granica procesu CLI dla UTF-8 i odziedziczonego CP1252 | `tests/test_cli.py` i `tests/test_release_distribution_installation.py` | Każda platforma szybkiego CI; czysta instalacja wheel i sdist powtarza kontrolę |
 | Efektywna polityka `text`/`eol` oraz stabilność bajtów i skrótów checkoutu | `tests/test_fast_ci_workflow.py` | Każda platforma szybkiego CI, w tym checkout skonfigurowany dla CRLF |
 | Dowód pracy z zablokowaną siecią | `tests/test_offline_verification.py` i `tests/test_privacy_dependency_audit.py` | Szybki runtime v1 nie podejmuje połączenia; testy wymuszają błąd sieci |

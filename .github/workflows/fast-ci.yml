@@ -17,18 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.12"
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.13"
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.14"
           - os: macos-15
             architecture: arm64
             setup-python-architecture: arm64
@@ -36,14 +24,6 @@ jobs:
           - os: macos-15
             architecture: arm64
             setup-python-architecture: arm64
-            python-version: "3.14"
-          - os: windows-2025
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.12"
-          - os: windows-2025
-            architecture: x86_64
-            setup-python-architecture: x64
             python-version: "3.14"
     steps:
       - name: Check out source
