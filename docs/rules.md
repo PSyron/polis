@@ -95,63 +95,10 @@ Wszystkie reguły składni obsługują filtrowanie kategorii przez wspólny mech
 `options.categories` i zwracają deterministyczne znaleziska ze stabilnymi
 identyfikatorami.
 
-## Opcjonalna reguła interpunkcyjna LanguageTool
-
-`LocalLanguageToolRule` jest rejestrowana tylko po skonfigurowaniu
-`[language_tool]`. Przyjmuje osobno zainstalowany lokalny serwer LanguageTool 6.8
-i mapuje wyłącznie
-`BRAK_PRZECINKA_KTORY`, `BRAK_PRZECINKA_SPOJNIK_PROSTY`,
-`BRAK_PRZECINKA_ZE`, `BRAK_PRZECINKA_ZEBY` oraz `WOLACZ_BEZ_PRZECINKA`
-na minimalne wstawienia przecinka ze źródłem `rule:languagetool.pl` i pewnością
-`0.85`. Aktywny kontrakt source-policy `1.2` zezwala na automatyczne stosowanie
-tych znalezisk tylko wtedy, gdy zainstalowane zachowanie to
-`check.allowlisted_comma` / `pl-6.8-five-rule-comma/1.0`, pełny klucz polityki
-jest zgodny i znaleziska nie kolidują. Kontrakt source-policy `1.1` pozostaje
-historycznym zapisem kwalifikacji tej listy dozwolonych pięciu identyfikatorów.
-
-Reguła przelicza przesunięcia Java UTF-16 na przesunięcia punktów kodowych
-Pythona, minimalizuje szerokie zastąpienia, odrzuca niejednoznaczne alternatywy
-i kolidujące znaleziska oraz porzuca każdą nieznaną regułę lub zmianę inną niż
-przecinek. Wybór czterech reguł z #70 (trzy nowo udostępnione identyfikatory oraz
-już włączony `BRAK_PRZECINKA_ZE`) zachował precyzję `1.00`: 5 prawdziwie
-pozytywnych edycji i zero zmian chronionych przypadków negatywnych na
-142-zdaniowym holdoucie. Ogólne znaleziska LanguageTool dotyczące pisowni,
-gramatyki, stylu i morfologii są celowo wyłączone.
-
-Dla dwóch zweryfikowanych konstrukcji z parą przecinków zaakceptowane znalezisko
-otwierające może również utworzyć przecinek zamykający. Domknięcie zdania
-względnego wymaga dokładnej kotwicy leksykalnej `Name która mieszka obok`, po
-której występuje osobny żeński predykat zdania głównego w czasie przeszłym.
-Domknięcie wtrącenia wymaga `Name proszę`, po którym występuje jedna z wcześniej
-zweryfikowanych kotwic trybu rozkazującego: `zamknij` lub `zadzwoń`. Oba kształty
-muszą obejmować jedno pełne zdanie i wymagają odpowiadającej zakwalifikowanej
-reguły LanguageTool; żaden nie działa jako samodzielne wyszukiwanie w korpusie.
-Inne zdania względne, wtrącenia, cytaty, adresy URL, liczby i kształty
-wielozdaniowe wstrzymują się do osobnej kwalifikacji. Oba wstawienia zachowują
-oryginalne przesunięcia Unicode w konwencji półotwartej oraz kanał source-policy
-`rule:languagetool.pl`.
-
-## Reguła sugestii fleksji kontekstowej
-
-`ContextualInflectionRule` implementuje cztery rodzaje dowodów zamrożone przez
-ADR-0015: zgodność sąsiadujących nazw własnych, dopełniacz po `bez`, celownik po
-`przygląd… się` oraz celownik po `podzięk…`. Wywołuje wstrzyknięty
-`ContextMorphologyTransport`, waliduje każdy kompletny tag i pochodzący z treści
-identyfikator kandydata `ltpl:` oraz emituje wyłącznie unikatową formę ze
-skończonego zbioru. Niejednoznaczność, niewspierana morfologia, konflikty,
-niepoprawne odpowiedzi i awarie transportu nie zwracają znaleziska. Wejście
-zawierające zero lub wiele zdań jest odrzucane przed wywołaniem lokalnego
-transportu.
-
-Znaleziska używają `Category.INFLECTION`, źródła
-`rule:languagetool.contextual_inflection`, pewności `0.95` oraz oryginalnych
-przesunięć Unicode `[start, end)`. Są wyłącznie sugestiami i są wyłączone
-z automatycznego kontraktu source-policy `1.2`.
-
 ## Tożsamości zachowań polityki automatycznej
 
 Aktywny kontrakt source-policy automatycznej korekty ma wersję `1.2`. Zachowuje
-dziewięć zachowań zakwalifikowanych według historycznego kontraktu source-policy
+osiem zachowań zakwalifikowanych według historycznego kontraktu source-policy
 `1.1`, lecz każde
 identyfikuje pełnym kluczem `(source, category, operation, behavior_version,
 source_policy_version)`. Sama nazwa źródła, kategoria lub wartość pewności nie
@@ -171,7 +118,6 @@ zawsze podlegają przeglądowi.
 | `rule:syntax.list_space` | `syntax` | `normalize.list_marker_spacing` | `syntax-list-space/1.0` | `1.2` |
 | `rule:syntax.quote_space` | `punctuation` | `normalize.quote_spacing` | `syntax-quote-space/1.0` | `1.2` |
 | `rule:syntax.sentence_space` | `punctuation` | `normalize.sentence_spacing` | `syntax-sentence-space/1.0` | `1.2` |
-| `rule:languagetool.pl` | `punctuation` | `check.allowlisted_comma` | `pl-6.8-five-rule-comma/1.0` | `1.2` |
 
 ## Normalizacja analizy
 
