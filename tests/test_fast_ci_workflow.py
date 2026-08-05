@@ -461,9 +461,10 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
 
     assert "Profil weryfikacji platform 1.0" in compatibility
     assert "`tests/test_cli.py`" in compatibility
-    assert "`tests/test_languagetool_vendor_artifacts.py`" in compatibility
-    assert "Bity wykonywalności POSIX" in compatibility
-    assert "Dowód odmowy sieci w macOS" in compatibility
+    assert "`tests/test_release_distribution_installation.py`" in compatibility
+    assert "`tests/test_offline_verification.py`" in compatibility
+    assert "Efektywna polityka `text`/`eol`" in compatibility
+    assert "Dowód pracy z zablokowaną siecią" in compatibility
     assert "osobną weryfikację bramki wydania" in compatibility
     assert "`PYTHONIOENCODING=cp1252`" in distribution
     assert "`tests/test_release_distribution_installation.py`" in distribution
@@ -472,8 +473,12 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
         "starsze środowisko Windows z odziedziczonym kodekiem"
         in normalized_distribution
     )
-    assert "documentation-contract" not in distribution
-    assert "python scripts/verify_distribution_install.py --dist dist" in distribution
+    assert "test_languagetool_vendor_artifacts.py" not in compatibility
+    assert "`language_tool_process_start_count`" in compatibility
+    assert (
+        "uv run python scripts/verify_distribution_install.py dist/*.whl"
+        in distribution
+    )
 
 
 def test_vendored_upstream_text_is_exempt_from_checkout_normalization() -> None:

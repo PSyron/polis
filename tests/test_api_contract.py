@@ -59,7 +59,7 @@ def test_api_contract_documents_the_accepted_adr_and_public_error_examples() -> 
         "BackendUnavailableError",
         "AnalysisTimeoutError",
         "InvalidBackendResponseError",
-        "No partial `AnalysisResult` is returned.",
+        "nie zwraca częściowego `AnalysisResult`",
     )
     for value in required:
         assert value in api_doc

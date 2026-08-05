@@ -1,4 +1,4 @@
-# Konserwatywna konfiguracja Polis v1 nie uruchamia modelu, Javy ani sieci.
+# Jedyną wspieraną sekcją konfiguracji v1 jest lokalna `[analysis]`.
 [analysis]
 categories = ["agreement", "syntax", "spelling", "punctuation"]
 minimum_confidence = 0.0

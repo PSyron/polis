@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
@@ -59,6 +60,265 @@ FROZEN_REVIEW_CHECKLISTS = frozenset(
         "docs/evaluation-safety-corpus-v2-review-checklist.md",
     }
 )
+MAINTAINED_V1_DOCUMENTS = (
+    "README.md",
+    "docs/project/RISKS.md",
+    "docs/architecture/README.md",
+    "docs/architecture/protocols.md",
+    "docs/compatibility.md",
+    "docs/customization.md",
+    "docs/development/dependency-licenses.md",
+    "docs/distribution-verification.md",
+    "docs/evaluation-dataset.md",
+    "docs/limitations.md",
+    "docs/offline-operation.md",
+    "docs/prerelease-candidate.md",
+    "docs/privacy.md",
+    "docs/privacy-audit.md",
+    "docs/public-api.md",
+    "docs/quick-start.md",
+    "docs/rules.md",
+    "examples/polis.toml",
+)
+OBSOLETE_V1_INSTRUCTIONS = (
+    "docs/architecture/contextual-inflection-routing-design.md",
+    "docs/architecture/finetuning-dataset.md",
+    "docs/architecture/languagetool-rule-inventory-design.md",
+    "docs/architecture/sentence-category-routing-design.md",
+    "docs/development/research-workflow.md",
+    "docs/llm-corrected-text-contract.md",
+    "docs/llm-prompt-response-contract.md",
+    "docs/llm-quality-gates.md",
+    "[backend]",
+    "[contextual_inflection]",
+    "[language_tool]",
+    "[vendored_language_tool]",
+    "contextual_inflection_stdio_path",
+    "contextual_inflection_timeout_seconds",
+    "language_tool_timeout_seconds",
+    "language_tool_url",
+    "languagetool.pl",
+    "specialist_engine",
+    "third_party/languagetool-pl",
+    "use_local_heuristic_backend",
+    "vendored_language_tool_stdio_path",
+    "vendored_language_tool_timeout_seconds",
+    'pytest -m "not research and not slow and not model"',
+)
+EXPECTED_V1_RULE_SOURCE_ORDER = (
+    "rule:agreement.copula",
+    "rule:spelling.jestes",
+    "rule:spelling.wlasnie",
+    "rule:spelling.zeby",
+    "rule:syntax.comma_space",
+    "rule:syntax.list_space",
+    "rule:syntax.missing_correlative",
+    "rule:syntax.missing_reflexive",
+    "rule:syntax.quote_space",
+    "rule:syntax.sentence_space",
+)
+ACTIVE_INSTRUCTION_VERB_PATTERN = (
+    r"\b(?:uruchom|skonfiguruj|włącz|użyj|zainstaluj|wykonaj)\b"
+)
+ACTIVE_INSTRUCTION_VERB = re.compile(
+    ACTIVE_INSTRUCTION_VERB_PATTERN,
+    re.IGNORECASE,
+)
+INACTIVE_REMOVED_V1_REFERENCE_CONTEXT = re.compile(
+    r"\b(?:odrzuc\w*|rejected|removed|usunięt\w*|historycz\w*|"
+    r"archiw\w*|not\s+supported)\b",
+    re.IGNORECASE,
+)
+ACTIVE_REMOVED_V1_CAPABILITY_INSTRUCTION = re.compile(
+    r"(" + ACTIVE_INSTRUCTION_VERB_PATTERN + r")[^.!?\n]{0,96}"
+    r"\b(?:"
+    r"llm|serwer\w*\s+model\w*|model\w*\s+server\w*|"
+    r"languagetool|jav(?:a|ę|ie|y)|"
+    r"kontekstow\w*\s+fleksj\w*|contextual[_ -]inflection|"
+    r"runner\w*\s+bada\w*|research\s+runner|"
+    r"inspekcj\w*\s+katalog\w*\s+reguł|catalog\s+inspection"
+    r")\b",
+    re.IGNORECASE,
+)
+REMOVED_TASK_13_GUIDES = frozenset(
+    {
+        "docs/architecture/contextual-inflection-routing-design.md",
+        "docs/architecture/finetuning-dataset.md",
+        "docs/architecture/languagetool-rule-inventory-design.md",
+        "docs/architecture/sentence-category-routing-design.md",
+        "docs/development/research-workflow.md",
+        "docs/llm-corrected-text-contract.md",
+        "docs/llm-prompt-response-contract.md",
+        "docs/llm-quality-gates.md",
+    }
+)
+FROZEN_REVIEW_CHECKLIST_SHA256 = {
+    "docs/evaluation-corpus-v3-review-checklist.md": (
+        "9793329b5ee1f7f71d2de6a0e652f0a67eff5d8f795b150ba1ff91b81db94847"
+    ),
+    "docs/evaluation-safety-corpus-v1-review-checklist.md": (
+        "6aef2d479c4806be2b3f3379aad20ef2bc695c04ade93c331bb3edaacdd9fc2e"
+    ),
+    "docs/evaluation-safety-corpus-v2-review-checklist.md": (
+        "b63e8ab7beaee16984c28c80dfea84b95ba740dbb26b67248be90a8adcf3eae9"
+    ),
+}
+
+
+def _local_clause(text: str, start: int, end: int) -> str:
+    clause_start = max(text.rfind(separator, 0, start) for separator in ".!?;") + 1
+    clause_end = len(text)
+    for separator in ".!?;":
+        separator_index = text.find(separator, end)
+        if separator_index != -1:
+            clause_end = min(clause_end, separator_index)
+    return text[clause_start:clause_end]
+
+
+def _is_directly_negated_active_verb(text: str, verb_start: int) -> bool:
+    return re.search(r"\bnie\s+$", text[:verb_start], re.IGNORECASE) is not None
+
+
+def _has_active_instruction_verb(text: str) -> bool:
+    return any(
+        not _is_directly_negated_active_verb(text, match.start())
+        for match in ACTIVE_INSTRUCTION_VERB.finditer(text)
+    )
+
+
+def _has_only_directly_negated_active_verbs(text: str) -> bool:
+    verb_matches = tuple(ACTIVE_INSTRUCTION_VERB.finditer(text))
+    return bool(verb_matches) and all(
+        _is_directly_negated_active_verb(text, match.start()) for match in verb_matches
+    )
+
+
+def _has_active_removed_v1_capability_instruction(text: str) -> bool:
+    return any(
+        not _is_directly_negated_active_verb(text, match.start(1))
+        for match in ACTIVE_REMOVED_V1_CAPABILITY_INSTRUCTION.finditer(text)
+    )
+
+
+def _requires_removed_v1_reference_detection(text: str, reference: str) -> bool:
+    normalized = text.casefold()
+    normalized_reference = reference.casefold()
+    search_start = 0
+    while (reference_index := normalized.find(normalized_reference, search_start)) >= 0:
+        clause = _local_clause(
+            text,
+            reference_index,
+            reference_index + len(reference),
+        )
+        if _has_active_instruction_verb(clause):
+            return True
+        if _has_only_directly_negated_active_verbs(clause):
+            search_start = reference_index + len(reference)
+            continue
+        if not INACTIVE_REMOVED_V1_REFERENCE_CONTEXT.search(clause):
+            return True
+        search_start = reference_index + len(reference)
+    return False
+
+
+def _find_active_removed_v1_instructions(text: str) -> tuple[str, ...]:
+    matches = [
+        instruction
+        for instruction in OBSOLETE_V1_INSTRUCTIONS
+        if _requires_removed_v1_reference_detection(text, instruction)
+    ]
+    if _has_active_removed_v1_capability_instruction(text):
+        matches.append("removed_v1_capability_instruction")
+    return tuple(matches)
+
+
+@pytest.mark.parametrize(
+    "instruction",
+    (
+        "Uruchom serwer LanguageTool w Javie.",
+        "Zainstaluj Javę.",
+        "Użyj Javy.",
+        "Skonfiguruj lokalny LLM.",
+        "Skonfiguruj lokalny model server.",
+        "Włącz routing kontekstowej fleksji.",
+        "Uruchom runner badań przed wydaniem.",
+        "Wykonaj inspekcję katalogu reguł.",
+    ),
+)
+def test_active_removed_v1_capability_instructions_are_detected(
+    instruction: str,
+) -> None:
+    assert _find_active_removed_v1_instructions(instruction)
+
+
+@pytest.mark.parametrize(
+    "statement",
+    (
+        "Runtime nie wymaga modelu, Javy ani sieci.",
+        "Nie uruchom serwera LanguageTool.",
+        "Nie użyj language_tool_url.",
+        "Historyczne badania pozostają wyłącznie w archiwum.",
+        "Legacy table `[language_tool]` is rejected in Polis v1.",
+        "Pole language_tool_url jest odrzucone w Polis v1.",
+        "Odwołanie do docs/llm-prompt-response-contract.md jest odrzucone.",
+    ),
+)
+def test_non_goal_and_rejection_statements_are_not_active_instructions(
+    statement: str,
+) -> None:
+    assert _find_active_removed_v1_instructions(statement) == ()
+
+
+def test_active_exact_reference_is_not_masked_by_an_inactive_occurrence() -> None:
+    text = "language_tool_url jest historyczne. Skonfiguruj language_tool_url."
+
+    assert _find_active_removed_v1_instructions(text) == ("language_tool_url",)
+
+
+@pytest.mark.parametrize(
+    "removed_reference",
+    (
+        "docs/llm-prompt-response-contract.md",
+        "docs/architecture/languagetool-rule-inventory-design.md",
+        "language_tool_url",
+        "vendored_language_tool_timeout_seconds",
+    ),
+)
+def test_exact_removed_v1_paths_and_configuration_are_detected(
+    removed_reference: str,
+) -> None:
+    assert removed_reference in _find_active_removed_v1_instructions(
+        f"Zobacz {removed_reference}."
+    )
+
+
+def test_rules_documentation_order_matches_default_registry() -> None:
+    documented_sources = tuple(
+        re.findall(
+            r"^\| `(rule:[^`]+)` \|",
+            (ROOT / "docs/rules.md").read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+    )
+    assert documented_sources == EXPECTED_V1_RULE_SOURCE_ORDER
+
+
+def test_configuration_docs_describe_exact_legacy_section_rejection() -> None:
+    expected = (
+        "[backend]",
+        "[language_tool]",
+        "[contextual_inflection]",
+        "[vendored_language_tool]",
+    )
+    for relative_path in ("README.md", "docs/offline-operation.md", "docs/privacy.md"):
+        documentation = (ROOT / relative_path).read_text(encoding="utf-8")
+
+        assert "[analysis]" in documentation
+        assert "categories" in documentation
+        assert "minimum_confidence" in documentation
+        assert all(section in documentation for section in expected)
+        assert "ConfigurationError" in documentation
+        assert "ignoruje" in documentation.casefold()
 
 
 def _run_validator(
@@ -241,6 +501,46 @@ def test_frozen_review_checklists_are_protected_exact_paths() -> None:
     assert FROZEN_REVIEW_CHECKLISTS <= exact_paths
     for path in FROZEN_REVIEW_CHECKLISTS:
         assert _effective_disposition(inventory, path) == "retain_research_evidence"
+
+
+def test_maintained_v1_documents_have_no_active_removed_runtime_instructions() -> None:
+    stale_references: dict[str, list[str]] = {}
+    for relative_path in MAINTAINED_V1_DOCUMENTS:
+        contents = (ROOT / relative_path).read_text(encoding="utf-8")
+        matches = _find_active_removed_v1_instructions(contents)
+        if matches:
+            stale_references[relative_path] = list(matches)
+
+    assert stale_references == {}
+
+
+def test_task_13_removed_guides_are_absent() -> None:
+    assert len(REMOVED_TASK_13_GUIDES) == 8
+    assert all(
+        not (ROOT / relative_path).exists() for relative_path in REMOVED_TASK_13_GUIDES
+    )
+
+
+def test_maintained_v1_document_links_resolve_locally() -> None:
+    for relative_path in MAINTAINED_V1_DOCUMENTS:
+        document = ROOT / relative_path
+        if document.suffix != ".md":
+            continue
+        for raw_target in MARKDOWN_LINK.findall(document.read_text(encoding="utf-8")):
+            if raw_target.startswith(("#", "http://", "https://", "mailto:")):
+                continue
+            relative_target = unquote(raw_target.split("#", maxsplit=1)[0])
+            if relative_target:
+                assert (document.parent / relative_target).is_file(), (
+                    f"broken local link in {relative_path}: {raw_target}"
+                )
+
+
+def test_frozen_review_checklists_match_their_protected_hashes() -> None:
+    assert set(FROZEN_REVIEW_CHECKLIST_SHA256) == FROZEN_REVIEW_CHECKLISTS
+    for relative_path, expected_hash in FROZEN_REVIEW_CHECKLIST_SHA256.items():
+        contents = (ROOT / relative_path).read_bytes()
+        assert hashlib.sha256(contents).hexdigest() == expected_hash
 
 
 def test_frozen_baselines_use_an_earlier_protected_inventory_rule() -> None:

@@ -7,7 +7,6 @@ ADR = ROOT / "docs" / "architecture" / "decisions" / "0008-hybrid-correction-pol
 ARCHITECTURE_INDEX = ROOT / "docs" / "architecture" / "README.md"
 ROADMAP = ROOT / "docs" / "project" / "ROADMAP.md"
 RISKS = ROOT / "docs" / "project" / "RISKS.md"
-QUALITY_GATES = ROOT / "docs" / "llm-quality-gates.md"
 LIMITATIONS = ROOT / "docs" / "limitations.md"
 
 
@@ -59,68 +58,36 @@ def test_m5_roadmap_keeps_completed_historical_record() -> None:
     assert roadmap.index("#60") < roadmap.index("#61")
 
 
-def test_m5_risk_register_covers_hybrid_evidence_and_runtime_risks() -> None:
+def test_v1_risk_register_covers_conservative_runtime_risks() -> None:
     risks = RISKS.read_text(encoding="utf-8").lower()
 
     for risk in (
-        "evaluation leakage",
-        "circular benchmark",
-        "morphology ambiguity",
-        "suggestion false positives",
-        "runtime availability",
-        "memory pressure",
-        "fine-tuning overfit",
+        "lokalnego uzasadnienia",
+        "znaczenie tekstu",
+        "przesunięcie",
+        "automatyczne uprawnienie",
+        "offline",
+        "archiwum v2",
     ):
         assert risk in risks
 
 
-def test_polish_risk_register_uses_precise_quality_and_artifact_terms() -> None:
+def test_v1_risk_register_points_to_the_current_product_decision() -> None:
     risks = RISKS.read_text(encoding="utf-8")
 
-    for phrase in (
-        "danych wzorcowych",
-        "0.90 precyzji dokładnej edycji",
-        "Nadmierne dopasowanie podczas dostrajania",
-        "dołączone wyniki kompilacji",
-    ):
-        assert phrase in risks
-
-    for rejected_phrase in (
-        "gold data",
-        "0,90 precyzji dokładnej edycji",
-        "dokładności dokładnej edycji",
-        "Overfitting fine-tuningu",
-        "vendored output",
-    ):
-        assert rejected_phrase not in risks
+    assert "ADR-0022" in risks
+    assert "danych wzorcowych" not in risks
+    assert "dostrajania" not in risks
 
 
-def test_quality_gates_split_automatic_corrections_from_suggestions() -> None:
-    gates = QUALITY_GATES.read_text(encoding="utf-8")
-
-    assert "## Bramki automatycznej korekty" in gates
-    assert "precision dokładnej edycji: **1.00**" in gates
-    assert "trafność korekty: **1.00**" in gates
-    assert "## Bramki sugestii" in gates
-    assert "precision dokładnej edycji: co najmniej **0.90**" in gates
-    assert "prawidłowe wyniki ustrukturyzowane: **100%**" in gates
-    assert "chronione trudne przypadki negatywne: **0** znalezisk" in gates
-    assert "documentation-contract" not in gates
+def test_removed_hybrid_quality_gates_are_not_a_maintained_v1_surface() -> None:
+    assert not (ROOT / "docs" / "llm-quality-gates.md").exists()
 
 
-def test_hybrid_policy_is_linked_without_claiming_qualification() -> None:
+def test_hybrid_policy_remains_historical_without_extending_v1() -> None:
     architecture_index = ARCHITECTURE_INDEX.read_text(encoding="utf-8")
     limitations = LIMITATIONS.read_text(encoding="utf-8")
-    normalized_limitations = " ".join(limitations.split())
 
     assert "0008-hybrid-correction-policy.md" in architecture_index
-    assert "ADR-0008" in limitations
-    assert "Żaden przetestowany model lokalny nie został zakwalifikowany" in limitations
-    assert (
-        "podzbiór pięciu reguł LanguageTool nie jest ogólnym korektorem języka "
-        "polskiego" in normalized_limitations
-    )
-    assert "source-policy 1.1" in limitations
-    assert "source-policy 1.2" in limitations
-    assert "Task 6" in limitations
-    assert "documentation-contract" not in limitations
+    assert "nie jest pełnym korektorem języka polskiego" in limitations
+    assert "nie wymaga sieci, modelu, procesu Java" in limitations
