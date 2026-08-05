@@ -414,6 +414,13 @@ def test_roadmap_records_conservative_v1_release_path_and_suffix_digest() -> Non
     _assert_conservative_v1_roadmap(ROADMAP.read_bytes())
 
 
+def test_roadmap_rejects_stale_c3_pr_absence_claim() -> None:
+    active, _ = _roadmap_active_and_suffix(ROADMAP.read_bytes())
+    active_text = " ".join(active.decode("utf-8").split())
+
+    assert "dla tego issue nie ma jeszcze numeru PR" not in active_text
+
+
 def test_roadmap_contract_rejects_one_space_suffix_mutation() -> None:
     contents = ROADMAP.read_bytes()
     _, suffix = _roadmap_active_and_suffix(contents)

@@ -32,7 +32,7 @@ rozbudowy katalogu M6.
 - C2 — [#219](https://github.com/PSyron/polis/issues/219) jest ukończone i
   scalone (merged/completed) przez [PR #224](https://github.com/PSyron/polis/pull/224).
 - C3 — [#220](https://github.com/PSyron/polis/issues/220) rejestruje tę prawdziwą
-  ścieżkę roadmapy; dla tego issue nie ma jeszcze numeru PR.
+  ścieżkę roadmapy.
 - C4 — [#221](https://github.com/PSyron/polis/issues/221) pozostaje otwartą bramą
   release infrastructure.
 - C5 — [#222](https://github.com/PSyron/polis/issues/222) pozostaje otwartą bramą
