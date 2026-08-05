@@ -18,13 +18,8 @@ BYTE_STABLE_TEXT_PATHS = (
     "experiments/languagetool_stdio_session/config.json",
     "tests/fixtures/evaluation/polish_correction_corpus_v3.json",
     "third_party/languagetool-pl/manifest.json",
-    "third_party/languagetool-pl/scripts/run_stdio.sh",
-    "third_party/languagetool-pl/src/main/java/org/polis/languagetool/PolisStdioServer.java",
 )
-BYTE_EXACT_UPSTREAM_PATHS = (
-    "third_party/languagetool-pl/LICENSE-LGPL-2.1.txt",
-    "third_party/languagetool-pl/sources/languagetool-core/pom.xml",
-)
+BYTE_EXACT_UPSTREAM_PATHS = ("third_party/languagetool-pl/LICENSE-LGPL-2.1.txt",)
 FAST_PYTEST_COMMAND = (
     'run: uv run --locked --extra dev pytest -m "not research and not slow and'
     ' not model"'
