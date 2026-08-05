@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from typing import Any, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from polis.core.models import AnalysisOptions, AnalysisResult, Finding, Source
 
@@ -68,62 +67,6 @@ class RuleRegistry(Protocol):
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Return validated findings from the selected registered rules."""
-
-
-@runtime_checkable
-class LocalGenerationBackend(Protocol):
-    """Asynchronously generate one local backend response for a prompt.
-
-    The future orchestrator owns timeout, cancellation, validation, retry, and
-    conversion of backend failures to ADR-0003 controlled errors. A backend
-    performs no network selection or finding/result construction through this
-    protocol.
-    """
-
-    @property
-    def name(self) -> str:
-        """Return the safe stable backend identifier used in error context."""
-
-    async def generate(self, prompt: str) -> str:
-        """Return one raw local-generation response for the supplied prompt."""
-
-
-@runtime_checkable
-class LocalFindingBackend(Protocol):
-    """Asynchronously return validated findings for one text fragment.
-
-    This composed boundary remains separate from raw local generation. Its
-    implementation owns prompt construction, raw-response validation, and any
-    implementation-specific retry policy. The analysis pipeline owns fragment
-    iteration, offset translation, and canonical public error context.
-    """
-
-    @property
-    def name(self) -> str:
-        """Return the safe stable backend identifier used in error context."""
-
-    async def generate_findings(
-        self,
-        text: str,
-        *,
-        policy: Any = None,
-        clock: MonotonicClock | None = None,
-        sleep: Callable[[float], Awaitable[None]],
-        operation: str = "analysis.llm.generate",
-    ) -> tuple[Finding, ...]:
-        """Return validated fragment-local findings or raise a controlled error."""
-
-
-@runtime_checkable
-class MonotonicClock(Protocol):
-    """Provide monotonic time for a future analysis deadline boundary.
-
-    A future orchestrator injects the clock to calculate one call deadline;
-    backends and rules do not create independent timeout policies.
-    """
-
-    def monotonic(self) -> float:
-        """Return a monotonically increasing time value in seconds."""
 
 
 @runtime_checkable

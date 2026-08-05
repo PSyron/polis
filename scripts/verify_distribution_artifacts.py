@@ -52,7 +52,6 @@ ALLOWED_SDIST_MEMBERS = (
 )
 ALLOWED_SDIST_PREFIXES = ("src/polis/",)
 REPOSITORY_ONLY_SDIST_MEMBERS = (
-    "scripts/generate_finetuning_dataset.py",
     "scripts/generate_safety_corpus_candidates.py",
     "scripts/run_sentence_safety_case.py",
     "docs/project/issue-62-implementation-plan.md",

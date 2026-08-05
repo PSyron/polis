@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from importlib import import_module
 from importlib.metadata import metadata, version
+from importlib.util import find_spec
 from pathlib import Path
 
 import pytest
@@ -29,7 +30,6 @@ from polis import (
         "polis.core",
         "polis.correction",
         "polis.evaluation",
-        "polis.llm",
         "polis.rules",
         "polis.segmentation",
     ],
@@ -74,8 +74,58 @@ def test_public_analysis_model_exports_are_intentional() -> None:
 def test_distribution_retains_evaluation_namespace_helpers() -> None:
     evaluation = import_module("polis.evaluation")
 
-    assert callable(evaluation.load_dataset)
-    assert callable(evaluation.validate_dataset)
+    loaded = evaluation.load_dataset()
+    validated = evaluation.validate_dataset(
+        {
+            "schema_version": 1,
+            "id": "package_boundary",
+            "provenance": {
+                "source": "project-authored",
+                "license": "CC0-1.0",
+                "created": "2026-08-05",
+                "review_status": "human-reviewed",
+                "notes": "Package-boundary retention check.",
+            },
+            "cases": [
+                {
+                    "id": "unchanged",
+                    "outcome": "correct",
+                    "text": "To jest poprawne zdanie.",
+                    "provenance": {
+                        "source": "project-authored",
+                        "license": "CC0-1.0",
+                        "created": "2026-08-05",
+                        "review_status": "human-reviewed",
+                        "notes": "Package-boundary retention check.",
+                    },
+                    "expected_findings": [],
+                }
+            ],
+        }
+    )
+
+    assert loaded.cases
+    assert validated.id == "package_boundary"
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    (
+        "polis.llm",
+        "polis.analysis.hybrid",
+        "polis.evaluation.finetuning_dataset",
+    ),
+)
+def test_v1_package_boundary_has_no_orphaned_model_modules(module_name: str) -> None:
+    assert find_spec(module_name) is None
+
+
+def test_v1_package_boundary_has_no_finetuning_generator() -> None:
+    generator_path = (
+        Path(__file__).parents[1] / "scripts/generate_finetuning_dataset.py"
+    )
+
+    assert not generator_path.exists()
 
 
 def test_readme_states_runtime_first_product_boundary() -> None:
