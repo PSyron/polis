@@ -55,6 +55,15 @@ def test_fast_ci_contract_is_valid() -> None:
     assert result.stdout == "fast CI workflow contract is valid\n"
 
 
+def test_fast_ci_runs_public_offline_install_and_documentation_validator() -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "scripts/prepare_build_wheelhouse.py" in workflow
+    assert "scripts/verify_distribution_install.py" in workflow
+    assert "--smoke-cwd" in workflow
+    assert "scripts/validate_documentation_inventory.py" in workflow
+
+
 def test_fast_ci_contract_requires_full_tag_history_for_release_evidence() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
@@ -82,7 +91,7 @@ def test_fast_ci_contract_rejects_a_missing_required_matrix_entry(
 ) -> None:
     invalid_workflow = tmp_path / "fast-ci.yml"
     invalid_workflow.write_text(
-        WORKFLOW.read_text(encoding="utf-8").replace("ubuntu-24.04", "ubuntu-latest"),
+        WORKFLOW.read_text(encoding="utf-8").replace("macos-15", "macos-latest"),
         encoding="utf-8",
     )
 
@@ -90,6 +99,25 @@ def test_fast_ci_contract_rejects_a_missing_required_matrix_entry(
 
     assert result.returncode != 0
     assert "missing required matrix entry" in result.stderr
+
+
+def test_fast_ci_contract_rejects_non_macos_intermediate_runner(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "- os: macos-15", "- os: ubuntu-24.04", 1
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "intermediate Fast CI must use macOS runners only: ubuntu-24.04" in (
+        result.stderr
+    )
 
 
 def test_fast_ci_contract_rejects_x86_64_for_setup_python(tmp_path: Path) -> None:
@@ -114,7 +142,7 @@ def test_fast_ci_contract_rejects_invalid_action_architecture(
     invalid_workflow = tmp_path / "fast-ci.yml"
     invalid_workflow.write_text(
         WORKFLOW.read_text(encoding="utf-8").replace(
-            "setup-python-architecture: x64",
+            "setup-python-architecture: arm64",
             "setup-python-architecture: x86_64",
             1,
         ),
@@ -133,7 +161,7 @@ def test_fast_ci_contract_rejects_wrong_policy_to_action_mapping(
     invalid_workflow = tmp_path / "fast-ci.yml"
     invalid_workflow.write_text(
         WORKFLOW.read_text(encoding="utf-8").replace(
-            "setup-python-architecture: x64",
+            "setup-python-architecture: arm64",
             "setup-python-architecture: x86",
             1,
         ),
@@ -143,7 +171,7 @@ def test_fast_ci_contract_rejects_wrong_policy_to_action_mapping(
     result = run_validator(invalid_workflow)
 
     assert result.returncode != 0
-    assert "x86_64 -> x86" in result.stderr
+    assert "arm64 -> x86" in result.stderr
 
 
 def test_fast_ci_contract_rejects_an_unfiltered_pytest_command(
@@ -475,10 +503,12 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
     )
     assert "test_languagetool_vendor_artifacts.py" not in compatibility
     assert "`language_tool_process_start_count`" in compatibility
-    assert (
-        "uv run python scripts/verify_distribution_install.py dist/*.whl"
-        in distribution
+    assert "scripts/verify_distribution_install.py" in distribution
+    assert "--dist dist --wheelhouse build-wheelhouse" in normalized_distribution
+    assert "--wheelhouse-manifest build-wheelhouse-manifest.json" in (
+        normalized_distribution
     )
+    assert "--smoke-cwd build-smoke-cwd" in normalized_distribution
 
 
 def test_vendored_upstream_text_is_exempt_from_checkout_normalization() -> None:

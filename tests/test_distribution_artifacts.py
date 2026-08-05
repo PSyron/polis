@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import tarfile
@@ -12,7 +13,14 @@ import scripts.verify_distribution_artifacts as artifact_verifier
 
 ROOT = Path(__file__).resolve().parents[1]
 VERIFIER = ROOT / "scripts/verify_distribution_artifacts.py"
-EXCLUDED_ARTIFACT_PREFIXES = artifact_verifier.EXCLUDED_ARTIFACT_PREFIXES
+EXCLUDED_ARTIFACT_PREFIXES = (
+    "experiments/",
+    "data/finetuning/",
+    "tests/",
+    "third_party/",
+    "docs/superpowers/",
+    ".superpowers/",
+)
 PROHIBITED_VENDOR_MARKERS = (
     ".jar",
     ".onnx",
@@ -24,8 +32,19 @@ PROHIBITED_VENDOR_MARKERS = (
     "target/",
     "repository/",
 )
-REPOSITORY_ONLY_SDIST_MEMBERS = artifact_verifier.REPOSITORY_ONLY_SDIST_MEMBERS
+REPOSITORY_ONLY_SDIST_MEMBERS = (
+    "scripts/generate_safety_corpus_candidates.py",
+    "scripts/run_sentence_safety_case.py",
+    "docs/project/issue-62-implementation-plan.md",
+    "docs/performance-baseline.md",
+    "docs/quality-baseline.md",
+)
 REQUIRED_SDIST_MEMBERS = artifact_verifier.REQUIRED_SDIST_MEMBERS
+EXPECTED_SOURCE_MEMBERS = tuple(
+    path.relative_to(ROOT).as_posix()
+    for path in sorted((ROOT / "src/polis").rglob("*"))
+    if path.is_file() and "__pycache__" not in path.parts
+)
 
 
 def _without_sdist_root(name: str) -> str:
@@ -114,6 +133,398 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     assert any(
         name == "polis/evaluation/datasets/v1/cases.json" for name in wheel_names
     )
+    assert len(EXPECTED_SOURCE_MEMBERS) == 26
+
+
+def _mutate_wheel(
+    source: Path, target: Path, *, add: str | None = None, remove: str | None = None
+) -> None:
+    with zipfile.ZipFile(source) as original, zipfile.ZipFile(target, "w") as changed:
+        for name in original.namelist():
+            if name != remove:
+                changed.writestr(name, original.read(name))
+        if add is not None:
+            changed.writestr(add, b"unexpected\n")
+
+
+def _rename_wheel_dist_info(source: Path, target: Path) -> None:
+    with zipfile.ZipFile(source) as original, zipfile.ZipFile(target, "w") as changed:
+        prefix = next(
+            name.split("/", 1)[0]
+            for name in original.namelist()
+            if ".dist-info/" in name
+        )
+        for name in original.namelist():
+            changed.writestr(
+                name.replace(prefix, "evil-9.9.dist-info"), original.read(name)
+            )
+
+
+def _rewrite_wheel_identity(
+    source: Path,
+    target: Path,
+    *,
+    dist_info_prefix: str | None = None,
+    metadata_changes: dict[str, str] | None = None,
+) -> None:
+    with zipfile.ZipFile(source) as original, zipfile.ZipFile(target, "w") as changed:
+        for name in original.namelist():
+            rewritten_name = name
+            if dist_info_prefix and ".dist-info/" in name:
+                rewritten_name = name.replace(
+                    name.split("/", 1)[0], dist_info_prefix, 1
+                )
+            content = original.read(name)
+            if metadata_changes and rewritten_name.endswith(".dist-info/METADATA"):
+                text = content.decode()
+                for field, value in metadata_changes.items():
+                    text = re.sub(
+                        rf"^{field}: .*$", f"{field}: {value}", text, flags=re.MULTILINE
+                    )
+                content = text.encode()
+            changed.writestr(rewritten_name, content)
+
+
+def _rewrite_sdist_identity(
+    source: Path,
+    target: Path,
+    *,
+    root: str | None = None,
+    metadata_changes: dict[str, str] | None = None,
+) -> None:
+    with tarfile.open(source) as original, tarfile.open(target, "w:gz") as changed:
+        old_root = original.getnames()[0].split("/", 1)[0]
+        new_root = root or old_root
+        for member in original.getmembers():
+            member.name = member.name.replace(old_root, new_root, 1)
+            member_file = original.extractfile(member) if member.isfile() else None
+            content = member_file.read() if member_file is not None else None
+            if metadata_changes and member.name.endswith("/PKG-INFO"):
+                assert content is not None
+                text = content.decode()
+                for field, value in metadata_changes.items():
+                    text = re.sub(
+                        rf"^{field}: .*$", f"{field}: {value}", text, flags=re.MULTILINE
+                    )
+                content = text.encode()
+                member.size = len(content)
+            changed.addfile(member, BytesIO(content) if content is not None else None)
+
+
+def _mutate_sdist(
+    source: Path, target: Path, *, add: str | None = None, remove: str | None = None
+) -> None:
+    with tarfile.open(source) as original, tarfile.open(target, "w:gz") as changed:
+        for member in original.getmembers():
+            if member.name.endswith(remove or "\0"):
+                continue
+            extracted = original.extractfile(member) if member.isfile() else None
+            changed.addfile(member, extracted)
+        if add is not None:
+            root = original.getnames()[0].split("/", 1)[0]
+            content = b"unexpected\n"
+            info = tarfile.TarInfo(f"{root}/{add}")
+            info.size = len(content)
+            changed.addfile(info, BytesIO(content))
+
+
+@pytest.mark.parametrize(
+    ("kind", "member", "expected"),
+    (
+        ("wheel", "polis/model.onnx", "prohibited vendor path"),
+        ("wheel", "polis/llm/adapter.py", "outside release surface"),
+        ("wheel", "polis/unknown.py", "outside release surface"),
+        ("sdist", "src/polis/model.onnx", "prohibited vendor path"),
+        ("sdist", "src/polis/llm/adapter.py", "outside release surface"),
+        ("sdist", "src/polis/unknown.py", "outside release surface"),
+    ),
+)
+def test_public_verifier_rejects_unknown_package_members(
+    tmp_path: Path, kind: str, member: str, expected: str
+) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+    if kind == "wheel":
+        replacement = dist / "changed.whl"
+        _mutate_wheel(wheel, replacement, add=member)
+        wheel.unlink()
+        replacement.rename(wheel)
+    else:
+        replacement = dist / "changed.tar.gz"
+        _mutate_sdist(sdist, replacement, add=member)
+        sdist.unlink()
+        replacement.rename(sdist)
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert expected in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("kind", "member"),
+    (
+        ("wheel", "polis/analyzer.py"),
+        ("sdist", "src/polis/analyzer.py"),
+    ),
+)
+def test_public_verifier_rejects_missing_package_members(
+    tmp_path: Path, kind: str, member: str
+) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+    if kind == "wheel":
+        replacement = dist / "changed.whl"
+        _mutate_wheel(wheel, replacement, remove=member)
+        wheel.unlink()
+        replacement.rename(wheel)
+    else:
+        replacement = dist / "changed.tar.gz"
+        _mutate_sdist(sdist, replacement, remove=member)
+        sdist.unlink()
+        replacement.rename(sdist)
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "missing package member" in result.stderr
+
+
+def test_public_verifier_rejects_an_extra_distribution(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    (dist / "unexpected.whl").write_bytes(b"extra")
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "exactly one wheel" in result.stderr
+
+
+def test_public_verifier_rejects_renamed_dist_info(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    replacement = dist / "changed.whl"
+    _rename_wheel_dist_info(wheel, replacement)
+    wheel.unlink()
+    replacement.rename(wheel)
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "dist-info directory does not match wheel" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        "wheel-renamed",
+        "wheel-metadata-name",
+        "wheel-metadata-version",
+        "sdist-root-renamed",
+        "sdist-metadata-name",
+        "sdist-metadata-version",
+        "joint-wrong-identity",
+    ),
+)
+def test_public_verifier_rejects_semantically_mismatched_identity(
+    tmp_path: Path, case: str
+) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    sdist = next(dist.glob("*.tar.gz"))
+
+    if case == "wheel-renamed":
+        rewritten = dist / "evil-9.9-py3-none-any.whl"
+        _rewrite_wheel_identity(wheel, rewritten, dist_info_prefix="evil-9.9.dist-info")
+        wheel.unlink()
+    elif case == "wheel-metadata-name":
+        rewritten = dist / "changed.whl"
+        _rewrite_wheel_identity(wheel, rewritten, metadata_changes={"Name": "evil"})
+        wheel.unlink()
+        rewritten.rename(wheel)
+    elif case == "wheel-metadata-version":
+        rewritten = dist / "changed.whl"
+        _rewrite_wheel_identity(wheel, rewritten, metadata_changes={"Version": "9.9"})
+        wheel.unlink()
+        rewritten.rename(wheel)
+    elif case == "sdist-root-renamed":
+        rewritten = dist / "evil-9.9.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, root="evil-9.9")
+        sdist.unlink()
+    elif case == "sdist-metadata-name":
+        rewritten = dist / "changed.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, metadata_changes={"Name": "evil"})
+        sdist.unlink()
+        rewritten.rename(sdist)
+    elif case == "sdist-metadata-version":
+        rewritten = dist / "changed.tar.gz"
+        _rewrite_sdist_identity(sdist, rewritten, metadata_changes={"Version": "9.9"})
+        sdist.unlink()
+        rewritten.rename(sdist)
+    else:
+        rewritten_wheel = dist / "evil-9.9-py3-none-any.whl"
+        _rewrite_wheel_identity(
+            wheel,
+            rewritten_wheel,
+            dist_info_prefix="evil-9.9.dist-info",
+            metadata_changes={"Name": "evil", "Version": "9.9"},
+        )
+        wheel.unlink()
+        rewritten_sdist = dist / "evil-9.9.tar.gz"
+        _rewrite_sdist_identity(
+            sdist,
+            rewritten_sdist,
+            root="evil-9.9",
+            metadata_changes={"Name": "evil", "Version": "9.9"},
+        )
+        sdist.unlink()
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "distribution identity mismatch" in result.stderr
+
+
+def test_public_verifier_rejects_a_duplicate_wheel_member(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    wheel = next(dist.glob("*.whl"))
+    with pytest.warns(UserWarning, match="Duplicate name"):
+        with zipfile.ZipFile(wheel, "a") as archive:
+            archive.writestr("polis/analyzer.py", b"duplicate\n")
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "duplicate archive member" in result.stderr
+
+
+def test_public_verifier_rejects_an_sdist_symlink(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    build = subprocess.run(
+        [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+    sdist = next(dist.glob("*.tar.gz"))
+    replacement = dist / "changed.tar.gz"
+    with tarfile.open(sdist) as original, tarfile.open(replacement, "w:gz") as changed:
+        for member in original.getmembers():
+            if member.name.endswith("/src/polis/analyzer.py"):
+                member.type = tarfile.SYMTYPE
+                member.linkname = "../../../../outside.py"
+                member.size = 0
+                changed.addfile(member)
+            else:
+                extracted = original.extractfile(member) if member.isfile() else None
+                changed.addfile(member, extracted)
+    sdist.unlink()
+    replacement.rename(sdist)
+
+    result = subprocess.run(
+        [sys.executable, str(VERIFIER), "--dist", str(dist)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "non-regular archive member" in result.stderr
 
 
 def test_built_distributions_exclude_repository_only_material(
@@ -177,5 +588,5 @@ def test_distribution_verifier_rejects_repository_only_sdist_members(
     sdist = tmp_path / "polis_nlp-0.2.0.dev0.tar.gz"
     _write_sdist(sdist, (member,))
 
-    with pytest.raises(SystemExit, match="repository-only"):
+    with pytest.raises(SystemExit):
         artifact_verifier.verify_sdist(sdist)

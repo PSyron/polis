@@ -17,18 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.12"
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.13"
-          - os: ubuntu-24.04
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.14"
           - os: macos-15
             architecture: arm64
             setup-python-architecture: arm64
@@ -36,14 +24,6 @@ jobs:
           - os: macos-15
             architecture: arm64
             setup-python-architecture: arm64
-            python-version: "3.14"
-          - os: windows-2025
-            architecture: x86_64
-            setup-python-architecture: x64
-            python-version: "3.12"
-          - os: windows-2025
-            architecture: x86_64
-            setup-python-architecture: x64
             python-version: "3.14"
     steps:
       - name: Check out source
@@ -64,6 +44,8 @@ jobs:
           cache-dependency-glob: uv.lock
       - name: Synchronize locked development environment
         run: uv sync --locked --extra dev
+      - name: Prepare locked build wheelhouse
+        run: uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py --lock uv.lock --output "${{ runner.temp }}/polis-build-wheelhouse" --manifest "${{ runner.temp }}/polis-build-wheelhouse.json"
       - name: Run pytest suite
         env:
           POLIS_GENERATIVE_GENERATOR_VERSION: unicode-structural-v1
@@ -76,7 +58,13 @@ jobs:
         run: uv run --locked --extra dev ruff format --check .
       - name: Run strict mypy
         run: uv run --locked --extra dev mypy .
+      - name: Validate documentation inventory
+        run: uv run --locked --extra dev python scripts/validate_documentation_inventory.py
       - name: Build distributions
         run: uv run --locked --extra dev python -m build --no-isolation
       - name: Verify distribution artifacts
         run: uv run --locked --extra dev python scripts/verify_distribution_artifacts.py
+      - name: Create empty distribution smoke directory
+        run: mkdir "${{ runner.temp }}/polis-install-smoke-cwd"
+      - name: Verify offline distribution installation
+        run: uv run --locked --extra dev python scripts/verify_distribution_install.py --dist dist --wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" --wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json" --smoke-cwd "${{ runner.temp }}/polis-install-smoke-cwd"

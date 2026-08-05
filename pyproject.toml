@@ -60,9 +60,6 @@ include = [
   "/docs/development/dependency-licenses.md",
   "/docs/distribution-verification.md",
   "/docs/limitations.md",
-  "/docs/llm-corrected-text-contract.md",
-  "/docs/llm-prompt-response-contract.md",
-  "/docs/llm-quality-gates.md",
   "/docs/offline-operation.md",
   "/docs/prerelease-candidate.md",
   "/docs/privacy-audit.md",
@@ -108,6 +105,7 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.mypy]
 files = ["src", "tests"]
+mypy_path = ["scripts"]
 exclude = ["^tests/typecheck/"]
 strict = true
 warn_unused_configs = true
@@ -115,7 +113,7 @@ follow_imports = "skip"
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-module = ["scripts.bootstrap_github"]
+module = ["scripts.bootstrap_github", "bootstrap_github"]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
