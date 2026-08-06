@@ -42,17 +42,20 @@ niż 0.11.2, a README wskazuje dokładnie to wydanie.
 | --- | --- | --- | --- | --- |
 | `uv` | 0.11.2 | Apache-2.0 OR MIT | inicjowanie środowiska i workflow oparty na lockfile | [Metadane PyPI](https://pypi.org/pypi/uv/0.11.2/json) i [licencja upstream](https://github.com/astral-sh/uv/tree/0.11.2#license); złożone wyrażenie zatwierdzono w wariancie MIT. |
 
-## Akcje workflow CI
+## Akcje workflow CI i wydania
 
-Szybki workflow używa wyłącznie poniższych akcji zewnętrznych. Każda jest
-przypięta do niezmiennego commita i objęta licencją MIT. Commity akcji nie są
-zależnościami Pythona i nie zmieniają `uv.lock`.
+Workflow szybkiego CI i chronionego wydania używają wyłącznie poniższych akcji
+zewnętrznych. Każda jest przypięta do niezmiennego commita. Commity akcji nie
+są zależnościami Pythona i nie zmieniają `uv.lock`.
 
 | Akcja | Commit | Wyrażenie SPDX | Rola | Dowody i obowiązki |
 | --- | --- | --- | --- | --- |
 | `actions/checkout` | `34e114876b0b11c390a56381ad16ebd13914f8d5` | MIT | Pobranie rewizji źródeł. | [Licencja](https://github.com/actions/checkout/blob/34e114876b0b11c390a56381ad16ebd13914f8d5/LICENSE); zachowaj noty. |
 | `actions/setup-python` | `ece7cb06caefa5fff74198d8649806c4678c61a1` | MIT | Instalacja CPythona z macierzy; `x86_64` ADR mapuje na wejście `x64`. | [Licencja](https://github.com/actions/setup-python/blob/ece7cb06caefa5fff74198d8649806c4678c61a1/LICENSE); zachowaj noty. |
 | `astral-sh/setup-uv` | `37802adc94f370d6bfd71619e3f0bf239e1f3b78` | MIT | Instalacja uv 0.11.2 i buforowanie środowiska z lockfile. | [Licencja](https://github.com/astral-sh/setup-uv/blob/37802adc94f370d6bfd71619e3f0bf239e1f3b78/LICENSE); zachowaj noty. |
+| `actions/upload-artifact` | `ea165f8d65b6e75b540449e92b4886f43607fa02` | MIT | Przekazanie jednego niezmiennego bundle po kwalifikacji. | [Licencja](https://github.com/actions/upload-artifact/blob/ea165f8d65b6e75b540449e92b4886f43607fa02/LICENSE); zachowaj noty. |
+| `actions/download-artifact` | `d3f86a106a0bac45b974a628896c90dbdf5c8093` | MIT | Pobranie tych samych bajtów w macierzy i przed publikacją. | [Licencja](https://github.com/actions/download-artifact/blob/d3f86a106a0bac45b974a628896c90dbdf5c8093/LICENSE); zachowaj noty. |
+| `pypa/gh-action-pypi-publish` | `dc37677b2e1c63e2034f94d8a5b11f265b73ba33` | BSD-3-Clause | Upload dwóch zweryfikowanych dystrybucji przez OIDC. | [Licencja](https://github.com/pypa/gh-action-pypi-publish/blob/dc37677b2e1c63e2034f94d8a5b11f265b73ba33/LICENSE.md); zachowaj prawa autorskie, warunki i wyłączenie odpowiedzialności. |
 
 ## Decyzja o przyjęciu
 

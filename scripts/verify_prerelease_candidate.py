@@ -81,6 +81,11 @@ def main() -> None:
     )
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--wheelhouse-manifest", type=Path, required=True)
+    parser.add_argument(
+        "--verify-existing",
+        action="store_true",
+        help="Verify an already built artifact pair without rebuilding it",
+    )
     args = parser.parse_args()
     root = _require_source_state(args.source_commit)
     dist = (root / args.dist).resolve()
@@ -125,22 +130,23 @@ def main() -> None:
         cwd=root,
     )
     _run(["uv", "run", "--locked", "--extra", "dev", "mypy", "."], cwd=root)
-    _run(
-        [
-            "uv",
-            "run",
-            "--locked",
-            "--extra",
-            "dev",
-            "python",
-            "-m",
-            "build",
-            "--no-isolation",
-            "--outdir",
-            str(dist),
-        ],
-        cwd=root,
-    )
+    if not args.verify_existing:
+        _run(
+            [
+                "uv",
+                "run",
+                "--locked",
+                "--extra",
+                "dev",
+                "python",
+                "-m",
+                "build",
+                "--no-isolation",
+                "--outdir",
+                str(dist),
+            ],
+            cwd=root,
+        )
     _run(
         [
             "uv",

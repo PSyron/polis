@@ -1,0 +1,10 @@
+{
+  "conclusion": "success",
+  "event": "workflow_dispatch",
+  "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "id": 17,
+  "path": ".github/workflows/release.yml",
+  "repository": {
+    "full_name": "PSyron/polis"
+  }
+}

@@ -43,6 +43,10 @@ REQUIRED_SNIPPETS = (
     "uv run --locked --extra dev ruff format --check .",
     "uv run --locked --extra dev mypy .",
     "uv run --locked --extra dev python scripts/validate_documentation_inventory.py",
+    (
+        "uv run --locked --extra dev python scripts/validate_release_workflow.py "
+        "--workflow .github/workflows/release.yml"
+    ),
     "uv run --locked --extra dev python -m build --no-isolation",
     "uv run --locked --extra dev python scripts/verify_distribution_artifacts.py",
     "uv run --locked --extra dev python scripts/verify_distribution_install.py",
