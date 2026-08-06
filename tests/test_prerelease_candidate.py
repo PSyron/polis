@@ -196,6 +196,50 @@ def test_prerelease_candidate_uses_the_product_only_pytest_marker(
     assert "--smoke-cwd" in calls[install_index]
 
 
+def test_prerelease_candidate_can_verify_existing_artifacts_without_rebuilding(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dist = tmp_path / "dist"
+    wheel = dist / "polis_nlp-0.2.0.dev0-py3-none-any.whl"
+    sdist = dist / "polis_nlp-0.2.0.dev0.tar.gz"
+    dist.mkdir()
+    wheel.write_bytes(b"wheel")
+    sdist.write_bytes(b"sdist")
+    calls: list[list[str]] = []
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "verify-prerelease",
+            "--source-commit",
+            "a" * 40,
+            "--dist",
+            str(dist),
+            "--verify-existing",
+            "--wheelhouse",
+            str(tmp_path / "wheelhouse"),
+            "--wheelhouse-manifest",
+            str(tmp_path / "wheelhouse-manifest.json"),
+        ],
+    )
+    monkeypatch.setattr(prerelease, "_require_source_state", lambda _commit: tmp_path)
+    monkeypatch.setattr(prerelease, "_run", lambda cmd, cwd=None: calls.append(cmd))
+    monkeypatch.setattr(prerelease, "_collect_artifacts", lambda _dist: (wheel, sdist))
+    monkeypatch.setattr(prerelease, "_print_hashes", lambda _wheel, _sdist: None)
+
+    prerelease.main()
+
+    assert not any(
+        command[1:6] == ["run", "--locked", "--extra", "dev", "python"]
+        and "build" in command
+        for command in calls
+    )
+    assert any(
+        "scripts/verify_distribution_artifacts.py" in command for command in calls
+    )
+
+
 def test_public_prerelease_verifier_requires_wheelhouse_inputs() -> None:
     result = subprocess.run(
         [

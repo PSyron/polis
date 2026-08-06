@@ -39,3 +39,20 @@ def test_external_uv_bootstrap_tool_is_pinned_and_reviewed() -> None:
     assert "środowiska z lockfile" in review
     assert "pakiety przypięte w lockfile" in review
     assert "documentation-contract" not in review
+
+
+def test_every_release_workflow_action_is_in_the_license_inventory() -> None:
+    workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+    review = LICENSE_REVIEW.read_text(encoding="utf-8")
+    action_references = set(
+        re.findall(r"^\s+uses: ([^@\s]+)@([0-9a-f]{40})$", workflow, re.MULTILINE)
+    )
+    reviewed = set(
+        re.findall(
+            r"^\| `([^`]+)` \| `([0-9a-f]{40})` \|",
+            review.split("## Decyzja o przyjęciu", maxsplit=1)[0],
+            re.MULTILINE,
+        )
+    )
+
+    assert action_references <= reviewed

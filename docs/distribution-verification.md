@@ -77,3 +77,22 @@ porównaj pobrane skróty z `dist/release-manifest.json` przez
 `uv run python scripts/release_identity.py verify-published`. Niezgodność jest
 incydentem wydania korygowanym append-only erratum; nie zastępuj opublikowanego
 artefaktu ani nie przenoś tagu.
+
+## Chroniony workflow wydania
+
+`.github/workflows/release.yml` przyjmuje wyłącznie ręczne wywołanie. Tryb
+`qualify` wiąże zdalny `main` z podanym commitem, buduje dokładnie raz poza
+checkoutem i przekazuje jeden bundle zawierający tylko `dist/`, manifest
+wydania, wheelhouse i jego manifest. Te same bajty są następnie deklaratywnie
+sprawdzane dla CPythonów 3.12–3.14 na Linux, macOS i Windows; lokalna praca
+deweloperska i QA pozostają macOS-only i nie zastępują końcowej macierzy.
+
+Tryb `publish` ponownie wiąże repozytorium, commit, wynik oryginalnego runu,
+oba manifesty, receipt oraz śledzoną politykę. Dopiero po zatwierdzeniu
+środowiska `pypi` kopiuje do `publish/` dokładnie wheel i sdist, a akcja uploadu
+nie widzi manifestów ani wheelhouse. Dla `publish` projektowy endpoint PyPI
+musi nadal zwracać HTTP 404. Tryb `recover` wymaga natomiast HTTP 200 i dokładnie
+jednego pliku wersji zgodnego z manifestem co do nazwy, rozmiaru i SHA-256.
+Drugi plik musi być nieobecny oraz wskazany przez `recovery_filename`; tylko on
+jest kopiowany do `publish/`. Zero, dwa lub nieznane pliki, niezgodny digest,
+rozmiar albo wskazanie już istniejącego pliku zatrzymują recovery bez uploadu.

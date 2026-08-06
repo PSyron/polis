@@ -1,0 +1,22 @@
+{
+  "deployment_branch_policy": {
+    "custom_branch_policies": true,
+    "protected_branches": false
+  },
+  "name": "pypi",
+  "protection_rules": [
+    {
+      "prevent_self_review": false,
+      "reviewers": [
+        {
+          "reviewer": {
+            "id": 221,
+            "login": "PSyron"
+          },
+          "type": "User"
+        }
+      ],
+      "type": "required_reviewers"
+    }
+  ]
+}

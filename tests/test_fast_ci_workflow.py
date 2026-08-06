@@ -62,6 +62,10 @@ def test_fast_ci_runs_public_offline_install_and_documentation_validator() -> No
     assert "scripts/verify_distribution_install.py" in workflow
     assert "--smoke-cwd" in workflow
     assert "scripts/validate_documentation_inventory.py" in workflow
+    assert (
+        "scripts/validate_release_workflow.py --workflow .github/workflows/release.yml"
+        in workflow
+    )
 
 
 def test_fast_ci_contract_requires_full_tag_history_for_release_evidence() -> None:

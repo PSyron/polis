@@ -1,0 +1,238 @@
+name: Protected release
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: qualify, publish, or recover
+        required: true
+        type: choice
+        options:
+          - qualify
+          - publish
+          - recover
+      source_commit:
+        description: Exact lowercase 40-character source commit
+        required: true
+        type: string
+      artifact_run_id:
+        description: Qualify run ID, only for publish or recover
+        required: false
+        default: ""
+        type: string
+      gate_receipt_json:
+        description: Canonical compact receipt, only for publish or recover
+        required: false
+        default: ""
+        type: string
+      recovery_filename:
+        description: Missing distribution filename, only for recover
+        required: false
+        default: ""
+        type: string
+
+concurrency:
+  group: polis-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate_inputs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Validate disjoint inputs
+        env:
+          ARTIFACT_RUN_ID: ${{ inputs.artifact_run_id }}
+          GATE_RECEIPT_JSON: ${{ inputs.gate_receipt_json }}
+          RECOVERY_FILENAME: ${{ inputs.recovery_filename }}
+        run: >-
+          python scripts/validate_release_inputs.py
+          --mode "${{ inputs.mode }}"
+          --source-commit "${{ inputs.source_commit }}"
+          --artifact-run-id "$ARTIFACT_RUN_ID"
+          --gate-receipt-json "$GATE_RECEIPT_JSON"
+          --recovery-filename "$RECOVERY_FILENAME"
+
+  qualify:
+    if: ${{ inputs.mode == 'qualify' }}
+    needs: validate_inputs
+    runs-on: macos-15
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Set up CPython
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: 0.11.2
+      - name: Synchronize locked tools
+        run: uv sync --locked --extra dev
+      - name: Require remote main binding
+        run: |
+          git fetch --no-tags origin main
+          test "$(git rev-parse refs/remotes/origin/main)" = "${{ inputs.source_commit }}"
+      - name: Prepare locked wheelhouse
+        run: >-
+          uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py
+          --lock uv.lock
+          --output "${{ runner.temp }}/wheelhouse"
+          --manifest "${{ runner.temp }}/wheelhouse-manifest.json"
+      - name: Build exactly once
+        run: uv run --locked --extra dev python -m build --no-isolation --outdir "${{ runner.temp }}/dist"
+      - name: Verify the existing build and write its manifest
+        run: >-
+          uv run --locked --extra dev python scripts/verify_prerelease_candidate.py
+          --verify-existing
+          --source-commit "${{ inputs.source_commit }}"
+          --dist "${{ runner.temp }}/dist"
+          --manifest "${{ runner.temp }}/release-manifest.json"
+          --wheelhouse "${{ runner.temp }}/wheelhouse"
+          --wheelhouse-manifest "${{ runner.temp }}/wheelhouse-manifest.json"
+      - name: Assemble exact transfer bundle
+        run: |
+          mkdir "${{ runner.temp }}/transfer-bundle"
+          cp -R "${{ runner.temp }}/dist" "${{ runner.temp }}/transfer-bundle/dist"
+          cp -R "${{ runner.temp }}/wheelhouse" "${{ runner.temp }}/transfer-bundle/wheelhouse"
+          cp "${{ runner.temp }}/release-manifest.json" "${{ runner.temp }}/transfer-bundle/release-manifest.json"
+          cp "${{ runner.temp }}/wheelhouse-manifest.json" "${{ runner.temp }}/transfer-bundle/wheelhouse-manifest.json"
+      - name: Upload immutable transfer bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-bundle
+          path: ${{ runner.temp }}/transfer-bundle
+          if-no-files-found: error
+          retention-days: 30
+
+  verify_bundle:
+    if: ${{ inputs.mode == 'qualify' }}
+    needs: qualify
+    name: ${{ matrix.os }} / CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            python-version: "3.12"
+          - os: ubuntu-24.04
+            python-version: "3.13"
+          - os: ubuntu-24.04
+            python-version: "3.14"
+          - os: macos-15
+            python-version: "3.12"
+          - os: macos-15
+            python-version: "3.14"
+          - os: windows-2025
+            python-version: "3.12"
+          - os: windows-2025
+            python-version: "3.14"
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ inputs.source_commit }}
+      - name: Set up CPython
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: 0.11.2
+      - name: Synchronize locked tools
+        run: uv sync --locked --extra dev
+      - name: Download build-once bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-bundle
+          path: bundle
+      - name: Verify both public manifests and offline installation
+        shell: bash
+        env:
+          SMOKE_CWD: ${{ runner.temp }}/polis-install-smoke
+        run: |
+          uv run --locked --extra dev python scripts/release_identity.py verify-manifest --manifest bundle/release-manifest.json --dist bundle/dist --source-commit "${{ inputs.source_commit }}"
+          uv run --locked --extra dev python -c "from pathlib import Path; from scripts.distribution_wheelhouse import validate_wheelhouse; validate_wheelhouse(Path('bundle/wheelhouse-manifest.json'), Path('bundle/wheelhouse'), Path('uv.lock'))"
+          uv run --locked --extra dev python scripts/verify_distribution_artifacts.py --dist bundle/dist
+          python -c "from pathlib import Path; import os; Path(os.environ['SMOKE_CWD']).mkdir()"
+          uv run --locked --extra dev python scripts/verify_distribution_install.py --dist bundle/dist --wheelhouse bundle/wheelhouse --wheelhouse-manifest bundle/wheelhouse-manifest.json --smoke-cwd "$SMOKE_CWD"
+
+  upload:
+    if: ${{ inputs.mode == 'publish' || inputs.mode == 'recover' }}
+    needs: validate_inputs
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Set up CPython
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: 0.11.2
+      - name: Synchronize locked tools
+        run: uv sync --locked --extra dev
+      - name: Require unchanged remote main
+        run: |
+          git fetch --no-tags origin main
+          test "$(git rev-parse refs/remotes/origin/main)" = "${{ inputs.source_commit }}"
+      - name: Read original qualify run metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api "repos/${{ github.repository }}/actions/runs/${{ inputs.artifact_run_id }}" > run-metadata.json
+      - name: Download original qualify bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-bundle
+          path: bundle
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.artifact_run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify authority, manifests, receipt, and stage allowlisted bytes
+        env:
+          GATE_RECEIPT_JSON: ${{ inputs.gate_receipt_json }}
+        run: |
+          VERSION=$(uv run --locked --extra dev python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          POLICY_DIGEST=$(uv run --locked --extra dev python scripts/release_identity.py verify-policy | cut -d= -f2)
+          PACKAGE_INDEX_URL=https://pypi.org/pypi/polis-nlp/json
+          if [ "${{ inputs.mode }}" = publish ]; then
+            uv run --locked --extra dev python scripts/release_identity.py candidate --version "$VERSION" --source-commit "${{ inputs.source_commit }}" --state tag-bound --remote origin --github-repo PSyron/polis --package-index-url "$PACKAGE_INDEX_URL"
+          else
+            uv run --locked --extra dev python scripts/release_identity.py recovery-authority --version "$VERSION" --source-commit "${{ inputs.source_commit }}" --remote origin --github-repo PSyron/polis --package-index-url "$PACKAGE_INDEX_URL"
+          fi
+          uv run --locked --extra dev python scripts/release_identity.py verify-manifest --manifest bundle/release-manifest.json --dist bundle/dist --source-commit "${{ inputs.source_commit }}"
+          uv run --locked --extra dev python -c "from pathlib import Path; from scripts.distribution_wheelhouse import validate_wheelhouse; validate_wheelhouse(Path('bundle/wheelhouse-manifest.json'), Path('bundle/wheelhouse'), Path('uv.lock'))"
+          printf '%s\n' "$GATE_RECEIPT_JSON" > gate-receipt.json
+          uv run --locked --extra dev python scripts/validate_release_gate_receipt.py validate --receipt gate-receipt.json --source-commit "${{ inputs.source_commit }}" --release-manifest bundle/release-manifest.json --wheelhouse-manifest bundle/wheelhouse-manifest.json --qualify-run-id "${{ inputs.artifact_run_id }}" --plan "$POLICY_DIGEST" --release-policy docs/project/release-policy.json --p1 APPROVE --p2 APPROVE --p3 APPROVE --p4 APPROVE --user-approval okay
+          mkdir publish
+          uv run --locked --extra dev python scripts/stage_release_upload.py --mode "${{ inputs.mode }}" --source-commit "${{ inputs.source_commit }}" --artifact-run-id "${{ inputs.artifact_run_id }}" --run-metadata run-metadata.json --receipt-json "$GATE_RECEIPT_JSON" --release-manifest bundle/release-manifest.json --wheelhouse-manifest bundle/wheelhouse-manifest.json --release-policy docs/project/release-policy.json --plan "$POLICY_DIGEST" --dist bundle/dist --output publish --package-index-url "$PACKAGE_INDEX_URL" --recovery-filename "${{ inputs.recovery_filename }}"
+      - name: Publish only allowlisted distributions
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        with:
+          packages-dir: publish
