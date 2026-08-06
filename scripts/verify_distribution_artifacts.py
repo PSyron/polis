@@ -61,6 +61,7 @@ ALLOWED_SDIST_MEMBERS = (
     "docs/privacy-audit.md",
     "docs/release-notes/0.1.0-erratum.md",
     "docs/release-notes/0.1.0.md",
+    "docs/release-notes/0.2.0.md",
     "docs/rules.md",
     "docs/segmentation.md",
     "docs/architecture/decisions/0001-python-platform-licensing-policy.md",

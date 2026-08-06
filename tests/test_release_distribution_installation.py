@@ -219,8 +219,8 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert "socket.connect=blocked" in result.stdout
     assert "socket.connect_ex=blocked" in result.stdout
     assert "socket.create_connection=blocked" in result.stdout
-    assert "artifact=wheel version=0.2.0.dev0 issues=1" in result.stdout
-    assert "artifact=sdist version=0.2.0.dev0 issues=1" in result.stdout
+    assert "artifact=wheel version=0.2.0 issues=1" in result.stdout
+    assert "artifact=sdist version=0.2.0 issues=1" in result.stdout
     assert '"text":"Witaj,świecie."' in result.stdout
     assert "http://" not in result.stdout.lower()
     assert "https://" not in result.stdout.lower()
