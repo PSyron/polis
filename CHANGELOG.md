@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-08-06)
+
 - Added a build-once release-identity manifest, explicit publication checks, and
   immutable tagged release-evidence verification. Historical 0.1.0 evidence is
   restored to the tag; its published-asset digest correction is append-only.

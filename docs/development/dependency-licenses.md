@@ -24,7 +24,7 @@ które potwierdzają tożsamość pakietu i opublikowane metadane licencji.
 | `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | zależność przechodnia build, Hatchling i pytest | [Metadane PyPI](https://pypi.org/pypi/packaging/26.2/json); złożone wyrażenie zatwierdzono w wariancie BSD-2-Clause. |
 | `pathspec` | 1.1.1 | MPL-2.0 | zależność przechodnia Hatchling i mypy | [Metadane PyPI](https://pypi.org/pypi/pathspec/1.1.1/json); osobna akceptacja wyłącznie dla niezmodyfikowanej zależności budowania i rozwoju. |
 | `pluggy` | 1.6.0 | MIT | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pluggy/1.6.0/json); przy redystrybucji zachowaj notę MIT. |
-| `polis-nlp` | 0.2.0.dev0 | MIT | projekt lokalny | `pyproject.toml` i `LICENSE`; kod i dokumentacja projektu są na licencji MIT. |
+| `polis-nlp` | 0.2.0 | MIT | projekt lokalny | `pyproject.toml` i `LICENSE`; kod i dokumentacja projektu są na licencji MIT. |
 | `pygments` | 2.20.0 | BSD-2-Clause | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pygments/2.20.0/json); zachowaj prawa autorskie, warunki i wyłączenie odpowiedzialności. |
 | `pyproject-hooks` | 1.2.0 | MIT | zależność przechodnia build | [Metadane PyPI](https://pypi.org/pypi/pyproject-hooks/1.2.0/json); przy redystrybucji zachowaj notę MIT. |
 | `pytest` | 9.1.1 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/pytest/9.1.1/json); przy redystrybucji zachowaj notę MIT. |
