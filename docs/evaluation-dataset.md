@@ -39,7 +39,8 @@ równych `1`, identyfikatora `polis_v1_quality_development`, a także pól
 `features`, opcjonalne `phenomenon` i `pair_id` oraz oczekiwane minimalne
 znaleziska z półotwartymi zakresami `[start, end)`. Pary obejmują fleksję,
 w tym zamkniętą konstrukcję rekcji po zaprzeczonym `widzieć`, rekcję, zgodę,
-pisownię, składnię, w tym zamkniętą konstrukcję celu podróży, i interpunkcję;
+pisownię, składnię, w tym zamknięte konstrukcje celu podróży i początkowego
+zdania warunkowego, oraz interpunkcję;
 osobne rekordy opisują
 konflikt nakładających się poprawek i sytuacje wymagające wstrzymania sugestii.
 
@@ -50,7 +51,7 @@ Manifest wiąże `dataset_id`, `dataset_version` i kanoniczny
 `maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie przypadki w
 kolejności datasetu. Maintainer zatwierdził dokładnie ten zestaw przypadków,
 związany z hashem danych
-`1a4899ca6e8e599d152aff436e18bc4e635d8a831442be5e6568cfd31859b68b`.
+`1edbfefb9ab63354b40b0f5060e37b82fb853f1a3460397e453fbd8c219bcb30`.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 

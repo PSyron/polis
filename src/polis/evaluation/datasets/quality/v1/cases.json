@@ -208,6 +208,26 @@
       "text": "Pojechałem do Warszawy.",
       "expected_findings": [],
       "rationale": null
+    },
+    {
+      "id": "quality_syntax_initial_conditional_comma_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_initial_conditional_comma",
+      "features": ["unicode"],
+      "text": "Jeśli pada zostaję w domu.",
+      "expected_findings": [{"category": "syntax", "start": 10, "end": 10, "original": "", "suggestion": ",", "rationale": "W zatwierdzonej zamkniętej konstrukcji po początkowym zdaniu warunkowym brakuje przecinka."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_initial_conditional_comma_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_initial_conditional_comma",
+      "features": ["unicode"],
+      "text": "Jeśli pada, zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
     }
   ]
 }
