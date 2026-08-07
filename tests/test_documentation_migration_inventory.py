@@ -111,6 +111,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:agreement.copula",
     "rule:inflection.negated_widziec",
     "rule:spelling.jestes",
+    "rule:spelling.napewno",
     "rule:spelling.wlasnie",
     "rule:spelling.zeby",
     "rule:syntax.comma_space",

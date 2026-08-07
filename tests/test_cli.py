@@ -189,3 +189,26 @@ def test_cli_applies_selected_finding() -> None:
     assert corrected.returncode == 0
     payload_corrected = json.loads(corrected.stdout)
     assert payload_corrected["corrected_text"] == "Witaj, świecie."
+
+
+def test_cli_json_reports_the_single_napewno_finding() -> None:
+    result = run_cli(["analyze", "To jest napewno ważne.", "--json"])
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["text"] == "To jest napewno ważne."
+    assert payload["issues"] == [
+        {
+            "category": "spelling",
+            "confidence": 0.98,
+            "end": 15,
+            "explanation": "Zamiast 'napewno' zwykle poprawnie pisze się 'na pewno'.",
+            "id": "finding_1528f91cbe34fee3da90eff22efa4364",
+            "message": "Wygląda jak częsty błąd ortograficzny: napewno.",
+            "original": "napewno",
+            "severity": "suggestion",
+            "source": "rule:spelling.napewno",
+            "start": 8,
+            "suggestion": "na pewno",
+        }
+    ]

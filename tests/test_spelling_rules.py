@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from polis import Analyzer, AnalyzerConfig
 from polis.core import AnalysisOptions, Category
 from polis.rules import DeterministicRuleRegistry, RuleRegistration
 from polis.rules.spelling import (
@@ -64,3 +65,70 @@ def test_spelling_rules_do_not_trigger_on_difficult_negatives() -> None:
     )
 
     assert len(findings) == 0
+
+
+def test_default_analyzer_detects_napewno_with_case_and_unicode_offsets() -> None:
+    text = "Żółw: NAPEWNO; Napewno, napewno."
+
+    analyzer = Analyzer(AnalyzerConfig())
+    result = analyzer.analyze(text)
+
+    assert [
+        (
+            finding.category.value,
+            str(finding.source),
+            finding.original,
+            finding.suggestion,
+            finding.start,
+            finding.end,
+        )
+        for finding in result.issues
+    ] == [
+        ("spelling", "rule:spelling.napewno", "NAPEWNO", "NA PEWNO", 6, 13),
+        ("spelling", "rule:spelling.napewno", "Napewno", "Na pewno", 15, 22),
+        ("spelling", "rule:spelling.napewno", "napewno", "na pewno", 24, 31),
+    ]
+    assert all(
+        text[finding.start : finding.end] == finding.original
+        for finding in result.issues
+    )
+    assert analyzer._registry.source_behavior(result.issues[0].source).operation == (
+        "replace.common_typo"
+    )
+    assert (
+        analyzer._registry.source_behavior(result.issues[0].source).behavior_version
+        == "spelling-napewno/1.0"
+    )
+    assert result.apply(tuple(finding.id for finding in result.issues)) == (
+        "Żółw: NA PEWNO; Na pewno, na pewno."
+    )
+    correction = analyzer.correct(text)
+    assert correction.corrected_text == text
+    assert correction.applied_findings == ()
+    assert correction.skipped_findings == result.issues
+
+
+def test_napewno_rule_respects_token_and_clause_boundaries() -> None:
+    text = "(napewno), napewno;napewno\nnapewno na pewno napewności xnapewno napewnoX"
+
+    findings = (
+        Analyzer(AnalyzerConfig())
+        .analyze(
+            text,
+            options=AnalysisOptions(categories={Category.SPELLING}),
+        )
+        .issues
+    )
+
+    assert [(finding.start, finding.end, finding.original) for finding in findings] == [
+        (1, 8, "napewno"),
+        (11, 18, "napewno"),
+        (19, 26, "napewno"),
+        (27, 34, "napewno"),
+    ]
+    assert (
+        Analyzer(AnalyzerConfig())
+        .analyze("na pewno napewności xnapewno napewnoX")
+        .issues
+        == ()
+    )

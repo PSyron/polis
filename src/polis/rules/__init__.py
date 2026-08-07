@@ -11,6 +11,7 @@ from polis.rules.agreement import AgreementCopulaRule
 from polis.rules.inflection import InflectionNegatedWidziecRule
 from polis.rules.spelling import (
     SpellingJestesRule,
+    SpellingNapewnoRule,
     SpellingWlasnieRule,
     SpellingZebyRule,
     TypoSpellingRule,
@@ -181,6 +182,7 @@ __all__ = [
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
     "SpellingJestesRule",
+    "SpellingNapewnoRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

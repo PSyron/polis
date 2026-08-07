@@ -23,6 +23,7 @@ from polis.rules import (
     RuleRegistration,
     RuleRegistryError,
     SpellingJestesRule,
+    SpellingNapewnoRule,
     SpellingWlasnieRule,
     SpellingZebyRule,
     SyntaxCommaSpacingRule,
@@ -108,6 +109,7 @@ def test_registry_returns_no_behavior_for_unversioned_or_unknown_sources() -> No
     (
         (AgreementCopulaRule(), "replace.copula_form", "agreement-copula/1.0"),
         (SpellingJestesRule(), "replace.common_typo", "spelling-jestes/1.0"),
+        (SpellingNapewnoRule(), "replace.common_typo", "spelling-napewno/1.0"),
         (SpellingWlasnieRule(), "replace.common_typo", "spelling-wlasnie/1.0"),
         (SpellingZebyRule(), "replace.common_typo", "spelling-zeby/1.0"),
         (
