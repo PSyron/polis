@@ -10,6 +10,7 @@
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
+| `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
 | `rule:syntax.list_space` | `syntax` | brakująca spacja po znaczniku listy |
 | `rule:syntax.missing_correlative` | `syntax` | lokalna konstrukcja `Im …, bardziej …` z brakującym `tym` |
 | `rule:syntax.missing_destination_preposition` | `syntax` | zamknięta konstrukcja `Pojechałem Warszawy.` → `Pojechałem do Warszawy.`, wyłącznie do przeglądu |
@@ -17,8 +18,9 @@
 | `rule:syntax.quote_space` | `punctuation` | brakująca spacja po otwierającym cudzysłowie |
 | `rule:syntax.sentence_space` | `punctuation` | brakująca spacja po kropce na granicy zdania |
 
-Reguły `rule:inflection.negated_widziec`, `rule:syntax.missing_correlative`,
-`rule:syntax.missing_destination_preposition` i `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
+Reguły `rule:inflection.negated_widziec`, `rule:syntax.initial_conditional_comma`,
+`rule:syntax.missing_correlative`, `rule:syntax.missing_destination_preposition` i
+`rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
 pozostają do przeglądu. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości `(source, category, operation, behavior_version,
 source_policy_version)` przez politykę `1.2`. Sama kategoria ani pewność nie

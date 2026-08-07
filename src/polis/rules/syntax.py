@@ -20,6 +20,11 @@ _DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
     r"(?:(?:Pojechałem|pojechałem) (?P<lower>Warszawy)|"
     r"POJECHAŁEM (?P<upper>WARSZAWY))\.\Z"
 )
+_INITIAL_CONDITIONAL_COMMA_PATTERN: Final = re.compile(
+    r"(?:(?P<title>Jeśli pada) zostaję w domu|"
+    r"(?P<lower>jeśli pada) zostaję w domu|"
+    r"(?P<upper>JEŚLI PADA) ZOSTAJĘ W DOMU)\.\Z"
+)
 
 
 class SyntaxCommaSpacingRule:
@@ -367,6 +372,54 @@ class SyntaxMissingDestinationPrepositionRule:
         )
 
 
+class SyntaxInitialConditionalCommaRule:
+    """Insert one comma in a reviewed initial conditional sentence only."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.initial_conditional_comma")
+
+    @property
+    def operation(self) -> str:
+        """Return the review-only action performed by this rule."""
+
+        return "insert.conditional_clause_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the review-only implementation behavior version."""
+
+        return "syntax-initial-conditional-comma/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        """Return the reviewed insertion for an exact allowed sentence."""
+
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        match = _INITIAL_CONDITIONAL_COMMA_PATTERN.fullmatch(text)
+        if match is None:
+            return ()
+        group = "title" if match.group("title") is not None else "lower"
+        group = group if match.group(group) is not None else "upper"
+        start = match.end(group)
+        return (
+            _make_insertion_or_replacement(
+                start,
+                start,
+                "",
+                ",",
+                self.source,
+                category=self._CATEGORY,
+                message="Brakuje przecinka po początkowym zdaniu warunkowym.",
+                explanation=(
+                    "W tej zamkniętej konstrukcji po zdaniu warunkowym stawiamy "
+                    "przecinek."
+                ),
+            ),
+        )
+
+
 def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:
     before = text[:comma_end].rsplit(" ", 1)[-1]
     if before.lower() in _ABBREVIATIONS:
@@ -408,6 +461,7 @@ __all__ = [
     "SyntaxListSpacingRule",
     "SyntaxMissingCorrelativeRule",
     "SyntaxMissingDestinationPrepositionRule",
+    "SyntaxInitialConditionalCommaRule",
     "SyntaxMissingReflexiveRule",
     "SyntaxQuoteSpacingRule",
 ]
