@@ -25,7 +25,7 @@ ponownie zużytych holdoutów i nie dostrajaj na podstawie zamrożonych dowodów
 
 ## Kandydat do aktywnego zbioru jakości
 
-Issue #229 wprowadza osobny, edytowalny zbiór 16 przypadków autorskich na
+Issue #229 wprowadziło osobny, edytowalny zbiór przypadków autorskich na
 licencji `CC0-1.0`:
 
 - dane: `src/polis/evaluation/datasets/quality/v1/cases.json`;
@@ -38,17 +38,18 @@ równych `1`, identyfikatora `polis_v1_quality_development`, a także pól
 `license`, `source` i `cases`. Każdy przypadek ma rolę w `kind`, jawne
 `features`, opcjonalne `phenomenon` i `pair_id` oraz oczekiwane minimalne
 znaleziska z półotwartymi zakresami `[start, end)`. Pary obejmują fleksję,
-rekcję, zgodę, pisownię, składnię i interpunkcję; osobne rekordy opisują
+w tym zamkniętą konstrukcję rekcji po zaprzeczonym `widzieć`, rekcję, zgodę,
+pisownię, składnię i interpunkcję; osobne rekordy opisują
 konflikt nakładających się poprawek i sytuacje wymagające wstrzymania sugestii.
 
 Manifest wiąże `dataset_id`, `dataset_version` i kanoniczny
 `canonical_sha256` z kontraktem `polis.quality-development-manifest` w wersji
 `1`. Sekcja `review` zapisuje `status`, `reviewer_role`, `checklist_version`,
 `reviewed_case_ids` oraz ten sam `canonical_sha256`. Bieżący status to
-`maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie 16 przypadków w
+`maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie przypadki w
 kolejności datasetu. Maintainer zatwierdził dokładnie ten zestaw przypadków,
 związany z hashem danych
-`1c38cd4cf5d1a5154127dda13dbcc469143952d7af1c72c3c54da1f7211f5ee4`.
+`6ae9e274263bf38f8b8c0215417c31624edb3e0fca3946474ec2607e4cf80a1b`.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 

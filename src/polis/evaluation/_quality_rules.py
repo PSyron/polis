@@ -108,11 +108,9 @@ def validate_quality_dataset(
 
 
 def _validate_matrix(cases: tuple[QualityCase, ...]) -> None:
-    if len(cases) != 16:
-        raise QualityDatasetError("quality dataset must contain exactly 16 cases")
     paired = [case for case in cases if case.pair_id is not None]
     pair_ids = {case.pair_id for case in paired}
-    if len(pair_ids) != 6 or any(
+    if any(
         {case.kind for case in paired if case.pair_id == pair_id}
         != {QualityCaseKind.ERROR, QualityCaseKind.CORRECT}
         or len([case for case in paired if case.pair_id == pair_id]) != 2

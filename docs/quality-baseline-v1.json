@@ -1,73 +1,73 @@
 {
   "analyzer": "Analyzer(AnalyzerConfig())",
   "artifact": {
-    "sha256": "1039f88e4ed9a68e2268fa6c86ce2bbf91ca4f22c4c8c508945d2b0a7aa4a85c"
+    "sha256": "5365e2b2516af367e634b9cfed77ade6c54dd30b10874dff7abf87e3f70ad0cc"
   },
   "dataset": {
-    "cases": 16,
+    "cases": 18,
     "id": "polis_v1_quality_development",
     "manifest": {
       "schema_id": "polis.quality-development-manifest",
       "schema_version": 1,
-      "sha256": "38a5c30dfa064d96b96a8622360ab171833e6b56d63b382a521849af4ca8b1d7"
+      "sha256": "101e92fd3993551d353174e3ab3ca1919239ad5d1d8df657944ed5cceb65649e"
     },
     "schema_id": "polis.quality-development-dataset",
     "schema_version": 1,
-    "sha256": "1c38cd4cf5d1a5154127dda13dbcc469143952d7af1c72c3c54da1f7211f5ee4",
+    "sha256": "6ae9e274263bf38f8b8c0215417c31624edb3e0fca3946474ec2607e4cf80a1b",
     "source": "quality:polis_v1_quality_development@1"
   },
   "environment": {
     "package_version": "0.2.0",
     "platform_machine": "arm64",
-    "platform_release": "24.3.0",
+    "platform_release": "25.5.0",
     "platform_system": "Darwin",
-    "python_version": "3.13.12"
+    "python_version": "3.14.3"
   },
   "performance": {
     "latency_ns": {
-      "max": 23292,
-      "mean": 14380,
-      "min": 10792,
-      "p50": 12959,
-      "p95": 22750,
-      "sample_count": 80
+      "max": 26291,
+      "mean": 11976,
+      "min": 8792,
+      "p50": 10667,
+      "p95": 18833,
+      "sample_count": 90
     },
-    "peak_rss_bytes": 29491200,
+    "peak_rss_bytes": 37994496,
     "throughput": {
-      "cases_per_second": 69537.76509099886,
-      "code_points_per_second": 1960095.7535025303,
-      "measured_cases": 80,
-      "measured_code_points": 2255,
-      "total_duration_ns": 1150454
+      "cases_per_second": 83498.08742991959,
+      "code_points_per_second": 2273003.491147811,
+      "measured_cases": 90,
+      "measured_code_points": 2450,
+      "total_duration_ns": 1077869
     }
   },
   "quality": {
-    "correction_accuracy": null,
+    "correction_accuracy": 1.0,
     "counts": {
       "alarmed_correct_cases": 0,
-      "correct_cases": 9,
-      "correction_matches": 0,
-      "expected_findings": 8,
+      "correct_cases": 10,
+      "correction_matches": 1,
+      "expected_findings": 9,
       "false_negatives": 8,
       "false_positives": 0,
-      "predicted_findings": 0,
-      "span_matches": 0,
-      "true_positives": 0
+      "predicted_findings": 1,
+      "span_matches": 1,
+      "true_positives": 1
     },
-    "f1": 0.0,
+    "f1": 0.2,
     "false_alarm_rate": 0.0,
-    "precision": null,
-    "recall": 0.0,
-    "span_accuracy": 0.0
+    "precision": 1.0,
+    "recall": 0.1111111111111111,
+    "span_accuracy": 0.1111111111111111
   },
   "reproducibility": {
     "measured_repetitions": 5,
     "repetition_hashes": [
-      "cd980a6fd4efd8cc07065fd6634a0335a0dc369e028fa2af93f5d509dc6cc18c",
-      "cd980a6fd4efd8cc07065fd6634a0335a0dc369e028fa2af93f5d509dc6cc18c",
-      "cd980a6fd4efd8cc07065fd6634a0335a0dc369e028fa2af93f5d509dc6cc18c",
-      "cd980a6fd4efd8cc07065fd6634a0335a0dc369e028fa2af93f5d509dc6cc18c",
-      "cd980a6fd4efd8cc07065fd6634a0335a0dc369e028fa2af93f5d509dc6cc18c"
+      "05e67d7cb02e4d6f35c31977d5e5e952636d8db2f23823c5230d29f71e38d350",
+      "05e67d7cb02e4d6f35c31977d5e5e952636d8db2f23823c5230d29f71e38d350",
+      "05e67d7cb02e4d6f35c31977d5e5e952636d8db2f23823c5230d29f71e38d350",
+      "05e67d7cb02e4d6f35c31977d5e5e952636d8db2f23823c5230d29f71e38d350",
+      "05e67d7cb02e4d6f35c31977d5e5e952636d8db2f23823c5230d29f71e38d350"
     ],
     "stable_repetitions": 5,
     "warmup_repetitions": 1

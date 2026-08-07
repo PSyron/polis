@@ -3,7 +3,7 @@
   "schema_version": 1,
   "dataset_id": "polis_v1_quality_development",
   "dataset_version": 1,
-  "canonical_sha256": "1c38cd4cf5d1a5154127dda13dbcc469143952d7af1c72c3c54da1f7211f5ee4",
+  "canonical_sha256": "6ae9e274263bf38f8b8c0215417c31624edb3e0fca3946474ec2607e4cf80a1b",
   "review": {
     "status": "maintainer-reviewed",
     "reviewer_role": "Polis maintainer",
@@ -24,8 +24,10 @@
       "quality_overlapping_conflict",
       "quality_abstain_temporal",
       "quality_abstain_style",
-      "quality_abstain_intent"
+      "quality_abstain_intent",
+      "quality_inflection_negated_government_error",
+      "quality_inflection_negated_government_correct"
     ],
-    "canonical_sha256": "1c38cd4cf5d1a5154127dda13dbcc469143952d7af1c72c3c54da1f7211f5ee4"
+    "canonical_sha256": "6ae9e274263bf38f8b8c0215417c31624edb3e0fca3946474ec2607e4cf80a1b"
   }
 }

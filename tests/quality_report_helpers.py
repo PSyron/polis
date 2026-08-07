@@ -26,6 +26,9 @@ type JsonObject = dict[str, JsonValue]
 def _result() -> QualityProtocolResult:
     active = load_quality_dataset()
     evaluated = as_evaluation_dataset(active)
+    measured_cases = len(active.cases) * 2
+    measured_code_points = measured_cases * 10
+    total_duration_ns = measured_cases * 20
     counts = QualityCounts(
         expected_findings=3,
         predicted_findings=2,
@@ -75,7 +78,7 @@ def _result() -> QualityProtocolResult:
         repetition_hashes=("d" * 64, "d" * 64),
         baseline=baseline,
         latency=LatencyMetrics(
-            sample_count=32,
+            sample_count=measured_cases,
             min_ns=10,
             mean_ns=20,
             p50_ns=20,
@@ -83,9 +86,9 @@ def _result() -> QualityProtocolResult:
             max_ns=30,
         ),
         throughput=ThroughputMetrics(
-            measured_cases=32,
-            measured_code_points=320,
-            total_duration_ns=640,
+            measured_cases=measured_cases,
+            measured_code_points=measured_code_points,
+            total_duration_ns=total_duration_ns,
             cases_per_second=50_000_000.0,
             code_points_per_second=500_000_000.0,
         ),

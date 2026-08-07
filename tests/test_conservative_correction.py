@@ -82,11 +82,12 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_the_ten_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_the_eleven_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
         "rule:agreement.copula",
+        "rule:inflection.negated_widziec",
         "rule:spelling.jestes",
         "rule:spelling.wlasnie",
         "rule:spelling.zeby",
