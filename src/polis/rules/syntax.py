@@ -76,6 +76,55 @@ class SyntaxCommaSpacingRule:
         return tuple(findings)
 
 
+class SyntaxDuplicateCommaRule:
+    """Remove one comma from an unambiguous adjacent pair."""
+
+    _CATEGORY = Category.PUNCTUATION
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.duplicate_comma")
+        self._pattern = re.compile(
+            r"(?<=[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]),,(?!,)(?=\s+[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ])"
+        )
+
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "remove.duplicate_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "syntax-duplicate-comma/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            first_comma = match.start()
+            if _is_quoted_position(text, first_comma):
+                continue
+            start = first_comma + 1
+            findings.append(
+                _make_insertion_or_replacement(
+                    start,
+                    start + 1,
+                    ",",
+                    "",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Zduplikowany przecinek.",
+                    explanation="W tej pozycji wystarcza jeden przecinek.",
+                )
+            )
+
+        return tuple(findings)
+
+
 class SyntaxSentenceSpacingRule:
     """Fix a missing space between two sentence-like fragments."""
 
@@ -427,6 +476,17 @@ def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:
     return False
 
 
+def _is_quoted_position(text: str, position: int) -> bool:
+    for opening, closing in (('"', '"'), ("„", "”"), ("“", "”"), ("«", "»")):
+        before = text[:position]
+        if opening == closing:
+            if before.count(opening) % 2 == 1:
+                return True
+        elif before.rfind(opening) > before.rfind(closing):
+            return True
+    return False
+
+
 def _make_insertion_or_replacement(
     start: int,
     end: int,
@@ -457,6 +517,7 @@ _ABBREVIATIONS = frozenset({"itp", "np", "tj", "m.in", "i.e", "np."})
 
 __all__ = [
     "SyntaxCommaSpacingRule",
+    "SyntaxDuplicateCommaRule",
     "SyntaxSentenceSpacingRule",
     "SyntaxListSpacingRule",
     "SyntaxMissingCorrelativeRule",

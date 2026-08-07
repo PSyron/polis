@@ -18,6 +18,7 @@ from polis.rules.spelling import (
 )
 from polis.rules.syntax import (
     SyntaxCommaSpacingRule,
+    SyntaxDuplicateCommaRule,
     SyntaxInitialConditionalCommaRule,
     SyntaxListSpacingRule,
     SyntaxMissingCorrelativeRule,
@@ -189,6 +190,7 @@ __all__ = [
     "AgreementCopulaRule",
     "InflectionNegatedWidziecRule",
     "SyntaxCommaSpacingRule",
+    "SyntaxDuplicateCommaRule",
     "SyntaxInitialConditionalCommaRule",
     "SyntaxListSpacingRule",
     "SyntaxMissingCorrelativeRule",
