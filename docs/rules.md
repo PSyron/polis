@@ -5,6 +5,7 @@
 | Źródło | Kategoria | Zakres |
 | --- | --- | --- |
 | `rule:agreement.copula` | `agreement` | lokalna niezgodność łącznika w ograniczonych wzorcach zaimka i czasownika |
+| `rule:agreement.te_zdanie` | `agreement` | zamknięty wzorzec `Te zdanie` → `To zdanie`, z zachowaniem wielkości liter |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
@@ -32,6 +33,9 @@ wyłącznie do przeglądu, dopóki osobne issue nie zakwalifikuje dokładnego kl
 polityki `(rule:syntax.duplicate_comma, punctuation, remove.duplicate_comma,
 syntax-duplicate-comma/1.0, 1.2)`. Sama kategoria ani pewność nie nadaje
 uprawnienia.
+`rule:agreement.te_zdanie` także pozostaje wyłącznie do przeglądu, dopóki
+osobna polityka nie zakwalifikuje jej dokładnego klucza `(source, category,
+operation, behavior_version, source_policy_version)`.
 
 ## Zasady bezpieczeństwa
 

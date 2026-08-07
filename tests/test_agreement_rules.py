@@ -1,7 +1,14 @@
 from __future__ import annotations
 
+import pytest
+
+from polis import Analyzer, AnalyzerConfig
 from polis.core import AnalysisOptions, Category
-from polis.rules import DeterministicRuleRegistry, RuleRegistration
+from polis.rules import (
+    AgreementTeZdanieRule,
+    DeterministicRuleRegistry,
+    RuleRegistration,
+)
 from polis.rules.agreement import AgreementCopulaRule
 
 
@@ -49,3 +56,88 @@ def test_agreement_copula_rule_respects_category_filtering() -> None:
     )
 
     assert findings == ()
+
+
+@pytest.mark.parametrize(
+    ("text", "original", "suggestion", "start", "end"),
+    (
+        ("Te zdanie jest poprawne.", "Te zdanie", "To zdanie", 0, 9),
+        ("te zdanie jest poprawne.", "te zdanie", "to zdanie", 0, 9),
+        ("Te\tzdanie jest poprawne.", "Te\tzdanie", "To\tzdanie", 0, 9),
+        ("🙂 Te zdanie jest poprawne.", "Te zdanie", "To zdanie", 2, 11),
+        ("Te zdanie, które czytasz, jest krótkie.", "Te zdanie", "To zdanie", 0, 9),
+        ("Pierwsze. Te zdanie jest drugie.", "Te zdanie", "To zdanie", 10, 19),
+    ),
+)
+def test_agreement_te_zdanie_rule_finds_allowlisted_phrase_with_exact_offsets(
+    text: str,
+    original: str,
+    suggestion: str,
+    start: int,
+    end: int,
+) -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    findings = analyzer.analyze(
+        text, options=AnalysisOptions(categories={Category.AGREEMENT})
+    ).issues
+
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.category is Category.AGREEMENT
+    assert str(finding.source) == "rule:agreement.te_zdanie"
+    assert finding.original == original
+    assert finding.suggestion == suggestion
+    assert (finding.start, finding.end) == (start, end)
+    assert text[finding.start : finding.end] == finding.original
+
+
+@pytest.mark.parametrize(
+    "text",
+    (
+        "To zdanie jest poprawne.",
+        "Te dziecko jest gotowe.",
+        "Te zdania są poprawne.",
+        "moTe zdanie jest poprawne.",
+        "Te zdaniem zajmuje się redaktor.",
+        "Te\nzdanie.",
+        "Te\r\nzdanie.",
+    ),
+)
+def test_agreement_te_zdanie_rule_abstains_outside_the_closed_pattern(
+    text: str,
+) -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    findings = analyzer.analyze(
+        text, options=AnalysisOptions(categories={Category.AGREEMENT})
+    ).issues
+
+    assert findings == ()
+
+
+def test_agreement_te_zdanie_rule_has_closed_behavior_metadata() -> None:
+    rule = AgreementTeZdanieRule()
+
+    assert rule.operation == "replace.demonstrative_neuter_phrase"
+    assert rule.behavior_version == "agreement-te-zdanie/1.0"
+
+
+def test_default_analyzer_exposes_te_zdanie_for_explicit_application_only() -> None:
+    text = "Te zdanie jest poprawne."
+    analyzer = Analyzer(AnalyzerConfig())
+
+    analysis = analyzer.analyze(
+        text, options=AnalysisOptions(categories={Category.AGREEMENT})
+    )
+    filtered = analyzer.analyze(
+        text, options=AnalysisOptions(categories={Category.SPELLING})
+    )
+    correction = analyzer.correct(text)
+
+    assert len(analysis.issues) == 1
+    assert analysis.apply((analysis.issues[0].id,)) == "To zdanie jest poprawne."
+    assert filtered.issues == ()
+    assert correction.corrected_text == text
+    assert correction.applied_findings == ()
+    assert correction.skipped_findings == analysis.issues

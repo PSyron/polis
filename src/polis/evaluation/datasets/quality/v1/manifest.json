@@ -3,7 +3,7 @@
   "schema_version": 1,
   "dataset_id": "polis_v1_quality_development",
   "dataset_version": 1,
-  "canonical_sha256": "8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf",
+  "canonical_sha256": "a8e77c62f567544c8eca423e2e4b7cc93f461c46412016dd43d19308f980154f",
   "review": {
     "status": "maintainer-reviewed",
     "reviewer_role": "Polis maintainer",
@@ -32,6 +32,6 @@
       "quality_syntax_initial_conditional_comma_error",
       "quality_syntax_initial_conditional_comma_correct"
     ],
-    "canonical_sha256": "8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf"
+    "canonical_sha256": "a8e77c62f567544c8eca423e2e4b7cc93f461c46412016dd43d19308f980154f"
   }
 }

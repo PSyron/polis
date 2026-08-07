@@ -77,6 +77,31 @@ def test_cli_invalid_config_path_fails_with_safe_error(tmp_path: Path) -> None:
     assert "error:" in result.stderr
 
 
+def test_cli_json_reports_the_review_only_te_zdanie_finding() -> None:
+    result = run_cli(["analyze", "Te zdanie jest poprawne.", "--json"])
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["text"] == "Te zdanie jest poprawne."
+    assert payload["issues"] == [
+        {
+            "category": "agreement",
+            "confidence": 0.98,
+            "end": 9,
+            "explanation": (
+                "Forma „Te” nie zgadza się z rzeczownikiem „zdanie” w tej regule."
+            ),
+            "id": "finding_891ce28822219f17c57d704f956965ab",
+            "message": "Niezgodność rodzaju zaimka i rzeczownika.",
+            "original": "Te zdanie",
+            "severity": "error",
+            "source": "rule:agreement.te_zdanie",
+            "start": 0,
+            "suggestion": "To zdanie",
+        }
+    ]
+
+
 def test_cli_reads_stdin_unicode_input() -> None:
     result = run_cli_with_inherited_cp1252(
         ["analyze", "--stdin", "--json"],

@@ -76,6 +76,60 @@ class AgreementCopulaRule:
         return tuple(findings)
 
 
+class AgreementTeZdanieRule:
+    """Detect the closed demonstrative mismatch before allowlisted neuter nouns."""
+
+    _CATEGORY = Category.AGREEMENT
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "agreement.te_zdanie")
+        self._pattern = re.compile(
+            rf"(?<!\w)(?P<phrase>(?P<pronoun>te)(?P<space>[ \t]+)"
+            rf"(?P<noun>{'|'.join(_NEUTER_NOUN_ALLOWLIST)}))(?!\w)",
+            re.IGNORECASE,
+        )
+        self._confidence = Confidence(0.98)
+
+    @property
+    def operation(self) -> str:
+        return "replace.demonstrative_neuter_phrase"
+
+    @property
+    def behavior_version(self) -> str:
+        return "agreement-te-zdanie/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            pronoun = match.group("pronoun")
+            space = match.group("space")
+            noun = match.group("noun")
+            original = match.group("phrase")
+            suggestion = f"{_match_case(pronoun, 'to')}{space}{noun}"
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.ERROR,
+                    message="Niezgodność rodzaju zaimka i rzeczownika.",
+                    explanation=(
+                        f"Forma „{pronoun}” nie zgadza się z rzeczownikiem „{noun}” "
+                        "w tej regule."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=match.start("phrase"),
+                    end=match.end("phrase"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+
+        return tuple(findings)
+
+
 def _match_case(reference: str, replacement: str) -> str:
     if reference.isupper():
         return replacement.upper()
@@ -105,6 +159,8 @@ _VERB_PATTERNS: tuple[str, ...] = (
     "są",
     "jest",
 )
+
+_NEUTER_NOUN_ALLOWLIST: tuple[str, ...] = ("zdanie",)
 
 _CORRECTIONS: dict[tuple[str, str], str] = {
     ("ona", "jestem"): "jest",
@@ -144,4 +200,4 @@ _CORRECTIONS: dict[tuple[str, str], str] = {
 }
 
 
-__all__ = ["AgreementCopulaRule"]
+__all__ = ["AgreementCopulaRule", "AgreementTeZdanieRule"]
