@@ -1,77 +1,23 @@
 {
   "analyzer": "Analyzer(AnalyzerConfig())",
-  "artifact": {
-    "sha256": "ae3ed1a9ce523b1180c603ebcf8566bc49cd58b06bf7e407fafb071f223ec480"
-  },
+  "artifact": {"sha256": "2eec3d545236e01b3d593f7e781476f107de8f90566aa14447e5b333623d3239"},
   "dataset": {
-    "cases": 22,
-    "id": "polis_v1_quality_development",
-    "manifest": {
-      "schema_id": "polis.quality-development-manifest",
-      "schema_version": 1,
-      "sha256": "ba639e97a6d067da5aa2b195b6e875826c3a78c593ef78fdaeb6f9428d3a25cd"
-    },
-    "schema_id": "polis.quality-development-dataset",
-    "schema_version": 1,
-    "sha256": "1edbfefb9ab63354b40b0f5060e37b82fb853f1a3460397e453fbd8c219bcb30",
-    "source": "quality:polis_v1_quality_development@1"
+    "cases": 22, "id": "polis_v1_quality_development",
+    "manifest": {"schema_id": "polis.quality-development-manifest", "schema_version": 1, "sha256": "60456653bba338e97375a4acd68cb0e8a07b7c4fb93083de09a82af04e45bcd8"},
+    "schema_id": "polis.quality-development-dataset", "schema_version": 1,
+    "sha256": "8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf", "source": "quality:polis_v1_quality_development@1"
   },
-  "environment": {
-    "package_version": "0.2.0",
-    "platform_machine": "arm64",
-    "platform_release": "24.3.0",
-    "platform_system": "Darwin",
-    "python_version": "3.13.12"
-  },
+  "environment": {"package_version": "0.2.0", "platform_machine": "arm64", "platform_release": "24.3.0", "platform_system": "Darwin", "python_version": "3.13.12"},
   "performance": {
-    "latency_ns": {
-      "max": 28583,
-      "mean": 16331,
-      "min": 10750,
-      "p50": 14625,
-      "p95": 24875,
-      "sample_count": 110
-    },
-    "peak_rss_bytes": 34684928,
-    "throughput": {
-      "cases_per_second": 61233.03288325199,
-      "code_points_per_second": 1631025.330435712,
-      "measured_cases": 110,
-      "measured_code_points": 2930,
-      "total_duration_ns": 1796416
-    }
+    "latency_ns": {"max": 25666, "mean": 16268, "min": 10750, "p50": 15083, "p95": 23041, "sample_count": 110},
+    "peak_rss_bytes": 29638656,
+    "throughput": {"cases_per_second": 61468.413338198654, "code_points_per_second": 1570238.5589121655, "measured_cases": 110, "measured_code_points": 2810, "total_duration_ns": 1789537}
   },
   "quality": {
     "correction_accuracy": 1.0,
-    "counts": {
-      "alarmed_correct_cases": 0,
-      "correct_cases": 12,
-      "correction_matches": 4,
-      "expected_findings": 11,
-      "false_negatives": 7,
-      "false_positives": 0,
-      "predicted_findings": 4,
-      "span_matches": 4,
-      "true_positives": 4
-    },
-    "f1": 0.5333333333333333,
-    "false_alarm_rate": 0.0,
-    "precision": 1.0,
-    "recall": 0.36363636363636365,
-    "span_accuracy": 0.36363636363636365
+    "counts": {"alarmed_correct_cases": 0, "correct_cases": 12, "correction_matches": 5, "expected_findings": 11, "false_negatives": 6, "false_positives": 0, "predicted_findings": 5, "span_matches": 5, "true_positives": 5},
+    "f1": 0.625, "false_alarm_rate": 0.0, "precision": 1.0, "recall": 0.45454545454545453, "span_accuracy": 0.45454545454545453
   },
-  "reproducibility": {
-    "measured_repetitions": 5,
-    "repetition_hashes": [
-      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
-      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
-      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
-      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
-      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32"
-    ],
-    "stable_repetitions": 5,
-    "warmup_repetitions": 1
-  },
-  "schema_id": "polis.quality-baseline",
-  "schema_version": 1
+  "reproducibility": {"measured_repetitions": 5, "repetition_hashes": ["565dec4736eee7b9c49096372ea73e5a060a7b773a7f57bcabd6a9fd66904563", "565dec4736eee7b9c49096372ea73e5a060a7b773a7f57bcabd6a9fd66904563", "565dec4736eee7b9c49096372ea73e5a060a7b773a7f57bcabd6a9fd66904563", "565dec4736eee7b9c49096372ea73e5a060a7b773a7f57bcabd6a9fd66904563", "565dec4736eee7b9c49096372ea73e5a060a7b773a7f57bcabd6a9fd66904563"], "stable_repetitions": 5, "warmup_repetitions": 1},
+  "schema_id": "polis.quality-baseline", "schema_version": 1
 }

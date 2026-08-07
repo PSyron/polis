@@ -212,3 +212,18 @@ def test_cli_json_reports_the_single_napewno_finding() -> None:
             "suggestion": "na pewno",
         }
     ]
+
+
+def test_cli_serializes_one_duplicate_comma_finding() -> None:
+    result = run_cli(["analyze", "Cześć,, Anno.", "--json"])
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["text"] == "Cześć,, Anno."
+    assert len(payload["issues"]) == 1
+    finding = payload["issues"][0]
+    assert finding["category"] == "punctuation"
+    assert finding["source"] == "rule:syntax.duplicate_comma"
+    assert finding["original"] == ","
+    assert finding["suggestion"] == ""
+    assert (finding["start"], finding["end"]) == (6, 7)

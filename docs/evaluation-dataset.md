@@ -51,7 +51,7 @@ Manifest wiąże `dataset_id`, `dataset_version` i kanoniczny
 `maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie przypadki w
 kolejności datasetu. Maintainer zatwierdził dokładnie ten zestaw przypadków,
 związany z hashem danych
-`1edbfefb9ab63354b40b0f5060e37b82fb853f1a3460397e453fbd8c219bcb30`.
+`8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf`.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 

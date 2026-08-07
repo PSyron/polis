@@ -115,6 +115,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:spelling.wlasnie",
     "rule:spelling.zeby",
     "rule:syntax.comma_space",
+    "rule:syntax.duplicate_comma",
     "rule:syntax.initial_conditional_comma",
     "rule:syntax.list_space",
     "rule:syntax.missing_correlative",
