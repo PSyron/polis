@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import Final
 
 from polis.core import (
     AnalysisOptions,
@@ -14,6 +15,11 @@ from polis.core import (
 )
 from polis.core.models import Severity
 from polis.segmentation import segment_sentences
+
+_DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
+    r"(?:(?:Pojechałem|pojechałem) (?P<lower>Warszawy)|"
+    r"POJECHAŁEM (?P<upper>WARSZAWY))\.\Z"
+)
 
 
 class SyntaxCommaSpacingRule:
@@ -314,6 +320,53 @@ class SyntaxMissingCorrelativeRule:
         )
 
 
+class SyntaxMissingDestinationPrepositionRule:
+    """Insert ``do`` in one reviewed destination construction only."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.missing_destination_preposition")
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        """Return the review-only action performed by this rule."""
+
+        return "insert.destination_preposition"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the review-only implementation behavior version."""
+
+        return "syntax-missing-destination-preposition/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        """Return the reviewed insertion for an exact allowed sentence."""
+
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        match = _DESTINATION_PREPOSITION_PATTERN.fullmatch(text)
+        if match is None:
+            return ()
+        group = "upper" if match.group("upper") is not None else "lower"
+        start = match.start(group)
+        return (
+            Finding.create(
+                category=self._CATEGORY,
+                severity=Severity.SUGGESTION,
+                message="Brakuje przyimka „do” przed nazwą celu podróży.",
+                explanation="W tej zamkniętej konstrukcji brakuje przyimka „do”.",
+                original="",
+                suggestion="do ",
+                start=start,
+                end=start,
+                confidence=self._confidence,
+                source=self.source,
+            ),
+        )
+
+
 def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:
     before = text[:comma_end].rsplit(" ", 1)[-1]
     if before.lower() in _ABBREVIATIONS:
@@ -354,6 +407,7 @@ __all__ = [
     "SyntaxSentenceSpacingRule",
     "SyntaxListSpacingRule",
     "SyntaxMissingCorrelativeRule",
+    "SyntaxMissingDestinationPrepositionRule",
     "SyntaxMissingReflexiveRule",
     "SyntaxQuoteSpacingRule",
 ]

@@ -36,5 +36,5 @@ implementacji zgodne z zaakceptowanym kontraktem publicznego API.
 
 [Inwentarz katalogu reguł](rule-catalog-inventory.md) jest zachowanym bez zmian
 historycznym snapshotem #148/#149, a nie opisem bieżącego runtime'u v1.
-Bieżące jedenaście źródeł runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
+Bieżące dwanaście źródeł runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
 konserwatywny zakres określa ADR-0022.

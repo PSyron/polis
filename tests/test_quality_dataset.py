@@ -97,6 +97,8 @@ def test_committed_quality_dataset_covers_the_v1_protocol() -> None:
         "quality_abstain_intent",
         "quality_inflection_negated_government_error",
         "quality_inflection_negated_government_correct",
+        "quality_syntax_destination_preposition_error",
+        "quality_syntax_destination_preposition_correct",
     )
 
     paired_cases = tuple(case for case in dataset.cases if case.pair_id is not None)
