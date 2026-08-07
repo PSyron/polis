@@ -8,6 +8,7 @@ import pytest
 from scripts.release_identity import ReleaseIdentityError, read_release_policy
 from tests.release_identity_helpers import (
     ROOT,
+    _candidate_absent_checkout,
     _candidate_command,
     _cli_environment,
     _empty_remote,
@@ -32,14 +33,7 @@ def test_candidate_cli_accepts_one_annotated_tag_bound_to_the_source(
     tmp_path: Path,
 ) -> None:
     remote = _empty_remote(tmp_path)
-    checkout = tmp_path / "checkout"
-    cloned = subprocess.run(
-        ["git", "clone", "--quiet", "--no-local", str(ROOT), str(checkout)],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert cloned.returncode == 0, cloned.stderr
+    checkout = _candidate_absent_checkout(tmp_path)
     tagged = subprocess.run(
         ["git", "tag", "-a", "v0.2.0", "-m", "candidate tag"],
         cwd=checkout,
@@ -63,7 +57,12 @@ def test_candidate_cli_accepts_one_annotated_tag_bound_to_the_source(
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="tag-bound"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="tag-bound",
+                repo=checkout,
+            ),
             cwd=checkout,
             text=True,
             capture_output=True,
@@ -79,14 +78,7 @@ def test_candidate_cli_rejects_annotated_tag_bound_to_another_commit(
     tmp_path: Path,
 ) -> None:
     remote = _empty_remote(tmp_path)
-    checkout = tmp_path / "checkout"
-    cloned = subprocess.run(
-        ["git", "clone", "--quiet", "--no-local", str(ROOT), str(checkout)],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert cloned.returncode == 0, cloned.stderr
+    checkout = _candidate_absent_checkout(tmp_path)
     tagged = subprocess.run(
         ["git", "tag", "-a", "v0.2.0", "-m", "candidate tag"],
         cwd=checkout,
@@ -112,7 +104,12 @@ def test_candidate_cli_rejects_annotated_tag_bound_to_another_commit(
     }
 
     with _wire_server(routes) as server:
-        command = _candidate_command(server=server, remote=remote, state="tag-bound")
+        command = _candidate_command(
+            server=server,
+            remote=remote,
+            state="tag-bound",
+            repo=checkout,
+        )
         source_index = command.index("--source-commit") + 1
         command[source_index] = wrong_source
         result = subprocess.run(

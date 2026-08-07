@@ -1,9 +1,39 @@
 from __future__ import annotations
 
+import os
+import shlex
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
-from tests.release_workflow_helpers import WORKFLOW, WORKFLOW_VALIDATOR, _run
+from tests.release_workflow_helpers import (
+    INPUT_VALIDATOR,
+    ROOT,
+    WORKFLOW,
+    WORKFLOW_VALIDATOR,
+    _run,
+)
+
+
+def _ruby_failure_environment(tmp_path: Path, detail: str) -> dict[str, str]:
+    ruby = shutil.which("ruby")
+    assert ruby is not None
+    fake_ruby = tmp_path / "ruby"
+    fake_ruby.write_text(
+        "#!/bin/sh\n"
+        'case "$*" in\n'
+        "  *-rdigest/sha2*)\n"
+        f"    printf {shlex.quote(detail + chr(10))} >&2\n"
+        "    exit 7\n"
+        "    ;;\n"
+        "esac\n"
+        f'exec {shlex.quote(ruby)} "$@"\n',
+        encoding="utf-8",
+    )
+    fake_ruby.chmod(0o755)
+    return os.environ | {"PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}"}
 
 
 @pytest.mark.parametrize(
@@ -129,3 +159,122 @@ def test_release_workflow_rejects_security_contract_mutations(
 
     assert result.returncode != 0
     assert error in result.stderr
+
+
+def test_release_workflow_rejects_direct_dispatch_input_in_shell_run(
+    tmp_path: Path,
+) -> None:
+    # Given: a shell step interpolates a dispatch input whose value may be shell syntax.
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    unsafe_step = (
+        "      - name: Unsafe dispatch input\n"
+        '        run: echo "${{ inputs.gate_receipt_json }}"\n'
+    )
+    invalid = tmp_path / "release.yml"
+    invalid.write_text(
+        workflow.replace("  qualify:\n", f"{unsafe_step}  qualify:\n", 1),
+        encoding="utf-8",
+    )
+
+    # When: the release workflow contract is validated.
+    result = _run(WORKFLOW_VALIDATOR, "--workflow", str(invalid))
+
+    # Then: validation rejects the shell boundary without executing the payload.
+    assert result.returncode == 1
+    assert (
+        "release shell run uses direct dispatch input at "
+        "jobs.validate_inputs.steps[2].run: inputs.gate_receipt_json"
+    ) in result.stderr
+
+
+def test_release_workflow_keeps_ruby_failure_detail(tmp_path: Path) -> None:
+    environment = _ruby_failure_environment(tmp_path, "Ruby parser rejected input")
+
+    result = subprocess.run(
+        [sys.executable, str(WORKFLOW_VALIDATOR), "--workflow", str(WORKFLOW)],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=30,
+    )
+
+    assert result.returncode == 1
+    assert (
+        result.stderr
+        == "release workflow YAML is invalid: Ruby parser rejected input\n"
+    )
+
+
+def test_release_workflow_rejects_ruby_failure_without_stderr(tmp_path: Path) -> None:
+    environment = _ruby_failure_environment(tmp_path, "")
+
+    result = subprocess.run(
+        [sys.executable, str(WORKFLOW_VALIDATOR), "--workflow", str(WORKFLOW)],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=30,
+    )
+
+    assert result.returncode == 1
+    assert (
+        result.stderr
+        == "release workflow YAML is invalid: Ruby parser failed without a diagnostic\n"
+    )
+    assert "Traceback" not in result.stderr
+    assert "IndexError" not in result.stderr
+
+
+def test_release_input_validator_rejects_shell_payload_as_data(
+    tmp_path: Path,
+) -> None:
+    sentinel = tmp_path / "sentinel"
+    payload = f"$(touch {sentinel})"
+    environment = os.environ.copy()
+    environment["SOURCE_COMMIT"] = payload
+    command = (
+        f"{shlex.quote(sys.executable)} {shlex.quote(str(INPUT_VALIDATOR))} "
+        '--mode qualify --source-commit "$SOURCE_COMMIT"'
+    )
+
+    result = subprocess.run(
+        ["bash", "-c", command],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=30,
+    )
+
+    assert result.returncode == 1
+    assert result.stderr == "source commit must be a lowercase 40-character SHA\n"
+    assert not sentinel.exists()
+
+
+def test_release_workflow_allows_dispatch_input_in_non_shell_with_run(
+    tmp_path: Path,
+) -> None:
+    # Given: an action input happens to be named run but is not a shell step.
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    invalid_contract = tmp_path / "release.yml"
+    invalid_contract.write_text(
+        workflow.replace(
+            "          ref: ${{ inputs.source_commit }}",
+            "          run: ${{ inputs.source_commit }}",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    # When: the mutated workflow contract is validated.
+    result = _run(WORKFLOW_VALIDATOR, "--workflow", str(invalid_contract))
+
+    # Then: only the pinned contract rejects it, not the shell-input boundary.
+    assert result.returncode == 1
+    assert "release validate_inputs steps semantic contract is invalid" in result.stderr
+    assert "release shell run uses direct dispatch input" not in result.stderr

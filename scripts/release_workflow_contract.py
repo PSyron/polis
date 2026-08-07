@@ -56,7 +56,7 @@ EXPECTED_SECTIONS: Final = (
     ),
     ContractSection(
         "validate_inputs steps",
-        "7cedde21eab8276f0a95cde0eead5fbd93f30d506bff608c515507298ad76f82",
+        "f5b9bcbb8fec19968dfce64f7a7bf25c68ed7a35b459468002e6a9845934cf27",
     ),
     ContractSection(
         "qualify job",
@@ -64,7 +64,7 @@ EXPECTED_SECTIONS: Final = (
     ),
     ContractSection(
         "qualify steps",
-        "62868951b9c31d533fd112aaa523d44de5722c4af28b77c89099cd7995e6efd1",
+        "f594537d81e240e0777ffc702fcde6db025aa3290d76f1fdbfb398f5f021d13e",
     ),
     ContractSection(
         "verify_bundle job",
@@ -76,7 +76,7 @@ EXPECTED_SECTIONS: Final = (
     ),
     ContractSection(
         "verify_bundle steps",
-        "3bf75ad5d734f097a11559ef985b71ea637f48d6900258ef91c44a5d005fbf11",
+        "e73689369d2d99348859b89ceed13ad663140bfb00c642163fe0f34a53b8b523",
     ),
     ContractSection(
         "upload job",
@@ -84,7 +84,7 @@ EXPECTED_SECTIONS: Final = (
     ),
     ContractSection(
         "upload steps",
-        "7ca5bc5356ff27ec12825ff1adab571068dd8cc2790e05e587e93c583942e306",
+        "fe3e4f29f10ad25b21c3fb2cac64042bb71085ec9a80ff163ea62055783e35a5",
     ),
 )
 
@@ -177,7 +177,8 @@ def validate_workflow(path: Path) -> WorkflowValidation:
     except subprocess.TimeoutExpired:
         return WorkflowValidation(("workflow parsing exceeded 10 seconds",), ())
     if result.returncode:
-        detail = result.stderr.strip().splitlines()[-1]
+        details = result.stderr.strip().splitlines()
+        detail = details[-1] if details else "Ruby parser failed without a diagnostic"
         return WorkflowValidation((f"release workflow YAML is invalid: {detail}",), ())
     actual = _parse_sections(result.stdout)
     if actual is None or len(actual) != len(EXPECTED_SECTIONS):
