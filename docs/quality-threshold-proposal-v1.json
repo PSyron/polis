@@ -1,8 +1,17 @@
 {
   "baseline_path": "docs/quality-baseline-v1.json",
-  "baseline_sha256": "e9b42f747a1eb05b481bdf75e5831081a7b204b22816dbdb322a2720300075a7",
-  "dataset_sha256": "8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf",
+  "baseline_sha256": "31666b6b9f9ffe9311124c1e11559c5ebff95cc594acfa3b876a97751ca5d042",
+  "dataset_sha256": "a8e77c62f567544c8eca423e2e4b7cc93f461c46412016dd43d19308f980154f",
   "enforced": false,
-  "proposed_thresholds": {"maximum_false_alarm_rate": 0.0, "minimum_correction_accuracy": 1.0, "minimum_f1": 0.625, "minimum_precision": 1.0, "minimum_recall": 0.45454545454545453, "minimum_span_accuracy": 0.45454545454545453},
-  "schema_id": "polis.quality-threshold-proposal", "schema_version": 1, "status": "pending_maintainer_approval"
+  "proposed_thresholds": {
+    "maximum_false_alarm_rate": 0.0,
+    "minimum_correction_accuracy": 1.0,
+    "minimum_f1": 0.7058823529411765,
+    "minimum_precision": 1.0,
+    "minimum_recall": 0.5454545454545454,
+    "minimum_span_accuracy": 0.5454545454545454
+  },
+  "schema_id": "polis.quality-threshold-proposal",
+  "schema_version": 1,
+  "status": "pending_maintainer_approval"
 }

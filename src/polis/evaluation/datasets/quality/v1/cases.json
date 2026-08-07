@@ -52,8 +52,8 @@
       "phenomenon": "agreement",
       "pair_id": "pair_agreement",
       "features": [],
-      "text": "Ta dziecko śpi.",
-      "expected_findings": [{"category": "agreement", "start": 0, "end": 2, "original": "Ta", "suggestion": "To", "rationale": "Zaimek powinien mieć rodzaj nijaki zgodny z rzeczownikiem „dziecko”."}],
+      "text": "Te zdanie jest poprawne.",
+      "expected_findings": [{"category": "agreement", "start": 0, "end": 9, "original": "Te zdanie", "suggestion": "To zdanie", "rationale": "Forma „Te” nie zgadza się z allowlistowanym rzeczownikiem „zdanie”."}],
       "rationale": null
     },
     {
@@ -62,7 +62,7 @@
       "phenomenon": "agreement",
       "pair_id": "pair_agreement",
       "features": [],
-      "text": "To dziecko śpi.",
+      "text": "To zdanie jest poprawne.",
       "expected_findings": [],
       "rationale": null
     },
