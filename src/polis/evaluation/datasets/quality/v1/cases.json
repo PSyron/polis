@@ -168,6 +168,26 @@
       "text": "Marta poprosiła Olę, żeby później zadzwoniła.",
       "expected_findings": [],
       "rationale": "Rozstrzygnięcie, która osoba ma zadzwonić, wymaga wiedzy o intencji autora."
+    },
+    {
+      "id": "quality_inflection_negated_government_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government",
+      "features": ["unicode"],
+      "text": "Nie widzę samochód.",
+      "expected_findings": [{"category": "inflection", "start": 10, "end": 18, "original": "samochód", "suggestion": "samochodu", "rationale": "Po zaprzeczonym czasowniku „widzieć” w tej zamkniętej konstrukcji potrzebny jest dopełniacz."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_negated_government_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government",
+      "features": ["unicode"],
+      "text": "Nie widzę samochodu.",
+      "expected_findings": [],
+      "rationale": null
     }
   ]
 }

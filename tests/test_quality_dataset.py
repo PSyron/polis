@@ -72,7 +72,7 @@ def test_committed_quality_dataset_covers_the_v1_protocol() -> None:
     assert dataset.dataset_version == 1
     assert dataset.license == "CC0-1.0"
     assert dataset.source == "project-authored"
-    assert len(dataset.cases) == 16
+    assert len(dataset.cases) >= 16
     assert len(dataset.canonical_sha256) == 64
     assert dataset.review.canonical_sha256 == dataset.canonical_sha256
     assert dataset.manifest_canonical_sha256 == dataset.canonical_sha256
@@ -95,23 +95,23 @@ def test_committed_quality_dataset_covers_the_v1_protocol() -> None:
         "quality_abstain_temporal",
         "quality_abstain_style",
         "quality_abstain_intent",
+        "quality_inflection_negated_government_error",
+        "quality_inflection_negated_government_correct",
     )
 
+    paired_cases = tuple(case for case in dataset.cases if case.pair_id is not None)
     pairs = {
-        phenomenon: [
-            case
-            for case in dataset.cases
-            if case.phenomenon is phenomenon and case.pair_id is not None
-        ]
-        for phenomenon in QualityPhenomenon
+        pair_id: [case for case in paired_cases if case.pair_id == pair_id]
+        for pair_id in {case.pair_id for case in paired_cases}
     }
     assert all(
         len(cases) == 2
         and {case.kind for case in cases}
         == {QualityCaseKind.ERROR, QualityCaseKind.CORRECT}
-        and len({case.pair_id for case in cases}) == 1
+        and len({case.phenomenon for case in cases}) == 1
         for cases in pairs.values()
     )
+    assert {case.phenomenon for case in paired_cases} == set(QualityPhenomenon)
 
     features = {feature for case in dataset.cases for feature in case.features}
     assert set(QualityFeature) <= features

@@ -83,8 +83,12 @@ def test_quality_report_load_rejects_foreign_dataset_identity(
 
 
 def test_quality_report_json_rejects_more_correct_cases_than_dataset_cases() -> None:
-    counts = replace(_result().baseline.aggregate, correct_cases=17)
-    result = replace(_result(), baseline=replace(_result().baseline, aggregate=counts))
+    valid = _result()
+    counts = replace(
+        valid.baseline.aggregate,
+        correct_cases=valid.baseline.dataset_cases + 1,
+    )
+    result = replace(valid, baseline=replace(valid.baseline, aggregate=counts))
 
     with pytest.raises(QualityReportError, match="counts are inconsistent"):
         quality_report_json(result)
@@ -98,8 +102,13 @@ def test_quality_report_load_rejects_more_correct_cases_than_dataset_cases(
     assert isinstance(quality, dict)
     counts = quality["counts"]
     assert isinstance(counts, dict)
-    counts["correct_cases"] = 17
-    quality["false_alarm_rate"] = 1 / 17
+    dataset = payload["dataset"]
+    assert isinstance(dataset, dict)
+    dataset_cases = dataset["cases"]
+    assert isinstance(dataset_cases, int)
+    invalid_correct_cases = dataset_cases + 1
+    counts["correct_cases"] = invalid_correct_cases
+    quality["false_alarm_rate"] = 1 / invalid_correct_cases
     baseline = tmp_path / "impossible-counts.json"
     _write_proposal(baseline, payload)
 

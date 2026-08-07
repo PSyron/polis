@@ -41,7 +41,7 @@ def test_pending_dataset_fails_closed_without_creating_report(
     assert result == 2
     assert capsys.readouterr().err == (
         "error: quality dataset requires completed maintainer review "
-        "(status=pending_maintainer_review, reviewed=0/16)\n"
+        f"(status=pending_maintainer_review, reviewed=0/{len(pending.cases)})\n"
     )
     assert not output.exists()
 

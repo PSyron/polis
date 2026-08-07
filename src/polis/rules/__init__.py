@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
 from polis.rules.agreement import AgreementCopulaRule
+from polis.rules.inflection import InflectionNegatedWidziecRule
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingWlasnieRule,
@@ -182,6 +183,7 @@ __all__ = [
     "SpellingZebyRule",
     "TypoSpellingRule",
     "AgreementCopulaRule",
+    "InflectionNegatedWidziecRule",
     "SyntaxCommaSpacingRule",
     "SyntaxListSpacingRule",
     "SyntaxMissingCorrelativeRule",

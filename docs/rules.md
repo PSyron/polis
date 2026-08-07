@@ -5,6 +5,7 @@
 | Źródło | Kategoria | Zakres |
 | --- | --- | --- |
 | `rule:agreement.copula` | `agreement` | lokalna niezgodność łącznika w ograniczonych wzorcach zaimka i czasownika |
+| `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
@@ -15,7 +16,7 @@
 | `rule:syntax.quote_space` | `punctuation` | brakująca spacja po otwierającym cudzysłowie |
 | `rule:syntax.sentence_space` | `punctuation` | brakująca spacja po kropce na granicy zdania |
 
-Reguły `rule:syntax.missing_correlative` i
+Reguły `rule:inflection.negated_widziec`, `rule:syntax.missing_correlative` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
 pozostają do przeglądu. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości `(source, category, operation, behavior_version,

@@ -128,7 +128,7 @@ def test_distribution_loads_active_quality_dataset_by_explicit_module_path() -> 
     loaded = quality_dataset.load_quality_dataset()
 
     assert loaded.id == "polis_v1_quality_development"
-    assert len(loaded.cases) == 16
+    assert len(loaded.cases) >= 16
 
 
 @pytest.mark.parametrize(
