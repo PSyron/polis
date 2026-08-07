@@ -61,6 +61,10 @@ Każdy śledzony plik Markdown musi otrzymać jedną efektywną dyspozycję:
   ścieżki zapisane w inwentarzu.
 - Zużyte holdouty, zamrożone raporty, manifesty, digesty i dowody wydania nie są
   modyfikowane, ponownie uruchamiane ani reinterpretowane przez migrację języka.
+- `src/polis/evaluation/datasets/quality/` zawiera aktywne, edytowalne dane
+  produktu i nie jest klasyfikowane jako zamrożony dowód badawczy. Pozostałe
+  zbiory ewaluacyjne zachowują ochronę wynikającą z dokładnych wpisów
+  inwentarza.
 - Tłumaczenie nie zmienia kodu, API, source policy, progów jakości ani zawartości
   pakietów poza dokumentami jawnie objętymi danym issue.
 

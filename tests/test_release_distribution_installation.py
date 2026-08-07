@@ -16,6 +16,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PREPARE = ROOT / "scripts/prepare_build_wheelhouse.py"
 VERIFY_INSTALL = ROOT / "scripts/verify_distribution_install.py"
+VERIFY_ARTIFACTS = ROOT / "scripts/verify_distribution_artifacts.py"
 EXPECTED_PACKAGES = {
     "hatchling": "1.31.0",
     "packaging": "26.2",
@@ -76,6 +77,104 @@ def _empty_smoke_cwd(base: Path) -> Path:
     smoke_cwd = base / "smoke-cwd"
     smoke_cwd.mkdir(exist_ok=True)
     return smoke_cwd
+
+
+def _remove_distribution_member(dist: Path, member: str) -> None:
+    wheel = next(dist.glob("*.whl"))
+    changed_wheel = dist / "changed.whl"
+    with (
+        zipfile.ZipFile(wheel) as original,
+        zipfile.ZipFile(changed_wheel, "w") as changed,
+    ):
+        for name in original.namelist():
+            if name != member.removeprefix("src/"):
+                changed.writestr(name, original.read(name))
+    wheel.unlink()
+    changed_wheel.rename(wheel)
+
+    sdist = next(dist.glob("*.tar.gz"))
+    changed_sdist = dist / "changed.tar.gz"
+    with (
+        tarfile.open(sdist) as original,
+        tarfile.open(changed_sdist, "w:gz") as changed,
+    ):
+        for archive_member in original.getmembers():
+            if archive_member.name.endswith(f"/{member}"):
+                continue
+            source = original.extractfile(archive_member)
+            changed.addfile(archive_member, source)
+    sdist.unlink()
+    changed_sdist.rename(sdist)
+
+
+def _add_distribution_member(dist: Path, member: str) -> None:
+    wheel = next(dist.glob("*.whl"))
+    changed_wheel = dist / "changed.whl"
+    with (
+        zipfile.ZipFile(wheel) as original,
+        zipfile.ZipFile(changed_wheel, "w") as changed,
+    ):
+        for name in original.namelist():
+            changed.writestr(name, original.read(name))
+        changed.writestr(member.removeprefix("src/"), b"unexpected\n")
+    wheel.unlink()
+    changed_wheel.rename(wheel)
+
+    sdist = next(dist.glob("*.tar.gz"))
+    changed_sdist = dist / "changed.tar.gz"
+    with (
+        tarfile.open(sdist) as original,
+        tarfile.open(changed_sdist, "w:gz") as changed,
+    ):
+        for archive_member in original.getmembers():
+            source = original.extractfile(archive_member)
+            changed.addfile(archive_member, source)
+        root = original.getnames()[0].split("/", 1)[0]
+        content = b"unexpected\n"
+        extra = tarfile.TarInfo(f"{root}/{member}")
+        extra.size = len(content)
+        changed.addfile(extra, BytesIO(content))
+    sdist.unlink()
+    changed_sdist.rename(sdist)
+
+
+@pytest.mark.parametrize(
+    "member",
+    (
+        pytest.param("src/polis/evaluation/quality_protocol.py", id="quality_module"),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v1/cases.json",
+            id="quality_cases",
+        ),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v1/manifest.json",
+            id="quality_manifest",
+        ),
+    ),
+)
+def test_distribution_artifact_verifier_rejects_missing_quality_members(
+    tmp_path: Path, member: str
+) -> None:
+    dist, _, _ = _prepare_release_inputs(tmp_path)
+    _remove_distribution_member(dist, member)
+
+    result = _run([sys.executable, str(VERIFY_ARTIFACTS), "--dist", str(dist)])
+
+    assert result.returncode != 0
+    assert f"missing package member: {member}" in result.stderr
+
+
+def test_distribution_artifact_verifier_rejects_unexpected_quality_member(
+    tmp_path: Path,
+) -> None:
+    dist, _, _ = _prepare_release_inputs(tmp_path)
+    member = "src/polis/evaluation/quality_unapproved.py"
+    _add_distribution_member(dist, member)
+
+    result = _run([sys.executable, str(VERIFY_ARTIFACTS), "--dist", str(dist)])
+
+    assert result.returncode != 0
+    assert f"wheel member outside release surface: {member}" in result.stderr
 
 
 def _replace_evaluation_exports(dist: Path, replacement: str) -> None:

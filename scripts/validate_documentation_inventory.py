@@ -55,6 +55,7 @@ _EVIDENCE_ROOTS: Final[tuple[str, ...]] = (
     "src/polis/evaluation/",
     "third_party/languagetool-pl/",
 )
+_ACTIVE_PRODUCT_DATA_PREFIX: Final[str] = "src/polis/evaluation/datasets/quality/"
 _EVIDENCE_FILENAMES: Final[frozenset[str]] = frozenset(
     {
         "README.md",
@@ -216,6 +217,8 @@ def _required_protected_disposition(path: str) -> str | None:
         return "retain_historical_evidence"
     if path in _FROZEN_REVIEW_CHECKLISTS:
         return "retain_research_evidence"
+    if path.startswith(_ACTIVE_PRODUCT_DATA_PREFIX):
+        return None
     if not path.startswith(_EVIDENCE_ROOTS):
         return None
     filename = path.rsplit("/", maxsplit=1)[-1]

@@ -10,6 +10,7 @@ from typing import Any
 from urllib.parse import unquote
 
 import pytest
+import scripts.validate_documentation_inventory as validator
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "validate_documentation_inventory.py"
@@ -27,6 +28,7 @@ EVIDENCE_ROOTS = (
     "src/polis/evaluation/",
     "third_party/languagetool-pl/",
 )
+ACTIVE_PRODUCT_DATA_PREFIX = "src/polis/evaluation/datasets/quality/"
 PROTECTED_EVIDENCE_FILENAMES = frozenset(
     {
         "README.md",
@@ -402,6 +404,24 @@ def _protected_exact_paths(inventory: dict[str, Any]) -> set[str]:
     }
 
 
+@pytest.mark.parametrize(
+    "path",
+    (
+        "src/polis/evaluation/datasets/quality/v1/cases.json",
+        "src/polis/evaluation/datasets/quality/v1/manifest.json",
+    ),
+)
+def test_active_quality_dataset_is_not_protected_research_evidence(path: str) -> None:
+    assert validator._required_protected_disposition(path) is None
+
+
+def test_historical_evaluation_case_remains_protected() -> None:
+    path = "src/polis/evaluation/datasets/unlisted-history/cases.json"
+    assert validator._required_protected_disposition(path) == (
+        "retain_research_evidence"
+    )
+
+
 def test_repository_markdown_inventory_is_complete() -> None:
     result = _run_validator(ROOT, INVENTORY)
 
@@ -460,9 +480,12 @@ def test_production_inventory_uses_exact_evidence_paths_before_removable_trees()
     tracked_candidates = {
         path
         for path in _tracked_paths(*EVIDENCE_ROOTS)
-        if Path(path).name in PROTECTED_EVIDENCE_FILENAMES
-        or Path(path).name.startswith("frozen_")
-        and Path(path).suffix == ".json"
+        if not path.startswith(ACTIVE_PRODUCT_DATA_PREFIX)
+        and (
+            Path(path).name in PROTECTED_EVIDENCE_FILENAMES
+            or Path(path).name.startswith("frozen_")
+            and Path(path).suffix == ".json"
+        )
     }
     historical_paths = (
         _tracked_paths("docs/architecture/decisions/")

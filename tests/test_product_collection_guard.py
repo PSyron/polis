@@ -12,6 +12,8 @@ _research_only_references = cast(
     sys.modules["conftest"].__dict__["_research_only_references"],
 )
 
+QUALITY_MODULE_PATTERNS = ("_quality_*.py", "quality_*.py")
+
 
 def _references_for(tmp_path: Path, source: str) -> str:
     path = tmp_path / f"test_guard_probe_{abs(hash(source))}.py"
@@ -74,6 +76,36 @@ def test_policy_mentions_research_fixture_path():
     )
 
     assert reasons == ""
+
+
+def test_all_quality_modules_stay_inside_the_product_boundary() -> None:
+    evaluation_root = Path(__file__).resolve().parents[1] / "src/polis/evaluation"
+    quality_modules = sorted(
+        {
+            path
+            for pattern in QUALITY_MODULE_PATTERNS
+            for path in evaluation_root.glob(pattern)
+        }
+    )
+
+    assert {path.name for path in quality_modules} >= {
+        "_quality_parsing.py",
+        "_quality_rules.py",
+        "_quality_types.py",
+        "quality_dataset.py",
+        "quality_protocol.py",
+        "quality_report.py",
+        "quality_report_baseline.py",
+        "quality_report_models.py",
+        "quality_report_proposal.py",
+        "quality_report_validation.py",
+        "quality_runner.py",
+    }
+    assert {
+        path.name: reasons
+        for path in quality_modules
+        if (reasons := _research_only_references(path))
+    } == {}
 
 
 def test_product_rules_exclude_orphaned_languagetool_runtime() -> None:
