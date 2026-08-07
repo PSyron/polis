@@ -7,6 +7,35 @@ from typing import Any, cast
 from polis import ANALYSIS_SCHEMA_VERSION, AnalysisResult, Analyzer, AnalyzerConfig
 from polis import __all__ as public_exports
 
+EXPECTED_PUBLIC_EXPORTS = (
+    "ANALYSIS_SCHEMA_VERSION",
+    "Analyzer",
+    "AnalyzerConfig",
+    "CorrectionResult",
+    "SuggestionOutcome",
+    "SuggestionStatus",
+    "AnalysisOptions",
+    "AnalysisResult",
+    "Category",
+    "Confidence",
+    "PolisError",
+    "AnalysisTimeoutError",
+    "BackendUnavailableError",
+    "ConfigurationError",
+    "InvalidBackendResponseError",
+    "CorrectionSelectionError",
+    "UnknownFindingError",
+    "UncorrectableFindingError",
+    "CorrectionConflictError",
+    "Finding",
+    "Severity",
+    "Source",
+    "SourceKind",
+    "__version__",
+    "analysis_result_from_json",
+    "analysis_result_to_json",
+)
+
 EXPECTED_EVALUATION_EXPORTS = (
     "BaselineResult",
     "EvaluationDataset",
@@ -41,6 +70,10 @@ def test_public_api_snapshot_stability() -> None:
     assert sorted(public_exports) == expected
 
 
+def test_root_namespace_retains_the_exact_public_contract() -> None:
+    assert tuple(public_exports) == EXPECTED_PUBLIC_EXPORTS
+
+
 def test_schema_compatibility_constants_stay_stable() -> None:
     snapshot = _load_snapshot()
     assert snapshot["analysis_schema_version"] == ANALYSIS_SCHEMA_VERSION
@@ -71,3 +104,10 @@ def test_evaluation_namespace_retains_the_literal_1_0_contract() -> None:
     import polis.evaluation as evaluation
 
     assert tuple(evaluation.__all__) == EXPECTED_EVALUATION_EXPORTS
+
+
+def test_quality_runner_is_not_exported_from_public_namespaces() -> None:
+    import polis.evaluation as evaluation
+
+    assert "quality_runner" not in public_exports
+    assert "quality_runner" not in evaluation.__all__

@@ -1,0 +1,173 @@
+{
+  "schema_id": "polis.quality-development-dataset",
+  "schema_version": 1,
+  "id": "polis_v1_quality_development",
+  "dataset_version": 1,
+  "license": "CC0-1.0",
+  "source": "project-authored",
+  "cases": [
+    {
+      "id": "quality_inflection_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection",
+      "features": ["unicode"],
+      "text": "Przyglądam się nowy budynek.",
+      "expected_findings": [{"category": "inflection", "start": 15, "end": 27, "original": "nowy budynek", "suggestion": "nowemu budynkowi", "rationale": "Po czasowniku „przyglądać się” potrzebny jest celownik."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection",
+      "features": ["unicode"],
+      "text": "Przyglądam się nowemu budynkowi.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_rection_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "pair_rection",
+      "features": [],
+      "text": "Potrzebuję pomoc.",
+      "expected_findings": [{"category": "inflection", "start": 11, "end": 16, "original": "pomoc", "suggestion": "pomocy", "rationale": "Czasownik „potrzebować” łączy się z dopełniaczem."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_rection_correct",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "pair_rection",
+      "features": [],
+      "text": "Potrzebuję pomocy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement",
+      "features": [],
+      "text": "Ta dziecko śpi.",
+      "expected_findings": [{"category": "agreement", "start": 0, "end": 2, "original": "Ta", "suggestion": "To", "rationale": "Zaimek powinien mieć rodzaj nijaki zgodny z rzeczownikiem „dziecko”."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement",
+      "features": [],
+      "text": "To dziecko śpi.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_spelling_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling",
+      "features": ["unicode"],
+      "text": "Napewno przyjdę.",
+      "expected_findings": [{"category": "spelling", "start": 0, "end": 7, "original": "Napewno", "suggestion": "Na pewno", "rationale": "Wyrażenie „na pewno” zapisuje się rozdzielnie."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_spelling_correct",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling",
+      "features": ["unicode"],
+      "text": "Na pewno przyjdę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax",
+      "features": ["multi_sentence", "unicode"],
+      "text": "Chcę żebyś wrócił. Potem porozmawiamy.",
+      "expected_findings": [{"category": "syntax", "start": 4, "end": 4, "original": "", "suggestion": ",", "rationale": "Zdanie podrzędne wprowadzone przez „żeby” wymaga przecinka."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax",
+      "features": ["multi_sentence", "unicode"],
+      "text": "Chcę, żebyś wrócił. Potem porozmawiamy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_punctuation_error",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation",
+      "features": [],
+      "text": "Pada deszcz ale idziemy.",
+      "expected_findings": [{"category": "punctuation", "start": 11, "end": 11, "original": "", "suggestion": ",", "rationale": "Przed spójnikiem przeciwstawnym „ale” należy postawić przecinek."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_punctuation_correct",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation",
+      "features": [],
+      "text": "Pada deszcz, ale idziemy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_overlapping_conflict",
+      "kind": "conflict",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": ["conflict", "unicode"],
+      "text": "Te dziecko przyszło.",
+      "expected_findings": [
+        {"category": "agreement", "start": 0, "end": 2, "original": "Te", "suggestion": "To", "rationale": "Zaimek powinien mieć rodzaj nijaki."},
+        {"category": "agreement", "start": 0, "end": 10, "original": "Te dziecko", "suggestion": "To dziecko", "rationale": "Cała grupa nominalna zawiera błąd zgodności."}
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_abstain_temporal",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": ["abstention", "unicode"],
+      "text": "W przyszłym tygodniu byłem już gotowy.",
+      "expected_findings": [],
+      "rationale": "Ocena zgodności czasu wymaga znajomości zamierzonej perspektywy autora, więc zbiór nie oczekuje korekty."
+    },
+    {
+      "id": "quality_abstain_style",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": ["abstention", "multi_sentence"],
+      "text": "Raport przygotowano starannie. Jego układ jest jednak nietypowy.",
+      "expected_findings": [],
+      "rationale": "Nietypowy układ wypowiedzi jest kwestią stylu, a nie bezpieczną korektą językową."
+    },
+    {
+      "id": "quality_abstain_intent",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": ["abstention", "unicode"],
+      "text": "Marta poprosiła Olę, żeby później zadzwoniła.",
+      "expected_findings": [],
+      "rationale": "Rozstrzygnięcie, która osoba ma zadzwonić, wymaga wiedzy o intencji autora."
+    }
+  ]
+}

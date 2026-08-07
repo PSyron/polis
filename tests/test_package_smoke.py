@@ -31,6 +31,19 @@ from polis import (
         "polis.core",
         "polis.correction",
         "polis.evaluation",
+        "polis.evaluation._quality_parsing",
+        "polis.evaluation._quality_rules",
+        "polis.evaluation._quality_types",
+        "polis.evaluation.datasets.quality",
+        "polis.evaluation.datasets.quality.v1",
+        "polis.evaluation.quality_dataset",
+        "polis.evaluation.quality_protocol",
+        "polis.evaluation.quality_report",
+        "polis.evaluation.quality_report_baseline",
+        "polis.evaluation.quality_report_models",
+        "polis.evaluation.quality_report_proposal",
+        "polis.evaluation.quality_report_validation",
+        "polis.evaluation.quality_runner",
         "polis.rules",
         "polis.segmentation",
     ],
@@ -107,6 +120,15 @@ def test_distribution_retains_evaluation_namespace_helpers() -> None:
 
     assert loaded.cases
     assert validated.id == "package_boundary"
+
+
+def test_distribution_loads_active_quality_dataset_by_explicit_module_path() -> None:
+    quality_dataset = import_module("polis.evaluation.quality_dataset")
+
+    loaded = quality_dataset.load_quality_dataset()
+
+    assert loaded.id == "polis_v1_quality_development"
+    assert len(loaded.cases) == 16
 
 
 @pytest.mark.parametrize(

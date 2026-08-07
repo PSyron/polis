@@ -134,7 +134,8 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     assert any(
         name == "polis/evaluation/datasets/v1/cases.json" for name in wheel_names
     )
-    assert len(EXPECTED_SOURCE_MEMBERS) == 26
+    assert EXPECTED_SOURCE_MEMBERS == artifact_verifier.EXPECTED_SOURCE_MEMBERS
+    assert len(EXPECTED_SOURCE_MEMBERS) == 41
 
 
 def _mutate_wheel(
