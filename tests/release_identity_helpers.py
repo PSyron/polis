@@ -67,9 +67,10 @@ def _candidate_command(
     remote: Path,
     state: str,
     version: str = "0.2.0",
+    repo: Path = ROOT,
 ) -> list[str]:
     source_commit = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
     ).strip()
     return [
         sys.executable,
@@ -81,6 +82,8 @@ def _candidate_command(
         source_commit,
         "--state",
         state,
+        "--repo",
+        str(repo),
         "--remote",
         str(remote),
         "--github-repo",
@@ -88,6 +91,29 @@ def _candidate_command(
         "--package-index-url",
         f"{server.base_url}/pypi/polis-nlp/json",
     ]
+
+
+def _candidate_absent_checkout(tmp_path: Path) -> Path:
+    checkout = tmp_path / "checkout"
+    cloned = subprocess.run(
+        ["git", "clone", "--quiet", "--no-local", str(ROOT), str(checkout)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert cloned.returncode == 0, cloned.stderr
+    removed = subprocess.run(
+        ["git", "tag", "--delete", "v0.2.0"],
+        cwd=checkout,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert removed.returncode == 0, removed.stderr
+    tags = subprocess.check_output(["git", "tag", "--list"], cwd=checkout, text=True)
+    assert "v0.1.0" in tags.splitlines()
+    assert "v0.2.0" not in tags.splitlines()
+    return checkout
 
 
 def _empty_remote(tmp_path: Path) -> Path:

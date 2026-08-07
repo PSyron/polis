@@ -92,9 +92,9 @@ def test_release_workflow_rejects_malformed_yaml(tmp_path: Path) -> None:
         ),
         (
             "      - name: Verify the existing build and write its manifest\n"
-            "        run:",
+            "        env:",
             "      - name: Verify the existing build and write its manifest\n"
-            "        if: false\n        run:",
+            "        if: false\n        env:",
             "qualify steps",
         ),
         (

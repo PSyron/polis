@@ -32,7 +32,8 @@ def test_release_workflow_routes_recovery_through_the_protected_upload_job() -> 
     assert "recover_blocked:" not in workflow
     assert "inputs.mode == 'publish' || inputs.mode == 'recover'" in workflow
     assert "release_identity.py recovery-authority" in workflow
-    assert '--recovery-filename "${{ inputs.recovery_filename }}"' in workflow
+    assert "RECOVERY_FILENAME: ${{ inputs.recovery_filename }}" in workflow
+    assert '--recovery-filename "$RECOVERY_FILENAME"' in workflow
     assert (
         workflow.count(
             "pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33"

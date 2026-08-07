@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from tests.release_identity_helpers import (
     ROOT,
+    _candidate_absent_checkout,
     _candidate_command,
     _cli_environment,
     _empty_remote,
@@ -33,16 +34,21 @@ def test_candidate_cli_accepts_only_derived_publication_inputs() -> None:
     assert "--latest-published" not in result.stdout
 
 
+def test_candidate_fixture_starts_without_public_candidate_tag(
+    tmp_path: Path,
+) -> None:
+    source_tags = subprocess.check_output(["git", "tag", "--list"], cwd=ROOT, text=True)
+    assert "v0.1.0" in source_tags.splitlines()
+    assert "v0.2.0" in source_tags.splitlines()
+    checkout = _candidate_absent_checkout(tmp_path)
+    tags = subprocess.check_output(["git", "tag", "--list"], cwd=checkout, text=True)
+    assert "v0.1.0" in tags.splitlines()
+    assert "v0.2.0" not in tags.splitlines()
+
+
 def test_candidate_cli_rejects_an_existing_remote_tag(tmp_path: Path) -> None:
     remote = _empty_remote(tmp_path)
-    checkout = tmp_path / "checkout"
-    cloned = subprocess.run(
-        ["git", "clone", "--quiet", "--no-local", str(ROOT), str(checkout)],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert cloned.returncode == 0, cloned.stderr
+    checkout = _candidate_absent_checkout(tmp_path)
     tag = subprocess.run(
         ["git", "tag", "-a", "v0.2.0", "-m", "candidate tag"],
         cwd=checkout,
@@ -66,7 +72,12 @@ def test_candidate_cli_rejects_an_existing_remote_tag(tmp_path: Path) -> None:
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="candidate-absent"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="candidate-absent",
+                repo=checkout,
+            ),
             cwd=checkout,
             text=True,
             capture_output=True,
@@ -86,6 +97,7 @@ def test_candidate_observes_github_and_package_index_over_local_wire(
     tmp_path: Path,
 ) -> None:
     remote = _empty_remote(tmp_path)
+    checkout = _candidate_absent_checkout(tmp_path)
     routes = {
         "/repos/PSyron/polis/releases": [_HttpReply(200, b"[]")],
         "/pypi/polis-nlp/json": [_HttpReply(404, b"")],
@@ -93,7 +105,13 @@ def test_candidate_observes_github_and_package_index_over_local_wire(
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="candidate-absent"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="candidate-absent",
+                repo=checkout,
+            ),
+            cwd=checkout,
             text=True,
             capture_output=True,
             check=False,
@@ -109,6 +127,7 @@ def test_candidate_observes_github_and_package_index_over_local_wire(
 
 def test_candidate_cli_accepts_project_404_before_first_upload(tmp_path: Path) -> None:
     remote = _empty_remote(tmp_path)
+    checkout = _candidate_absent_checkout(tmp_path)
     routes = {
         "/repos/PSyron/polis/releases": [_HttpReply(200, b"[]")],
         "/pypi/polis-nlp/json": [_HttpReply(404, b"")],
@@ -116,7 +135,13 @@ def test_candidate_cli_accepts_project_404_before_first_upload(tmp_path: Path) -
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="candidate-absent"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="candidate-absent",
+                repo=checkout,
+            ),
+            cwd=checkout,
             text=True,
             capture_output=True,
             check=False,
@@ -136,6 +161,7 @@ def test_candidate_cli_fail_closes_on_project_index_status(
     tmp_path: Path, status: int
 ) -> None:
     remote = _empty_remote(tmp_path)
+    checkout = _candidate_absent_checkout(tmp_path)
     routes = {
         "/repos/PSyron/polis/releases": [_HttpReply(200, b"[]")],
         "/pypi/polis-nlp/json": [_HttpReply(status, b'{"releases": {}}')],
@@ -143,7 +169,13 @@ def test_candidate_cli_fail_closes_on_project_index_status(
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="candidate-absent"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="candidate-absent",
+                repo=checkout,
+            ),
+            cwd=checkout,
             text=True,
             capture_output=True,
             check=False,
@@ -163,6 +195,7 @@ def test_candidate_cli_fail_closes_on_invalid_github_response(
     tmp_path: Path, github_body: bytes
 ) -> None:
     remote = _empty_remote(tmp_path)
+    checkout = _candidate_absent_checkout(tmp_path)
     routes = {
         "/repos/PSyron/polis/releases": [_HttpReply(200, github_body)],
         "/pypi/polis-nlp/json": [_HttpReply(404, b"")],
@@ -170,7 +203,13 @@ def test_candidate_cli_fail_closes_on_invalid_github_response(
 
     with _wire_server(routes) as server:
         result = subprocess.run(
-            _candidate_command(server=server, remote=remote, state="candidate-absent"),
+            _candidate_command(
+                server=server,
+                remote=remote,
+                state="candidate-absent",
+                repo=checkout,
+            ),
+            cwd=checkout,
             text=True,
             capture_output=True,
             check=False,
