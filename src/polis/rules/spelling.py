@@ -151,8 +151,33 @@ class SpellingJestesRule(TypoSpellingRule):
         return "spelling-jestes/1.0"
 
 
+class SpellingNapewnoRule(TypoSpellingRule):
+    """Corrects ``napewno`` -> ``na pewno``."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.napewno",
+            typed="napewno",
+            corrected="na pewno",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "spelling-napewno/1.0"
+
+
 __all__ = [
     "SpellingJestesRule",
+    "SpellingNapewnoRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

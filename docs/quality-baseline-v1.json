@@ -1,7 +1,7 @@
 {
   "analyzer": "Analyzer(AnalyzerConfig())",
   "artifact": {
-    "sha256": "594628974b9b4e125963b8b1f648ce47e0f0e63f5f9d6f5f2cef8dfa49d8e2e6"
+    "sha256": "ae3ed1a9ce523b1180c603ebcf8566bc49cd58b06bf7e407fafb071f223ec480"
   },
   "dataset": {
     "cases": 22,
@@ -19,26 +19,26 @@
   "environment": {
     "package_version": "0.2.0",
     "platform_machine": "arm64",
-    "platform_release": "25.5.0",
+    "platform_release": "24.3.0",
     "platform_system": "Darwin",
-    "python_version": "3.14.3"
+    "python_version": "3.13.12"
   },
   "performance": {
     "latency_ns": {
-      "max": 22500,
-      "mean": 12570,
-      "min": 8958,
-      "p50": 11333,
-      "p95": 19000,
+      "max": 28583,
+      "mean": 16331,
+      "min": 10750,
+      "p50": 14625,
+      "p95": 24875,
       "sample_count": 110
     },
-    "peak_rss_bytes": 38207488,
+    "peak_rss_bytes": 34684928,
     "throughput": {
-      "cases_per_second": 79554.43729338447,
-      "code_points_per_second": 2119040.9206328774,
+      "cases_per_second": 61233.03288325199,
+      "code_points_per_second": 1631025.330435712,
       "measured_cases": 110,
       "measured_code_points": 2930,
-      "total_duration_ns": 1382701
+      "total_duration_ns": 1796416
     }
   },
   "quality": {
@@ -46,28 +46,28 @@
     "counts": {
       "alarmed_correct_cases": 0,
       "correct_cases": 12,
-      "correction_matches": 3,
+      "correction_matches": 4,
       "expected_findings": 11,
-      "false_negatives": 8,
+      "false_negatives": 7,
       "false_positives": 0,
-      "predicted_findings": 3,
-      "span_matches": 3,
-      "true_positives": 3
+      "predicted_findings": 4,
+      "span_matches": 4,
+      "true_positives": 4
     },
-    "f1": 0.42857142857142855,
+    "f1": 0.5333333333333333,
     "false_alarm_rate": 0.0,
     "precision": 1.0,
-    "recall": 0.2727272727272727,
-    "span_accuracy": 0.2727272727272727
+    "recall": 0.36363636363636365,
+    "span_accuracy": 0.36363636363636365
   },
   "reproducibility": {
     "measured_repetitions": 5,
     "repetition_hashes": [
-      "79f5fc3bfb5f5f7745a076ade2a34d901e8daf33c49a17cf4c7fdfdc146d615b",
-      "79f5fc3bfb5f5f7745a076ade2a34d901e8daf33c49a17cf4c7fdfdc146d615b",
-      "79f5fc3bfb5f5f7745a076ade2a34d901e8daf33c49a17cf4c7fdfdc146d615b",
-      "79f5fc3bfb5f5f7745a076ade2a34d901e8daf33c49a17cf4c7fdfdc146d615b",
-      "79f5fc3bfb5f5f7745a076ade2a34d901e8daf33c49a17cf4c7fdfdc146d615b"
+      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
+      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
+      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
+      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32",
+      "5e9175fd3273aff80f6cd5de74e554684a59354abf928f9856d088ecb8559b32"
     ],
     "stable_repetitions": 5,
     "warmup_repetitions": 1

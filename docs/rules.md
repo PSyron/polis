@@ -7,6 +7,7 @@
 | `rule:agreement.copula` | `agreement` | lokalna niezgodność łącznika w ograniczonych wzorcach zaimka i czasownika |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
+| `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
@@ -21,10 +22,11 @@
 Reguły `rule:inflection.negated_widziec`, `rule:syntax.initial_conditional_comma`,
 `rule:syntax.missing_correlative`, `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
-pozostają do przeglądu. Pozostałe źródła mogą zostać zastosowane automatycznie
-tylko po sprawdzeniu pełnej tożsamości `(source, category, operation, behavior_version,
-source_policy_version)` przez politykę `1.2`. Sama kategoria ani pewność nie
-nadaje uprawnienia.
+pozostają do przeglądu. `rule:spelling.napewno` również pozostaje wyłącznie do
+przeglądu, dopóki osobne issue nie zakwalifikuje jego dokładnego klucza polityki
+`(source, category, operation, behavior_version, source_policy_version)`. Pozostałe
+źródła mogą zostać zastosowane automatycznie tylko po sprawdzeniu pełnej
+tożsamości przez politykę `1.2`. Sama kategoria ani pewność nie nadaje uprawnienia.
 
 ## Zasady bezpieczeństwa
 

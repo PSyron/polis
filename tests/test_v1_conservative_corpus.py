@@ -11,7 +11,7 @@ from polis import Analyzer, AnalyzerConfig, CorrectionConflictError, Finding
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "v1" / "conservative_corrections.json"
 
-RULE_SOURCES = frozenset(
+FROZEN_V1_RULE_SOURCES = frozenset(
     {
         "rule:agreement.copula",
         "rule:spelling.zeby",
@@ -115,7 +115,7 @@ def test_fixture_schema_rejects_duplicate_case_ids() -> None:
         _validate_cases(duplicate_cases)
 
 
-def test_fixture_covers_every_active_rule_with_error_and_close_negative() -> None:
+def test_fixture_covers_every_frozen_v1_rule_with_error_and_close_negative() -> None:
     cases = _load_cases()
 
     error_sources = {case["rule_source"] for case in cases if case["kind"] == "error"}
@@ -123,8 +123,8 @@ def test_fixture_covers_every_active_rule_with_error_and_close_negative() -> Non
         case["rule_source"] for case in cases if case["kind"] == "correct"
     }
 
-    assert RULE_SOURCES <= error_sources
-    assert RULE_SOURCES <= correct_sources
+    assert FROZEN_V1_RULE_SOURCES <= error_sources
+    assert FROZEN_V1_RULE_SOURCES <= correct_sources
 
 
 def test_fixture_captures_exact_runtime_findings_and_safe_application() -> None:
