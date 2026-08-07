@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from tests.test_quality_dataset import _raw_documents, _rebind_manifest
 
-from polis.evaluation.quality_dataset import validate_quality_dataset
+from polis.evaluation.quality_dataset import (
+    load_quality_dataset,
+    validate_quality_dataset,
+)
 
 
 def test_dataset_accepts_an_additional_reviewed_pair_for_existing_phenomenon() -> None:
@@ -51,4 +54,4 @@ def test_dataset_accepts_an_additional_reviewed_pair_for_existing_phenomenon() -
     dataset = validate_quality_dataset(raw, manifest)
 
     # Then
-    assert len(dataset.cases) == 20
+    assert len(dataset.cases) == len(load_quality_dataset().cases) + 2

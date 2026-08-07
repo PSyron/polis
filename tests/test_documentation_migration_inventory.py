@@ -116,6 +116,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:syntax.comma_space",
     "rule:syntax.list_space",
     "rule:syntax.missing_correlative",
+    "rule:syntax.missing_destination_preposition",
     "rule:syntax.missing_reflexive",
     "rule:syntax.quote_space",
     "rule:syntax.sentence_space",

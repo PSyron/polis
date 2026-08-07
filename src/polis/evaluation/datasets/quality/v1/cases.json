@@ -188,6 +188,26 @@
       "text": "Nie widzę samochodu.",
       "expected_findings": [],
       "rationale": null
+    },
+    {
+      "id": "quality_syntax_destination_preposition_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_destination_preposition",
+      "features": ["unicode"],
+      "text": "Pojechałem Warszawy.",
+      "expected_findings": [{"category": "syntax", "start": 11, "end": 11, "original": "", "suggestion": "do ", "rationale": "W zatwierdzonej zamkniętej konstrukcji przed nazwą celu podróży brakuje przyimka „do”."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_destination_preposition_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_destination_preposition",
+      "features": ["unicode"],
+      "text": "Pojechałem do Warszawy.",
+      "expected_findings": [],
+      "rationale": null
     }
   ]
 }
