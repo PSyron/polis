@@ -7,9 +7,9 @@ import pytest
 from polis import AnalysisOptions
 from polis.core import Category
 from polis.core.models import Severity
-from polis.rules._morfeusz_negated_widziec import (
-    _NegatedWidziecMorphology,
+from polis.rules._morfeusz import (
     _ProviderIdentity,
+    _QualifiedMorfeusz,
 )
 from polis.rules.inflection import InflectionNegatedWidziecNominalGroupRule
 
@@ -93,8 +93,8 @@ def _provider(
     package_version: str = "1.99.15",
     dictionary_id: str = "pl.sgjp.sgjp-2026.06.01",
     notice_sha256: str = _NOTICE_SHA256,
-) -> _NegatedWidziecMorphology:
-    return _NegatedWidziecMorphology(
+) -> _QualifiedMorfeusz:
+    return _QualifiedMorfeusz(
         backend=backend,
         identity=_ProviderIdentity(
             package_version=package_version,

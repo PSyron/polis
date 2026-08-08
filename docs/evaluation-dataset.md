@@ -94,12 +94,13 @@ zgadywać jednostkę.
 Baseline powstaje dopiero po przeglądzie danych i zamrożeniu zmian źródłowych.
 Należy zbudować wheel do świeżego katalogu, obliczyć SHA-256 jego surowych
 bajtów, zainstalować go bez indeksu w świeżym środowisku i uruchomić moduł ze
-świeżego pustego katalogu roboczego. Aktywny zbiór zawierający przypadek
-`rule:inflection.negated_widziec_nominal_group` mierzy finalny wheel wraz z
-dokładnym extra `morphology`; wheelhouse musi więc zawierać zarówno finalny
-wheel Polis, jak i przypięte koło `morfeusz2==1.99.15`. Instalacja domyślna bez
-tego extra pozostaje wspierana, lecz zgodnie z kontraktem reguły abstenuje i nie
-jest środowiskiem pomiaru tego aktywnego baseline'u.
+świeżego pustego katalogu roboczego. Aktywny zbiór zawierający przypadki
+`rule:inflection.negated_widziec_nominal_group` i
+`rule:agreement.nominal_group_te_duze_okno` mierzy finalny wheel wraz z dokładnym
+extra `morphology`; wheelhouse musi więc zawierać zarówno finalny wheel Polis,
+jak i przypięte koło `morfeusz2==1.99.15`. Instalacja domyślna bez tego extra
+pozostaje wspierana, lecz zgodnie z kontraktem tych reguł abstenuje i nie jest
+środowiskiem pomiaru tego aktywnego baseline'u.
 
 Przed pomiarem wyeksportuj z `uv.lock` wymagania dostawcy wraz z hashami:
 

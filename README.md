@@ -34,16 +34,18 @@ Do pracy deweloperskiej używaj przypiętego uv 0.11.2. Oficjalne instalatory to
 python -m pip install polis-nlp
 ```
 
-Domyślna instalacja pozostaje kompletnym runtime'em. Opcjonalny, lokalny
-konsument Morfeusz2 dla jednego zamkniętego wzorca wymaga osobnego extra:
+Domyślna instalacja pozostaje kompletnym runtime'em. Dwaj opcjonalni, lokalni
+konsumenci Morfeusz2 dla zamkniętych wzorców wymagają osobnego extra:
 
 ```console
 python -m pip install 'polis-nlp[morphology]'
 ```
 
 Po tej instalacji `Analyzer.analyze("Nie widzę czerwony samochód.")` zwraca
-jedną sugestię `czerwonego samochodu` do przeglądu. `Analyzer.correct()` nie
-stosuje jej automatycznie; można ją zastosować przez
+jedną sugestię `czerwonego samochodu`, a
+`Analyzer.analyze("Te duże okno jest otwarte.")` jedną sugestię `To`, zawsze
+do przeglądu. `Analyzer.correct()` nie stosuje ich automatycznie; można je
+zastosować przez
 `CorrectionResult.apply_suggestions()`. Brak dostawcy, dryft jego dokładnej
 tożsamości albo niejednoznaczny wynik oznacza abstencję bez częściowej sugestii.
 Obie instalacje działają bez sieci, modelu i procesu Java.

@@ -210,6 +210,26 @@
       "rationale": null
     },
     {
+      "id": "quality_agreement_nominal_group_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_nominal_group",
+      "features": ["unicode"],
+      "text": "Te duże okno jest otwarte.",
+      "expected_findings": [{"category": "agreement", "start": 0, "end": 2, "original": "Te", "suggestion": "To", "rationale": "W tej zamkniętej konstrukcji forma demonstratywna wymaga rodzaju nijakiego liczby pojedynczej."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_nominal_group_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_nominal_group",
+      "features": ["unicode"],
+      "text": "To duże okno jest otwarte.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
       "id": "quality_syntax_destination_preposition_error",
       "kind": "error",
       "phenomenon": "syntax",
