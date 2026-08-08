@@ -14,7 +14,10 @@ import scripts.verify_distribution_artifacts as artifact_verifier
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN = "morfeusz2==1.99.15"
-RUNTIME_MODULE = "src/polis/rules/_morfeusz.py"
+RUNTIME_MODULES = (
+    "src/polis/rules/_morfeusz.py",
+    "src/polis/rules/subject_verb.py",
+)
 
 
 def _build_distributions(tmp_path: Path) -> tuple[Path, Path]:
@@ -52,7 +55,7 @@ def test_optional_extra_keeps_default_runtime_dependency_free() -> None:
     assert PIN in extras["dev"]
 
 
-def test_distributions_declare_extra_and_include_private_consumer(
+def test_distributions_declare_extra_and_include_morphology_consumers(
     tmp_path: Path,
 ) -> None:
     # Given
@@ -76,9 +79,10 @@ def test_distributions_declare_extra_and_include_private_consumer(
     requirement = f"Requires-Dist: {PIN}; extra == 'morphology'"
     assert requirement in wheel_metadata
     assert requirement in sdist_metadata
-    assert RUNTIME_MODULE.removeprefix("src/") in wheel_names
-    assert any(name.endswith(f"/{RUNTIME_MODULE}") for name in sdist_names)
-    assert RUNTIME_MODULE in artifact_verifier.EXPECTED_SOURCE_MEMBERS
+    for runtime_module in RUNTIME_MODULES:
+        assert runtime_module.removeprefix("src/") in wheel_names
+        assert any(name.endswith(f"/{runtime_module}") for name in sdist_names)
+        assert runtime_module in artifact_verifier.EXPECTED_SOURCE_MEMBERS
 
 
 def test_clean_wheel_without_extra_abstains_offline(
@@ -119,8 +123,7 @@ def test_clean_wheel_without_extra_abstains_offline(
             "socket.socket.connect_ex = reject_network",
             "socket.create_connection = reject_network",
             "from polis.cli import run",
-            "raise SystemExit(run(['analyze', '--json', "
-            "'Nie widzę czerwony samochód.']))",
+            "raise SystemExit(run(['analyze', '--json', 'Oni czyta książkę.']))",
         )
     )
     clean_env = os.environ.copy()

@@ -65,6 +65,7 @@ EXPECTED_SOURCE_MEMBERS = tuple(
         "src/polis/rules/_morfeusz.py "
         "src/polis/rules/agreement.py "
         "src/polis/rules/inflection.py src/polis/rules/spelling.py "
+        "src/polis/rules/subject_verb.py "
         "src/polis/rules/syntax.py "
         "src/polis/segmentation/__init__.py"
     ).split()
