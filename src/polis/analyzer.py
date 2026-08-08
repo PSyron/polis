@@ -19,6 +19,7 @@ from polis.correction.policy import (
 from polis.rules import (
     AgreementCopulaRule,
     AgreementNominalGroupTeDuzeOknoRule,
+    AgreementSubjectVerbOniCzytaRule,
     AgreementTeZdanieRule,
     DeterministicRuleRegistry,
     InflectionNegatedWidziecNominalGroupRule,
@@ -332,6 +333,7 @@ def _make_default_registry() -> DeterministicRuleRegistry:
             RuleRegistration(rule=AgreementCopulaRule()),
             RuleRegistration(rule=AgreementTeZdanieRule()),
             RuleRegistration(rule=AgreementNominalGroupTeDuzeOknoRule(morphology)),
+            RuleRegistration(rule=AgreementSubjectVerbOniCzytaRule(morphology)),
             RuleRegistration(rule=InflectionNegatedWidziecRule()),
             RuleRegistration(rule=InflectionNegatedWidziecNominalGroupRule(morphology)),
             RuleRegistration(rule=SpellingJestesRule()),

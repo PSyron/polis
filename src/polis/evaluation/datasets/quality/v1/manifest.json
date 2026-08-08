@@ -3,7 +3,7 @@
   "schema_version": 1,
   "dataset_id": "polis_v1_quality_development",
   "dataset_version": 1,
-  "canonical_sha256": "75661245d3488b6485ec86d0f8233b0f1d200e88f6725d29bfd5e9616844396d",
+  "canonical_sha256": "152f7e23e5e56f299fc35e5acbb515515a855ee5925664e6b0a5179380984a2e",
   "review": {
     "status": "maintainer-reviewed",
     "reviewer_role": "Polis maintainer",
@@ -31,11 +31,13 @@
       "quality_inflection_negated_government_nominal_group_correct",
       "quality_agreement_nominal_group_error",
       "quality_agreement_nominal_group_correct",
+      "quality_agreement_subject_verb_error",
+      "quality_agreement_subject_verb_correct",
       "quality_syntax_destination_preposition_error",
       "quality_syntax_destination_preposition_correct",
       "quality_syntax_initial_conditional_comma_error",
       "quality_syntax_initial_conditional_comma_correct"
     ],
-    "canonical_sha256": "75661245d3488b6485ec86d0f8233b0f1d200e88f6725d29bfd5e9616844396d"
+    "canonical_sha256": "152f7e23e5e56f299fc35e5acbb515515a855ee5925664e6b0a5179380984a2e"
   }
 }

@@ -49,9 +49,10 @@ Manifest wiąże `dataset_id`, `dataset_version` i kanoniczny
 `1`. Sekcja `review` zapisuje `status`, `reviewer_role`, `checklist_version`,
 `reviewed_case_ids` oraz ten sam `canonical_sha256`. Bieżący status to
 `maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie przypadki w
-kolejności datasetu. Maintainer zatwierdził dokładnie ten zestaw przypadków,
-związany z hashem danych
-`facc333ce69c9e81db2ad30213ea2ac84b067fc02c2b78b5a4b3c9dfa2174649`.
+kolejności datasetu. Maintainer zatwierdził dokładnie ten 28-przypadkowy zestaw;
+jego bieżący hash kanoniczny to
+`152f7e23e5e56f299fc35e5acbb515515a855ee5925664e6b0a5179380984a2e`
+i jest zapisany jednocześnie w danych i manifeście.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 
@@ -96,7 +97,8 @@ Należy zbudować wheel do świeżego katalogu, obliczyć SHA-256 jego surowych
 bajtów, zainstalować go bez indeksu w świeżym środowisku i uruchomić moduł ze
 świeżego pustego katalogu roboczego. Aktywny zbiór zawierający przypadki
 `rule:inflection.negated_widziec_nominal_group` i
-`rule:agreement.nominal_group_te_duze_okno` mierzy finalny wheel wraz z dokładnym
+`rule:agreement.nominal_group_te_duze_okno` oraz
+`rule:agreement.subject_verb_oni_czyta` mierzy finalny wheel wraz z dokładnym
 extra `morphology`; wheelhouse musi więc zawierać zarówno finalny wheel Polis,
 jak i przypięte koło `morfeusz2==1.99.15`. Instalacja domyślna bez tego extra
 pozostaje wspierana, lecz zgodnie z kontraktem tych reguł abstenuje i nie jest

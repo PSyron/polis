@@ -24,10 +24,11 @@ wysyła wejścia poza proces.
 
 ## Opcjonalna morfologia
 
-Extra `polis-nlp[morphology]` instaluje Morfeusz2 1.99.15 wyłącznie dla
-zamkniętych sugestii `Nie widzę czerwony samochód.` →
-`Nie widzę czerwonego samochodu.` oraz `Te duże okno jest otwarte.` →
-`To duże okno jest otwarte.`. Obie pozostają do przeglądu. Dostawca analizuje
+Extra `polis-nlp[morphology]` instaluje Morfeusz2 1.99.15 wyłącznie dla trzech
+zamkniętych sugestii: `Nie widzę czerwony samochód.` →
+`Nie widzę czerwonego samochodu.`, `Te duże okno jest otwarte.` →
+`To duże okno jest otwarte.` oraz `Oni czyta książkę.` →
+`Oni czytają książkę.`. Wszystkie pozostają do przeglądu. Dostawca analizuje
 i generuje formy lokalnie; nie otwiera połączenia, nie pobiera słownika i nie
 uruchamia procesu Java.
 

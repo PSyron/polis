@@ -230,6 +230,26 @@
       "rationale": null
     },
     {
+      "id": "quality_agreement_subject_verb_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_subject_verb",
+      "features": ["unicode"],
+      "text": "Oni czyta książkę.",
+      "expected_findings": [{"category": "agreement", "start": 4, "end": 9, "original": "czyta", "suggestion": "czytają", "rationale": "W zatwierdzonej zamkniętej konstrukcji podmiot „Oni” wymaga liczby mnogiej czasownika."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_subject_verb_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_subject_verb",
+      "features": ["unicode"],
+      "text": "Oni czytają książkę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
       "id": "quality_syntax_destination_preposition_error",
       "kind": "error",
       "phenomenon": "syntax",
