@@ -10,6 +10,7 @@
 | `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
+| `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
@@ -28,11 +29,12 @@ Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:agreement.subject_verb_oni_czyta`,
 `rule:inflection.negated_widziec`,
 `rule:inflection.negated_widziec_nominal_group`,
+`rule:inflection.government_potrzebowac_pomoc`,
 `rule:syntax.initial_conditional_comma`, `rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
 pozostają do przeglądu. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
-oraz druga z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
+oraz druga i trzecia z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo
 niejednoznaczność kończy się abstencją. `rule:spelling.napewno` również pozostaje
@@ -40,6 +42,10 @@ wyłącznie do przeglądu, dopóki osobne issue nie zakwalifikuje jego dokładne
 klucza polityki `(source, category, operation, behavior_version,
 source_policy_version)`. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości przez politykę `1.2`.
+Reguła `rule:inflection.government_potrzebowac_pomoc` ma dokładną tożsamość
+zachowania `inflection-government-potrzebowac-pomoc/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393`
+i nie rozszerza rekcji na negację, przyimek, inne leksemy ani zdanie dłuższe od
+zatwierdzonej konstrukcji.
 `rule:syntax.duplicate_comma` również pozostaje
 wyłącznie do przeglądu, dopóki osobne issue nie zakwalifikuje dokładnego klucza
 polityki `(rule:syntax.duplicate_comma, punctuation, remove.duplicate_comma,
