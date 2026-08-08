@@ -84,6 +84,7 @@
         "docs/superpowers/plans/2026-08-04-issue-185-conservative-v1-cleanup.md",
         "docs/superpowers/plans/2026-08-07-quality-dataset-inventory-exception.md",
         "docs/superpowers/plans/2026-08-08-issue-237-quality-contract.md",
+        "docs/superpowers/plans/2026-08-08-issue-238-morfeusz2-qualification.md",
         "docs/superpowers/specs/2026-07-20-github-project-planning-design.md",
         "docs/superpowers/specs/2026-07-20-llm-assisted-polish-corpus-design.md",
         "docs/superpowers/specs/2026-07-20-real-local-llm-benchmark-design.md",
@@ -115,7 +116,8 @@
         "docs/superpowers/specs/2026-08-02-issue-146-sentence-safety-gate-v2-design.md",
         "docs/superpowers/specs/2026-08-04-issue-150-rule-catalog-contracts-design.md",
         "docs/superpowers/specs/2026-08-04-issue-185-conservative-v1-cleanup-design.md",
-        "docs/superpowers/specs/2026-08-07-quality-dataset-inventory-exception-design.md"
+        "docs/superpowers/specs/2026-08-07-quality-dataset-inventory-exception-design.md",
+        "docs/superpowers/specs/2026-08-08-issue-238-morfeusz2-qualification-design.md"
       ],
       "prefixes": []
     },
@@ -246,6 +248,16 @@
         "docs/evaluation-corpus-v3-review-checklist.md",
         "docs/evaluation-safety-corpus-v1-review-checklist.md",
         "docs/evaluation-safety-corpus-v2-review-checklist.md"
+      ],
+      "prefixes": []
+    },
+    {
+      "id": "morphology-provider-qualification-evidence",
+      "disposition": "retain_research_evidence",
+      "wave": "protected",
+      "paths": [
+        "docs/morphology-provider-qualification-reproduction-v1.json",
+        "docs/morphology-provider-qualification-v1.json"
       ],
       "prefixes": []
     },

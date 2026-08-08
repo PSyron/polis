@@ -1,0 +1,24 @@
+{
+  "schema_id": "polis.morphology-provider-qualification-manifest",
+  "schema_version": 1,
+  "dataset_id": "polis_v1_morphology_provider_qualification",
+  "dataset_version": 1,
+  "canonical_sha256": "6a1dfca36682ee7e5524ef7a97fbd1438ebc11c124916ee6f2154741ff7ce68b",
+  "review": {
+    "status": "independent-reviewed",
+    "reviewer_role": "independent language-data reviewer",
+    "checklist_version": "morphology-provider-qualification-v1",
+    "reviewed_case_ids": [
+      "inflection_pomoc_genitive",
+      "government_samochod_genitive",
+      "agreement_nowy_feminine",
+      "negative_pomocy_already_genitive",
+      "negative_samochodu_already_genitive",
+      "ambiguity_nowy_without_source_filter",
+      "unknown_xyzzyq",
+      "negative_pomoc_wrong_gender",
+      "negative_nowy_noun_not_adjective"
+    ],
+    "canonical_sha256": "6a1dfca36682ee7e5524ef7a97fbd1438ebc11c124916ee6f2154741ff7ce68b"
+  }
+}

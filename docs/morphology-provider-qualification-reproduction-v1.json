@@ -1,0 +1,28 @@
+{
+  "schema_id": "polis.morphology-provider-qualification-reproduction",
+  "schema_version": 1,
+  "command": "uv run --locked --extra dev python scripts/benchmark_morphology_provider.py --dataset tests/fixtures/v1/morphology_provider_qualification.json --output build/morphology-provider-qualification.json",
+  "dataset_canonical_sha256": "6a1dfca36682ee7e5524ef7a97fbd1438ebc11c124916ee6f2154741ff7ce68b",
+  "provider": {
+    "package_version": "1.99.15",
+    "dictionary_id": "pl.sgjp.sgjp-2026.06.01"
+  },
+  "runs": [
+    {
+      "ordinal": 1,
+      "exit_code": 0,
+      "verdict": "PASS",
+      "normalized_digest": "7f55d0c4e0223653081493281be853eeda71d8077199a08e3536464a22c8eb11",
+      "report_sha256": "2612bbf03b1274443d41d090d79978a423a571fb6eeb5967e017260bf7e1d7e9"
+    },
+    {
+      "ordinal": 2,
+      "exit_code": 0,
+      "verdict": "PASS",
+      "normalized_digest": "7f55d0c4e0223653081493281be853eeda71d8077199a08e3536464a22c8eb11",
+      "report_sha256": "2a24cbc5fa04369273fadd9313e1fb684d97d49d63dc1ec9e4c7b9f418264ffd"
+    }
+  ],
+  "normalized_digest_match": true,
+  "recorded_report_run": 2
+}
