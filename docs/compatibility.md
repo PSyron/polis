@@ -9,6 +9,13 @@ opisuje ADR-0001:
 - CPython 3.12, 3.14 w systemie macOS arm64;
 - CPython 3.12, 3.14 w systemie Windows x86_64.
 
+Domyślna instalacja `polis-nlp` nie ma zależności runtime. Opcjonalne
+`polis-nlp[morphology]` jest wspierane w tych samych rodzinach systemów tylko
+tam, gdzie istnieje natywne koło Morfeusz2 1.99.15: manylinux 2.28 x86_64,
+macOS 11 universal2 (w tym arm64) i Windows amd64. Dostawca publikuje koła
+`cp310-abi3`, lecz nie publikuje sdistu ani kół Linux arm64/musl. Brak
+zgodnego koła nie zmienia kompletności domyślnego runtime'u.
+
 Pośrednie PR-y kwalifikują tę samą, uniwersalną paczkę w Fast CI wyłącznie na
 macOS arm64 (CPython 3.12 i 3.14). Linux i Windows nie są osobnymi funkcjami
 produktu; wracają wyłącznie jako jednorazowe kontrole przenośności tych samych
@@ -43,7 +50,7 @@ Dowód z jednego systemu operacyjnego nie kwalifikuje innego.
 | Szybki zestaw deterministyczny i macierz wspieranych interpreterów | `.github/workflows/fast-ci.yml` | Pośrednie Fast CI na macOS; Linux i Windows w końcowej macierzy kwalifikacji wydania Todo 6 |
 | Granica procesu CLI dla UTF-8 i odziedziczonego CP1252 | `tests/test_cli.py` i `tests/test_release_distribution_installation.py` | Każda platforma szybkiego CI; czysta instalacja wheel i sdist powtarza kontrolę |
 | Efektywna polityka `text`/`eol` oraz stabilność bajtów i skrótów checkoutu | `tests/test_fast_ci_workflow.py` | Każda platforma szybkiego CI, w tym checkout skonfigurowany dla CRLF |
-| Dowód pracy z zablokowaną siecią | `tests/test_offline_verification.py` i `tests/test_privacy_dependency_audit.py` | Szybki runtime v1 nie podejmuje połączenia; testy wymuszają błąd sieci |
+| Dowód pracy z zablokowaną siecią | `tests/test_offline_verification.py`, `tests/test_privacy_dependency_audit.py` i `tests/test_morphology_inflection_runtime.py` | Szybki runtime v1 i opcjonalny konsument morfologii nie podejmują połączenia; testy wymuszają błąd sieci |
 | Izolowana instalacja artefaktów i właściwy dla platformy układ środowiska | `tests/test_release_distribution_installation.py` i `scripts/verify_distribution_install.py` | Wheel i sdist są instalowane w czystych środowiskach na każdej wspieranej platformie |
 
 Niedostępny dowód platformowy blokuje kwalifikację wydania, chyba że tabela

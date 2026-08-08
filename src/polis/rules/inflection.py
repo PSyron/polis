@@ -14,9 +14,18 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
+from polis.rules._morfeusz_negated_widziec import _NegatedWidziecMorphology
 
 _PATTERN: Final = re.compile(
     r"(?:(?:Nie|nie) widzę (?P<lower>samochód)|NIE WIDZĘ (?P<upper>SAMOCHÓD))\.\Z"
+)
+_NOMINAL_GROUP_PATTERN: Final = re.compile(
+    r"Nie widzę (?P<nominal_group>czerwony samochód)\.\Z"
+)
+_NOMINAL_GROUP_BEHAVIOR_VERSION: Final = (
+    "inflection-negated-widziec-nominal-group/1.0+"
+    "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
+    "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
 
 
@@ -71,4 +80,57 @@ class InflectionNegatedWidziecRule:
         )
 
 
-__all__ = ["InflectionNegatedWidziecRule"]
+class InflectionNegatedWidziecNominalGroupRule:
+    """Review one exact nominal-group error using qualified morphology."""
+
+    _CATEGORY = Category.INFLECTION
+
+    def __init__(self, provider: _NegatedWidziecMorphology | None) -> None:
+        self.source = Source(
+            SourceKind.RULE,
+            "inflection.negated_widziec_nominal_group",
+        )
+        self._provider = provider
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.negated_government_nominal_group"
+
+    @property
+    def behavior_version(self) -> str:
+        return _NOMINAL_GROUP_BEHAVIOR_VERSION
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        match = _NOMINAL_GROUP_PATTERN.fullmatch(text)
+        if match is None or self._provider is None:
+            return ()
+        replacement = self._provider.replacement("czerwony", "samochód")
+        if replacement != "czerwonego samochodu":
+            return ()
+        original = match.group("nominal_group")
+        return (
+            Finding.create(
+                category=self._CATEGORY,
+                severity=Severity.SUGGESTION,
+                message="Niepoprawna odmiana grupy nominalnej po zaprzeczeniu.",
+                explanation=(
+                    "W tej zamkniętej konstrukcji przymiotnik i rzeczownik "
+                    "wymagają dopełniacza."
+                ),
+                original=original,
+                suggestion=replacement,
+                start=match.start("nominal_group"),
+                end=match.end("nominal_group"),
+                confidence=self._confidence,
+                source=self.source,
+            ),
+        )
+
+
+__all__ = [
+    "InflectionNegatedWidziecNominalGroupRule",
+    "InflectionNegatedWidziecRule",
+]

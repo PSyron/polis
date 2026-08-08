@@ -97,6 +97,8 @@ def test_committed_quality_dataset_covers_the_v1_protocol() -> None:
         "quality_abstain_intent",
         "quality_inflection_negated_government_error",
         "quality_inflection_negated_government_correct",
+        "quality_inflection_negated_government_nominal_group_error",
+        "quality_inflection_negated_government_nominal_group_correct",
         "quality_syntax_destination_preposition_error",
         "quality_syntax_destination_preposition_correct",
         "quality_syntax_initial_conditional_comma_error",

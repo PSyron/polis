@@ -20,6 +20,7 @@ from polis.rules import (
     AgreementCopulaRule,
     AgreementTeZdanieRule,
     DeterministicRuleRegistry,
+    InflectionNegatedWidziecNominalGroupRule,
     InflectionNegatedWidziecRule,
     RuleRegistration,
     SpellingJestesRule,
@@ -35,6 +36,9 @@ from polis.rules import (
     SyntaxMissingReflexiveRule,
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
+)
+from polis.rules._morfeusz_negated_widziec import (
+    _load_qualified_negated_widziec_morphology,
 )
 
 __all__ = [
@@ -323,11 +327,13 @@ class Analyzer:
 def _make_default_registry() -> DeterministicRuleRegistry:
     """Compose the fixed conservative v1 rule set in public evaluation order."""
 
+    morphology = _load_qualified_negated_widziec_morphology()
     return DeterministicRuleRegistry(
         (
             RuleRegistration(rule=AgreementCopulaRule()),
             RuleRegistration(rule=AgreementTeZdanieRule()),
             RuleRegistration(rule=InflectionNegatedWidziecRule()),
+            RuleRegistration(rule=InflectionNegatedWidziecNominalGroupRule(morphology)),
             RuleRegistration(rule=SpellingJestesRule()),
             RuleRegistration(rule=SpellingNapewnoRule()),
             RuleRegistration(rule=SpellingWlasnieRule()),

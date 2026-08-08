@@ -262,18 +262,22 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
 ]
+morphology = [
+    { name = "morfeusz2" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.3.0" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.27.0" },
     { name = "morfeusz2", marker = "extra == 'dev'", specifier = "==1.99.15" },
+    { name = "morfeusz2", marker = "extra == 'morphology'", specifier = "==1.99.15" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=2.3.0" },
     { name = "packaging", marker = "extra == 'dev'", specifier = ">=26.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.0" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["morphology", "dev"]
 
 [[package]]
 name = "pygments"

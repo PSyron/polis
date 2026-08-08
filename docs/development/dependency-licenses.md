@@ -2,8 +2,8 @@
 
 - Data przeglądu: 2026-07-20
 - Właściciel: Paweł Cyroń
-- Zakres: pełny graf z `uv.lock` dla opcjonalnej grupy `dev`, w tym projekt
-  lokalny i backend budowania
+- Zakres: pełny graf z `uv.lock` dla opcjonalnych grup `dev` i `morphology`, w
+  tym projekt lokalny i backend budowania
 - Decyzja: zatwierdzono do użycia przy budowaniu i rozwoju z zachowaniem
   poniższych obowiązków
 
@@ -21,7 +21,7 @@ które potwierdzają tożsamość pakietu i opublikowane metadane licencji.
 | `librt` | 0.13.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/librt/0.13.0/json); przy redystrybucji zachowaj notę MIT. |
 | `mypy` | 2.3.0 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/mypy/2.3.0/json); przy redystrybucji zachowaj notę MIT. |
 | `mypy-extensions` | 1.1.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/mypy-extensions/1.1.0/json); przy redystrybucji zachowaj notę MIT. |
-| `morfeusz2` | 1.99.15 | BSD-2-Clause | bezpośrednia zależność deweloperska benchmarku #238 | [Metadane PyPI](https://pypi.org/pypi/morfeusz2/1.99.15/json) i [licencja dostawcy](https://morfeusz.sgjp.pl/doc/license/); zachowaj notę, warunki i wyłączenie odpowiedzialności programu oraz dołączonych danych fleksyjnych SGJP/Polimorf. Licencja nie obejmuje całego słownika gramatycznego SGJP. |
+| `morfeusz2` | 1.99.15 | BSD-2-Clause | bezpośrednia zależność extras `dev` i `morphology`; benchmark #238 oraz opcjonalny konsument #239 | [Metadane PyPI](https://pypi.org/pypi/morfeusz2/1.99.15/json) i [licencja dostawcy](https://morfeusz.sgjp.pl/doc/license/); zachowaj notę, warunki i wyłączenie odpowiedzialności programu oraz dołączonych danych fleksyjnych SGJP/Polimorf. Licencja nie obejmuje całego słownika gramatycznego SGJP. |
 | `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | zależność przechodnia build, Hatchling i pytest | [Metadane PyPI](https://pypi.org/pypi/packaging/26.2/json); złożone wyrażenie zatwierdzono w wariancie BSD-2-Clause. |
 | `pathspec` | 1.1.1 | MPL-2.0 | zależność przechodnia Hatchling i mypy | [Metadane PyPI](https://pypi.org/pypi/pathspec/1.1.1/json); osobna akceptacja wyłącznie dla niezmodyfikowanej zależności budowania i rozwoju. |
 | `pluggy` | 1.6.0 | MIT | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pluggy/1.6.0/json); przy redystrybucji zachowaj notę MIT. |
@@ -69,8 +69,9 @@ jako niezmodyfikowana zależność budowania i rozwoju, niedołączana do artefa
 Polis. Zmiana sprawdzonego wyrażenia, roli, wersji lub modelu redystrybucji
 wymaga nowego przeglądu.
 
-Morfeusz2 pozostaje przypiętym narzędziem wyłącznie grupy `dev`. Jego natywne
-koło, kod i dane nie trafiają do wheel ani sdist Polis. Przyjęcie dotyczy
-kwalifikacji dostawcy z issue #238; zależność produkcyjna albo redystrybucja
-wymaga osobnej decyzji, ponownego przeglądu platform i spełnienia obowiązków
-BSD-2-Clause.
+Morfeusz2 pozostaje dokładnie przypięty w grupie `dev` i opcjonalnym extra
+`morphology`; nie jest zależnością instalacji domyślnej. Jego natywne koło, kod
+i dane nie trafiają do wheel ani sdist Polis. Przyjęcie obejmuje kwalifikację
+dostawcy z issue #238 i jednego konsumenta review-only z issue #239. Szersze
+użycie albo redystrybucja wymaga osobnej decyzji, ponownego przeglądu platform
+i spełnienia obowiązków BSD-2-Clause.
