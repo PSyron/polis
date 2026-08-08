@@ -44,7 +44,10 @@ ADR_0023_MEMBER = "docs/architecture/decisions/0023-evaluation-namespace-1-0.md"
 EXPECTED_SOURCE_MEMBERS = tuple(
     path.relative_to(ROOT).as_posix()
     for path in sorted((ROOT / "src/polis").rglob("*"))
-    if path.is_file() and "__pycache__" not in path.parts
+    if path.is_file()
+    and "__pycache__" not in path.parts
+    and path != ROOT / "src/polis/evaluation/__main__.py"
+    and not path.name.startswith("holdout_")
 )
 
 
@@ -133,6 +136,18 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     assert any(name.endswith("/README.md") for name in sdist_names)
     assert any(
         name == "polis/evaluation/datasets/v1/cases.json" for name in wheel_names
+    )
+    assert not any(
+        name == "polis/evaluation/__main__.py"
+        or name.startswith("polis/evaluation/holdout_")
+        or name.startswith("experiments/a-b-one-shot/")
+        for name in wheel_names
+    )
+    assert not any(
+        name.endswith("/src/polis/evaluation/__main__.py")
+        or "/src/polis/evaluation/holdout_" in name
+        or "/experiments/a-b-one-shot/" in name
+        for name in sdist_names
     )
     assert EXPECTED_SOURCE_MEMBERS == artifact_verifier.EXPECTED_SOURCE_MEMBERS
     assert len(EXPECTED_SOURCE_MEMBERS) == 45

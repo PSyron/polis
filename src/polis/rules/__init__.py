@@ -64,6 +64,15 @@ class RuleRegistration:
             object.__setattr__(self, "categories", normalized_categories)
 
 
+@dataclass(frozen=True, slots=True)
+class RuleSourceIdentity:
+    """Immutable public identity of one composed deterministic source."""
+
+    source: str
+    operation: str
+    behavior_version: str
+
+
 class RuleRegistryError(ValueError):
     """Base error for rule registration and deterministic execution failures."""
 
@@ -115,6 +124,19 @@ class DeterministicRuleRegistry:
         """Return trusted registered behavior metadata for ``source`` if available."""
 
         return self._behaviors.get(source)
+
+    def source_identity_snapshot(self) -> tuple[RuleSourceIdentity, ...]:
+        """Return the composed versioned sources in deterministic public order."""
+
+        return tuple(
+            RuleSourceIdentity(
+                str(entry.rule.source),
+                entry.rule.operation,
+                entry.rule.behavior_version,
+            )
+            for entry in self._registrations
+            if isinstance(entry.rule, VersionedRule)
+        )
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Execute selected rules and validate their findings."""
@@ -213,5 +235,6 @@ __all__ = [
     "SyntaxQuoteSpacingRule",
     "SyntaxSentenceSpacingRule",
     "RuleRegistration",
+    "RuleSourceIdentity",
     "RuleRegistryError",
 ]

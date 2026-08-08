@@ -1,0 +1,32 @@
+{
+  "schema_id": "polis.a-b-one-shot.dataset-manifest",
+  "schema_version": 1,
+  "dataset_id": "polis-a-b-one-shot-v1",
+  "dataset_schema": "polis.a-b-one-shot.dataset/1",
+  "sha256": "a1f9b87dbfc89dc9283f652b56058fee995dabbb71902d642fb8efd576ea7b32",
+  "size_bytes": 17370,
+  "mode": "0600",
+  "case_count": 52,
+  "source_count": 20,
+  "expected_finding_count": 19,
+  "role_counts": {
+    "error": 14,
+    "correct": 27,
+    "abstain": 10,
+    "conflict": 1
+  },
+  "license": "CC0-1.0",
+  "provenance": "project-authored-independent-review",
+  "review": {
+    "reviewer_role": "independent-dataset-reviewer",
+    "verdict": "APPROVE",
+    "reviewed_case_count": 52,
+    "total_case_count": 52,
+    "reviewed_source_count": 20,
+    "review_manifest_sha256": "f58f7c81ee46cb25968ca84e1f0ce6a842b14181c6151f041a4f30225aab3e4d",
+    "review_payload_sha256": "f5312a257d634f240301dbdfe47fad3b0897e4a4e7f11f10af3a51df0a777cd0",
+    "analyzer_executed": false,
+    "protected_artifacts_used": false
+  },
+  "plaintext_in_repository": false
+}

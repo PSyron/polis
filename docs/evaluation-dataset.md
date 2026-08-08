@@ -164,3 +164,43 @@ Oczekująca propozycja w `docs/quality-threshold-proposal-v1.json` pozostaje
 związana byte-for-byte z tym baseline'em, ma
 `status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
 jakości ani dowodem zatwierdzenia przypadków.
+## Prerejestracja jednorazowego holdoutu A+B
+
+Eksperyment `polis-a-b-one-shot-v1` jest rozdzielony na dwa append-only pull
+requesty. Pierwszy zamraża kod wykonawczy, konfigurację i metadane niezależnie
+sprawdzonego zbioru CC0. Dopiero podpisane przez GitHub scalenie tego PR-a,
+odtwarzalny preflight i osobna zgoda powiązana z SHA mogą dopuścić jedną próbę.
+Drugi PR może opublikować wyłącznie niezmienne dowody konsumpcji i agregatowy
+wynik.
+
+Nowy runner nie zmienia zgodności publicznego modułu `polis.evaluation`,
+opisanej przez ADR-0019, ani granic zapisanych w manifeście archiwum v2.
+Funkcje `load_dataset` i `validate_dataset` zachowują dotychczasowe znaczenie.
+
+Runner sprawdza konfigurację, dokładne 20 tożsamości źródeł, skróty datasetu i
+status podpisu przed utworzeniem markera. Marker powstaje wyłącznie i trwale
+przed pierwszym dostępem do datasetu; plik oraz katalog nadrzędny są
+synchronizowane. Istniejący, częściowy albo niezgodny marker zawsze blokuje
+ponowienie.
+
+Zewnętrzne, nieśledzone dowody wejściowe mają zamrożone ścieżki
+`.omo/sealed/a-b-one-shot-v1/merge-verification.json` i
+`.omo/sealed/a-b-one-shot-v1/run-authorization.json`. Pierwszy wiąże bieżący
+commit i tree z surowym payloadem GitHub `verified=true`, `reason=valid`,
+podpisem, payloadem oraz jego kanonicznym SHA-256. Runner dodatkowo wykonuje
+offline `git verify-commit` dla dokładnego SHA. Ten plik jest atestacją
+zmaterializowaną przez zaufanego operatora po sprawdzeniu live API GitHub, a
+nie samodzielnym dowodem kryptograficznym.
+
+Drugi plik utrwala pełną tożsamość komentarza: repozytorium `PSyron/polis`,
+issue 243, identyfikator i dokładny URL komentarza, autora `PSyron`, czas
+późniejszy od pełnego preflightu oraz ciało z dokładnymi tokenami SHA źródła,
+konfiguracji i datasetu. Kanoniczny digest atestacji operatora obejmuje cały
+ten zapis. Zaufane materializowanie obu plików po weryfikacji live przez
+operatora stanowi granicę zaufania; runner podczas wykonania nie używa sieci.
+Prerejestracja celowo nie zapisuje przyszłych wartości tych pól.
+
+Raport surowy dopuszcza jedynie agregaty jakości, wydajności, środowiska i
+wyniki per źródło. Raport znormalizowany pomija dane czasowe, RSS i dane hosta,
+dzięki czemu rebuild ma kanoniczne, stabilne bajty. Oba schematy odrzucają pola
+z tekstem przypadku, goldem, sugestią lub prywatną ścieżką.
