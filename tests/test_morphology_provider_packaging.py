@@ -14,4 +14,4 @@ def test_morfeusz_is_optional_and_not_a_default_dependency() -> None:
     assert project["project"]["optional-dependencies"]["morphology"] == [
         "morfeusz2==1.99.15"
     ]
-    assert (ROOT / "src/polis/rules/_morfeusz_negated_widziec.py").is_file()
+    assert (ROOT / "src/polis/rules/_morfeusz.py").is_file()

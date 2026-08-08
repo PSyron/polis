@@ -7,7 +7,11 @@ from dataclasses import dataclass
 
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
-from polis.rules.agreement import AgreementCopulaRule, AgreementTeZdanieRule
+from polis.rules.agreement import (
+    AgreementCopulaRule,
+    AgreementNominalGroupTeDuzeOknoRule,
+    AgreementTeZdanieRule,
+)
 from polis.rules.inflection import (
     InflectionNegatedWidziecNominalGroupRule,
     InflectionNegatedWidziecRule,
@@ -191,6 +195,7 @@ __all__ = [
     "SpellingZebyRule",
     "TypoSpellingRule",
     "AgreementCopulaRule",
+    "AgreementNominalGroupTeDuzeOknoRule",
     "AgreementTeZdanieRule",
     "InflectionNegatedWidziecNominalGroupRule",
     "InflectionNegatedWidziecRule",

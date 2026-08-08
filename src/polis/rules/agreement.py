@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import Final
 
 from polis.core import (
     AnalysisOptions,
@@ -13,6 +14,16 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
+from polis.rules._morfeusz import _QualifiedMorfeusz
+
+_NOMINAL_GROUP_TE_DUZE_OKNO_PATTERN: Final = re.compile(
+    r"Te duże okno jest otwarte\.\Z"
+)
+_NOMINAL_GROUP_TE_DUZE_OKNO_BEHAVIOR_VERSION: Final = (
+    "agreement-nominal-group-te-duze-okno/1.0+"
+    "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
+    "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+)
 
 
 class AgreementCopulaRule:
@@ -130,6 +141,52 @@ class AgreementTeZdanieRule:
         return tuple(findings)
 
 
+class AgreementNominalGroupTeDuzeOknoRule:
+    """Review one exact demonstrative error using qualified morphology."""
+
+    _CATEGORY = Category.AGREEMENT
+
+    def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
+        self.source = Source(SourceKind.RULE, "agreement.nominal_group_te_duze_okno")
+        self._provider = provider
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.demonstrative_neuter_form"
+
+    @property
+    def behavior_version(self) -> str:
+        return _NOMINAL_GROUP_TE_DUZE_OKNO_BEHAVIOR_VERSION
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if (
+            _NOMINAL_GROUP_TE_DUZE_OKNO_PATTERN.fullmatch(text) is None
+            or self._provider is None
+            or self._provider.nominal_group_te_duze_okno_replacement() != "To"
+        ):
+            return ()
+        return (
+            Finding.create(
+                category=self._CATEGORY,
+                severity=Severity.SUGGESTION,
+                message="Niezgodność form w grupie nominalnej.",
+                explanation=(
+                    "W tej zamkniętej konstrukcji forma „Te” nie zgadza się z "
+                    "rzeczownikiem „okno”; oczekiwana jest forma „To”."
+                ),
+                original="Te",
+                suggestion="To",
+                start=0,
+                end=2,
+                confidence=self._confidence,
+                source=self.source,
+            ),
+        )
+
+
 def _match_case(reference: str, replacement: str) -> str:
     if reference.isupper():
         return replacement.upper()
@@ -200,4 +257,8 @@ _CORRECTIONS: dict[tuple[str, str], str] = {
 }
 
 
-__all__ = ["AgreementCopulaRule", "AgreementTeZdanieRule"]
+__all__ = [
+    "AgreementCopulaRule",
+    "AgreementNominalGroupTeDuzeOknoRule",
+    "AgreementTeZdanieRule",
+]

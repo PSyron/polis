@@ -14,7 +14,7 @@ import scripts.verify_distribution_artifacts as artifact_verifier
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN = "morfeusz2==1.99.15"
-RUNTIME_MODULE = "src/polis/rules/_morfeusz_negated_widziec.py"
+RUNTIME_MODULE = "src/polis/rules/_morfeusz.py"
 
 
 def _build_distributions(tmp_path: Path) -> tuple[Path, Path]:

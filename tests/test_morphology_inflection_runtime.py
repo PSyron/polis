@@ -18,10 +18,10 @@ from polis import (
 )
 from polis.core import Category, Confidence, Source
 from polis.core.models import Severity
-from polis.rules._morfeusz_negated_widziec import (
-    _load_qualified_negated_widziec_morphology,
-    _NegatedWidziecMorphology,
+from polis.rules._morfeusz import (
+    _load_qualified_morfeusz,
     _ProviderIdentity,
+    _QualifiedMorfeusz,
 )
 
 _NOTICE_SHA256 = "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
@@ -71,8 +71,8 @@ class _QualifiedBackend:
         return rows[lemma]
 
 
-def _provider() -> _NegatedWidziecMorphology:
-    return _NegatedWidziecMorphology(
+def _provider() -> _QualifiedMorfeusz:
+    return _QualifiedMorfeusz(
         backend=_QualifiedBackend(),
         identity=_ProviderIdentity(
             package_version="1.99.15",
@@ -85,7 +85,7 @@ def _provider() -> _NegatedWidziecMorphology:
 def _install_provider(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         analyzer_module,
-        "_load_qualified_negated_widziec_morphology",
+        "_load_qualified_morfeusz",
         _provider,
     )
 
@@ -198,7 +198,7 @@ def test_missing_provider_preserves_other_rules(
     # Given
     monkeypatch.setattr(
         analyzer_module,
-        "_load_qualified_negated_widziec_morphology",
+        "_load_qualified_morfeusz",
         lambda: None,
     )
     analyzer = Analyzer(AnalyzerConfig())
@@ -239,12 +239,12 @@ def test_loader_abstains_when_provider_is_missing(
         raise ModuleNotFoundError
 
     monkeypatch.setattr(
-        "polis.rules._morfeusz_negated_widziec.importlib.import_module",
+        "polis.rules._morfeusz.importlib.import_module",
         missing_module,
     )
 
     # When
-    provider = _load_qualified_negated_widziec_morphology()
+    provider = _load_qualified_morfeusz()
 
     # Then
     assert provider is None

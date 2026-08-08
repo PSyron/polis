@@ -14,7 +14,7 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
-from polis.rules._morfeusz_negated_widziec import _NegatedWidziecMorphology
+from polis.rules._morfeusz import _QualifiedMorfeusz
 
 _PATTERN: Final = re.compile(
     r"(?:(?:Nie|nie) widzę (?P<lower>samochód)|NIE WIDZĘ (?P<upper>SAMOCHÓD))\.\Z"
@@ -85,7 +85,7 @@ class InflectionNegatedWidziecNominalGroupRule:
 
     _CATEGORY = Category.INFLECTION
 
-    def __init__(self, provider: _NegatedWidziecMorphology | None) -> None:
+    def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
         self.source = Source(
             SourceKind.RULE,
             "inflection.negated_widziec_nominal_group",
@@ -107,7 +107,9 @@ class InflectionNegatedWidziecNominalGroupRule:
         match = _NOMINAL_GROUP_PATTERN.fullmatch(text)
         if match is None or self._provider is None:
             return ()
-        replacement = self._provider.replacement("czerwony", "samochód")
+        replacement = self._provider.negated_widziec_nominal_group_replacement(
+            "czerwony", "samochód"
+        )
         if replacement != "czerwonego samochodu":
             return ()
         original = match.group("nominal_group")

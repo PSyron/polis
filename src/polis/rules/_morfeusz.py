@@ -1,4 +1,4 @@
-"""Private Morfeusz2 adapter for one closed negated-government consumer."""
+"""Private qualified Morfeusz2 adapter for current closed consumers."""
 
 from __future__ import annotations
 
@@ -17,27 +17,46 @@ _DICTIONARY_ID: Final = "pl.sgjp.sgjp-2026.06.01"
 _NOTICE_SHA256: Final = (
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
-_ADJECTIVE_LEMMA: Final = "czerwony:A"
-_NOUN_LEMMA: Final = "samochód"
-_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
+_NEGATED_ADJECTIVE_LEMMA: Final = "czerwony:A"
+_NEGATED_NOUN_LEMMA: Final = "samochód"
+_NEGATED_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
     {
         "adj:sg:acc:m3:pos",
         "adj:sg:nom.voc:m1.m2.m3:pos",
     }
 )
-_NOUN_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc:m3"})
-_ADJECTIVE_TARGET_TAG: Final = "adj:sg:gen:m1.m2.m3.n:pos"
-_NOUN_TARGET_TAG: Final = "subst:sg:gen:m3"
+_NEGATED_NOUN_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc:m3"})
+_NEGATED_ADJECTIVE_TARGET_TAG: Final = "adj:sg:gen:m1.m2.m3.n:pos"
+_NEGATED_NOUN_TARGET_TAG: Final = "subst:sg:gen:m3"
+_DEMONSTRATIVE_LEMMA: Final = "ten"
+_DEMONSTRATIVE_SOURCE_TAGS: Final = frozenset(
+    {
+        "adj:pl:acc:m2.m3.f.n:pos",
+        "adj:pl:nom.voc:m2.m3.f.n:pos",
+    }
+)
+_ADJECTIVE_LEMMA: Final = "duży"
+_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
+    {
+        "adj:pl:acc:m2.m3.f.n:pos",
+        "adj:pl:nom.voc:m2.m3.f.n:pos",
+        "adj:sg:acc:n:pos",
+        "adj:sg:nom.voc:n:pos",
+    }
+)
+_NOMINAL_HEAD_LEMMA: Final = "okno"
+_NOMINAL_HEAD_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc.voc:n:ncol"})
+_DEMONSTRATIVE_TARGET_TAG: Final = "adj:sg:nom.voc:n:pos"
 
 
-class _NegatedWidziecBackend(Protocol):
+class _QualifiedMorfeuszBackend(Protocol):
     def analyse(self, text: str) -> Sequence[_AnalysisRow]: ...
 
     def generate(self, lemma: str) -> Sequence[_GenerationRow]: ...
 
 
 @runtime_checkable
-class _QualifiedBackend(_NegatedWidziecBackend, Protocol):
+class _IdentityBackend(_QualifiedMorfeuszBackend, Protocol):
     def dict_id(self) -> str: ...
 
     def dict_copyright(self) -> str: ...
@@ -45,7 +64,7 @@ class _QualifiedBackend(_NegatedWidziecBackend, Protocol):
 
 @runtime_checkable
 class _MorfeuszModule(Protocol):
-    Morfeusz: Callable[[], _QualifiedBackend]
+    Morfeusz: Callable[[], _IdentityBackend]
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,44 +75,87 @@ class _ProviderIdentity:
 
 
 @dataclass(frozen=True, slots=True)
-class _NegatedWidziecMorphology:
-    backend: _NegatedWidziecBackend
+class _QualifiedMorfeusz:
+    backend: _QualifiedMorfeuszBackend
     identity: _ProviderIdentity
 
-    def replacement(self, adjective: str, noun: str) -> str | None:
+    def negated_widziec_nominal_group_replacement(
+        self, adjective: str, noun: str
+    ) -> str | None:
         if self.identity != _qualified_identity():
             return None
         try:
             adjective_analyses = _analyses(self.backend.analyse(adjective), adjective)
             noun_analyses = _analyses(self.backend.analyse(noun), noun)
             adjective_forms = _forms(
-                self.backend.generate(_ADJECTIVE_LEMMA),
-                lemma=_ADJECTIVE_LEMMA,
-                target_tag=_ADJECTIVE_TARGET_TAG,
+                self.backend.generate(_NEGATED_ADJECTIVE_LEMMA),
+                lemma=_NEGATED_ADJECTIVE_LEMMA,
+                target_tag=_NEGATED_ADJECTIVE_TARGET_TAG,
             )
             noun_forms = _forms(
-                self.backend.generate(_NOUN_LEMMA),
-                lemma=_NOUN_LEMMA,
-                target_tag=_NOUN_TARGET_TAG,
+                self.backend.generate(_NEGATED_NOUN_LEMMA),
+                lemma=_NEGATED_NOUN_LEMMA,
+                target_tag=_NEGATED_NOUN_TARGET_TAG,
             )
         except (KeyError, RuntimeError, TypeError, ValueError):
             return None
         if (
             not _has_one_supported_lemma(
                 adjective_analyses,
-                lemma=_ADJECTIVE_LEMMA,
-                source_tags=_ADJECTIVE_SOURCE_TAGS,
+                lemma=_NEGATED_ADJECTIVE_LEMMA,
+                source_tags=_NEGATED_ADJECTIVE_SOURCE_TAGS,
             )
             or not _has_one_supported_lemma(
                 noun_analyses,
-                lemma=_NOUN_LEMMA,
-                source_tags=_NOUN_SOURCE_TAGS,
+                lemma=_NEGATED_NOUN_LEMMA,
+                source_tags=_NEGATED_NOUN_SOURCE_TAGS,
             )
             or adjective_forms != {"czerwonego"}
             or noun_forms != {"samochodu"}
         ):
             return None
         return "czerwonego samochodu"
+
+    def nominal_group_te_duze_okno_replacement(self) -> str | None:
+        if self.identity != _qualified_identity():
+            return None
+        try:
+            demonstrative_analyses = _analyses(self.backend.analyse("Te"), "Te")
+            adjective_analyses = _analyses(self.backend.analyse("duże"), "duże")
+            nominal_head_analyses = _analyses(self.backend.analyse("okno"), "okno")
+            demonstrative_forms = _forms(
+                self.backend.generate(_DEMONSTRATIVE_LEMMA),
+                lemma=_DEMONSTRATIVE_LEMMA,
+                target_tag=_DEMONSTRATIVE_TARGET_TAG,
+            )
+        except (KeyError, RuntimeError, TypeError, ValueError):
+            return None
+        if (
+            not _has_one_supported_lemma(
+                demonstrative_analyses,
+                lemma=_DEMONSTRATIVE_LEMMA,
+                source_tags=_DEMONSTRATIVE_SOURCE_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                adjective_analyses,
+                lemma=_ADJECTIVE_LEMMA,
+                source_tags=_ADJECTIVE_SOURCE_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                nominal_head_analyses,
+                lemma=_NOMINAL_HEAD_LEMMA,
+                source_tags=_NOMINAL_HEAD_SOURCE_TAGS,
+            )
+            or _tags_for_lemma(demonstrative_analyses, _DEMONSTRATIVE_LEMMA)
+            != _DEMONSTRATIVE_SOURCE_TAGS
+            or _tags_for_lemma(adjective_analyses, _ADJECTIVE_LEMMA)
+            != _ADJECTIVE_SOURCE_TAGS
+            or _tags_for_lemma(nominal_head_analyses, _NOMINAL_HEAD_LEMMA)
+            != _NOMINAL_HEAD_SOURCE_TAGS
+            or demonstrative_forms != {"to"}
+        ):
+            return None
+        return "To"
 
 
 def _qualified_identity() -> _ProviderIdentity:
@@ -185,13 +247,19 @@ def _has_one_supported_lemma(
     return selected_lemmas == {lemma} and all(tag in source_tags for _, tag in selected)
 
 
-def _load_qualified_negated_widziec_morphology() -> _NegatedWidziecMorphology | None:
+def _tags_for_lemma(analyses: set[tuple[str, str]] | None, lemma: str) -> set[str]:
+    if analyses is None:
+        return set()
+    return {tag for row_lemma, tag in analyses if row_lemma == lemma}
+
+
+def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
     try:
         module = importlib.import_module("morfeusz2")
         if not isinstance(module, _MorfeuszModule):
             return None
         backend = module.Morfeusz()
-        if not isinstance(backend, _QualifiedBackend):
+        if not isinstance(backend, _IdentityBackend):
             return None
         identity = _ProviderIdentity(
             package_version=importlib.metadata.version("morfeusz2"),
@@ -204,7 +272,7 @@ def _load_qualified_negated_widziec_morphology() -> _NegatedWidziecMorphology | 
         return None
     if identity != _qualified_identity():
         return None
-    return _NegatedWidziecMorphology(backend=backend, identity=identity)
+    return _QualifiedMorfeusz(backend=backend, identity=identity)
 
 
 __all__: list[str] = []

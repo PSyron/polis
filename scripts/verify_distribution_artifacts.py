@@ -62,7 +62,7 @@ EXPECTED_SOURCE_MEMBERS = tuple(
         "src/polis/evaluation/quality_runner.py "
         "src/polis/evaluation/safety_corpus.py src/polis/py.typed "
         "src/polis/rules/__init__.py "
-        "src/polis/rules/_morfeusz_negated_widziec.py "
+        "src/polis/rules/_morfeusz.py "
         "src/polis/rules/agreement.py "
         "src/polis/rules/inflection.py src/polis/rules/spelling.py "
         "src/polis/rules/syntax.py "

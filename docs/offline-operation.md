@@ -24,10 +24,12 @@ wysyła wejścia poza proces.
 
 ## Opcjonalna morfologia
 
-Extra `polis-nlp[morphology]` instaluje Morfeusz2 1.99.15 do obsługi wyłącznie
-zamkniętej sugestii `Nie widzę czerwony samochód.` →
-`Nie widzę czerwonego samochodu.`. Dostawca analizuje i generuje formy lokalnie;
-nie otwiera połączenia, nie pobiera słownika i nie uruchamia procesu Java.
+Extra `polis-nlp[morphology]` instaluje Morfeusz2 1.99.15 wyłącznie dla
+zamkniętych sugestii `Nie widzę czerwony samochód.` →
+`Nie widzę czerwonego samochodu.` oraz `Te duże okno jest otwarte.` →
+`To duże okno jest otwarte.`. Obie pozostają do przeglądu. Dostawca analizuje
+i generuje formy lokalnie; nie otwiera połączenia, nie pobiera słownika i nie
+uruchamia procesu Java.
 
 Runtime sprawdza wersję pakietu, identyfikator słownika
 `pl.sgjp.sgjp-2026.06.01` oraz skrót jego noty. Brak extra, błąd dostawcy,
