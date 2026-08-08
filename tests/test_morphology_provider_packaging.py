@@ -15,3 +15,4 @@ def test_morfeusz_is_optional_and_not_a_default_dependency() -> None:
         "morfeusz2==1.99.15"
     ]
     assert (ROOT / "src/polis/rules/_morfeusz.py").is_file()
+    assert (ROOT / "src/polis/rules/subject_verb.py").is_file()

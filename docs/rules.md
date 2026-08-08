@@ -7,6 +7,7 @@
 | `rule:agreement.copula` | `agreement` | lokalna niezgodność łącznika w ograniczonych wzorcach zaimka i czasownika |
 | `rule:agreement.te_zdanie` | `agreement` | zamknięty wzorzec `Te zdanie` → `To zdanie`, z zachowaniem wielkości liter |
 | `rule:agreement.nominal_group_te_duze_okno` | `agreement` | opcjonalna zamknięta konstrukcja `Te duże okno jest otwarte.` → `To duże okno jest otwarte.`, wyłącznie do przeglądu |
+| `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
@@ -24,13 +25,14 @@
 | `rule:syntax.sentence_space` | `punctuation` | brakująca spacja po kropce na granicy zdania |
 
 Reguły `rule:agreement.nominal_group_te_duze_okno`,
+`rule:agreement.subject_verb_oni_czyta`,
 `rule:inflection.negated_widziec`,
 `rule:inflection.negated_widziec_nominal_group`,
 `rule:syntax.initial_conditional_comma`, `rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
-pozostają do przeglądu. Reguła zgody grupy nominalnej i druga z reguł
-fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
+pozostają do przeglądu. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
+oraz druga z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo
 niejednoznaczność kończy się abstencją. `rule:spelling.napewno` również pozostaje
