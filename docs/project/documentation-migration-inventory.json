@@ -83,6 +83,7 @@
         "docs/superpowers/plans/2026-08-04-issue-181-residual-syntax-evidence-identity.md",
         "docs/superpowers/plans/2026-08-04-issue-185-conservative-v1-cleanup.md",
         "docs/superpowers/plans/2026-08-07-quality-dataset-inventory-exception.md",
+        "docs/superpowers/plans/2026-08-08-issue-237-quality-contract.md",
         "docs/superpowers/specs/2026-07-20-github-project-planning-design.md",
         "docs/superpowers/specs/2026-07-20-llm-assisted-polish-corpus-design.md",
         "docs/superpowers/specs/2026-07-20-real-local-llm-benchmark-design.md",
@@ -220,7 +221,8 @@
         "docs/architecture/decisions/0020-runtime-first-product-charter.md",
         "docs/architecture/decisions/0021-rule-catalog-ownership.md",
         "docs/architecture/decisions/0022-conservative-v1-product-scope.md",
-        "docs/architecture/decisions/0023-evaluation-namespace-1-0.md"
+        "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
+        "docs/architecture/decisions/0024-automatic-review-abstention-quality-contract.md"
       ],
       "prefixes": []
     },
