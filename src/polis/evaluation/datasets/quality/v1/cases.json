@@ -190,6 +190,26 @@
       "rationale": null
     },
     {
+      "id": "quality_inflection_negated_government_nominal_group_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government_nominal_group",
+      "features": ["unicode"],
+      "text": "Nie widzę czerwony samochód.",
+      "expected_findings": [{"category": "inflection", "start": 10, "end": 27, "original": "czerwony samochód", "suggestion": "czerwonego samochodu", "rationale": "Po zaprzeczonym czasowniku „widzieć” w tej zamkniętej konstrukcji grupa nominalna wymaga dopełniacza."}],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_negated_government_nominal_group_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government_nominal_group",
+      "features": ["unicode"],
+      "text": "Nie widzę czerwonego samochodu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
       "id": "quality_syntax_destination_preposition_error",
       "kind": "error",
       "phenomenon": "syntax",

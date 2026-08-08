@@ -51,7 +51,7 @@ Manifest wiąże `dataset_id`, `dataset_version` i kanoniczny
 `maintainer-reviewed`, a `reviewed_case_ids` zawiera wszystkie przypadki w
 kolejności datasetu. Maintainer zatwierdził dokładnie ten zestaw przypadków,
 związany z hashem danych
-`8920408d5d0aaf1a00bd84a2ffab17089107ca4a55f21e765f097712b16f3edf`.
+`facc333ce69c9e81db2ad30213ea2ac84b067fc02c2b78b5a4b3c9dfa2174649`.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 
@@ -94,7 +94,33 @@ zgadywać jednostkę.
 Baseline powstaje dopiero po przeglądzie danych i zamrożeniu zmian źródłowych.
 Należy zbudować wheel do świeżego katalogu, obliczyć SHA-256 jego surowych
 bajtów, zainstalować go bez indeksu w świeżym środowisku i uruchomić moduł ze
-świeżego pustego katalogu roboczego:
+świeżego pustego katalogu roboczego. Aktywny zbiór zawierający przypadek
+`rule:inflection.negated_widziec_nominal_group` mierzy finalny wheel wraz z
+dokładnym extra `morphology`; wheelhouse musi więc zawierać zarówno finalny
+wheel Polis, jak i przypięte koło `morfeusz2==1.99.15`. Instalacja domyślna bez
+tego extra pozostaje wspierana, lecz zgodnie z kontraktem reguły abstenuje i nie
+jest środowiskiem pomiaru tego aktywnego baseline'u.
+
+Przed pomiarem wyeksportuj z `uv.lock` wymagania dostawcy wraz z hashami:
+
+```console
+uv export --locked --extra morphology --no-dev --no-emit-project \
+  --format requirements-txt \
+  --output-file <morphology-requirements>
+```
+
+Następnie utwórz świeże środowisko i z pustego katalogu sprawdź, że Polis jest
+ładowany z jego `site-packages`. Koło Polis instaluj osobno bez zależności, a
+koło dostawcy wyłącznie z wheelhouse'u i z obowiązkową weryfikacją hashy z
+wyeksportowanego pliku:
+
+```console
+python -m pip install --no-index --no-deps <wheelhouse>/<polis-wheel>
+python -m pip install --no-index --find-links <wheelhouse> --require-hashes \
+  --requirement <morphology-requirements>
+```
+
+Po instalacji uruchom runner tym samym interpreterem:
 
 ```console
 python -m polis.evaluation.quality_runner baseline \

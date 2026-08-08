@@ -112,6 +112,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:agreement.copula",
     "rule:agreement.te_zdanie",
     "rule:inflection.negated_widziec",
+    "rule:inflection.negated_widziec_nominal_group",
     "rule:spelling.jestes",
     "rule:spelling.napewno",
     "rule:spelling.wlasnie",

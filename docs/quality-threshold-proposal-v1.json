@@ -1,15 +1,15 @@
 {
   "baseline_path": "docs/quality-baseline-v1.json",
-  "baseline_sha256": "31666b6b9f9ffe9311124c1e11559c5ebff95cc594acfa3b876a97751ca5d042",
-  "dataset_sha256": "a8e77c62f567544c8eca423e2e4b7cc93f461c46412016dd43d19308f980154f",
+  "baseline_sha256": "99c7116b3d32b98720bde6c0ef4d8885612027ad7dfe7382861f8fe1312a3af3",
+  "dataset_sha256": "facc333ce69c9e81db2ad30213ea2ac84b067fc02c2b78b5a4b3c9dfa2174649",
   "enforced": false,
   "proposed_thresholds": {
     "maximum_false_alarm_rate": 0.0,
     "minimum_correction_accuracy": 1.0,
-    "minimum_f1": 0.7058823529411765,
+    "minimum_f1": 0.7368421052631579,
     "minimum_precision": 1.0,
-    "minimum_recall": 0.5454545454545454,
-    "minimum_span_accuracy": 0.5454545454545454
+    "minimum_recall": 0.5833333333333334,
+    "minimum_span_accuracy": 0.5833333333333334
   },
   "schema_id": "polis.quality-threshold-proposal",
   "schema_version": 1,

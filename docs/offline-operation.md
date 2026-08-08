@@ -21,3 +21,15 @@ należy na tym zachowaniu polegać.
 Testy i dystrybucje weryfikują tę granicę w izolowanym środowisku. Aplikacja
 wywołująca odpowiada za własne logowanie i magazynowanie tekstu; Polis nie
 wysyła wejścia poza proces.
+
+## Opcjonalna morfologia
+
+Extra `polis-nlp[morphology]` instaluje Morfeusz2 1.99.15 do obsługi wyłącznie
+zamkniętej sugestii `Nie widzę czerwony samochód.` →
+`Nie widzę czerwonego samochodu.`. Dostawca analizuje i generuje formy lokalnie;
+nie otwiera połączenia, nie pobiera słownika i nie uruchamia procesu Java.
+
+Runtime sprawdza wersję pakietu, identyfikator słownika
+`pl.sgjp.sgjp-2026.06.01` oraz skrót jego noty. Brak extra, błąd dostawcy,
+niepełne dane, niejednoznaczna analiza lub dryft któregokolwiek elementu
+powodują abstencję. Pozostałe reguły działają wtedy normalnie.
