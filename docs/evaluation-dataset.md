@@ -98,7 +98,8 @@ bajtów, zainstalować go bez indeksu w świeżym środowisku i uruchomić modu�
 świeżego pustego katalogu roboczego. Aktywny zbiór zawierający przypadki
 `rule:inflection.negated_widziec_nominal_group` i
 `rule:agreement.nominal_group_te_duze_okno` oraz
-`rule:agreement.subject_verb_oni_czyta` mierzy finalny wheel wraz z dokładnym
+`rule:agreement.subject_verb_oni_czyta` oraz
+`rule:inflection.government_potrzebowac_pomoc` mierzy finalny wheel wraz z dokładnym
 extra `morphology`; wheelhouse musi więc zawierać zarówno finalny wheel Polis,
 jak i przypięte koło `morfeusz2==1.99.15`. Instalacja domyślna bez tego extra
 pozostaje wspierana, lecz zgodnie z kontraktem tych reguł abstenuje i nie jest
@@ -155,6 +156,11 @@ Po prawdziwym przeglądzie maintainera obowiązuje sekwencja:
 4. dopiero potem włączenie egzekwowania w kolejnej osobnej, autoryzowanej
    zmianie.
 
-Issue #229 nie zawiera jeszcze zmierzonych wartości ani progów. Propozycja po
-pomiarze pozostaje `pending_maintainer_approval` i ma `enforced` równe `false`;
-nie jest bramką jakości ani dowodem zatwierdzenia przypadków.
+Aktualny baseline z issue #242 zachowuje niezmienione 28 przypadków i ich hashe,
+mierzy 140 przypadków po jednym rozgrzewkowym i pięciu mierzonych przebiegach
+oraz uzyskuje 10 TP, 4 FN i 0 FP. Precyzja i accuracy korekty wynoszą `1.0`,
+recall oraz span accuracy `0.7142857142857143`, a F1 `0.8333333333333334`.
+Oczekująca propozycja w `docs/quality-threshold-proposal-v1.json` pozostaje
+związana byte-for-byte z tym baseline'em, ma
+`status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
+jakości ani dowodem zatwierdzenia przypadków.

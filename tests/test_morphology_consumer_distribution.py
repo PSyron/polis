@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PIN = "morfeusz2==1.99.15"
 RUNTIME_MODULES = (
     "src/polis/rules/_morfeusz.py",
+    "src/polis/rules/government.py",
     "src/polis/rules/subject_verb.py",
 )
 
@@ -123,7 +124,7 @@ def test_clean_wheel_without_extra_abstains_offline(
             "socket.socket.connect_ex = reject_network",
             "socket.create_connection = reject_network",
             "from polis.cli import run",
-            "raise SystemExit(run(['analyze', '--json', 'Oni czyta książkę.']))",
+            "raise SystemExit(run(['analyze', '--json', 'Potrzebuję pomoc.']))",
         )
     )
     clean_env = os.environ.copy()

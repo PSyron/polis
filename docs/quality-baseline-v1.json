@@ -1,7 +1,7 @@
 {
   "analyzer": "Analyzer(AnalyzerConfig())",
   "artifact": {
-    "sha256": "6afd5d9906356aa427e9e7e2f3e72b959b801f9e3b929366d82feb3f777f86bc"
+    "sha256": "1189c7071ec505dd3a5c252866d6a284fb16fe1d5fb98734ff955ad72a68abba"
   },
   "dataset": {
     "cases": 28,
@@ -25,20 +25,20 @@
   },
   "performance": {
     "latency_ns": {
-      "max": 294583,
-      "mean": 42173,
-      "min": 13750,
-      "p50": 20416,
-      "p95": 242166,
+      "max": 370458,
+      "mean": 45130,
+      "min": 10583,
+      "p50": 21792,
+      "p95": 186584,
       "sample_count": 140
     },
-    "peak_rss_bytes": 69271552,
+    "peak_rss_bytes": 65929216,
     "throughput": {
-      "cases_per_second": 23711.42785815011,
-      "code_points_per_second": 617343.9610211225,
+      "cases_per_second": 22158.1850673775,
+      "code_points_per_second": 576904.1755042213,
       "measured_cases": 140,
       "measured_code_points": 3645,
-      "total_duration_ns": 5904326
+      "total_duration_ns": 6318207
     }
   },
   "quality": {
@@ -46,28 +46,28 @@
     "counts": {
       "alarmed_correct_cases": 0,
       "correct_cases": 15,
-      "correction_matches": 9,
+      "correction_matches": 10,
       "expected_findings": 14,
-      "false_negatives": 5,
+      "false_negatives": 4,
       "false_positives": 0,
-      "predicted_findings": 9,
-      "span_matches": 9,
-      "true_positives": 9
+      "predicted_findings": 10,
+      "span_matches": 10,
+      "true_positives": 10
     },
-    "f1": 0.782608695652174,
+    "f1": 0.8333333333333334,
     "false_alarm_rate": 0.0,
     "precision": 1.0,
-    "recall": 0.6428571428571429,
-    "span_accuracy": 0.6428571428571429
+    "recall": 0.7142857142857143,
+    "span_accuracy": 0.7142857142857143
   },
   "reproducibility": {
     "measured_repetitions": 5,
     "repetition_hashes": [
-      "6070b2c4747fdcadd691a14ca5820ba9615ccc13fb9ef42807b27e9f3a8f0852",
-      "6070b2c4747fdcadd691a14ca5820ba9615ccc13fb9ef42807b27e9f3a8f0852",
-      "6070b2c4747fdcadd691a14ca5820ba9615ccc13fb9ef42807b27e9f3a8f0852",
-      "6070b2c4747fdcadd691a14ca5820ba9615ccc13fb9ef42807b27e9f3a8f0852",
-      "6070b2c4747fdcadd691a14ca5820ba9615ccc13fb9ef42807b27e9f3a8f0852"
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd"
     ],
     "stable_repetitions": 5,
     "warmup_repetitions": 1

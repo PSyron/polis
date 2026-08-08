@@ -9,7 +9,7 @@
   można wybrać jawnie przez `CorrectionResult.apply_suggestions()`.
 - Runtime działa offline i nie wymaga sieci, modelu, procesu Java ani
   instalacji dodatkowych usług.
-- Opcjonalne extra `morphology` rozszerza tylko trzy dokładne wzorce review-only
+- Opcjonalne extra `morphology` rozszerza tylko cztery dokładne wzorce review-only
   i nie stanowi ogólnej obsługi polskiej fleksji, zgody ani rekcji. Morfeusz2
   1.99.15 nie ma
   opublikowanego sdistu ani kół Linux arm64/musl; jego koła obejmują macOS
