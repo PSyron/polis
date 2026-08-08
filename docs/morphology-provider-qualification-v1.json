@@ -1,0 +1,123 @@
+{
+  "dataset": {
+    "canonical_sha256": "6a1dfca36682ee7e5524ef7a97fbd1438ebc11c124916ee6f2154741ff7ce68b",
+    "dataset_id": "polis_v1_morphology_provider_qualification",
+    "dataset_version": 1
+  },
+  "environment": {
+    "machine": "arm64",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3"
+  },
+  "gates": {
+    "ambiguity_abstention": true,
+    "correction_accuracy": true,
+    "dictionary_id": true,
+    "dictionary_notice_sha256": true,
+    "false_alarm_rate": true,
+    "package_version": true,
+    "precision": true,
+    "recall": true,
+    "stable_repetitions": true,
+    "unknown_abstention": true
+  },
+  "identity": {
+    "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+    "dictionary_notice_sha256": "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    "package_version": "1.99.15",
+    "provider": "morfeusz2"
+  },
+  "normalized_digest": "7f55d0c4e0223653081493281be853eeda71d8077199a08e3536464a22c8eb11",
+  "outcomes": [
+    {
+      "case_id": "inflection_pomoc_genitive",
+      "form": "pomocy",
+      "kind": "suggest",
+      "reason": "unique-exact-candidate"
+    },
+    {
+      "case_id": "government_samochod_genitive",
+      "form": "samochodu",
+      "kind": "suggest",
+      "reason": "unique-exact-candidate"
+    },
+    {
+      "case_id": "agreement_nowy_feminine",
+      "form": "nowa",
+      "kind": "suggest",
+      "reason": "unique-exact-candidate"
+    },
+    {
+      "case_id": "negative_pomocy_already_genitive",
+      "form": null,
+      "kind": "abstain",
+      "reason": "already-satisfied"
+    },
+    {
+      "case_id": "negative_samochodu_already_genitive",
+      "form": null,
+      "kind": "abstain",
+      "reason": "already-satisfied"
+    },
+    {
+      "case_id": "ambiguity_nowy_without_source_filter",
+      "form": null,
+      "kind": "abstain",
+      "reason": "ambiguous-source"
+    },
+    {
+      "case_id": "unknown_xyzzyq",
+      "form": null,
+      "kind": "abstain",
+      "reason": "unknown-source"
+    },
+    {
+      "case_id": "negative_pomoc_wrong_gender",
+      "form": null,
+      "kind": "abstain",
+      "reason": "no-exact-candidate"
+    },
+    {
+      "case_id": "negative_nowy_noun_not_adjective",
+      "form": null,
+      "kind": "abstain",
+      "reason": "incompatible-pos"
+    }
+  ],
+  "performance": {
+    "installed_size_delta_bytes": 40725689,
+    "max_ns": 108250,
+    "mean_ns": 34292,
+    "min_ns": 7250,
+    "p50_ns": 29000,
+    "p95_ns": 100334,
+    "peak_rss_bytes": 60588032,
+    "startup_ns": 25839125,
+    "throughput_cases_per_second": 29160.866894251034
+  },
+  "quality": {
+    "alarmed_negative_cases": 0,
+    "correction_accuracy": 1.0,
+    "false_alarm_rate": 0.0,
+    "false_negatives": 0,
+    "false_positives": 0,
+    "negative_cases": 6,
+    "precision": 1.0,
+    "recall": 1.0,
+    "true_positives": 3
+  },
+  "reproducibility": {
+    "measured_repetitions": 5,
+    "repetition_hashes": [
+      "b6aab0d3cafd2457f2e62040585d21d53ce95cf38f566ed4cccbdc5f77646897",
+      "b6aab0d3cafd2457f2e62040585d21d53ce95cf38f566ed4cccbdc5f77646897",
+      "b6aab0d3cafd2457f2e62040585d21d53ce95cf38f566ed4cccbdc5f77646897",
+      "b6aab0d3cafd2457f2e62040585d21d53ce95cf38f566ed4cccbdc5f77646897",
+      "b6aab0d3cafd2457f2e62040585d21d53ce95cf38f566ed4cccbdc5f77646897"
+    ],
+    "stable_repetitions": true
+  },
+  "schema_id": "polis.morphology-provider-qualification-report",
+  "schema_version": 1,
+  "verdict": "PASS"
+}

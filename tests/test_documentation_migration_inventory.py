@@ -72,6 +72,7 @@ MAINTAINED_V1_DOCUMENTS = (
     "docs/development/dependency-licenses.md",
     "docs/distribution-verification.md",
     "docs/evaluation-dataset.md",
+    "docs/morphology-provider-qualification.md",
     "docs/limitations.md",
     "docs/offline-operation.md",
     "docs/prerelease-candidate.md",

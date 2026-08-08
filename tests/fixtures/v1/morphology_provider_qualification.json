@@ -1,0 +1,113 @@
+{
+  "schema_id": "polis.morphology-provider-qualification",
+  "schema_version": 1,
+  "dataset_id": "polis_v1_morphology_provider_qualification",
+  "dataset_version": 1,
+  "license": "CC0-1.0",
+  "source": {
+    "author": "Paweł Cyroń",
+    "created": "2026-08-08",
+    "description": "Autorskie, sztuczne przypadki kwalifikacji dostawcy morfologii offline dla issue #238."
+  },
+  "thresholds": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "correction_accuracy": 1.0,
+    "false_alarm_rate": 0.0,
+    "stable_repetitions": 5,
+    "require_ambiguity_abstention": true,
+    "require_unknown_abstention": true
+  },
+  "cases": [
+    {
+      "id": "inflection_pomoc_genitive",
+      "phenomenon": "inflection",
+      "input_form": "pomoc",
+      "source_lemma": "pomoc",
+      "source_pos": "subst",
+      "target_tag": "subst:sg:gen:f",
+      "expected_outcome": "suggest",
+      "expected_form": "pomocy"
+    },
+    {
+      "id": "government_samochod_genitive",
+      "phenomenon": "government",
+      "input_form": "samochód",
+      "source_lemma": "samochód",
+      "source_pos": "subst",
+      "target_tag": "subst:sg:gen:m3",
+      "expected_outcome": "suggest",
+      "expected_form": "samochodu"
+    },
+    {
+      "id": "agreement_nowy_feminine",
+      "phenomenon": "agreement",
+      "input_form": "nowy",
+      "source_lemma": "nowy:A",
+      "source_pos": "adj",
+      "target_tag": "adj:sg:nom.voc:f:pos",
+      "expected_outcome": "suggest",
+      "expected_form": "nowa"
+    },
+    {
+      "id": "negative_pomocy_already_genitive",
+      "phenomenon": "inflection",
+      "input_form": "pomocy",
+      "source_lemma": "pomoc",
+      "source_pos": "subst",
+      "target_tag": "subst:sg:gen:f",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    },
+    {
+      "id": "negative_samochodu_already_genitive",
+      "phenomenon": "government",
+      "input_form": "samochodu",
+      "source_lemma": "samochód",
+      "source_pos": "subst",
+      "target_tag": "subst:sg:gen:m3",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    },
+    {
+      "id": "ambiguity_nowy_without_source_filter",
+      "phenomenon": "ambiguity",
+      "input_form": "nowy",
+      "source_lemma": null,
+      "source_pos": null,
+      "target_tag": "adj:sg:nom.voc:f:pos",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    },
+    {
+      "id": "unknown_xyzzyq",
+      "phenomenon": "unknown",
+      "input_form": "xyzzyq",
+      "source_lemma": null,
+      "source_pos": null,
+      "target_tag": "subst:sg:gen:f",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    },
+    {
+      "id": "negative_pomoc_wrong_gender",
+      "phenomenon": "inflection",
+      "input_form": "pomoc",
+      "source_lemma": "pomoc",
+      "source_pos": "subst",
+      "target_tag": "subst:sg:gen:m3",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    },
+    {
+      "id": "negative_nowy_noun_not_adjective",
+      "phenomenon": "agreement",
+      "input_form": "nowy",
+      "source_lemma": "nowy:S",
+      "source_pos": "subst",
+      "target_tag": "adj:sg:nom.voc:f:pos",
+      "expected_outcome": "abstain",
+      "expected_form": null
+    }
+  ]
+}
