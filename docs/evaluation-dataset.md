@@ -164,6 +164,35 @@ Oczekująca propozycja w `docs/quality-threshold-proposal-v1.json` pozostaje
 związana byte-for-byte z tym baseline'em, ma
 `status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
 jakości ani dowodem zatwierdzenia przypadków.
+
+## Syntetyczny kontrakt kalibracji per dokładny klucz
+
+Issue #267 dodaje powtarzalny, działający offline kontrakt kalibracji dla 20
+dokładnych tożsamości polityki. Narzędzie wykonuje jedno powtórzenie
+rozgrzewkowe i pięć mierzonych, wymaga identycznych skrótów znalezisk oraz
+oblicza wynik niezależnie dla każdego klucza. Jedynym kandydatem jest jego
+emitowana wartość `minimum_confidence`; brak pełnych dowodów daje `none`.
+
+Ta powierzchnia jest wyłącznie repozytoryjna i nie należy do wheel ani sdist.
+W checkout źródłowym ma postać:
+
+```console
+python -m polis.evaluation run-calibration \
+  --config experiments/a-b-qualification-v2/config.json
+```
+
+Polecenie przyjmuje tylko `--config` i wymaga dokładnie pokazanej ścieżki
+względnej oraz uruchomienia z katalogu głównego repozytorium. Nie pozwala
+zastąpić datasetu, źródła, progu, liczby powtórzeń ani ścieżek wynikowych przez
+argumenty CLI. Obecna implementacja służy wyłącznie testom na syntetycznych
+fixture'ach: nie istnieje jeszcze rzeczywisty zbiór
+`polis-a-b-calibration-v2-v1`, konfiguracja wykonania ani raport kalibracji.
+
+Wynik `threshold-selection` jest jawnie niepodpisany i nieautoryzujący. Nie
+promuje klucza do automatycznej korekty, nie zmienia polityki i nie dopuszcza
+holdoutu. Rzeczywiste dane CC0, niezależny przegląd, podpisany wybór progów,
+prerejestracja i osobny one-shot wymagają kolejnych, odrębnych issues.
+
 ## Prerejestracja jednorazowego holdoutu A+B
 
 Eksperyment `polis-a-b-one-shot-v1` został dostarczony w trzech append-only pull
