@@ -48,7 +48,18 @@ EXPECTED_SOURCE_MEMBERS = tuple(
     and "__pycache__" not in path.parts
     and path != ROOT / "src/polis/evaluation/__main__.py"
     and not path.name.startswith("holdout_")
+    and not path.name.startswith("calibration_")
 )
+
+
+def _is_repository_only_calibration_member(name: str) -> bool:
+    return (
+        name == "polis/evaluation/__main__.py"
+        or name.startswith("polis/evaluation/calibration_")
+        or "/src/polis/evaluation/calibration_" in name
+        or "polis-a-b-calibration-v2-v1" in name
+        or "polis-a-b-qualification-v2-v1" in name
+    )
 
 
 def _without_sdist_root(name: str) -> str:
@@ -143,12 +154,14 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
         or name.startswith("experiments/a-b-one-shot/")
         for name in wheel_names
     )
+    assert not any(_is_repository_only_calibration_member(name) for name in wheel_names)
     assert not any(
         name.endswith("/src/polis/evaluation/__main__.py")
         or "/src/polis/evaluation/holdout_" in name
         or "/experiments/a-b-one-shot/" in name
         for name in sdist_names
     )
+    assert not any(_is_repository_only_calibration_member(name) for name in sdist_names)
     assert EXPECTED_SOURCE_MEMBERS == artifact_verifier.EXPECTED_SOURCE_MEMBERS
     assert len(EXPECTED_SOURCE_MEMBERS) == 45
 
