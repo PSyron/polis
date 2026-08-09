@@ -166,6 +166,15 @@ def _install_and_smoke(
             ),
             f"{label} evaluation export contract",
         )
+        evaluation_cli = _run(
+            [str(python), "-m", "polis.evaluation", "--help"],
+            cwd=smoke_cwd,
+            env=env,
+        )
+        if evaluation_cli.returncode == 0 or "polis.evaluation.__main__" not in (
+            evaluation_cli.stdout + evaluation_cli.stderr
+        ):
+            raise SystemExit(f"{label} exposed repository-only evaluation CLI")
         cli_env = env | {"PYTHONIOENCODING": "cp1252"}
         cli = _require_success(
             _run(
@@ -184,6 +193,7 @@ def _install_and_smoke(
         print(probe)
         print(f"artifact={label} {api}")
         print(f"artifact={label} {exports}")
+        print(f"artifact={label} repository_only_evaluation_cli=absent")
         print(cli)
 
 

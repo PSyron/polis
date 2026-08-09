@@ -10,6 +10,10 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RETAINED_EVIDENCE_SHA256 = {
+    "experiments/a-b-one-shot/README.md": "77382c5d81fb3d9cb5e98a36ef418cdc7c84228d61abcb0f427abaa5ab465bf0",
+    "experiments/a-b-one-shot/config.json": "e6316a6fb2c764e2ccd95dbbfff9c00b37575d9aefe79af0673e4a3f88fbd595",
+    "experiments/a-b-one-shot/dataset.manifest.json": "3f80ef44ce11b7e4d492e340c0265ff8913fe766a8a4b98377bc55540e58c6d7",
+    "experiments/a-b-one-shot/preregistration.json": "3eda81de3349453b2a57ffae65d8d9d4db1c389d1e24ea3f6328046922266be8",
     "experiments/contextual_inflection_routing/README.md": "d2a39cb1763f519e4249ca63cd59749975b710425a1def055bf14528d7059964",
     "experiments/contextual_inflection_routing/config.json": "8b5af09fc6cb780067387eb75ce27e2f33bbe4b4f74938a2d323065520ed5d05",
     "experiments/contextual_inflection_routing/frozen_router.json": "73e61539f4373d75b4df65b3ee52b5b73ef6f8b101a7bbfe4ba5da6e5af8f22e",

@@ -26,6 +26,7 @@ from polis.rules import (
     InflectionNegatedWidziecNominalGroupRule,
     InflectionNegatedWidziecRule,
     RuleRegistration,
+    RuleSourceIdentity,
     SpellingJestesRule,
     SpellingNapewnoRule,
     SpellingWlasnieRule,
@@ -229,7 +230,7 @@ class Analyzer:
         if not isinstance(config, AnalyzerConfig):
             raise TypeError("config must be AnalyzerConfig")
         self._config = config
-        self._registry = _make_default_registry()
+        self._registry: DeterministicRuleRegistry = _make_default_registry()
 
     @classmethod
     def from_config(cls, path: str | Path) -> Analyzer:
@@ -240,6 +241,15 @@ class Analyzer:
         """Return zero because the conservative v1 analyzer owns no process."""
 
         return 0
+
+    @property
+    def source_identity_snapshot(self) -> tuple[RuleSourceIdentity, ...]:
+        """Return the immutable identity of the composed deterministic sources."""
+
+        snapshot: list[RuleSourceIdentity] = []
+        for identity in self._registry.source_identity_snapshot():
+            snapshot.append(identity)
+        return tuple(snapshot)
 
     def analyze(
         self,

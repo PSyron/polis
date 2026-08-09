@@ -49,12 +49,20 @@ required-version = "==0.11.2"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/polis"]
+exclude = [
+  "/src/polis/evaluation/__main__.py",
+  "/src/polis/evaluation/holdout_*.py",
+]
 
 [tool.hatch.build.targets.wheel.force-include]
 "docs/architecture/decisions/0023-evaluation-namespace-1-0.md" = "docs/architecture/decisions/0023-evaluation-namespace-1-0.md"
 
 [tool.hatch.build.targets.sdist]
 ignore-vcs = true
+exclude = [
+  "/src/polis/evaluation/__main__.py",
+  "/src/polis/evaluation/holdout_*.py",
+]
 include = [
   "/LICENSE",
   "/README.md",
