@@ -5,6 +5,7 @@ import json
 
 import pytest
 from tests.calibration_test_helpers import canonical_bytes, nonfinite_bytes
+from tests.denominator_test_constants import expected_denominators
 from tests.test_calibration_scoring import _inputs
 
 from polis.evaluation.calibration_models import CalibrationContractError, JsonObject
@@ -144,7 +145,7 @@ else:
             isinstance(row, dict)
             and set(row) == {"identity", "denominators", "metrics", "verdict"}
             and set(row["identity"]) == _IDENTITY_FIELDS
-            and row["denominators"] == {"error_cases": 20, "correct_cases": 40}
+            and row["denominators"] == expected_denominators(row["identity"]["source"])
             and set(row["metrics"]) == _METRIC_FIELDS
             and row["verdict"]
             in {"candidate", "fail_threshold", "insufficient_evidence"}

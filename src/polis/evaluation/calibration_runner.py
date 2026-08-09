@@ -6,6 +6,11 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from polis.core import Finding
+from polis.evaluation.calibration_commitment import CalibrationArtifactCommitment
+from polis.evaluation.calibration_denominators import (
+    CALIBRATION_CASE_COUNT,
+    counts_for,
+)
 from polis.evaluation.calibration_models import (
     AnalyzerCallable,
     AnalyzerFactory,
@@ -40,9 +45,9 @@ def _validate_inputs(
         manifest.dataset_id != config.dataset_id
         or dataset.id != config.dataset_id
         or dataset.sha256 != manifest.dataset_sha256
-        or manifest.case_count != 1200
-        or manifest.reviewed_case_count != 1200
-        or len(dataset.cases) != 1200
+        or manifest.case_count != CALIBRATION_CASE_COUNT
+        or manifest.reviewed_case_count != CALIBRATION_CASE_COUNT
+        or len(dataset.cases) != CALIBRATION_CASE_COUNT
     ):
         raise CalibrationContractError("calibration run dataset identity drifted")
     counts: dict[tuple[str, str], int] = {}
@@ -50,8 +55,11 @@ def _validate_inputs(
         key = (case.primary_source_identity, case.role)
         counts[key] = counts.get(key, 0) + 1
     if any(
-        counts.get((row.source, "error"), 0) != 20
-        or counts.get((row.source, "correct"), 0) != 40
+        (
+            counts.get((row.source, "error"), 0),
+            counts.get((row.source, "correct"), 0),
+        )
+        != counts_for("calibration", row.source)
         for row in SOURCE_ROWS
     ):
         raise CalibrationContractError("calibration run denominators drifted")
@@ -98,7 +106,7 @@ def _measure_once(
     return {case.id: analyzer(case.text) for case in dataset.cases}
 
 
-def run_synthetic_calibration(
+def _run_admitted_calibration(
     config: CalibrationConfig,
     manifest: CalibrationManifest,
     dataset: CalibrationDataset,
@@ -140,3 +148,19 @@ def _run_calibration_for_test(
         _run_calibration_files_for_test
     )
     return implementation(config_path, analyzer_factory, repository_root)
+
+
+def _run_calibration_with_commitment_for_test(
+    config_path: Path,
+    analyzer_factory: AnalyzerFactory,
+    repository_root: Path,
+    commitment: CalibrationArtifactCommitment,
+) -> int:
+    from polis.evaluation.calibration_runner_io import (
+        _run_calibration_files_with_commitment_for_test,
+    )
+
+    implementation: Callable[
+        [Path, AnalyzerFactory, Path, CalibrationArtifactCommitment], int
+    ] = _run_calibration_files_with_commitment_for_test
+    return implementation(config_path, analyzer_factory, repository_root, commitment)

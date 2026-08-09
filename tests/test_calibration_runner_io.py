@@ -209,7 +209,7 @@ else:
     def test_fifth_repetition_drift_creates_no_outputs(tmp_path: Path) -> None:
         config_path = write_workspace(tmp_path)
         _, _, _, findings = synthetic_run_inputs()
-        factory = RecordingFactory(RecordingAnalyzer(findings, drift_call=6001))
+        factory = RecordingFactory(RecordingAnalyzer(findings, drift_call=5366))
 
         with pytest.raises(CalibrationIntegrityError):
             _run_calibration_for_test(config_path, factory, tmp_path)

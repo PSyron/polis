@@ -5,6 +5,7 @@ import math
 import re
 from typing import Final, NoReturn
 
+from polis.evaluation.calibration_denominators import denominator_for
 from polis.evaluation.calibration_models import (
     CalibrationContractError,
     CalibrationCounts,
@@ -143,8 +144,12 @@ def _outcome(value: JsonValue, expected: CalibrationSourceIdentity) -> KeyOutcom
     counts = CalibrationCounts(
         *(_integer(counts_raw[name], name) for name in COUNT_NAMES)
     )
-    if counts.error_cases != 20 or counts.correct_cases != 40:
-        _fail("report denominators must be exactly 20 error and 40 correct cases")
+    policy = denominator_for(expected.source)
+    if (counts.error_cases, counts.correct_cases) != (
+        policy.calibration_error_cases,
+        policy.calibration_correct_cases,
+    ):
+        _fail("report denominators do not match the approved per-source contract")
     metrics_raw = _object(raw["metrics"], set(METRIC_NAMES), "report metrics")
     metrics = CalibrationMetrics(
         *(_optional_number(metrics_raw[name], name) for name in METRIC_NAMES)
@@ -154,14 +159,15 @@ def _outcome(value: JsonValue, expected: CalibrationSourceIdentity) -> KeyOutcom
     match raw["verdict"]:
         case "candidate":
             if (
-                observed != expected.emitted_confidence
+                policy.preregistered_verdict is not None
+                or observed != expected.emitted_confidence
                 or minimum != expected.emitted_confidence
                 or not _candidate_metrics_pass(metrics)
             ):
                 _fail("candidate row does not satisfy the frozen baseline")
             return KeyOutcome(expected, counts, metrics, observed, minimum, "candidate")
         case "fail_threshold":
-            if minimum is not None:
+            if policy.preregistered_verdict is not None or minimum is not None:
                 _fail("non-candidate row must not carry minimum confidence")
             return KeyOutcome(
                 expected, counts, metrics, observed, minimum, "fail_threshold"

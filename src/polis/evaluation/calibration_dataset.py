@@ -9,6 +9,7 @@ from polis.evaluation.calibration_contract import (
     _object,
     _string,
 )
+from polis.evaluation.calibration_denominators import counts_for
 from polis.evaluation.calibration_models import (
     CalibrationCase,
     CalibrationConfig,
@@ -36,9 +37,19 @@ def _finding(value: JsonValue, text: str) -> ExpectedFinding:
     raw = _object(value, _FINDING_FIELDS, "expected finding")
     start = _integer(raw["start"], "finding start")
     end = _integer(raw["end"], "finding end")
-    original = _string(raw["original"], "finding original")
-    suggestion = _string(raw["suggestion"], "finding suggestion")
-    if not 0 <= start < end <= len(text) or text[start:end] != original:
+    original_value = raw["original"]
+    if not isinstance(original_value, str):
+        _fail("finding original must be a string")
+    original = original_value
+    suggestion_value = raw["suggestion"]
+    if not isinstance(suggestion_value, str):
+        _fail("finding suggestion must be a string")
+    suggestion = suggestion_value
+    if (
+        not 0 <= start <= end <= len(text)
+        or (start == end) != (original == "")
+        or text[start:end] != original
+    ):
         _fail("expected finding must match its Unicode half-open text span")
     if suggestion == original:
         _fail("expected finding suggestion must differ from original")
@@ -121,9 +132,10 @@ def load_calibration_dataset_bytes(
         key = (case.primary_source_identity, case.role)
         counts[key] = counts.get(key, 0) + 1
     for source in categories:
-        if (
-            counts.get((source, "error"), 0) < config.minimum_error_cases_per_key
-            or counts.get((source, "correct"), 0) < config.minimum_correct_cases_per_key
-        ):
-            _fail("calibration dataset is below a per-source minimum")
+        observed = (
+            counts.get((source, "error"), 0),
+            counts.get((source, "correct"), 0),
+        )
+        if observed != counts_for("calibration", source):
+            _fail("calibration dataset does not match per-source denominators")
     return CalibrationDataset(config.dataset_id, cases, digest)

@@ -10,6 +10,7 @@ from tests.calibration_test_helpers import (
     synthetic_dataset,
     synthetic_manifest,
 )
+from tests.denominator_test_constants import expected_counts, expected_verdict
 
 from polis.core import Category, Confidence, Finding, Severity, Source
 from polis.evaluation.calibration_contract import (
@@ -72,27 +73,34 @@ else:
             == verdict
         )
         assert all(
-            item.verdict == "candidate"
+            item.verdict == (expected_verdict(item.identity.source) or "candidate")
             for item in outcomes
             if item.identity.source != source
         )
 
-    def test_each_key_receives_an_independent_candidate_at_emitted_confidence() -> None:
+    def test_finite_keys_are_structurally_insufficient_and_other_keys_candidate() -> (
+        None
+    ):
         dataset, config, findings = _inputs()
 
         outcomes = score_calibration(dataset, findings, config)
 
         assert len(outcomes) == 20
-        assert all(item.verdict == "candidate" for item in outcomes)
         assert all(
-            item.counts.error_cases == 20 and item.counts.correct_cases == 40
+            item.verdict == (expected_verdict(item.identity.source) or "candidate")
+            for item in outcomes
+        )
+        assert all(
+            (item.counts.error_cases, item.counts.correct_cases)
+            == expected_counts("calibration", item.identity.source)
             for item in outcomes
         )
         assert [item.observed_confidence for item in outcomes] == [
             row.emitted_confidence for row in SOURCE_ROWS
         ]
         assert [item.minimum_confidence for item in outcomes] == [
-            row.emitted_confidence for row in SOURCE_ROWS
+            None if expected_verdict(row.source) else row.emitted_confidence
+            for row in SOURCE_ROWS
         ]
 
     def test_duplicate_exact_prediction_is_one_true_and_one_false_positive() -> None:

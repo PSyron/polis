@@ -57,15 +57,15 @@ else:
         config = parse_calibration_config(canonical_bytes(synthetic_config()))
         return load_calibration_dataset_bytes(dataset_bytes, manifest, config)
 
-    def test_reviewed_manifest_and_1200_case_dataset_are_accepted() -> None:
+    def test_reviewed_manifest_and_1073_case_dataset_are_accepted() -> None:
         dataset_bytes, manifest_raw = _valid_inputs()
         manifest = parse_calibration_manifest(canonical_bytes(manifest_raw))
         config = parse_calibration_config(canonical_bytes(synthetic_config()))
 
         dataset = load_calibration_dataset_bytes(dataset_bytes, manifest, config)
 
-        assert len(dataset.cases) == 1200
-        assert sum(case.role == "error" for case in dataset.cases) == 400
+        assert len(dataset.cases) == 1073
+        assert sum(case.role == "error" for case in dataset.cases) == 273
         assert sum(case.role == "correct" for case in dataset.cases) == 800
 
     @pytest.mark.parametrize(

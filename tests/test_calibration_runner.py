@@ -21,20 +21,20 @@ if importlib.util.find_spec("polis.evaluation.calibration_runner") is None:
 
 else:
     from polis.evaluation.calibration_models import CalibrationIntegrityError
-    from polis.evaluation.calibration_runner import run_synthetic_calibration
+    from polis.evaluation.calibration_runner import _run_admitted_calibration
 
     def test_one_warmup_and_five_measured_repetitions_are_deterministic() -> None:
         config, manifest, dataset, findings = synthetic_run_inputs()
         analyzer = RecordingAnalyzer(findings)
 
-        result = run_synthetic_calibration(config, manifest, dataset, analyzer)
+        result = _run_admitted_calibration(config, manifest, dataset, analyzer)
 
         texts = [case.text for case in dataset.cases]
-        assert len(analyzer.calls) == 7200
-        assert analyzer.calls[:1200] == texts
+        assert len(analyzer.calls) == 6438
+        assert analyzer.calls[:1073] == texts
         assert all(
-            analyzer.calls[start : start + 1200] == texts
-            for start in range(1200, 7200, 1200)
+            analyzer.calls[start : start + 1073] == texts
+            for start in range(1073, 6438, 1073)
         )
         assert len(result.repetition_hashes) == 5
         assert len(set(result.repetition_hashes)) == 1
@@ -42,15 +42,15 @@ else:
 
     def test_fifth_repetition_drift_fails_without_a_result() -> None:
         config, manifest, dataset, findings = synthetic_run_inputs()
-        analyzer = RecordingAnalyzer(findings, drift_call=6001)
+        analyzer = RecordingAnalyzer(findings, drift_call=5366)
 
         with pytest.raises(
             CalibrationIntegrityError,
             match="calibration findings changed between measured repetitions",
         ):
-            run_synthetic_calibration(config, manifest, dataset, analyzer)
+            _run_admitted_calibration(config, manifest, dataset, analyzer)
 
-        assert len(analyzer.calls) == 7200
+        assert len(analyzer.calls) == 6438
 
     @pytest.mark.parametrize("boundary", ["manifest", "source", "denominator"])
     def test_invalid_inputs_fail_before_analyzer(boundary: str) -> None:
@@ -64,7 +64,7 @@ else:
         analyzer = RecordingAnalyzer(findings)
 
         with pytest.raises(CalibrationContractError):
-            run_synthetic_calibration(config, manifest, dataset, analyzer)
+            _run_admitted_calibration(config, manifest, dataset, analyzer)
 
         assert analyzer.calls == []
 
@@ -73,6 +73,6 @@ else:
         analyzer = RecordingAnalyzer(findings, failure_call=1201)
 
         with pytest.raises(SyntheticAnalyzerError):
-            run_synthetic_calibration(config, manifest, dataset, analyzer)
+            _run_admitted_calibration(config, manifest, dataset, analyzer)
 
         assert len(analyzer.calls) == 1201
