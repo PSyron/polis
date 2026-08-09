@@ -17,6 +17,9 @@ from polis.evaluation.holdout_models import (
     HoldoutConfig,
     JsonObject,
 )
+from polis.evaluation.holdout_preregistration import (
+    AUTHORIZATION_COMMENT_ID_WATERMARK,
+)
 from polis.evaluation.holdout_ssh_authorization import _authorization_verifier
 
 _SHA256 = re.compile(r"[0-9a-f]{64}")
@@ -99,7 +102,7 @@ def _parse_authorization(
     ):
         raise HoldoutAdmissionError("run authorization identity is invalid")
     comment_id = raw["comment_id"]
-    if type(comment_id) is not int or comment_id != 5228447541:
+    if type(comment_id) is not int or comment_id <= AUTHORIZATION_COMMENT_ID_WATERMARK:
         raise HoldoutAdmissionError("run authorization comment_id is invalid")
     config_sha = canonical_sha256(config_document)
     executable_path = config.authorization_signature.ssh_keygen_path
