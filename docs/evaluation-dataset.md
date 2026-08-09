@@ -166,12 +166,13 @@ związana byte-for-byte z tym baseline'em, ma
 jakości ani dowodem zatwierdzenia przypadków.
 ## Prerejestracja jednorazowego holdoutu A+B
 
-Eksperyment `polis-a-b-one-shot-v1` jest rozdzielony na dwa append-only pull
-requesty. Pierwszy zamraża kod wykonawczy, konfigurację i metadane niezależnie
-sprawdzonego zbioru CC0. Dopiero podpisane przez GitHub scalenie tego PR-a,
-odtwarzalny preflight i osobna zgoda powiązana z SHA mogą dopuścić jedną próbę.
-Drugi PR może opublikować wyłącznie niezmienne dowody konsumpcji i agregatowy
-wynik.
+Eksperyment `polis-a-b-one-shot-v1` został dostarczony w trzech append-only pull
+requestach. PR1 zamroził kod wykonawczy, konfigurację i metadane niezależnie
+sprawdzonego zbioru CC0. PR1.1, przed ujawnieniem zbioru, skorygował wyłącznie
+wiązanie autoryzacji do nowego, podpisanego komentarza o identyfikatorze
+większym niż prerejestrowany watermark. Dopiero podpisane przez GitHub scalenie
+PR1.1, odtwarzalny preflight i osobna zgoda powiązana z SHA dopuściły jedną
+próbę. PR2 publikuje wyłącznie niezmienne dowody konsumpcji i agregatowy wynik.
 
 Nowy runner nie zmienia zgodności publicznego modułu `polis.evaluation`,
 opisanej przez ADR-0019, ani granic zapisanych w manifeście archiwum v2.
@@ -205,3 +206,22 @@ Raport surowy dopuszcza jedynie agregaty jakości, wydajności, środowiska i
 wyniki per źródło. Raport znormalizowany pomija dane czasowe, RSS i dane hosta,
 dzięki czemu rebuild ma kanoniczne, stabilne bajty. Oba schematy odrzucają pola
 z tekstem przypadku, goldem, sugestią lub prywatną ścieżką.
+
+### Wynik `polis-a-b-one-shot-v1`
+
+Jedyna autoryzowana próba dla merge
+`b22e389cb5309ee17f35f1884b90b4cbaa7efd34` została zużyta i zakończyła się
+globalnym werdyktem `fail_threshold`. Precision, recall, F1 i exact-span
+accuracy wyniosły `0.9473684210526315`, exact-correction accuracy `1.0`, a
+correct-sentence false-alarm rate `0.037037037037037035`.
+
+Raport per dokładna tożsamość zawiera 12 wyników `pass`, jeden
+`fail_threshold` i siedem `insufficient_evidence`. Globalny failure i każdy
+wynik różny od `pass` pozostają wiążące: nie wolno uruchamiać eksperymentu
+ponownie ani stroić zachowania na tym holdoucie. Osobna decyzja o promocji może
+dotyczyć wyłącznie pełnego klucza tożsamości z wynikiem `pass`; nie może objąć
+źródła niezaliczonego, niejednoznacznego ani całej kategorii.
+
+Marker i raporty są niezmiennym dowodem konsumpcji. Odbudowa raportu
+znormalizowanego z raportu surowego daje identyczne bajty, a skan prywatności
+nie wykazuje tekstu przypadków, goldów, sugestii ani prywatnych ścieżek.

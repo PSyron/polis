@@ -61,3 +61,24 @@ wyłącznie względem zweryfikowanego katalogu eksperymentu.
 Do czasu zakończenia ostatniego preflightu i opublikowania zgody powiązanej z
 SHA nie wolno wykonywać komendy `run-holdout`. Każda utworzona rezerwacja jest
 trwała: przerwanie, błąd lub częściowy wynik zużywają jedyną próbę.
+
+## Wynik jedynej próby
+
+Autoryzowana próba dla merge SHA
+`b22e389cb5309ee17f35f1884b90b4cbaa7efd34` zakończyła się werdyktem
+`fail_threshold`. Komenda została wykonana dokładnie raz, zakończyła się kodem
+`0`, a trwały marker uniemożliwia ponowienie.
+
+Agregaty jakości wyniosły: precision, recall i F1
+`0.9473684210526315`, exact-span accuracy `0.9473684210526315`,
+exact-correction accuracy `1.0` oraz correct-sentence false-alarm rate
+`0.037037037037037035`. Spośród 20 dokładnych tożsamości 12 otrzymało `pass`,
+jedna `fail_threshold`, a siedem `insufficient_evidence`. Wynik nie uruchamia
+strojenia ani ponownego pomiaru. Każda tożsamość bez `pass` pozostaje
+review-only; ewentualna promocja tożsamości z `pass` wymaga osobnego issue i
+dokładnego klucza polityki.
+
+`normalized-report.json` został odbudowany byte-for-byte z raportu surowego.
+`result.manifest.json` wiąże marker, oba raporty, źródło, konfigurację, dataset
+i payload weryfikacji merge. Raporty nie zawierają tekstów przypadków, goldów,
+sugestii ani prywatnych ścieżek.

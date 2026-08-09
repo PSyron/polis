@@ -10,10 +10,14 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RETAINED_EVIDENCE_SHA256 = {
-    "experiments/a-b-one-shot/README.md": "035e710a67453dec5dc64719d1cc04bae8100b02cf6a037297c77ebfac619f82",
+    "experiments/a-b-one-shot/README.md": "64842d74b48a32e6bb7e2274f58877496c65e963165b245cf04d67de78f45266",
     "experiments/a-b-one-shot/config.json": "e6316a6fb2c764e2ccd95dbbfff9c00b37575d9aefe79af0673e4a3f88fbd595",
     "experiments/a-b-one-shot/dataset.manifest.json": "3f80ef44ce11b7e4d492e340c0265ff8913fe766a8a4b98377bc55540e58c6d7",
+    "experiments/a-b-one-shot/holdout.started": "b4d6e27aaec54471b25970f6d20ea515893563508806b6a6ddf0ce88bf696dae",
+    "experiments/a-b-one-shot/normalized-report.json": "3bf34f54b68d62d84a9d34b6ca0bd1cf878fc30c718d4179791aa6349a94fc58",
     "experiments/a-b-one-shot/preregistration.json": "3eda81de3349453b2a57ffae65d8d9d4db1c389d1e24ea3f6328046922266be8",
+    "experiments/a-b-one-shot/report.json": "808b7838179b641ff400c78441b7c9b42d4cac245cded7a391882ae9d29d4365",
+    "experiments/a-b-one-shot/result.manifest.json": "9b08fa964efe50224deb2cb5e4a1a76ac7060335d223b2449cc5a29657322578",
     "experiments/contextual_inflection_routing/README.md": "d2a39cb1763f519e4249ca63cd59749975b710425a1def055bf14528d7059964",
     "experiments/contextual_inflection_routing/config.json": "8b5af09fc6cb780067387eb75ce27e2f33bbe4b4f74938a2d323065520ed5d05",
     "experiments/contextual_inflection_routing/frozen_router.json": "73e61539f4373d75b4df65b3ee52b5b73ef6f8b101a7bbfe4ba5da6e5af8f22e",
