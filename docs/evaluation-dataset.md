@@ -192,8 +192,9 @@ offline `git verify-commit` dla dokładnego SHA. Ten plik jest atestacją
 zmaterializowaną przez zaufanego operatora po sprawdzeniu live API GitHub, a
 nie samodzielnym dowodem kryptograficznym.
 
-Drugi plik utrwala pełną tożsamość komentarza: repozytorium `PSyron/polis`,
-issue 243, identyfikator i dokładny URL komentarza, autora `PSyron`, czas
+Drugi plik utrwala pełną tożsamość nowego komentarza: repozytorium
+`PSyron/polis`, issue 243, całkowity identyfikator ściśle większy niż
+`5228447541`, skonstruowany z niego dokładny URL, autora `PSyron`, czas
 późniejszy od pełnego preflightu oraz ciało z dokładnymi tokenami SHA źródła,
 konfiguracji i datasetu. Kanoniczny digest atestacji operatora obejmuje cały
 ten zapis. Zaufane materializowanie obu plików po weryfikacji live przez

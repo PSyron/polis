@@ -3,6 +3,7 @@ from __future__ import annotations
 from polis.evaluation.holdout_models import Taxonomy
 
 DATASET_SHA256 = "a1f9b87dbfc89dc9283f652b56058fee995dabbb71902d642fb8efd576ea7b32"
+AUTHORIZATION_COMMENT_ID_WATERMARK = 5228447541
 AUTHORIZATION_METHOD = "ssh-ed25519-detached"
 AUTHORIZATION_IDENTITY = "PSyron"
 AUTHORIZATION_NAMESPACE = "polis-holdout-authorization-v1"

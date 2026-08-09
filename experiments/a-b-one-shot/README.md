@@ -29,10 +29,11 @@ rezerwacją i przed dostępem do datasetu.
 `merge-verification.json` jest atestacją operatora zmaterializowaną po
 sprawdzeniu live odpowiedzi GitHub API i musi zachować surowe pola podpisu oraz
 payloadu. Runner niezależnie wykonuje offline `git verify-commit` dla dokładnego
-SHA. `run-authorization.json` zachowuje pełną tożsamość komentarza
-`https://github.com/PSyron/polis/issues/243#issuecomment-5228447541`, autora
-`PSyron`, dokładne ciało z trzema wiązaniami digestów oraz digest całej
-atestacji. Te pola i ich samodzielnie obliczony skrót nie ustanawiają
+SHA. `run-authorization.json` zachowuje pełną tożsamość nowego komentarza issue
+#243 o całkowitym identyfikatorze ściśle większym niż `5228447541`. Runner
+konstruuje z niego dokładny URL, wymaga autora `PSyron`, czasu późniejszego od
+pełnego preflightu, dokładnego ciała z trzema wiązaniami digestów oraz digestu
+całej atestacji. Te pola i ich samodzielnie obliczony skrót nie ustanawiają
 autoryzacji. Operator zapisuje odłączony podpis SSH ED25519 w
 `.omo/sealed/a-b-one-shot-v1/run-authorization.sig`. Runner weryfikuje podpis
 nad dokładnymi kanonicznymi bajtami `run-authorization.json`: UTF-8, klucze sortowane,
