@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 
+from tests.denominator_test_constants import expected_counts
+
 from polis.evaluation.calibration_models import JsonValue
 from polis.evaluation.calibration_sources import SOURCE_ROWS, SOURCE_SNAPSHOT_SHA256
 
@@ -79,7 +81,8 @@ def synthetic_config() -> JsonObject:
 def synthetic_dataset() -> JsonObject:
     cases: list[JsonValue] = []
     for source_index, row in enumerate(SOURCE_ROWS):
-        for case_index in range(20):
+        error_count, correct_count = expected_counts("calibration", row.source)
+        for case_index in range(error_count):
             cases.append(
                 {
                     "id": f"error-{source_index:02d}-{case_index:02d}",
@@ -98,7 +101,7 @@ def synthetic_dataset() -> JsonObject:
                     ],
                 }
             )
-        for case_index in range(40):
+        for case_index in range(correct_count):
             cases.append(
                 {
                     "id": f"correct-{source_index:02d}-{case_index:02d}",
@@ -127,8 +130,8 @@ def synthetic_manifest(dataset_bytes: bytes) -> JsonObject:
         "author_role": "calibration-dataset-author",
         "reviewer_role": "independent-calibration-reviewer",
         "review_status": "approved",
-        "case_count": 1200,
-        "reviewed_case_count": 1200,
+        "case_count": 1073,
+        "reviewed_case_count": 1073,
         "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
         "dataset_size_bytes": len(dataset_bytes),
         "pii_status": "absent",

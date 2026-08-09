@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from polis.core import Category, Finding, Source
+from polis.evaluation.calibration_denominators import denominator_for
 from polis.evaluation.calibration_models import (
     CalibrationCase,
     CalibrationConfig,
@@ -114,6 +115,9 @@ def _verdict(
     config: CalibrationConfig,
 ) -> tuple[float | None, KeyVerdict]:
     observed = next(iter(confidences)) if len(confidences) == 1 else None
+    policy = denominator_for(identity.source)
+    if policy.preregistered_verdict == "insufficient_evidence":
+        return observed, "insufficient_evidence"
     complete = (
         counts.error_cases >= config.minimum_error_cases_per_key
         and counts.correct_cases >= config.minimum_correct_cases_per_key

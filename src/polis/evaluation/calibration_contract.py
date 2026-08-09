@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Final, NoReturn
 
+from polis.evaluation.calibration_denominators import CALIBRATION_CASE_COUNT
 from polis.evaluation.calibration_models import (
     CalibrationConfig,
     CalibrationContractError,
@@ -254,7 +255,7 @@ def parse_calibration_manifest(raw_bytes: bytes) -> CalibrationManifest:
         or schema_version != 1
     ):
         _fail("calibration manifest review identity is invalid")
-    if case_count != 1200 or reviewed != case_count or size <= 0:
+    if case_count != CALIBRATION_CASE_COUNT or reviewed != case_count or size <= 0:
         _fail("calibration manifest counts are invalid")
     if re.fullmatch(r"[0-9a-f]{64}", digest) is None:
         _fail("calibration manifest digest is invalid")

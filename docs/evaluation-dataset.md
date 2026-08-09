@@ -184,14 +184,33 @@ python -m polis.evaluation run-calibration \
 Polecenie przyjmuje tylko `--config` i wymaga dokładnie pokazanej ścieżki
 względnej oraz uruchomienia z katalogu głównego repozytorium. Nie pozwala
 zastąpić datasetu, źródła, progu, liczby powtórzeń ani ścieżek wynikowych przez
-argumenty CLI. Obecna implementacja służy wyłącznie testom na syntetycznych
-fixture'ach: nie istnieje jeszcze rzeczywisty zbiór
-`polis-a-b-calibration-v2-v1`, konfiguracja wykonania ani raport kalibracji.
+argumenty CLI. Issue #269 zmaterializowało i zamroziło niezależny zbiór
+kalibracyjny CC0 `polis-a-b-calibration-v2-v1` oraz rozłączny holdout CC0
+`polis-a-b-holdout-v2-v1`. Kalibracja ma 1073 przypadki, w tym 273 błędne
+i 800 poprawnych; holdout ma 530 przypadków, w tym 130 błędnych i 400
+poprawnych. Odrębni autorzy, kustosze i recenzenci sprawdzili ręcznie 1073/1073
+oraz 530/530 przypadków. Deterministyczny skan PII nie wykrył danych osobowych.
+
+Siedem skończonych kluczy pełnego dopasowania ma po 1 albo 3 możliwe
+powierzchnie błędne i pozostaje strukturalnie `insufficient_evidence`, bez
+możliwości promocji. Pozostałe 13 kluczy zachowuje mianowniki 20+40
+w kalibracji oraz 10+20 w holdoucie. Keyed overlap oracle sklasyfikował osobno
+dokładnie 78 prerejestrowanych dopasowań exact skończonych powierzchni
+kalibracji; wszystkie inne exact i wszystkie near wynoszą zero, a holdout nie
+ma wyjątku.
+
+Śledzone metadane w `experiments/a-b-qualification-v2/` wiążą skróty zbiorów,
+pełne przeglądy, manifesty, raport overlap i dwie niezależne weryfikacje freeze.
+Nie zawierają tekstu przypadków, goldów, sugestii, HMAC-ów ani klucza. Samo
+zamrożenie nie uruchomiło kalibracji ani holdoutu, nie wybrało progów i nie
+autoryzuje otwarcia holdoutu. Kalibracyjny plaintext jest przeznaczony wyłącznie
+do późniejszej powtarzalnej kalibracji po osobnej autoryzacji; holdout pozostaje
+zapieczętowany do odrębnego prerejestrowanego one-shotu.
 
 Wynik `threshold-selection` jest jawnie niepodpisany i nieautoryzujący. Nie
 promuje klucza do automatycznej korekty, nie zmienia polityki i nie dopuszcza
-holdoutu. Rzeczywiste dane CC0, niezależny przegląd, podpisany wybór progów,
-prerejestracja i osobny one-shot wymagają kolejnych, odrębnych issues.
+holdoutu. Podpisany wybór progów, prerejestracja i osobny one-shot wymagają
+kolejnych, odrębnych issues.
 
 ## Prerejestracja jednorazowego holdoutu A+B
 

@@ -8,6 +8,12 @@ from polis.evaluation.calibration_models import CalibrationContractError
 CANONICAL_CALIBRATION_CONFIG: Final = Path(
     "experiments/a-b-qualification-v2/config.json"
 )
+CALIBRATION_REVIEW: Final = Path(
+    "experiments/a-b-qualification-v2/calibration.review.json"
+)
+CALIBRATION_REVIEW_PAYLOAD: Final = Path(
+    ".omo/sealed/a-b-calibration-v2-v1/review.payload.json"
+)
 
 
 def require_canonical_calibration_config(
