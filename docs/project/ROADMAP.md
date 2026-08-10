@@ -43,6 +43,18 @@ finalization/publication (#222) są etapami zakończonymi tego samego wydania.
 #195 pozostaje opcjonalną, nieblokującą ścieżką post-v1 i nie jest bramką
 tego wydania.
 
+Pozostałe kierunki nie zmieniają statusu opublikowanego wydania:
+
+- Umbrella B — [#236](https://github.com/PSyron/polis/issues/236) — jest odrębną,
+  nieblokującą ścieżką jakościową dla opcjonalnej warstwy morfologicznej; nie
+  stanowi bramki wydania ani ukrytej zależności runtime'u v1.
+- Umbrella C — [#245](https://github.com/PSyron/polis/issues/245) — pozostaje
+  uśpioną, opcjonalną ścieżką badań v2 bez aktywnych dzieci i poza krytyczną
+  ścieżką produktu.
+- Umbrella D — [#271](https://github.com/PSyron/polis/issues/271) — obejmuje
+  nieblokujące utwardzanie po wydaniu (post-release hardening); nie blokuje
+  retroaktywnie opublikowanego `0.2.0`.
+
 Historyczny graf karty runtime-first miał postać `#120 -> #84 -> #95`.
 #84 to praca P0 nad bezpieczeństwem produktu, a #95 to utwardzanie P1.
 Strzałka `#120 -> #84 -> #95` zapisuje kolejność; nie oznacza, że #95 blokuje
