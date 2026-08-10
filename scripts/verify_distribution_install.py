@@ -22,10 +22,12 @@ def _deny(*args, **kwargs):
 socket.socket.connect = _deny
 socket.socket.connect_ex = _deny
 socket.socket.sendto = _deny
+if hasattr(socket.socket, "sendmsg"):
+    socket.socket.sendmsg = _deny
 socket.create_connection = _deny
 """
 SOCKET_PROBE = """import socket
-probes = (
+probes = [
     ("socket.connect", lambda: socket.socket().connect(("127.0.0.1", 9))),
     ("socket.connect_ex", lambda: socket.socket().connect_ex(("127.0.0.1", 9))),
     ("socket.create_connection", lambda: socket.create_connection(("127.0.0.1", 9))),
@@ -35,7 +37,16 @@ probes = (
             b"probe", ("127.0.0.1", 9)
         ),
     ),
-)
+]
+if hasattr(socket.socket, "sendmsg"):
+    probes.append(
+        (
+            "socket.sendmsg",
+            lambda: socket.socket(socket.AF_INET, socket.SOCK_DGRAM).sendmsg(
+                [b"probe"], [], 0, ("127.0.0.1", 9)
+            ),
+        )
+    )
 for name, probe in probes:
     try:
         probe()
