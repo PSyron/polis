@@ -8,6 +8,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
+from scripts.validate_fast_ci_workflow import _strip_unquoted_shell_comment
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate_fast_ci_workflow.py"
@@ -237,6 +238,42 @@ def test_fast_ci_contract_rejects_required_command_in_run_comment(
     assert "workflow must have exactly one filtered test command" in result.stderr
 
 
+def test_fast_ci_contract_rejects_required_command_in_shell_comment(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "run: uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+            "run: |\n"
+            "          true # uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    (
+        ("true # comment", "true"),
+        ("printf '# keep'", "printf '# keep'"),
+        ('printf "# keep"', 'printf "# keep"'),
+        (r"printf \# keep", r"printf \# keep"),
+    ),
+)
+def test_shell_comment_stripping_preserves_quoted_and_escaped_hashes(
+    line: str, expected: str
+) -> None:
+    assert _strip_unquoted_shell_comment(line) == expected
+
+
 def test_fast_ci_contract_rejects_required_command_in_step_name(
     tmp_path: Path,
 ) -> None:
@@ -261,10 +298,171 @@ def test_fast_ci_contract_rejects_required_command_in_step_name(
     assert "workflow must have exactly one filtered test command" in result.stderr
 
 
-def test_fast_ci_contract_accepts_multiline_filtered_pytest_run(tmp_path: Path) -> None:
+def test_fast_ci_contract_rejects_required_command_in_step_env_run(
+    tmp_path: Path,
+) -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8").replace(
         FAST_PYTEST_COMMAND,
-        "run: |\n"
+        "run: # command moved to env.run",
+    )
+    workflow = workflow.replace(
+        "        env:\n          POLIS_GENERATIVE_GENERATOR_VERSION",
+        "        env:\n"
+        "          run: uv run --locked --extra dev pytest "
+        '-m "not research and not slow"\n'
+        "          POLIS_GENERATIVE_GENERATOR_VERSION",
+    )
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(workflow, encoding="utf-8")
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "workflow must have exactly one filtered test command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_another_job(
+    tmp_path: Path,
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        FAST_PYTEST_COMMAND,
+        "run: # command moved to another job",
+    )
+    workflow += (
+        "\n  unrelated:\n"
+        "    runs-on: macos-15\n"
+        "    steps:\n"
+        "      - name: Retained unrelated command\n"
+        "        run: uv run --locked --extra dev pytest "
+        '-m "not research and not slow"\n'
+    )
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(workflow, encoding="utf-8")
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "workflow must have exactly one filtered test command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_nested_step_field(
+    tmp_path: Path,
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        FAST_PYTEST_COMMAND,
+        "run: # command moved to an unrelated nested field",
+    )
+    workflow = workflow.replace(
+        "        run: # command moved to an unrelated nested field",
+        "        run: # command moved to an unrelated nested field\n"
+        "        with:\n"
+        "          diagnostic:\n"
+        "            - description: retained metadata\n"
+        "              run: uv run --locked --extra dev pytest "
+        '-m "not research and not slow"',
+    )
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(workflow, encoding="utf-8")
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "workflow must have exactly one filtered test command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_run_true_comment(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "run: uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+            "run: true # uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_hidden_in_echo(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "run: uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+            'run: echo "uv run --locked --extra dev python '
+            'scripts/verify_distribution_artifacts.py"',
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_unreachable_if_false_body(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "run: uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+            "run: |\n"
+            "          if false; then\n"
+            "            uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py\n"
+            "          fi",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_heredoc_payload(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            "run: uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py",
+            "run: |\n"
+            "          cat <<'EOF'\n"
+            "          uv run --locked --extra dev python "
+            "scripts/verify_distribution_artifacts.py\n"
+            "          EOF",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+@pytest.mark.parametrize("style", ("|", ">"))
+def test_fast_ci_contract_accepts_multiline_filtered_pytest_run(
+    tmp_path: Path, style: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        FAST_PYTEST_COMMAND,
+        f"run: {style}\n"
         '          uv run --locked --extra dev pytest -m "not research and not slow"',
     )
     multiline_workflow = tmp_path / "fast-ci.yml"
