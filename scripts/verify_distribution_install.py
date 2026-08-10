@@ -57,6 +57,18 @@ EVALUATION_EXPORTS = (
     "validate_dataset",
     "validate_safety_corpus",
 )
+PUBLIC_EVAL_IMPORTS = (
+    "polis.evaluation.datasets",
+    "polis.evaluation.datasets.quality",
+    "polis.evaluation.datasets.quality.v1",
+    "polis.evaluation.datasets.v1",
+)
+FORBIDDEN_REPOSITORY_MODULES = (
+    "polis.evaluation.__main__",
+    "polis.evaluation.calibration_runner",
+    "polis.evaluation.holdout_runner",
+    "polis.evaluation.holdout_reservation",
+)
 
 
 def _venv_python(venv_dir: Path) -> Path:
@@ -80,6 +92,35 @@ def _run(
         capture_output=True,
         timeout=120,
     )
+
+
+def _assert_distribution_public_import_contract(
+    python: Path, *, label: str, smoke_cwd: Path, env: dict[str, str]
+) -> None:
+    module_check = f"""
+import importlib
+
+
+required_modules = {PUBLIC_EVAL_IMPORTS}
+for module in required_modules:
+    importlib.import_module(module)
+
+for module in {FORBIDDEN_REPOSITORY_MODULES}:
+    try:
+        importlib.import_module(module)
+    except ModuleNotFoundError:
+        continue
+    raise SystemExit("{label} exposed repository-only module: " + module)
+"""
+    result = _run(
+        [str(python), "-c", module_check.strip()],
+        cwd=smoke_cwd,
+        env=env,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.stdout + result.stderr)
+    print(f"artifact={label} public_dataset_imports=ok")
+    print(f"artifact={label} repository_only_modules=absent")
 
 
 def _offline_environment(blocker: Path, wheelhouse: Path) -> dict[str, str]:
@@ -165,6 +206,21 @@ def _install_and_smoke(
                 env=env,
             ),
             f"{label} evaluation export contract",
+        )
+        _require_success(
+            _run(
+                [
+                    str(python),
+                    "-c",
+                    "import polis.evaluation\nprint('evaluation import ok')",
+                ],
+                cwd=smoke_cwd,
+                env=env,
+            ),
+            f"{label} package import",
+        )
+        _assert_distribution_public_import_contract(
+            python, label=label, smoke_cwd=smoke_cwd, env=env
         )
         evaluation_cli = _run(
             [str(python), "-m", "polis.evaluation", "--help"],
