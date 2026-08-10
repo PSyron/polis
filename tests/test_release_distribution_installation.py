@@ -25,6 +25,12 @@ EXPECTED_PACKAGES = {
     "trove-classifiers": "2026.6.1.19",
 }
 EVALUATION_INIT = "polis/evaluation/__init__.py"
+REPOSITORY_ONLY_MODULES = (
+    "src/polis/evaluation/calibration_runner.py",
+    "src/polis/evaluation/holdout_runner.py",
+    "src/polis/evaluation/holdout_reservation.py",
+    "src/polis/evaluation/__main__.py",
+)
 
 
 def _run(
@@ -116,7 +122,10 @@ def _add_distribution_member(dist: Path, member: str) -> None:
     ):
         for name in original.namelist():
             changed.writestr(name, original.read(name))
-        changed.writestr(member.removeprefix("src/"), b"unexpected\n")
+        payload = b"repository_only_test_module = True\n"
+        if member.endswith(".py") or member.endswith("__main__.py"):
+            payload = b'"repository-only-sentinel"\n'
+        changed.writestr(member.removeprefix("src/"), payload)
     wheel.unlink()
     changed_wheel.rename(wheel)
 
@@ -130,7 +139,9 @@ def _add_distribution_member(dist: Path, member: str) -> None:
             source = original.extractfile(archive_member)
             changed.addfile(archive_member, source)
         root = original.getnames()[0].split("/", 1)[0]
-        content = b"unexpected\n"
+        content = b"repository_only_test_module = True\n"
+        if member.endswith(".py") or member.endswith("__main__.py"):
+            content = b'"repository-only-sentinel"\n'
         extra = tarfile.TarInfo(f"{root}/{member}")
         extra.size = len(content)
         changed.addfile(extra, BytesIO(content))
@@ -320,6 +331,8 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert "socket.create_connection=blocked" in result.stdout
     assert "artifact=wheel version=0.2.0 issues=1" in result.stdout
     assert "artifact=sdist version=0.2.0 issues=1" in result.stdout
+    assert result.stdout.count("public_dataset_imports=ok") == 2
+    assert result.stdout.count("repository_only_modules=absent") == 2
     assert result.stdout.count("repository_only_evaluation_cli=absent") == 2
     assert '"text":"Witaj,świecie."' in result.stdout
     assert "http://" not in result.stdout.lower()
@@ -563,6 +576,32 @@ def test_public_install_verifier_rejects_malformed_wheelhouse_manifest(
 
     assert result.returncode != 0
     assert "manifest is malformed" in result.stderr
+
+
+@pytest.mark.parametrize("module", REPOSITORY_ONLY_MODULES)
+def test_public_install_verifier_rejects_repository_only_evaluation_modules(
+    tmp_path: Path, module: str
+) -> None:
+    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    _add_distribution_member(dist, module)
+
+    result = _run(
+        [
+            sys.executable,
+            str(VERIFY_INSTALL),
+            "--dist",
+            str(dist),
+            "--wheelhouse",
+            str(wheelhouse),
+            "--wheelhouse-manifest",
+            str(manifest),
+            "--smoke-cwd",
+            str(_empty_smoke_cwd(tmp_path)),
+        ]
+    )
+
+    assert result.returncode != 0
+    assert "exposed repository-only module" in result.stderr
 
 
 def test_public_wheelhouse_preparer_rejects_lock_version_drift(
