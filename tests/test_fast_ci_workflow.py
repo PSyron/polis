@@ -455,6 +455,30 @@ def test_fast_ci_contract_rejects_multiline_failure_masking(
     assert "missing required executable command" in result.stderr
 
 
+def test_fast_ci_contract_rejects_required_command_with_help_argument(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    required_command = (
+        "run: uv run --locked --extra dev python "
+        "scripts/verify_distribution_install.py --dist dist "
+        '--wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" '
+        '--wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json" '
+        '--smoke-cwd "${{ runner.temp }}/polis-install-smoke-cwd"'
+    )
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    assert required_command in workflow
+    invalid_workflow.write_text(
+        workflow.replace(required_command, required_command + " --help"),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
 def test_fast_ci_contract_rejects_required_command_in_unreachable_if_false_body(
     tmp_path: Path,
 ) -> None:

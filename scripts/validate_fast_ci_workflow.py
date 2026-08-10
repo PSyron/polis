@@ -50,7 +50,8 @@ REQUIRED_EXECUTABLE_COMMANDS = (
     "uv sync --locked --extra dev",
     (
         "uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py "
-        "--lock uv.lock --output"
+        '--lock uv.lock --output "${{ runner.temp }}/polis-build-wheelhouse" '
+        '--manifest "${{ runner.temp }}/polis-build-wheelhouse.json"'
     ),
     "uv run --locked --extra dev ruff check .",
     "uv run --locked --extra dev ruff format --check .",
@@ -62,7 +63,12 @@ REQUIRED_EXECUTABLE_COMMANDS = (
     ),
     "uv run --locked --extra dev python -m build --no-isolation",
     "uv run --locked --extra dev python scripts/verify_distribution_artifacts.py",
-    "uv run --locked --extra dev python scripts/verify_distribution_install.py",
+    (
+        "uv run --locked --extra dev python scripts/verify_distribution_install.py "
+        '--dist dist --wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" '
+        '--wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json" '
+        '--smoke-cwd "${{ runner.temp }}/polis-install-smoke-cwd"'
+    ),
 )
 
 
@@ -117,10 +123,7 @@ def _executes_required_command(run: str, required: str) -> bool:
         return False
     run_tokens = _shell_tokens(run)
     required_tokens = _shell_tokens(required)
-    if run_tokens[: len(required_tokens)] != required_tokens:
-        return False
-    trailing_tokens = run_tokens[len(required_tokens) :]
-    return not any(set(token) & {";", "&", "|"} for token in trailing_tokens)
+    return run_tokens == required_tokens
 
 
 def extract_quality_run_commands(path: Path) -> tuple[list[str], str | None]:
