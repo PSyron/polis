@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -99,6 +100,27 @@ def _strip_unquoted_shell_comment(line: str) -> str:
         elif character == "#":
             return line[:index].rstrip()
     return line.rstrip()
+
+
+def _shell_tokens(command: str) -> list[str]:
+    lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|")
+    lexer.commenters = ""
+    lexer.whitespace_split = True
+    try:
+        return list(lexer)
+    except ValueError:
+        return []
+
+
+def _executes_required_command(run: str, required: str) -> bool:
+    if len(run.splitlines()) != 1:
+        return False
+    run_tokens = _shell_tokens(run)
+    required_tokens = _shell_tokens(required)
+    if run_tokens[: len(required_tokens)] != required_tokens:
+        return False
+    trailing_tokens = run_tokens[len(required_tokens) :]
+    return not any(set(token) & {";", "&", "|"} for token in trailing_tokens)
 
 
 def extract_quality_run_commands(path: Path) -> tuple[list[str], str | None]:
@@ -263,7 +285,9 @@ def validate_contract(path: Path) -> list[str]:
     if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
     for command in REQUIRED_EXECUTABLE_COMMANDS:
-        if not any(run.startswith(command) for run in quality_run_commands):
+        if not any(
+            _executes_required_command(run, command) for run in quality_run_commands
+        ):
             errors.append(f"missing required executable command: {command}")
     errors.extend(validate_generated_invariant_configuration(workflow))
 
