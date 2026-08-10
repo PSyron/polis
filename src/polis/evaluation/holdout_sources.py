@@ -96,9 +96,28 @@ def parse_sources(
         raise HoldoutContractError(
             "current source identity snapshot is unavailable"
         ) from error
-    if identities != current:
+    current_set = set(current)
+    identities_set = set(identities)
+    if len(current_set) != len(current) or len(identities_set) != len(identities):
+        raise HoldoutContractError("source identities must be unique")
+
+    missing = sorted(
+        (item for item in identities if item not in current_set),
+        key=lambda item: item.source,
+    )
+    extra = sorted(
+        (item for item in current if item not in identities_set),
+        key=lambda item: item.source,
+    )
+    if missing or extra:
+        details = []
+        if missing:
+            details.append("missing: " + ", ".join(item.source for item in missing))
+        if extra:
+            details.append("extra: " + ", ".join(item.source for item in extra))
         raise HoldoutContractError(
-            "source identities must match the current composition root exactly"
+            "source identities differ from the runtime composition root: "
+            + "; ".join(details)
         )
     return identities
 
