@@ -12,6 +12,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pytest
+from scripts.verify_distribution_install import FORBIDDEN_REPOSITORY_MODULES
 
 ROOT = Path(__file__).resolve().parents[1]
 PREPARE = ROOT / "scripts/prepare_build_wheelhouse.py"
@@ -25,12 +26,6 @@ EXPECTED_PACKAGES = {
     "trove-classifiers": "2026.6.1.19",
 }
 EVALUATION_INIT = "polis/evaluation/__init__.py"
-REPOSITORY_ONLY_MODULES = (
-    "src/polis/evaluation/calibration_runner.py",
-    "src/polis/evaluation/holdout_runner.py",
-    "src/polis/evaluation/holdout_reservation.py",
-    "src/polis/evaluation/__main__.py",
-)
 
 
 def _run(
@@ -329,10 +324,15 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert "socket.connect=blocked" in result.stdout
     assert "socket.connect_ex=blocked" in result.stdout
     assert "socket.create_connection=blocked" in result.stdout
+    assert "socket.sendto=blocked" in result.stdout
     assert "artifact=wheel version=0.2.0 issues=1" in result.stdout
     assert "artifact=sdist version=0.2.0 issues=1" in result.stdout
     assert result.stdout.count("public_dataset_imports=ok") == 2
     assert result.stdout.count("repository_only_modules=absent") == 2
+    assert result.stdout.count("public_resource=") == 6
+    assert result.stdout.count("forbidden_module=") == (
+        2 * len(FORBIDDEN_REPOSITORY_MODULES)
+    )
     assert result.stdout.count("repository_only_evaluation_cli=absent") == 2
     assert '"text":"Witaj,świecie."' in result.stdout
     assert "http://" not in result.stdout.lower()
@@ -578,12 +578,12 @@ def test_public_install_verifier_rejects_malformed_wheelhouse_manifest(
     assert "manifest is malformed" in result.stderr
 
 
-@pytest.mark.parametrize("module", REPOSITORY_ONLY_MODULES)
+@pytest.mark.parametrize("module", FORBIDDEN_REPOSITORY_MODULES)
 def test_public_install_verifier_rejects_repository_only_evaluation_modules(
     tmp_path: Path, module: str
 ) -> None:
     dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
-    _add_distribution_member(dist, module)
+    _add_distribution_member(dist, f"src/{module.replace('.', '/')}.py")
 
     result = _run(
         [
@@ -601,7 +601,7 @@ def test_public_install_verifier_rejects_repository_only_evaluation_modules(
     )
 
     assert result.returncode != 0
-    assert "exposed repository-only module" in result.stderr
+    assert f"exposed repository-only module: {module}" in result.stderr
 
 
 def test_public_wheelhouse_preparer_rejects_lock_version_drift(

@@ -11,13 +11,17 @@ import sys
 import tempfile
 from pathlib import Path
 
-from distribution_wheelhouse import validate_wheelhouse
+if __package__:
+    from scripts.distribution_wheelhouse import validate_wheelhouse
+else:
+    from distribution_wheelhouse import validate_wheelhouse
 
 SOCKET_BLOCKER = """import socket
 def _deny(*args, **kwargs):
     raise OSError("network blocked by Polis distribution verifier")
 socket.socket.connect = _deny
 socket.socket.connect_ex = _deny
+socket.socket.sendto = _deny
 socket.create_connection = _deny
 """
 SOCKET_PROBE = """import socket
@@ -25,6 +29,12 @@ probes = (
     ("socket.connect", lambda: socket.socket().connect(("127.0.0.1", 9))),
     ("socket.connect_ex", lambda: socket.socket().connect_ex(("127.0.0.1", 9))),
     ("socket.create_connection", lambda: socket.create_connection(("127.0.0.1", 9))),
+    (
+        "socket.sendto",
+        lambda: socket.socket(socket.AF_INET, socket.SOCK_DGRAM).sendto(
+            b"probe", ("127.0.0.1", 9)
+        ),
+    ),
 )
 for name, probe in probes:
     try:
@@ -63,11 +73,21 @@ PUBLIC_EVAL_IMPORTS = (
     "polis.evaluation.datasets.quality.v1",
     "polis.evaluation.datasets.v1",
 )
-FORBIDDEN_REPOSITORY_MODULES = (
-    "polis.evaluation.__main__",
-    "polis.evaluation.calibration_runner",
-    "polis.evaluation.holdout_runner",
-    "polis.evaluation.holdout_reservation",
+PUBLIC_EVAL_RESOURCES = (
+    ("polis.evaluation.datasets.quality.v1", "cases.json"),
+    ("polis.evaluation.datasets.quality.v1", "manifest.json"),
+    ("polis.evaluation.datasets.v1", "cases.json"),
+)
+EVALUATION_SOURCE = Path(__file__).resolve().parents[1] / "src" / "polis" / "evaluation"
+FORBIDDEN_REPOSITORY_MODULES = tuple(
+    f"polis.evaluation.{path.stem}"
+    for path in sorted(
+        (
+            EVALUATION_SOURCE / "__main__.py",
+            *EVALUATION_SOURCE.glob("calibration_*.py"),
+            *EVALUATION_SOURCE.glob("holdout_*.py"),
+        )
+    )
 )
 
 
@@ -98,19 +118,26 @@ def _assert_distribution_public_import_contract(
     python: Path, *, label: str, smoke_cwd: Path, env: dict[str, str]
 ) -> None:
     module_check = f"""
-import importlib
+from importlib import resources, util
 
 
 required_modules = {PUBLIC_EVAL_IMPORTS}
 for module in required_modules:
-    importlib.import_module(module)
+    if util.find_spec(module) is None:
+        raise SystemExit("{label} missing public evaluation module: " + module)
+    print("public_module=" + module + " present")
+
+for module, resource in {PUBLIC_EVAL_RESOURCES}:
+    if not resources.files(module).joinpath(resource).is_file():
+        raise SystemExit(
+            "{label} missing public dataset resource: " + module + ":" + resource
+        )
+    print("public_resource=" + module + ":" + resource + " present")
 
 for module in {FORBIDDEN_REPOSITORY_MODULES}:
-    try:
-        importlib.import_module(module)
-    except ModuleNotFoundError:
-        continue
-    raise SystemExit("{label} exposed repository-only module: " + module)
+    if util.find_spec(module) is not None:
+        raise SystemExit("{label} exposed repository-only module: " + module)
+    print("forbidden_module=" + module + " absent")
 """
     result = _run(
         [str(python), "-c", module_check.strip()],
@@ -119,6 +146,7 @@ for module in {FORBIDDEN_REPOSITORY_MODULES}:
     )
     if result.returncode != 0:
         raise SystemExit(result.stdout + result.stderr)
+    print(result.stdout.strip())
     print(f"artifact={label} public_dataset_imports=ok")
     print(f"artifact={label} repository_only_modules=absent")
 
