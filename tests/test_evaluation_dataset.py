@@ -10,8 +10,6 @@ import pytest
 from polis.core import Category
 from polis.evaluation.dataset import DATASET_PATH, load_dataset, validate_dataset
 
-pytestmark = pytest.mark.research
-
 ROOT = Path(__file__).resolve().parents[1]
 DOCUMENTATION = ROOT / "docs" / "evaluation-dataset.md"
 
@@ -232,6 +230,7 @@ def test_dataset_asset_is_distributed_with_the_package() -> None:
     assert DATASET_PATH.is_file()
 
 
+@pytest.mark.slow
 def test_dataset_documentation_points_to_adr_0019_and_archive() -> None:
     documentation = " ".join(DOCUMENTATION.read_text(encoding="utf-8").split())
 

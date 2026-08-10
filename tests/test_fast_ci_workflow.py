@@ -478,6 +478,30 @@ class ResearchCase(unittest.TestCase):
     assert "1 passed, 2 deselected" in result.stdout
 
 
+def test_fast_ci_evaluation_contracts_run_without_documentation_prose() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--strict-markers",
+            "-c",
+            str(ROOT / "pyproject.toml"),
+            "-m",
+            "not research and not slow",
+            "tests/test_evaluation_dataset.py",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "19 passed" in result.stdout
+    assert "1 deselected" in result.stdout
+
+
 def test_byte_stable_text_uses_effective_text_and_lf_attributes() -> None:
     result = subprocess.run(
         ["git", "check-attr", "text", "eol", "--", *BYTE_STABLE_TEXT_PATHS],
