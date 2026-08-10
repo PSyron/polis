@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import tarfile
@@ -26,6 +27,17 @@ EXPECTED_PACKAGES = {
     "trove-classifiers": "2026.6.1.19",
 }
 EVALUATION_INIT = "polis/evaluation/__init__.py"
+EVALUATION_SOURCE = ROOT / "src" / "polis" / "evaluation"
+EXPECTED_FORBIDDEN_REPOSITORY_MODULES = tuple(
+    f"polis.evaluation.{path.stem}"
+    for path in sorted(
+        (
+            EVALUATION_SOURCE / "__main__.py",
+            *EVALUATION_SOURCE.glob("calibration_*.py"),
+            *EVALUATION_SOURCE.glob("holdout_*.py"),
+        )
+    )
+)
 
 
 def _run(
@@ -72,6 +84,13 @@ def _prepare_release_inputs(base: Path) -> tuple[Path, Path, Path]:
     )
     assert build.returncode == 0, build.stderr + build.stdout
     return dist, wheelhouse, manifest
+
+
+@pytest.fixture(scope="session")
+def repository_module_mutation_inputs(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> tuple[Path, Path, Path]:
+    return _prepare_release_inputs(tmp_path_factory.mktemp("repository-module-inputs"))
 
 
 def _empty_smoke_cwd(base: Path) -> Path:
@@ -325,13 +344,17 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert "socket.connect_ex=blocked" in result.stdout
     assert "socket.create_connection=blocked" in result.stdout
     assert "socket.sendto=blocked" in result.stdout
+    if hasattr(socket.socket, "sendmsg"):
+        assert "socket.sendmsg=blocked" in result.stdout
+    else:
+        assert "socket.sendmsg=blocked" not in result.stdout
     assert "artifact=wheel version=0.2.0 issues=1" in result.stdout
     assert "artifact=sdist version=0.2.0 issues=1" in result.stdout
     assert result.stdout.count("public_dataset_imports=ok") == 2
     assert result.stdout.count("repository_only_modules=absent") == 2
     assert result.stdout.count("public_resource=") == 6
     assert result.stdout.count("forbidden_module=") == (
-        2 * len(FORBIDDEN_REPOSITORY_MODULES)
+        2 * len(EXPECTED_FORBIDDEN_REPOSITORY_MODULES)
     )
     assert result.stdout.count("repository_only_evaluation_cli=absent") == 2
     assert '"text":"Witaj,świecie."' in result.stdout
@@ -578,11 +601,21 @@ def test_public_install_verifier_rejects_malformed_wheelhouse_manifest(
     assert "manifest is malformed" in result.stderr
 
 
-@pytest.mark.parametrize("module", FORBIDDEN_REPOSITORY_MODULES)
+def test_repository_only_boundary_matches_independent_source_discovery() -> None:
+    assert FORBIDDEN_REPOSITORY_MODULES == EXPECTED_FORBIDDEN_REPOSITORY_MODULES
+
+
+@pytest.mark.parametrize("module", EXPECTED_FORBIDDEN_REPOSITORY_MODULES)
 def test_public_install_verifier_rejects_repository_only_evaluation_modules(
-    tmp_path: Path, module: str
+    tmp_path: Path,
+    repository_module_mutation_inputs: tuple[Path, Path, Path],
+    module: str,
 ) -> None:
-    dist, wheelhouse, manifest = _prepare_release_inputs(tmp_path)
+    source_dist, source_wheelhouse, source_manifest = repository_module_mutation_inputs
+    dist = shutil.copytree(source_dist, tmp_path / "dist")
+    wheelhouse = shutil.copytree(source_wheelhouse, tmp_path / "wheelhouse")
+    manifest = tmp_path / "wheelhouse-manifest.json"
+    shutil.copy2(source_manifest, manifest)
     _add_distribution_member(dist, f"src/{module.replace('.', '/')}.py")
 
     result = _run(
