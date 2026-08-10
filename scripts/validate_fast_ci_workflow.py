@@ -74,6 +74,44 @@ def parse_matrix(workflow: str) -> set[tuple[str, str, str, str]]:
     }
 
 
+def _extract_run_commands(workflow: str) -> list[str]:
+    commands: list[str] = []
+    lines = workflow.splitlines()
+    index = 0
+    while index < len(lines):
+        match = re.match(r"^(?P<indent>\s*)run:\s*(?P<rest>.*)$", lines[index])
+        if match is None:
+            index += 1
+            continue
+
+        rest = match.group("rest").strip()
+        indent = len(match.group("indent"))
+        if rest.startswith("#"):
+            index += 1
+            continue
+
+        if rest and not rest.startswith(("|", ">")):
+            commands.append(f"run: {rest}")
+            index += 1
+            continue
+
+        index += 1
+        while index < len(lines):
+            current = lines[index]
+            current_indent = len(current) - len(current.lstrip())
+            current_text = current.strip()
+            if current_indent <= indent:
+                break
+            if current_text.startswith("#"):
+                index += 1
+                continue
+            if current_text:
+                commands.append(f"run: {current_text}")
+            index += 1
+
+    return commands
+
+
 def validate_yaml_syntax(path: Path) -> str | None:
     ruby = shutil.which("ruby")
     if ruby is None:
@@ -200,9 +238,11 @@ def validate_contract(path: Path) -> list[str]:
 
     if FAST_PYTEST_FILTER not in workflow:
         errors.append("fast pytest marker filter is missing")
-    test_commands = re.findall(
-        r"^\s+run: .*\b(?:pytest|unittest)\b.*$", workflow, re.MULTILINE
-    )
+    test_commands = [
+        command.strip()
+        for command in _extract_run_commands(workflow)
+        if ("pytest" in command or "unittest" in command)
+    ]
     if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
     errors.extend(validate_generated_invariant_configuration(workflow))
