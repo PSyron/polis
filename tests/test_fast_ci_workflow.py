@@ -216,6 +216,65 @@ def test_fast_ci_contract_rejects_a_second_unfiltered_test_command(
     assert "exactly one filtered test command" in result.stderr
 
 
+def test_fast_ci_contract_rejects_required_command_in_run_comment(
+    tmp_path: Path,
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            FAST_PYTEST_COMMAND,
+            (
+                "run: # uv run --locked --extra dev "
+                'pytest -m "not research and not slow"'
+            ),
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "workflow must have exactly one filtered test command" in result.stderr
+
+
+def test_fast_ci_contract_rejects_required_command_in_step_name(
+    tmp_path: Path,
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    workflow = workflow.replace(
+        "      - name: Run pytest suite",
+        (
+            "      - name: Run uv run --locked --extra dev "
+            'pytest -m "not research and not slow"'
+        ),
+    )
+    workflow = workflow.replace(
+        FAST_PYTEST_COMMAND,
+        "run: # command moved to step name",
+    )
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    invalid_workflow.write_text(workflow, encoding="utf-8")
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "workflow must have exactly one filtered test command" in result.stderr
+
+
+def test_fast_ci_contract_accepts_multiline_filtered_pytest_run(tmp_path: Path) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        FAST_PYTEST_COMMAND,
+        "run: |\n"
+        '          uv run --locked --extra dev pytest -m "not research and not slow"',
+    )
+    multiline_workflow = tmp_path / "fast-ci.yml"
+    multiline_workflow.write_text(workflow, encoding="utf-8")
+
+    result = run_validator(multiline_workflow)
+
+    assert result.returncode == 0, result.stderr
+
+
 @pytest.mark.parametrize("name,value", GENERATIVE_CONFIGURATION)
 def test_fast_ci_contract_rejects_missing_generated_invariant_configuration(
     tmp_path: Path, name: str, value: str
