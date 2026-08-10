@@ -2,6 +2,8 @@
 
 - Data przeglądu: 2026-08-10
 - Właściciel: Paweł Cyroń
+- Zatwierdzający: Paweł Cyroń
+- Audytowana rewizja: `59919931a95589d0ef5498fc8bcfe6ea0b67d62a`
 - Zakres: pełny graf z `uv.lock` dla opcjonalnych grup `dev` i `morphology`, w
   tym projekt lokalny i backend budowania
 - Decyzja: zatwierdzono do użycia przy budowaniu i rozwoju z zachowaniem
@@ -22,7 +24,7 @@ które potwierdzają tożsamość pakietu i opublikowane metadane licencji.
 | `mypy` | 2.3.0 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/mypy/2.3.0/json); przy redystrybucji zachowaj notę MIT. |
 | `mypy-extensions` | 1.1.0 | MIT | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/mypy-extensions/1.1.0/json); przy redystrybucji zachowaj notę MIT. |
 | `morfeusz2` | 1.99.15 | BSD-2-Clause | bezpośrednia zależność extras `dev` i `morphology`; benchmark #238 oraz opcjonalny konsument #239 | [Metadane PyPI](https://pypi.org/pypi/morfeusz2/1.99.15/json) i [licencja dostawcy](https://morfeusz.sgjp.pl/doc/license/); zachowaj notę, warunki i wyłączenie odpowiedzialności programu oraz dołączonych danych fleksyjnych SGJP/Polimorf. Licencja nie obejmuje całego słownika gramatycznego SGJP. |
-| `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | zależność przechodnia build, Hatchling i pytest | [Metadane PyPI](https://pypi.org/pypi/packaging/26.2/json); złożone wyrażenie zatwierdzono w wariancie BSD-2-Clause. |
+| `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | bezpośrednia zależność deweloperska `dev` (`packaging>=26.2`); także zależność przechodnia build, Hatchling i pytest | [Metadane PyPI](https://pypi.org/pypi/packaging/26.2/json); złożone wyrażenie zatwierdzono w wariancie BSD-2-Clause. |
 | `pathspec` | 1.1.1 | MPL-2.0 | zależność przechodnia Hatchling i mypy | [Metadane PyPI](https://pypi.org/pypi/pathspec/1.1.1/json); osobna akceptacja wyłącznie dla niezmodyfikowanej zależności budowania i rozwoju. |
 | `pluggy` | 1.6.0 | MIT | zależność przechodnia pytest | [Metadane PyPI](https://pypi.org/pypi/pluggy/1.6.0/json); przy redystrybucji zachowaj notę MIT. |
 | `polis-nlp` | 0.2.0 | MIT | projekt lokalny | `pyproject.toml` i `LICENSE`; kod i dokumentacja projektu są na licencji MIT. |
@@ -43,26 +45,33 @@ które potwierdzają tożsamość pakietu i opublikowane metadane licencji.
 - Aktywnie dystrybuowany kod jest ograniczony do `/src/polis/**` bez warstwy badawczej;
   wszystkie rekordy jakości `src/polis/evaluation/datasets/quality/v1/*` i
   `src/polis/evaluation/datasets/v1/cases.json` deklarują `license: CC0-1.0`.
-- `mypy`, `ruff`, `build`, `hatchling`, `pytest`, `morfeusz2` oraz powiązane
+- `packaging`, `mypy`, `ruff`, `build`, `hatchling`, `pytest`, `morfeusz2` oraz powiązane
   pozycje zgodnie z `pyproject.toml` i `uv.lock` pozostają narzędziami
   deweloperskimi i nie stanowią zmienionej powierzchni danych użytkownika.
 
-### Decyzja
+### Decyzja dla obecnych artefaktów
 
 - **Zalecenie**: utrzymać obecny model bez zmian.
 - **Polityka**: nie wprowadzać dodatkowych plików `LICENSES/` ani globalnych
   plików legalnych podsumowań dla CC0, dopóki rozsyłane pliki danych pozostają
   jawnie oznaczone i ograniczone do bieżącego zakresu dystrybucji runtime.
-- **Obowiązek prawny**: brak nowych dowodów na wymóg PEP 639 ani
-  dodatkowych warunków prawnych poza istniejącym `License-Expression: MIT` oraz
-  istniejącymi dowodami źródłowymi (`license` i `source`) w danych jakości.
+- **Zakres artefaktów**: dla bieżących wheel i sdist zachować `MIT` dla kodu i
+  dokumentacji projektu oraz `CC0-1.0` dla
+  `src/polis/evaluation/datasets/quality/v1/cases.json` i
+  `src/polis/evaluation/datasets/v1/cases.json`. Osobne dane, modele oraz noty
+  upstream/providerów, w tym dotyczące niebundlowanego `morfeusz2`, nie są
+  częścią tej powierzchni dystrybucji.
+- **Wynik dokumentacyjny**: w tym issue nie dodawać osobnego pliku legal-code ani
+  `NOTICE` dla CC0 i nie zmieniać metadanych PEP 639. Jest to decyzja dla
+  obecnej granicy artefaktów, a nie opinia prawna; ten audyt nie stwierdza
+  naruszenia ani nie przesądza o obowiązku prawnym.
 
 ### Zobowiązania i wznowienie
 
 Jeśli przyszła zmiana w przyszłości włączy nowe pliki danych (poza powyższymi),
 dozwolone są tylko dwa warianty:
 
-1. dodać wymagany plik prawny CC0/NOTATE/NOTICE oraz odzwierciedlić to w
+1. dodać wymagany plik prawny CC0/NOTICE oraz odzwierciedlić to w
    metadanych i testach dystrybucyjnych w osobnym issue,
 2. lub pozostawić brak dodatkowych plików prawnych przy braku takiej potrzeby i
    zachować dotychczasowy kontrakt publikacyjny.
