@@ -107,15 +107,8 @@ def test_strict_contract_rejects_unknown_field() -> None:
 @pytest.mark.parametrize(
     ("mutation", "message"),
     [
-        (
-            "wrong_order",
-            "source identities must match the current composition root exactly",
-        ),
         ("duplicate", "source identities must be unique"),
-        (
-            "missing",
-            "source identities must match the current composition root exactly",
-        ),
+        ("missing", "source identities differ from the runtime composition root"),
     ],
 )
 def test_exact_twenty_source_tuple_binding_rejects_drift(
@@ -124,15 +117,36 @@ def test_exact_twenty_source_tuple_binding_rejects_drift(
     raw = changed_config()
     identities = raw["source_identities"]
     assert isinstance(identities, list)
-    if mutation == "wrong_order":
-        identities[0], identities[1] = identities[1], identities[0]
-    elif mutation == "duplicate":
+    if mutation == "duplicate":
         identities[1] = identities[0]
     else:
         identities.pop()
 
     with pytest.raises(_contract().HoldoutContractError, match=message):
         _contract().parse_holdout_config(raw)
+
+
+def test_source_identity_reordering_is_allowed() -> None:
+    raw = changed_config()
+    identities = raw["source_identities"]
+    assert isinstance(identities, list)
+
+    identities.reverse()
+
+    _contract().parse_holdout_config(raw)
+
+
+def test_source_snapshot_missing_identity_is_reported() -> None:
+    source_snapshot = _source_snapshot()
+    missing_source = source_snapshot[-1].source
+
+    with pytest.raises(
+        _contract().HoldoutContractError,
+        match=f"missing: {missing_source}",
+    ):
+        _contract().parse_holdout_config(
+            synthetic_config(), source_snapshot=lambda: source_snapshot[:-1]
+        )
 
 
 def _source_snapshot() -> tuple[SourceIdentity, ...]:
@@ -142,10 +156,30 @@ def _source_snapshot() -> tuple[SourceIdentity, ...]:
 def test_source_snapshot_drift_is_a_typed_contract_error() -> None:
     with pytest.raises(
         _contract().HoldoutContractError,
-        match="source identities must match the current composition root exactly",
+        match="source identities differ from the runtime composition root.*missing",
     ):
         _contract().parse_holdout_config(
             synthetic_config(), source_snapshot=lambda: _source_snapshot()[:-1]
+        )
+
+
+def test_source_snapshot_drift_reports_extra_identity() -> None:
+    with pytest.raises(
+        _contract().HoldoutContractError,
+        match="extra: rule:synthetic.extra_rule_identity",
+    ):
+        _contract().parse_holdout_config(
+            synthetic_config(),
+            source_snapshot=lambda: (
+                *_source_snapshot(),
+                SourceIdentity(
+                    "rule:synthetic.extra_rule_identity",
+                    "syntax",
+                    "noop",
+                    "synthetic/1.0",
+                    "1.2",
+                ),
+            ),
         )
 
 
