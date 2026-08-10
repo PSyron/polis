@@ -1,6 +1,6 @@
 # Przegląd licencji zależności budowania i rozwoju
 
-- Data przeglądu: 2026-07-20
+- Data przeglądu: 2026-08-10
 - Właściciel: Paweł Cyroń
 - Zakres: pełny graf z `uv.lock` dla opcjonalnych grup `dev` i `morphology`, w
   tym projekt lokalny i backend budowania
@@ -32,6 +32,54 @@ które potwierdzają tożsamość pakietu i opublikowane metadane licencji.
 | `ruff` | 0.15.22 | MIT | bezpośrednia zależność deweloperska | [Metadane PyPI](https://pypi.org/pypi/ruff/0.15.22/json); przy redystrybucji zachowaj notę MIT. |
 | `trove-classifiers` | 2026.6.1.19 | Apache-2.0 | zależność przechodnia Hatchling | [Metadane PyPI](https://pypi.org/pypi/trove-classifiers/2026.6.1.19/json); zachowaj licencję i noty. |
 | `typing-extensions` | 4.16.0 | PSF-2.0 | zależność przechodnia mypy | [Metadane PyPI](https://pypi.org/pypi/typing-extensions/4.16.0/json); zachowaj licencję PSF i noty. |
+
+## Decyzja #277: reprezentacja licencji dystrybucyjnej i CC0
+
+### Rzeczywiste źródło obowiązków
+
+- Projektowy kod i dokumentacja są objęte `license = "MIT"` w `pyproject.toml`
+  i `license-files = ["LICENSE"]`, dlatego kontrakt runtime i opublikowane
+  artefakty są licencjonowane jako MIT.
+- Aktywnie dystrybuowany kod jest ograniczony do `/src/polis/**` bez warstwy badawczej;
+  wszystkie rekordy jakości `src/polis/evaluation/datasets/quality/v1/*` i
+  `src/polis/evaluation/datasets/v1/cases.json` deklarują `license: CC0-1.0`.
+- `mypy`, `ruff`, `build`, `hatchling`, `pytest`, `morfeusz2` oraz powiązane
+  pozycje zgodnie z `pyproject.toml` i `uv.lock` pozostają narzędziami
+  deweloperskimi i nie stanowią zmienionej powierzchni danych użytkownika.
+
+### Decyzja
+
+- **Zalecenie**: utrzymać obecny model bez zmian.
+- **Polityka**: nie wprowadzać dodatkowych plików `LICENSES/` ani globalnych
+  plików legalnych podsumowań dla CC0, dopóki rozsyłane pliki danych pozostają
+  jawnie oznaczone i ograniczone do bieżącego zakresu dystrybucji runtime.
+- **Obowiązek prawny**: brak nowych dowodów na wymóg PEP 639 ani
+  dodatkowych warunków prawnych poza istniejącym `License-Expression: MIT` oraz
+  istniejącymi dowodami źródłowymi (`license` i `source`) w danych jakości.
+
+### Zobowiązania i wznowienie
+
+Jeśli przyszła zmiana w przyszłości włączy nowe pliki danych (poza powyższymi),
+dozwolone są tylko dwa warianty:
+
+1. dodać wymagany plik prawny CC0/NOTATE/NOTICE oraz odzwierciedlić to w
+   metadanych i testach dystrybucyjnych w osobnym issue,
+2. lub pozostawić brak dodatkowych plików prawnych przy braku takiej potrzeby i
+   zachować dotychczasowy kontrakt publikacyjny.
+
+Każda zmiana dystrybucji metadanych i bundlingu danych uruchamia odrębne
+`issue` implementacyjne z nowym zakresem testów.
+
+Wynik obecnego przeglądu zakłada również, że przy dzisiejszym zakresie
+dystrybucji nie wprowadzamy i nie dołączamy noty upstream dla osobnych danych
+czy modeli; te komponenty nie są częścią pakietu runtime.
+
+## Autorytatywne źródła
+
+- [Python Packaging Core Metadata (`License-Expression`, `License-File`)](https://packaging.python.org/en/latest/specifications/core-metadata/#license)
+- [MIT License](https://opensource.org/license/mit)
+- [Creative Commons CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+- [PEP 639 – License Expression](https://peps.python.org/pep-0639/)
 
 ## Zewnętrzne narzędzie inicjujące
 
