@@ -33,14 +33,15 @@ rozbudowy katalogu M6.
   scalone (merged/completed) przez [PR #224](https://github.com/PSyron/polis/pull/224).
 - C3 — [#220](https://github.com/PSyron/polis/issues/220) rejestruje tę prawdziwą
   ścieżkę roadmapy.
-- C4 — [#221](https://github.com/PSyron/polis/issues/221) pozostaje otwartą bramą
-  release infrastructure.
-- C5 — [#222](https://github.com/PSyron/polis/issues/222) pozostaje otwartą bramą
-  finalization/publication.
+- C4 — [#221](https://github.com/PSyron/polis/issues/221) zostało zamknięte jako
+  etap release infrastructure.
+- C5 — [#222](https://github.com/PSyron/polis/issues/222) zostało zamknięte
+  jako etap finalization/publication.
 
-Pozostałe bramy wydania to release infrastructure (#221), a następnie
-finalization/publication (#222). #195 pozostaje opcjonalną, nieblokującą ścieżką
-post-v1 i nie jest bramką tego wydania.
+Wydanie `0.2.0` zostało opublikowane, a release infrastructure (#221) i
+finalization/publication (#222) są etapami zakończonymi tego samego wydania.
+#195 pozostaje opcjonalną, nieblokującą ścieżką post-v1 i nie jest bramką
+tego wydania.
 
 Historyczny graf karty runtime-first miał postać `#120 -> #84 -> #95`.
 #84 to praca P0 nad bezpieczeństwem produktu, a #95 to utwardzanie P1.
