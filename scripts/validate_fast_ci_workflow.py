@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
@@ -37,8 +38,19 @@ REQUIRED_SNIPPETS = (
     "push:",
     "pull_request:",
     "permissions:\n  contents: read",
+    "version: 0.11.2",
+    "enable-cache: true",
+    "cache-dependency-glob: uv.lock",
+    "fetch-depth: 0",
+    "fetch-tags: true",
+    ("Fast suite deliberately excludes research, slow, benchmark, and release work."),
+)
+REQUIRED_EXECUTABLE_COMMANDS = (
     "uv sync --locked --extra dev",
-    "scripts/prepare_build_wheelhouse.py --lock uv.lock --output",
+    (
+        "uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py "
+        "--lock uv.lock --output"
+    ),
     "uv run --locked --extra dev ruff check .",
     "uv run --locked --extra dev ruff format --check .",
     "uv run --locked --extra dev mypy .",
@@ -50,12 +62,6 @@ REQUIRED_SNIPPETS = (
     "uv run --locked --extra dev python -m build --no-isolation",
     "uv run --locked --extra dev python scripts/verify_distribution_artifacts.py",
     "uv run --locked --extra dev python scripts/verify_distribution_install.py",
-    "version: 0.11.2",
-    "enable-cache: true",
-    "cache-dependency-glob: uv.lock",
-    "fetch-depth: 0",
-    "fetch-tags: true",
-    ("Fast suite deliberately excludes research, slow, benchmark, and release work."),
 )
 
 
@@ -74,57 +80,68 @@ def parse_matrix(workflow: str) -> set[tuple[str, str, str, str]]:
     }
 
 
-def _extract_run_commands(workflow: str) -> list[str]:
-    commands: list[str] = []
-    lines = workflow.splitlines()
-    index = 0
-    while index < len(lines):
-        match = re.match(r"^(?P<indent>\s*)run:\s*(?P<rest>.*)$", lines[index])
-        if match is None:
-            index += 1
+def _strip_unquoted_shell_comment(line: str) -> str:
+    quote: str | None = None
+    escaped = False
+    for index, character in enumerate(line):
+        if escaped:
+            escaped = False
             continue
-
-        rest = match.group("rest").strip()
-        indent = len(match.group("indent"))
-        if rest.startswith("#"):
-            index += 1
+        if character == "\\" and quote != "'":
+            escaped = True
             continue
-
-        if rest and not rest.startswith(("|", ">")):
-            commands.append(f"run: {rest}")
-            index += 1
+        if quote is not None:
+            if character == quote:
+                quote = None
             continue
-
-        index += 1
-        while index < len(lines):
-            current = lines[index]
-            current_indent = len(current) - len(current.lstrip())
-            current_text = current.strip()
-            if current_indent <= indent:
-                break
-            if current_text.startswith("#"):
-                index += 1
-                continue
-            if current_text:
-                commands.append(f"run: {current_text}")
-            index += 1
-
-    return commands
+        if character in {"'", '"'}:
+            quote = character
+        elif character == "#":
+            return line[:index].rstrip()
+    return line.rstrip()
 
 
-def validate_yaml_syntax(path: Path) -> str | None:
+def extract_quality_run_commands(path: Path) -> tuple[list[str], str | None]:
     ruby = shutil.which("ruby")
     if ruby is None:
-        return "Ruby is required for local YAML syntax validation."
+        return [], "Ruby is required for local YAML syntax validation."
     result = subprocess.run(
-        [ruby, "-e", "require 'yaml'; YAML.load_file(ARGV.fetch(0))", str(path)],
+        [
+            ruby,
+            "-e",
+            (
+                "require 'json'; require 'yaml'; "
+                "workflow = YAML.load_file(ARGV.fetch(0)); "
+                "steps = workflow.fetch('jobs').fetch('quality').fetch('steps'); "
+                "runs = steps.select { |step| "
+                "step.is_a?(Hash) && step['run'].is_a?(String) }.map { |step| "
+                "step['run'] }; "
+                "STDOUT.write(JSON.generate(runs))"
+            ),
+            str(path),
+        ],
         text=True,
         capture_output=True,
         check=False,
     )
     if result.returncode != 0:
-        return f"YAML syntax validation failed: {result.stderr.strip()}"
-    return None
+        return [], f"YAML syntax validation failed: {result.stderr.strip()}"
+    try:
+        commands = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return [], "YAML command extraction returned invalid JSON."
+    if not isinstance(commands, list) or not all(
+        isinstance(command, str) for command in commands
+    ):
+        return [], "YAML command extraction returned invalid run values."
+    return [
+        "\n".join(
+            cleaned_line
+            for line in command.splitlines()
+            if (cleaned_line := _strip_unquoted_shell_comment(line))
+        ).strip()
+        for command in commands
+    ], None
 
 
 def validate_generated_invariant_configuration(workflow: str) -> list[str]:
@@ -195,9 +212,9 @@ def validate_contract(path: Path) -> list[str]:
     if not path.is_file():
         return [f"workflow does not exist: {path}"]
 
-    syntax_error = validate_yaml_syntax(path)
-    if syntax_error is not None:
-        return [syntax_error]
+    quality_run_commands, yaml_error = extract_quality_run_commands(path)
+    if yaml_error is not None:
+        return [yaml_error]
 
     workflow = path.read_text(encoding="utf-8")
     errors = [
@@ -236,15 +253,18 @@ def validate_contract(path: Path) -> list[str]:
             "setup-python architecture input must use the mapped matrix field"
         )
 
-    if FAST_PYTEST_FILTER not in workflow:
+    if not any(FAST_PYTEST_FILTER in command for command in quality_run_commands):
         errors.append("fast pytest marker filter is missing")
     test_commands = [
-        command.strip()
-        for command in _extract_run_commands(workflow)
+        f"run: {command}"
+        for command in quality_run_commands
         if ("pytest" in command or "unittest" in command)
     ]
     if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
+    for command in REQUIRED_EXECUTABLE_COMMANDS:
+        if not any(run.startswith(command) for run in quality_run_commands):
+            errors.append(f"missing required executable command: {command}")
     errors.extend(validate_generated_invariant_configuration(workflow))
 
     action_references = re.findall(
