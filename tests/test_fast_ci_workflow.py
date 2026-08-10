@@ -410,6 +410,51 @@ def test_fast_ci_contract_rejects_required_command_hidden_in_echo(
     assert "missing required executable command" in result.stderr
 
 
+@pytest.mark.parametrize("masking_suffix", (" || true", "; true", " &"))
+def test_fast_ci_contract_rejects_failure_masking_after_required_command(
+    tmp_path: Path, masking_suffix: str
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    required_command = (
+        "run: uv run --locked --extra dev python "
+        "scripts/verify_distribution_artifacts.py"
+    )
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            required_command,
+            required_command + masking_suffix,
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
+@pytest.mark.parametrize("masking_command", ("true", "exit 0"))
+def test_fast_ci_contract_rejects_multiline_failure_masking(
+    tmp_path: Path, masking_command: str
+) -> None:
+    invalid_workflow = tmp_path / "fast-ci.yml"
+    required_command = (
+        "uv run --locked --extra dev python scripts/verify_distribution_artifacts.py"
+    )
+    invalid_workflow.write_text(
+        WORKFLOW.read_text(encoding="utf-8").replace(
+            f"run: {required_command}",
+            f"run: |\n          {required_command}\n          {masking_command}",
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_validator(invalid_workflow)
+
+    assert result.returncode != 0
+    assert "missing required executable command" in result.stderr
+
+
 def test_fast_ci_contract_rejects_required_command_in_unreachable_if_false_body(
     tmp_path: Path,
 ) -> None:
