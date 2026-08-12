@@ -13,6 +13,13 @@ jawnie wskazany plik. `categories` ogranicza analizę do wartości `Category`, a
 `minimum_confidence` odrzuca mniej pewne znaleziska. Niepodana kategoria
 oznacza wszystkie kategorie.
 
+W CLI obowiązuje kolejność: jawna flaga `--category` albo
+`--minimum-confidence`, następnie wartość z pliku TOML, a na końcu wbudowana
+wartość domyślna. Flaga zastępuje tylko odpowiadające jej pole, więc na przykład
+`--category punctuation` zachowuje `analysis.minimum_confidence` z pliku.
+Wywołanie bez pliku i bez tych flag analizuje wszystkie kategorie z progiem
+`0.0`. Efektywne wartości są widoczne w polu `options` wyniku `--json`.
+
 Regułę można dodać wyłącznie w zmianie runtime'u: implementuje ona `Rule`, ma
 unikatowe stabilne `source`, deklaruje kategorie oraz zachowanie i przechodzi
 testy przesunięć, filtrowania i polityki automatycznej. Nie twórz rozszerzenia
