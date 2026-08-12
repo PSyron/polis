@@ -1,5 +1,17 @@
 # Kandydat do wydania
 
+Następnym zamierzonym wydaniem runtime'u jest `0.3.0`. Jest to wydanie minor,
+ponieważ od `0.2.0` przybyły kompatybilne funkcje deterministycznego runtime'u
+i publiczne zachowania; nie jest to wyłącznie zestaw poprawek patch. Wersja w
+`pyproject.toml` pozostaje `0.2.0` do chwili rozpoczęcia osobnego wykonania
+wydania.
+
+Poniższe polecenia stają się właściwą ścieżką kandydata dopiero po osobnej
+zmianie wykonującej wydanie, która ustawi spójną wersję `0.3.0` w metadanych
+źródła, artefaktach i manifeście. Na obecnym `main` z wersją `0.2.0` służą
+wyłącznie jako opis bramki i nie wolno ich używać do utworzenia kandydata
+`0.3.0`.
+
 Kandydat v1 dotyczy wyłącznie deterministycznego runtime'u offline. Przed
 publikacją uruchom:
 
@@ -33,6 +45,12 @@ runtime'u. Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi
 sieciowej, korpusu badawczego ani zużytego holdoutu. Szczegóły zawiera
 [weryfikacja dystrybucji](distribution-verification.md).
 
+Plik `quality-threshold-proposal-v1.json` pozostaje odroczoną, niewymuszoną
+propozycją, niezależną od `0.3.0` i oczekującą na odrębną decyzję maintainera.
+Nie kwalifikuje żadnego zachowania review-only do automatycznej korekty. Także
+opcjonalna kwalifikacja morfologii, praca modelowa, kalibracja i holdouty nie
+wchodzą do krytycznej ścieżki tego wydania.
+
 `--source-commit` musi być dokładnym SHA bieżącego `HEAD`, a worktree musi być
 czysty jeszcze przed uruchomieniem testów, budowy i tworzenia manifestu.
 Workflow może najpierw wykonać jedyną budowę do katalogu tymczasowego, a potem
@@ -42,21 +60,14 @@ instalacji offline i zapis manifestu.
 
 ## Tożsamość i manifest wydania
 
-Przed pierwszym uploadem sprawdź kandydat z obserwacjami pobranymi przez skrypt,
-bez przekazywania wersji opublikowanej przez wywołującego:
-
-```console
-uv run --locked --extra dev python scripts/release_identity.py candidate \
-  --version 0.2.0 --source-commit "$(git rev-parse HEAD)" \
-  --state candidate-absent --remote origin --github-repo PSyron/polis \
-  --package-index-url https://pypi.org/pypi/polis-nlp/json
-```
-
-Dozwolony stan przed uploadem wymaga odpowiedzi HTTP 404 dla dokładnego adresu
-projektu na PyPI. Odpowiedź 200 oznacza przejętą nazwę i blokuje ścieżkę
-wydania. Po kwalifikacji ten sam kandydat używa `--state tag-bound`; wymaga to
-jednego adnotowanego tagu `v0.2.0`, wskazującego `--source-commit`, bez GitHub
-Release.
+Obecne polecenie `release_identity.py candidate --state candidate-absent`
+kwalifikuje pierwszy upload projektu i wymaga braku całej nazwy projektu na
+PyPI. Nie jest właściwą kontrolą kolejnej wersji istniejącego projektu, dlatego
+nie wolno użyć go dla `0.3.0`. Osobne issue wykonujące wydanie musi najpierw
+dodać i przetestować wersjoświadomą kontrolę nieobecności dokładnej wersji
+`0.3.0`, zachowując weryfikację zdalnego tagu i GitHub Release. Dopiero ten
+kontrakt może dostarczyć wykonywalne polecenie kandydata i później związać
+adnotowany tag `v0.3.0` z dokładnym `--source-commit`.
 
 Manifest zawiera wyłącznie wersję schematu, tożsamość oraz nazwę, rozmiar i
 SHA-256 wheela i sdist. Sprawdź go przed przekazaniem dalej:
