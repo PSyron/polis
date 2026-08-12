@@ -46,6 +46,12 @@ deterministyczne. `apply_suggestions(finding_ids)` pozwala jawnie dołączyć
 wybrane pominięte znaleziska. Brak lokalnego uzasadnienia, konflikt lub ryzyko
 zmiany znaczenia oznaczają wstrzymanie korekty.
 
+`Analyzer.correct(text)` jest metodą synchroniczną i należy ją wywoływać poza
+działającą pętlą zdarzeń. W kodzie asynchronicznym należy użyć
+`await Analyzer.correct_async(text)`. Próba wywołania `correct()` w działającej
+pętli zgłasza `RuntimeError` z tą instrukcją, zanim powstanie coroutine, dzięki
+czemu nie emituje ostrzeżenia o nieoczekiwanym braku `await`.
+
 ## Konfiguracja i błędy
 
 `AnalyzerConfig(categories=None, minimum_confidence=0.0)` określa filtry

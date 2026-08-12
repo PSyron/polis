@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import gc
 from typing import cast
 
 import pytest
@@ -70,6 +72,35 @@ def test_correct_applies_safe_rule_corrections_to_a_sentence() -> None:
     assert {finding.original for finding in result.applied_findings} == {"Zeby", ","}
     assert result.skipped_findings == ()
     assert result.suggestion_outcomes == ()
+
+
+def test_correct_fails_cleanly_inside_a_running_event_loop(
+    recwarn: pytest.WarningsRecorder,
+) -> None:
+    async def call_sync_correction() -> None:
+        with pytest.raises(
+            RuntimeError,
+            match=(
+                r"Analyzer\.correct\(\) cannot be called from a running event loop; "
+                r"use 'await Analyzer\.correct_async\(\.\.\.\)' instead"
+            ),
+        ):
+            Analyzer(AnalyzerConfig()).correct("Zeby")
+
+    asyncio.run(call_sync_correction())
+    gc.collect()
+
+    assert not [
+        warning for warning in recwarn if issubclass(warning.category, RuntimeWarning)
+    ]
+
+
+def test_correct_async_remains_available_inside_a_running_event_loop() -> None:
+    async def correct() -> None:
+        result = await Analyzer(AnalyzerConfig()).correct_async("Zeby")
+        assert result.corrected_text == "Żeby"
+
+    asyncio.run(correct())
 
 
 def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> None:
