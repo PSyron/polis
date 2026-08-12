@@ -9,7 +9,13 @@ from pathlib import Path
 from typing import Any, Final, Literal, cast
 
 from polis.analysis.pipeline import analyze_text, analyze_text_async
-from polis.core import AnalysisOptions, AnalysisResult, ConfigurationError, Finding
+from polis.core import (
+    AnalysisOptions,
+    AnalysisResult,
+    Confidence,
+    ConfigurationError,
+    Finding,
+)
 from polis.core.models import Category
 from polis.correction import findings_conflict
 from polis.correction.policy import (
@@ -88,6 +94,19 @@ class AnalyzerConfig:
 
     categories: frozenset[Category] | None = None
     minimum_confidence: float = 0.0
+
+    def __post_init__(self) -> None:
+        try:
+            minimum_confidence = Confidence(self.minimum_confidence).value
+        except (TypeError, ValueError) as exc:
+            raise ConfigurationError(
+                "'analysis.minimum_confidence' must be a finite number "
+                "between 0.0 and 1.0",
+                code="configuration.invalid",
+                retryable=False,
+                context={"operation": "configuration.construct"},
+            ) from exc
+        object.__setattr__(self, "minimum_confidence", minimum_confidence)
 
     @classmethod
     def from_toml(cls, path: str | Path) -> AnalyzerConfig:
@@ -168,17 +187,19 @@ class AnalyzerConfig:
                 ) from exc
 
         try:
-            minimum_confidence = float(analysis.get("minimum_confidence", 0.0))
             return cls(
                 categories=categories,
-                minimum_confidence=minimum_confidence,
+                minimum_confidence=analysis.get("minimum_confidence", 0.0),
             )
-        except (TypeError, ValueError) as exc:
+        except ConfigurationError as exc:
             raise ConfigurationError(
-                "invalid analysis configuration",
-                code="configuration.invalid_value",
-                retryable=False,
-                context={"path": str(path_obj)},
+                str(exc),
+                code="configuration.invalid",
+                retryable=exc.retryable,
+                context={
+                    "operation": "configuration.load",
+                    "path": str(path_obj),
+                },
             ) from exc
 
     @classmethod
