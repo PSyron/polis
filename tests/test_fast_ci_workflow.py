@@ -49,11 +49,279 @@ def run_validator(workflow: Path | None = None) -> subprocess.CompletedProcess[s
     )
 
 
+def write_workflow(tmp_path: Path, workflow: str) -> Path:
+    path = tmp_path / "fast-ci.yml"
+    path.write_text(workflow, encoding="utf-8")
+    return path
+
+
 def test_fast_ci_contract_is_valid() -> None:
     result = run_validator()
 
     assert result.returncode == 0, result.stderr
     assert result.stdout == "fast CI workflow contract is valid\n"
+
+
+def test_fast_ci_contract_rejects_nonexistent_workflow(tmp_path: Path) -> None:
+    missing_workflow = tmp_path / "missing-fast-ci.yml"
+
+    result = run_validator(missing_workflow)
+
+    assert result.returncode != 0
+    assert result.stderr == f"workflow does not exist: {missing_workflow}\n"
+
+
+def test_fast_ci_contract_rejects_malformed_yaml(tmp_path: Path) -> None:
+    malformed_workflow = tmp_path / "fast-ci.yml"
+    malformed_workflow.write_text("jobs: [\n", encoding="utf-8")
+
+    result = run_validator(malformed_workflow)
+
+    assert result.returncode != 0
+    assert result.stderr.startswith("YAML syntax validation failed:")
+    assert "Traceback" not in result.stderr
+    assert ".rb:" not in result.stderr
+    assert "psych" not in result.stderr.lower()
+
+
+def test_fast_ci_contract_rejects_triggers_present_only_in_comments(
+    tmp_path: Path,
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "on:\n  push:\n  pull_request:\n",
+        "on:\n  workflow_dispatch:\n# push:\n# pull_request:\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected workflow trigger" in result.stderr
+
+
+def test_fast_ci_contract_rejects_duplicate_root_permissions(tmp_path: Path) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "permissions:\n  contents: read\n",
+        "permissions:\n  contents: read\npermissions:\n  contents: write\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "duplicate YAML mapping key" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("workflow", "expected_error"),
+    (
+        (
+            WORKFLOW.read_text(encoding="utf-8").replace("name: Fast CI\n", "", 1),
+            "unexpected workflow root key",
+        ),
+        (
+            WORKFLOW.read_text(encoding="utf-8").replace(
+                "name: Fast CI\n", "name: Fast CI\nconcurrency: fast-ci\n", 1
+            ),
+            "unexpected workflow root key",
+        ),
+        (
+            WORKFLOW.read_text(encoding="utf-8").replace(
+                "contents: read", "contents: write", 1
+            ),
+            "unexpected workflow permissions",
+        ),
+        (
+            WORKFLOW.read_text(encoding="utf-8").replace(
+                "on:\n  push:\n  pull_request:\n",
+                "on:\n  workflow_dispatch:\non:\n  push:\n  pull_request:\n",
+                1,
+            ),
+            "duplicate YAML mapping key",
+        ),
+    ),
+)
+def test_fast_ci_contract_rejects_root_policy_drift(
+    tmp_path: Path, workflow: str, expected_error: str
+) -> None:
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert expected_error in result.stderr
+
+
+def test_fast_ci_contract_rejects_fake_uv_added_through_github_path(
+    tmp_path: Path,
+) -> None:
+    attack = (
+        "      - name: Shadow uv\n"
+        "        run: |\n"
+        '          mkdir -p "${{ runner.temp }}/fake-bin"\n'
+        "          printf '#!/bin/sh\\nexit 0\\n' > "
+        '"${{ runner.temp }}/fake-bin/uv"\n'
+        '          chmod +x "${{ runner.temp }}/fake-bin/uv"\n'
+        '          echo "${{ runner.temp }}/fake-bin" >> "$GITHUB_PATH"\n'
+    )
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "      - name: Synchronize locked development environment\n",
+        attack + "      - name: Synchronize locked development environment\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected quality step" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "modifier",
+    (
+        "    if: false\n",
+        "    continue-on-error: true\n",
+        "    defaults:\n      run:\n        shell: bash\n",
+        "    defaults:\n      run:\n        working-directory: /tmp\n",
+    ),
+)
+def test_fast_ci_contract_rejects_unsafe_quality_job_modifier(
+    tmp_path: Path, modifier: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "    strategy:\n", modifier + "    strategy:\n", 1
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected quality job key" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("modifier", "value"),
+    (
+        ("if", "false"),
+        ("continue-on-error", "true"),
+        ("shell", "bash"),
+        ("working-directory", "/tmp"),
+    ),
+)
+def test_fast_ci_contract_rejects_unsafe_quality_step_modifier(
+    tmp_path: Path, modifier: str, value: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "      - name: Run Ruff lint\n        run:",
+        f"      - name: Run Ruff lint\n        {modifier}: {value}\n        run:",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected quality step" in result.stderr
+
+
+@pytest.mark.parametrize("scope", ("job", "step"))
+def test_fast_ci_contract_rejects_path_environment_shadowing(
+    tmp_path: Path, scope: str
+) -> None:
+    match scope:
+        case "job":
+            workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+                "    strategy:\n",
+                "    env:\n      PATH: /tmp/fake-bin\n    strategy:\n",
+                1,
+            )
+        case "step":
+            workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+                "        env:\n",
+                "        env:\n          PATH: /tmp/fake-bin\n",
+                1,
+            )
+        case unreachable:
+            pytest.fail(f"unexpected mutation scope: {unreachable}")
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert (
+        "unexpected quality job key"
+        if scope == "job"
+        else "unexpected environment entry"
+    ) in result.stderr
+
+
+@pytest.mark.parametrize("name", ("PATH", "GITHUB_PATH"))
+def test_fast_ci_contract_rejects_workflow_root_path_environment_shadowing(
+    tmp_path: Path, name: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "permissions:\n  contents: read\n",
+        f"permissions:\n  contents: read\nenv:\n  {name}: /tmp/fake-bin\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected workflow root key" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (("shell", "bash"), ("working-directory", "/tmp")),
+)
+def test_fast_ci_contract_rejects_workflow_root_defaults_modifier(
+    tmp_path: Path, name: str, value: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "permissions:\n  contents: read\n",
+        f"permissions:\n  contents: read\ndefaults:\n  run:\n    {name}: {value}\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected workflow root key" in result.stderr
+
+
+@pytest.mark.parametrize("name", ("PATH", "GITHUB_PATH"))
+def test_fast_ci_contract_rejects_unexpected_pytest_environment_entry(
+    tmp_path: Path, name: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "          POLIS_GENERATIVE_CASES: 64\n",
+        f"          POLIS_GENERATIVE_CASES: 64\n          {name}: /tmp/fake-bin\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected environment entry" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "step",
+    (
+        "      - name: Unexpected run\n        run: true\n",
+        "      - name: Unexpected action\n"
+        "        uses: actions/cache@34e114876b0b11c390a56381ad16ebd13914f8d5\n",
+    ),
+)
+def test_fast_ci_contract_rejects_unexpected_quality_step(
+    tmp_path: Path, step: str
+) -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8").replace(
+        "      - name: Synchronize locked development environment\n",
+        step + "      - name: Synchronize locked development environment\n",
+        1,
+    )
+
+    result = run_validator(write_workflow(tmp_path, workflow))
+
+    assert result.returncode != 0
+    assert "unexpected quality step" in result.stderr
 
 
 def test_fast_ci_runs_public_offline_install_and_documentation_validator() -> None:
