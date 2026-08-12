@@ -12,6 +12,10 @@ minimum_confidence = 0.8
 jawnie wskazany plik. `categories` ogranicza analizę do wartości `Category`, a
 `minimum_confidence` odrzuca mniej pewne znaleziska. Niepodana kategoria
 oznacza wszystkie kategorie.
+`minimum_confidence` musi być liczbą skończoną z przedziału domkniętego
+`0.0`–`1.0`; wartości logiczne, tekstowe, nieskończone i spoza zakresu kończą
+się kontrolowanym `ConfigurationError` już podczas tworzenia lub wczytywania
+konfiguracji.
 
 W CLI obowiązuje kolejność: jawna flaga `--category` albo
 `--minimum-confidence`, następnie wartość z pliku TOML, a na końcu wbudowana

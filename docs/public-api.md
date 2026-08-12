@@ -51,6 +51,11 @@ zmiany znaczenia oznaczają wstrzymanie korekty.
 `AnalyzerConfig(categories=None, minimum_confidence=0.0)` określa filtry
 domyślnego analizatora. `AnalyzerConfig.from_toml(path)` i
 `Analyzer.from_config(path)` wczytują lokalny plik z sekcją `[analysis]`.
+Próg pewności musi być skończoną liczbą od `0.0` do `1.0`; nieprawidłowa
+wartość zgłasza `ConfigurationError` przy tworzeniu lub wczytywaniu
+konfiguracji, przed rozpoczęciem analizy. Błąd ma stabilny kod
+`configuration.invalid` i kontekst `operation`; przy wczytywaniu z pliku
+kontekst zawiera również `path`.
 
 Wszystkie kontrolowane błędy dziedziczą po `PolisError` i mają stabilne pola
 `code`, `retryable` i bezpieczny `context`. Publiczne typy obejmują błędy
