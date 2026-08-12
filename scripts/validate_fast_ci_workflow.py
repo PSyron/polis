@@ -3,42 +3,70 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import shlex
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_WORKFLOW = ROOT / ".github/workflows/fast-ci.yml"
+try:
+    from scripts.fast_ci_workflow_graph import (
+        EXPECTED_RUN_COMMANDS,
+        _strip_unquoted_shell_comment,
+        executes_required_command,
+        validate_quality_graph,
+    )
+except ModuleNotFoundError:
+    from fast_ci_workflow_graph import (
+        EXPECTED_RUN_COMMANDS,
+        _strip_unquoted_shell_comment,
+        executes_required_command,
+        validate_quality_graph,
+    )
+
+__all__ = ("_strip_unquoted_shell_comment",)
+
+DEFAULT_WORKFLOW = Path(__file__).resolve().parents[1] / ".github/workflows/fast-ci.yml"
+EXPECTED_ROOT_POLICY = {
+    "name": "Fast CI",
+    "on": {"push": None, "pull_request": None},
+    "permissions": {"contents": "read"},
+}
+RUBY_ROOT_READER = (
+    "require 'json'; require 'yaml'; "
+    "def duplicate_mapping_key?(node); "
+    "if node.class==Psych::Nodes::Mapping; "
+    "keys=node.children.each_slice(2).map(&:first); "
+    "return true unless keys.all? { |key| key.is_a?(Psych::Nodes::Scalar) }; "
+    "labels=keys.map { |key| [key.tag,key.value] }; "
+    "return true if labels.uniq.length != labels.length; end; "
+    "node.children&.any? { |child| duplicate_mapping_key?(child) }; end; "
+    "workflow=YAML.load_file(ARGV[0]); ast=Psych.parse_file(ARGV[0]); root=ast.root; "
+    "keys=root.class==Psych::Nodes::Mapping ? "
+    "root.children.each_slice(2).map { |key,_| "
+    "key.is_a?(Psych::Nodes::Scalar) ? key.value : nil } : nil; "
+    "on=workflow.is_a?(Hash) && workflow.key?(true) ? workflow[true] : workflow['on']; "
+    "policy=workflow.is_a?(Hash) ? {'name'=>workflow['name'],'on'=>on,"
+    "'permissions'=>workflow['permissions']} : nil; "
+    "STDOUT.write(JSON.generate({'root_keys'=>keys,'policy'=>policy,"
+    "'duplicate_keys'=>duplicate_mapping_key?(root)}))"
+)
 EXPECTED_MATRIX = {
     ("macos-15", "arm64", "arm64", "3.12"),
     ("macos-15", "arm64", "arm64", "3.14"),
 }
 VALID_SETUP_PYTHON_ARCHITECTURES = {"x86", "x64", "arm64"}
 SETUP_PYTHON_ARCHITECTURE_BY_POLICY = {"x86_64": "x64", "arm64": "arm64"}
-EXPECTED_ACTIONS = {
-    "actions/checkout": "34e114876b0b11c390a56381ad16ebd13914f8d5",
-    "actions/setup-python": "ece7cb06caefa5fff74198d8649806c4678c61a1",
-    "astral-sh/setup-uv": "37802adc94f370d6bfd71619e3f0bf239e1f3b78",
-}
 GENERATIVE_GENERATOR_VERSION = "unicode-structural-v1"
-GENERATIVE_SEED = 95001
-GENERATIVE_CASES = 64
+GENERATIVE_SEED, GENERATIVE_CASES = 95001, 64
 GENERATIVE_MAX_CASES = 256
 GENERATIVE_ENVIRONMENT = (
     ("POLIS_GENERATIVE_GENERATOR_VERSION", GENERATIVE_GENERATOR_VERSION),
     ("POLIS_GENERATIVE_SEED", str(GENERATIVE_SEED)),
     ("POLIS_GENERATIVE_CASES", str(GENERATIVE_CASES)),
 )
-FAST_PYTEST_COMMAND = (
-    'run: uv run --locked --extra dev pytest -m "not research and not slow"'
-)
 FAST_PYTEST_FILTER = 'pytest -m "not research and not slow"'
+FAST_PYTEST_COMMAND = f"run: uv run --locked --extra dev {FAST_PYTEST_FILTER}"
 REQUIRED_SNIPPETS = (
-    "push:",
-    "pull_request:",
-    "permissions:\n  contents: read",
     "version: 0.11.2",
     "enable-cache: true",
     "cache-dependency-glob: uv.lock",
@@ -46,30 +74,44 @@ REQUIRED_SNIPPETS = (
     "fetch-tags: true",
     ("Fast suite deliberately excludes research, slow, benchmark, and release work."),
 )
-REQUIRED_EXECUTABLE_COMMANDS = (
-    "uv sync --locked --extra dev",
-    (
-        "uv run --locked --extra dev python scripts/prepare_build_wheelhouse.py "
-        '--lock uv.lock --output "${{ runner.temp }}/polis-build-wheelhouse" '
-        '--manifest "${{ runner.temp }}/polis-build-wheelhouse.json"'
-    ),
-    "uv run --locked --extra dev ruff check .",
-    "uv run --locked --extra dev ruff format --check .",
-    "uv run --locked --extra dev mypy .",
-    "uv run --locked --extra dev python scripts/validate_documentation_inventory.py",
-    (
-        "uv run --locked --extra dev python scripts/validate_release_workflow.py "
-        "--workflow .github/workflows/release.yml"
-    ),
-    "uv run --locked --extra dev python -m build --no-isolation",
-    "uv run --locked --extra dev python scripts/verify_distribution_artifacts.py",
-    (
-        "uv run --locked --extra dev python scripts/verify_distribution_install.py "
-        '--dist dist --wheelhouse "${{ runner.temp }}/polis-build-wheelhouse" '
-        '--wheelhouse-manifest "${{ runner.temp }}/polis-build-wheelhouse.json" '
-        '--smoke-cwd "${{ runner.temp }}/polis-install-smoke-cwd"'
-    ),
-)
+
+
+def validate_root_contract(path: Path) -> list[str]:
+    ruby = shutil.which("ruby")
+    if ruby is None:
+        return ["Ruby is required for local YAML syntax validation."]
+    result = subprocess.run(
+        [ruby, "-e", RUBY_ROOT_READER, str(path)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return ["YAML syntax validation failed: invalid YAML."]
+    try:
+        decoded = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return ["YAML command extraction returned invalid JSON."]
+    if not isinstance(decoded, dict):
+        return ["YAML command extraction returned invalid JSON."]
+    if decoded.get("duplicate_keys") is True:
+        return ["duplicate YAML mapping key"]
+    root_keys = decoded.get("root_keys")
+    policy = decoded.get("policy")
+    if not isinstance(root_keys, list) or set(root_keys) != {
+        "name",
+        "on",
+        "permissions",
+        "jobs",
+    }:
+        return ["unexpected workflow root key"]
+    if not isinstance(policy, dict):
+        return ["unexpected workflow root key"]
+    return [
+        f"unexpected workflow {'trigger' if name == 'on' else name}"
+        for name, expected in EXPECTED_ROOT_POLICY.items()
+        if policy.get(name) != expected
+    ]
 
 
 def parse_matrix(workflow: str) -> set[tuple[str, str, str, str]]:
@@ -85,88 +127,6 @@ def parse_matrix(workflow: str) -> set[tuple[str, str, str, str]]:
         (os_name, architecture, setup_python_architecture, python_version)
         for os_name, architecture, setup_python_architecture, python_version in entries
     }
-
-
-def _strip_unquoted_shell_comment(line: str) -> str:
-    quote: str | None = None
-    escaped = False
-    for index, character in enumerate(line):
-        if escaped:
-            escaped = False
-            continue
-        if character == "\\" and quote != "'":
-            escaped = True
-            continue
-        if quote is not None:
-            if character == quote:
-                quote = None
-            continue
-        if character in {"'", '"'}:
-            quote = character
-        elif character == "#":
-            return line[:index].rstrip()
-    return line.rstrip()
-
-
-def _shell_tokens(command: str) -> list[str]:
-    lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|")
-    lexer.commenters = ""
-    lexer.whitespace_split = True
-    try:
-        return list(lexer)
-    except ValueError:
-        return []
-
-
-def _executes_required_command(run: str, required: str) -> bool:
-    if len(run.splitlines()) != 1:
-        return False
-    run_tokens = _shell_tokens(run)
-    required_tokens = _shell_tokens(required)
-    return run_tokens == required_tokens
-
-
-def extract_quality_run_commands(path: Path) -> tuple[list[str], str | None]:
-    ruby = shutil.which("ruby")
-    if ruby is None:
-        return [], "Ruby is required for local YAML syntax validation."
-    result = subprocess.run(
-        [
-            ruby,
-            "-e",
-            (
-                "require 'json'; require 'yaml'; "
-                "workflow = YAML.load_file(ARGV.fetch(0)); "
-                "steps = workflow.fetch('jobs').fetch('quality').fetch('steps'); "
-                "runs = steps.select { |step| "
-                "step.is_a?(Hash) && step['run'].is_a?(String) }.map { |step| "
-                "step['run'] }; "
-                "STDOUT.write(JSON.generate(runs))"
-            ),
-            str(path),
-        ],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return [], f"YAML syntax validation failed: {result.stderr.strip()}"
-    try:
-        commands = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return [], "YAML command extraction returned invalid JSON."
-    if not isinstance(commands, list) or not all(
-        isinstance(command, str) for command in commands
-    ):
-        return [], "YAML command extraction returned invalid run values."
-    return [
-        "\n".join(
-            cleaned_line
-            for line in command.splitlines()
-            if (cleaned_line := _strip_unquoted_shell_comment(line))
-        ).strip()
-        for command in commands
-    ], None
 
 
 def validate_generated_invariant_configuration(workflow: str) -> list[str]:
@@ -237,9 +197,13 @@ def validate_contract(path: Path) -> list[str]:
     if not path.is_file():
         return [f"workflow does not exist: {path}"]
 
-    quality_run_commands, yaml_error = extract_quality_run_commands(path)
-    if yaml_error is not None:
-        return [yaml_error]
+    root_errors = validate_root_contract(path)
+    if root_errors and root_errors[0].startswith(("Ruby", "YAML")):
+        return root_errors
+    graph = validate_quality_graph(path)
+    if graph.errors and graph.errors[0].startswith(("Ruby", "YAML")):
+        return list(graph.errors)
+    quality_run_commands = graph.run_commands
 
     workflow = path.read_text(encoding="utf-8")
     errors = [
@@ -287,27 +251,13 @@ def validate_contract(path: Path) -> list[str]:
     ]
     if [command.strip() for command in test_commands] != [FAST_PYTEST_COMMAND]:
         errors.append("workflow must have exactly one filtered test command")
-    for command in REQUIRED_EXECUTABLE_COMMANDS:
+    for command in EXPECTED_RUN_COMMANDS:
         if not any(
-            _executes_required_command(run, command) for run in quality_run_commands
+            executes_required_command(run, command) for run in quality_run_commands
         ):
             errors.append(f"missing required executable command: {command}")
     errors.extend(validate_generated_invariant_configuration(workflow))
-
-    action_references = re.findall(
-        r"^\s+uses: ([^@\s]+)@([^\s]+)$", workflow, re.MULTILINE
-    )
-    actual_actions = dict(action_references)
-    if len(action_references) != len(EXPECTED_ACTIONS):
-        errors.append("workflow must use exactly the reviewed external actions")
-    for action, commit in EXPECTED_ACTIONS.items():
-        if actual_actions.get(action) != commit:
-            errors.append(f"action is not pinned to its reviewed commit: {action}")
-    for action, reference in action_references:
-        if re.fullmatch(r"[0-9a-f]{40}", reference) is None:
-            errors.append(f"action is not pinned to a full commit SHA: {action}")
-
-    return errors
+    return root_errors + list(graph.errors) + errors
 
 
 def main() -> int:
