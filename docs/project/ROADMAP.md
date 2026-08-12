@@ -43,6 +43,22 @@ finalization/publication (#222) są etapami zakończonymi tego samego wydania.
 #195 pozostaje opcjonalną, nieblokującą ścieżką post-v1 i nie jest bramką
 tego wydania.
 
+Następnym zamierzonym wydaniem runtime'u jest `0.3.0`. Przyrost minor wynika z
+kompatybilnych rozszerzeń deterministycznego zestawu reguł i publicznych
+zachowań po `0.2.0`; wersja pakietu zmieni się dopiero w osobnym wykonaniu
+wydania. Bramkę tworzą standardowe kontrole runtime'u, Fast CI, weryfikacja
+dystrybucji i instalacji offline oraz kontrola tożsamości kandydata opisana w
+[`docs/prerelease-candidate.md`](../prerelease-candidate.md). Wykonanie wydania
+musi najpierw ustawić spójną wersję `0.3.0` w źródle i artefaktach oraz zastąpić
+kontrolę nieobecności całego projektu wersjoświadomą kontrolą dokładnej wersji;
+obecny tryb pierwszego uploadu nie jest bramką kolejnego wydania.
+
+Niewymuszona propozycja progów jakości pozostaje odroczona i niezależna od
+`0.3.0`. Nie kwalifikuje zachowań review-only i nie jest bramką budowy,
+testów, pakowania ani publikacji. Opcjonalne badania, kwalifikacja morfologii,
+praca modelowa, kalibracja i holdouty pozostają poza krytyczną ścieżką
+runtime'u, dopóki osobna zaakceptowana decyzja nie zmieni tej granicy.
+
 Pozostałe kierunki nie zmieniają statusu opublikowanego wydania:
 
 - Umbrella B — [#236](https://github.com/PSyron/polis/issues/236) — jest odrębną,

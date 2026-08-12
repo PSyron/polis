@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+### Dodano
+
+- Dodano wąskie deterministyczne korekty dla rekcji po negacji, kierunku z
+  `do`, początkowych zdań warunkowych, podwójnych przecinków, zapisu `napewno`
+  i zamkniętego wzorca zgody `Te zdanie`.
+- Dodano kwalifikację dostawcy morfologii offline i ograniczone reguły
+  korzystające z morfologii. Zachowania bez dokładnej niezależnej kwalifikacji
+  pozostają review-only i nie rozszerzają listy automatycznych korekt.
+- Dodano edytowalny baseline jakości oraz narzędzia kalibracji i niezależnych
+  zbiorów dla opcjonalnej ewaluacji, bez włączania danych badawczych do
+  dystrybucji ani ścieżki wydania runtime'u.
+- Dodano widoczny w runtime kontrakt tożsamości źródeł reguł i diagnostykę
+  brakujących oraz nadmiarowych tożsamości.
+
+### Zmieniono
+
+- CLI respektuje domyślne kategorie i próg pewności wczytane z TOML, a jawne
+  wartości wiersza poleceń nadal mają pierwszeństwo dla każdego pola osobno.
+- Nieprawidłowe wartości skonfigurowanego progu pewności są odrzucane podczas
+  tworzenia lub wczytywania konfiguracji zgodnie ze stabilnym publicznym
+  kontraktem błędów.
+- `Analyzer.correct()` kończy się kontrolowanym błędem w działającej pętli
+  zdarzeń i kieruje kod asynchroniczny do `await Analyzer.correct_async(...)`,
+  bez ostrzeżenia o coroutine pozbawionej `await`.
+- Fast CI i weryfikacja dystrybucji ściślej sprawdzają wykonywalne polecenia
+  workflow, zainstalowane moduły publiczne, instalację offline i wykluczenie
+  materiałów dostępnych wyłącznie w repozytorium.
+
+### Decyzja o wydaniu
+
+- Następnym zamierzonym wydaniem runtime'u jest `0.3.0`. Przyrost minor zapisuje
+  kompatybilne rozszerzenia wspieranego deterministycznego zestawu reguł i
+  publicznych zachowań od `0.2.0`; nie jest to wyłącznie zestaw poprawek patch.
+  Metadane źródłowe pozostają w wersji `0.2.0`, dopóki osobna zmiana wykonująca
+  wydanie nie utworzy kandydata.
+- Oczekująca propozycja progów jakości jest odroczona i niezależna od `0.3.0`.
+  Nie jest wymuszana, nie kwalifikuje zachowań review-only do automatycznej
+  korekty i nie stanowi bramki budowy, testów, pakowania ani publikacji tego
+  wydania runtime'u.
+- Opcjonalne badania, kwalifikacja morfologii, praca modelowa, kalibracja i
+  holdouty pozostają poza krytyczną ścieżką runtime'u. Włączenie któregokolwiek
+  z tych elementów do zależności wydania wymaga osobnej zaakceptowanej decyzji.
+
 ## 0.2.0 (2026-08-06)
 
 - Added a build-once release-identity manifest, explicit publication checks, and
