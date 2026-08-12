@@ -306,7 +306,14 @@ class Analyzer:
     def correct(self, text: str) -> CorrectionResult:
         """Apply only high-confidence, non-conflicting deterministic corrections."""
 
-        return asyncio.run(self.correct_async(text))
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self.correct_async(text))
+        raise RuntimeError(
+            "Analyzer.correct() cannot be called from a running event loop; "
+            "use 'await Analyzer.correct_async(...)' instead"
+        )
 
     async def correct_async(self, text: str) -> CorrectionResult:
         """Asynchronously return the same conservative correction outcome."""
