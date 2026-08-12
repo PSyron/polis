@@ -105,12 +105,19 @@ def _read_input(
     raise ValueError("input is required via --stdin, --file, or positional text")
 
 
-def _options_from_args(args: argparse.Namespace) -> AnalysisOptions:
+def _options_from_args(
+    args: argparse.Namespace,
+    config: AnalyzerConfig,
+) -> AnalysisOptions:
     categories = _parse_categories(args.category)
 
     return AnalysisOptions(
-        categories=categories,
-        minimum_confidence=args.minimum_confidence or 0.0,
+        categories=config.categories if categories is None else categories,
+        minimum_confidence=(
+            config.minimum_confidence
+            if args.minimum_confidence is None
+            else args.minimum_confidence
+        ),
     )
 
 
@@ -151,18 +158,16 @@ def run(argv: list[str] | None = None) -> int:
         parser.error("the command must be 'analyze'")
 
     try:
-        options = _options_from_args(args)
+        config = (
+            AnalyzerConfig.from_config(args.config) if args.config else AnalyzerConfig()
+        )
+        options = _options_from_args(args, config)
         text = _read_input(
             stdin=bool(args.stdin),
             file_path=args.file,
             positional=args.text,
         )
-
-        analyzer = (
-            Analyzer.from_config(args.config)
-            if args.config
-            else Analyzer(AnalyzerConfig())
-        )
+        analyzer = Analyzer(config)
     except (ConfigurationError, OSError, ValueError, TypeError, PolisError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
