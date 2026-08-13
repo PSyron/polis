@@ -34,6 +34,7 @@ def test_baseline_help_exposes_only_default_protocol_flags() -> None:
         "--warmup",
         "--repetitions",
         "--artifact-sha256",
+        "--dataset-version",
         "--output",
         "--replace",
     ):
@@ -46,7 +47,7 @@ def test_baseline_help_exposes_only_default_protocol_flags() -> None:
         "--threshold",
         "--minimum-confidence",
     ):
-        assert forbidden not in result.stdout
+        assert f"{forbidden} " not in result.stdout
 
 
 @pytest.mark.parametrize(
@@ -79,6 +80,29 @@ def test_baseline_rejects_invalid_protocol_values(
     )
 
     assert result.returncode == 2
+    assert not output.exists()
+
+
+def test_v2_baseline_requires_source_sha_and_profile(tmp_path: Path) -> None:
+    output = tmp_path / "baseline.json"
+
+    result = _module_command(
+        "baseline",
+        "--dataset-version",
+        "v2",
+        "--warmup",
+        "0",
+        "--repetitions",
+        "2",
+        "--artifact-sha256",
+        _ARTIFACT_SHA256,
+        "--output",
+        str(output),
+    )
+
+    assert result.returncode == 2
+    assert "--source-sha" in result.stderr
+    assert "--profile" in result.stderr
     assert not output.exists()
 
 

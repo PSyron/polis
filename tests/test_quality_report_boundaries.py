@@ -78,7 +78,12 @@ def test_quality_report_load_rejects_foreign_dataset_identity(
     baseline = tmp_path / "foreign-identity.json"
     _write_proposal(baseline, payload)
 
-    with pytest.raises(QualityReportError, match="active dataset identity mismatch"):
+    expected_message = (
+        "schema version mismatch"
+        if section == "dataset" and field == "schema_version"
+        else "active dataset identity mismatch"
+    )
+    with pytest.raises(QualityReportError, match=expected_message):
         load_quality_report(baseline)
 
 

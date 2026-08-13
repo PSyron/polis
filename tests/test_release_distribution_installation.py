@@ -175,6 +175,14 @@ def _add_distribution_member(dist: Path, member: str) -> None:
             "src/polis/evaluation/datasets/quality/v1/manifest.json",
             id="quality_manifest",
         ),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v2/cases.json",
+            id="quality_v2_cases",
+        ),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v2/manifest.json",
+            id="quality_v2_manifest",
+        ),
     ),
 )
 def test_distribution_artifact_verifier_rejects_missing_quality_members(
@@ -352,7 +360,7 @@ def test_public_install_verifier_installs_both_artifacts_with_socket_denied(
     assert "artifact=sdist version=0.2.0 issues=1" in result.stdout
     assert result.stdout.count("public_dataset_imports=ok") == 2
     assert result.stdout.count("repository_only_modules=absent") == 2
-    assert result.stdout.count("public_resource=") == 6
+    assert result.stdout.count("public_resource=") == 10
     assert result.stdout.count("forbidden_module=") == (
         2 * len(EXPECTED_FORBIDDEN_REPOSITORY_MODULES)
     )

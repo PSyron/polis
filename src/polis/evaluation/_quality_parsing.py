@@ -107,7 +107,7 @@ def parse_case(raw: JsonValue, seen_ids: set[str]) -> QualityCase:
     )
 
 
-def parse_review(raw: JsonValue) -> QualityReview:
+def parse_review(raw: JsonValue, *, checklist_version: str) -> QualityReview:
     review = require_object(raw, "quality review")
     require_exact_fields(review, _REVIEW_FIELDS, "quality review")
     status = review["status"]
@@ -117,9 +117,7 @@ def parse_review(raw: JsonValue) -> QualityReview:
     }:
         raise QualityDatasetError("quality review status is unsupported")
     require_literal(review, "reviewer_role", "Polis maintainer", "quality review")
-    require_literal(
-        review, "checklist_version", "quality-development-review-v1", "quality review"
-    )
+    require_literal(review, "checklist_version", checklist_version, "quality review")
     raw_ids = review["reviewed_case_ids"]
     if not isinstance(raw_ids, list):
         raise QualityDatasetError("reviewed_case_ids must be a list")
@@ -131,7 +129,7 @@ def parse_review(raw: JsonValue) -> QualityReview:
     return QualityReview(
         status=status,
         reviewer_role="Polis maintainer",
-        checklist_version="quality-development-review-v1",
+        checklist_version=checklist_version,
         reviewed_case_ids=reviewed_ids,
         canonical_sha256=require_sha256(
             review["canonical_sha256"], "quality review canonical_sha256"

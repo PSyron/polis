@@ -9,6 +9,7 @@ import resource
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from enum import StrEnum
 
 from polis.core import Finding
 from polis.evaluation.dataset import EvaluationDataset
@@ -31,6 +32,29 @@ class RunIdentity:
     manifest_schema_id: str
     manifest_schema_version: int
     manifest_sha256: str
+    source_sha: str | None = None
+    profile: RunProfile | None = None
+
+
+class InstallationProfile(StrEnum):
+    DEFAULT = "default"
+    MORPHOLOGY = "morphology"
+
+
+@dataclass(frozen=True, slots=True)
+class MorphologyProviderIdentity:
+    provider: str
+    package_version: str
+    dictionary_id: str
+    dictionary_notice_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class RunProfile:
+    id: InstallationProfile
+    morphology_provider: MorphologyProviderIdentity | None
+    planned_morphology_source_semantics: str
+    planned_non_morphology_source_semantics: str
 
 
 @dataclass(frozen=True, slots=True)

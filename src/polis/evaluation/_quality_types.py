@@ -17,6 +17,18 @@ QUALITY_DATASET_PATH: Final = (
 QUALITY_MANIFEST_PATH: Final = QUALITY_DATASET_PATH.with_name("manifest.json")
 
 
+class QualityDatasetVersion(StrEnum):
+    V1 = "v1"
+    V2 = "v2"
+
+
+def quality_dataset_paths(version: QualityDatasetVersion) -> tuple[Path, Path]:
+    dataset_path = (
+        Path(__file__).parent / "datasets" / "quality" / version.value / "cases.json"
+    )
+    return dataset_path, dataset_path.with_name("manifest.json")
+
+
 class QualityDatasetError(ValueError):
     """Raised when quality dataset bytes do not satisfy the reviewed contract."""
 
