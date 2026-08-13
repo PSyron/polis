@@ -79,6 +79,13 @@ else:
         with pytest.raises(CalibrationContractError):
             parse_source_rows(rows)
 
+    def test_source_parser_rejects_extra_twenty_first_row() -> None:
+        rows = _raw_rows()
+        rows.append(list(rows[-1]))
+
+        with pytest.raises(CalibrationContractError):
+            parse_source_rows(rows)
+
     @pytest.mark.parametrize(
         ("field_index", "replacement"),
         [
@@ -140,6 +147,27 @@ else:
         drifted = current[:-1]
 
         monkeypatch.setattr(calibration_sources, "current_sources", lambda: drifted)
+
+        with pytest.raises(CalibrationContractError):
+            validate_live_sources()
+
+    def test_live_source_validation_rejects_extra_runtime_source(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        current = tuple(SourceIdentity(*row.as_tuple()[:5]) for row in SOURCE_ROWS)
+        extra = SourceIdentity(
+            source="rule:agreement.unqualified_extra",
+            category="agreement",
+            operation="replace.unqualified_extra",
+            behavior_version="agreement-unqualified-extra/1.0",
+            source_policy_version="policy/absent-from-frozen-cohort",
+        )
+
+        monkeypatch.setattr(
+            calibration_sources,
+            "current_sources",
+            lambda: (*current, extra),
+        )
 
         with pytest.raises(CalibrationContractError):
             validate_live_sources()

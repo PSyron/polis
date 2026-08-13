@@ -31,11 +31,12 @@ późniejszy ADR.
 | [ADR-0022](decisions/0022-conservative-v1-product-scope.md) | Zaakceptowany | Konserwatywny zakres v1 i dokładna powłoka dowodowa zastępują szerszy plan runtime'u |
 | [ADR-0023](decisions/0023-evaluation-namespace-1-0.md) | Zaakceptowany | Pełna obecna przestrzeń `polis.evaluation` pozostaje zgodna przez 1.0 |
 | [ADR-0024](decisions/0024-automatic-review-abstention-quality-contract.md) | Zaakceptowany | Kontrakt automatycznej korekty, przeglądu i abstencji dla jakości v1 |
+| [ADR-0025](decisions/0025-runtime-source-cohort-evolution.md) | Zaakceptowany | Niezmienna kohorta kwalifikacji i ewolucja źródeł runtime'u |
 
 [Granica protokołów runtime'u v1](protocols.md) opisuje punkty rozdziału
 implementacji zgodne z zaakceptowanym kontraktem publicznego API.
 
 [Inwentarz katalogu reguł](rule-catalog-inventory.md) jest zachowanym bez zmian
 historycznym snapshotem #148/#149, a nie opisem bieżącego runtime'u v1.
-Bieżące szesnaście źródeł runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
-konserwatywny zakres określa ADR-0022.
+Bieżące źródła runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
+konserwatywny zakres określa ADR-0022 i ADR-0025.
