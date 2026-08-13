@@ -24,6 +24,15 @@ _NOMINAL_GROUP_TE_DUZE_OKNO_BEHAVIOR_VERSION: Final = (
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
+_NOMINAL_GROUP_TA_NOWY_KSIAZKA_PATTERN: Final = re.compile(
+    r"(?<!\w)(?P<phrase>Ta (?P<adjective>nowy) książka)(?!\w)",
+    re.IGNORECASE,
+)
+_NOMINAL_GROUP_TA_NOWY_KSIAZKA_BEHAVIOR_VERSION: Final = (
+    "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+    "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
+    "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+)
 
 
 class AgreementCopulaRule:
@@ -187,12 +196,90 @@ class AgreementNominalGroupTeDuzeOknoRule:
         )
 
 
+class AgreementNominalGroupTaNowyKsiazkaRule:
+    """Review one exact adjective gender error using qualified morphology."""
+
+    _CATEGORY = Category.AGREEMENT
+
+    def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
+        self.source = Source(SourceKind.RULE, "agreement.nominal_group_ta_nowy_ksiazka")
+        self._provider = provider
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.adjective_gender"
+
+    @property
+    def behavior_version(self) -> str:
+        return _NOMINAL_GROUP_TA_NOWY_KSIAZKA_BEHAVIOR_VERSION
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+
+        matches = tuple(
+            match
+            for match in _NOMINAL_GROUP_TA_NOWY_KSIAZKA_PATTERN.finditer(text)
+            if not _is_wrapped_mention(text, match.start("phrase"), match.end("phrase"))
+        )
+        if (
+            not matches
+            or self._provider is None
+            or self._provider.nominal_group_ta_nowy_ksiazka_replacement() != "nowa"
+        ):
+            return ()
+
+        findings: list[Finding] = []
+        for match in matches:
+            adjective = match.group("adjective")
+            suggestion = _match_case(adjective, "nowa")
+            if suggestion == adjective:
+                continue
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niezgodność form w grupie nominalnej.",
+                    explanation=(
+                        "W tej zamkniętej konstrukcji forma „nowy” nie zgadza się "
+                        "z rzeczownikiem „książka”; oczekiwana jest forma „nowa”."
+                    ),
+                    original=adjective,
+                    suggestion=suggestion,
+                    start=match.start("adjective"),
+                    end=match.end("adjective"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
 def _match_case(reference: str, replacement: str) -> str:
     if reference.isupper():
         return replacement.upper()
     if reference[:1].isupper():
         return replacement[:1].upper() + replacement[1:]
     return replacement
+
+
+_MENTION_WRAPPERS: Final = frozenset(
+    {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
+)
+
+
+def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
+    if start <= 0 or end >= len(text):
+        return False
+    left = text[start - 1]
+    right = text[end]
+    if (left, right) in _MENTION_WRAPPERS:
+        return True
+    if left == "`":
+        rest = text[end:]
+        return rest.startswith("`") or rest.startswith("`()")
+    return False
 
 
 _SUBJECTS: tuple[str, ...] = (
@@ -259,6 +346,7 @@ _CORRECTIONS: dict[tuple[str, str], str] = {
 
 __all__ = [
     "AgreementCopulaRule",
+    "AgreementNominalGroupTaNowyKsiazkaRule",
     "AgreementNominalGroupTeDuzeOknoRule",
     "AgreementTeZdanieRule",
 ]

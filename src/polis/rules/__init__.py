@@ -9,6 +9,7 @@ from polis.core import AnalysisOptions, Category, Finding, Rule, Source, Version
 from polis.correction.policy import SourceBehavior
 from polis.rules.agreement import (
     AgreementCopulaRule,
+    AgreementNominalGroupTaNowyKsiazkaRule,
     AgreementNominalGroupTeDuzeOknoRule,
     AgreementTeZdanieRule,
 )
@@ -225,6 +226,7 @@ __all__ = [
     "SpellingZebyRule",
     "TypoSpellingRule",
     "AgreementCopulaRule",
+    "AgreementNominalGroupTaNowyKsiazkaRule",
     "AgreementNominalGroupTeDuzeOknoRule",
     "AgreementSubjectVerbOniCzytaRule",
     "AgreementTeZdanieRule",

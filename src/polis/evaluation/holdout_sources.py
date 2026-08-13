@@ -18,6 +18,7 @@ _CATEGORY_BY_SOURCE = {
     "rule:agreement.copula": "agreement",
     "rule:agreement.te_zdanie": "agreement",
     "rule:agreement.nominal_group_te_duze_okno": "agreement",
+    "rule:agreement.nominal_group_ta_nowy_ksiazka": "agreement",
     "rule:agreement.subject_verb_oni_czyta": "agreement",
     "rule:inflection.negated_widziec": "inflection",
     "rule:inflection.negated_widziec_nominal_group": "inflection",

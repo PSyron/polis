@@ -7,6 +7,7 @@
 | `rule:agreement.copula` | `agreement` | lokalna niezgodność łącznika w ograniczonych wzorcach zaimka i czasownika |
 | `rule:agreement.te_zdanie` | `agreement` | zamknięty wzorzec `Te zdanie` → `To zdanie`, z zachowaniem wielkości liter |
 | `rule:agreement.nominal_group_te_duze_okno` | `agreement` | opcjonalna zamknięta konstrukcja `Te duże okno jest otwarte.` → `To duże okno jest otwarte.`, wyłącznie do przeglądu |
+| `rule:agreement.nominal_group_ta_nowy_ksiazka` | `agreement` | opcjonalna zamknięta konstrukcja `Ta nowy książka.` → `Ta nowa książka.`, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
@@ -29,6 +30,7 @@
 | `rule:syntax.sentence_space` | `punctuation` | brakująca spacja po kropce na granicy zdania |
 
 Reguły `rule:agreement.nominal_group_te_duze_okno`,
+`rule:agreement.nominal_group_ta_nowy_ksiazka`,
 `rule:agreement.subject_verb_oni_czyta`,
 `rule:inflection.negated_widziec`,
 `rule:inflection.negated_widziec_nominal_group`,
