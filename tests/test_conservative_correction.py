@@ -113,7 +113,7 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_twenty_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_twenty_one_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
@@ -128,6 +128,7 @@ def test_default_analyzer_composes_exactly_twenty_conservative_v1_rules() -> Non
         "rule:spelling.napewno",
         "rule:spelling.wlasnie",
         "rule:spelling.zeby",
+        "rule:spelling.wogole",
         "rule:syntax.comma_space",
         "rule:syntax.duplicate_comma",
         "rule:syntax.initial_conditional_comma",

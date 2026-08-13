@@ -242,6 +242,22 @@ def test_llm_finding_is_ineligible_at_full_confidence() -> None:
     )
 
 
+def test_wogole_full_policy_key_remains_review_only() -> None:
+    source = Source(SourceKind.RULE, "spelling.wogole")
+    behavior = SourceBehavior(
+        source,
+        "replace.common_typo",
+        "spelling-wogole/1.0",
+    )
+
+    assert SOURCE_POLICY_VERSION == "1.2"
+    assert not is_automatic_correction_eligible(
+        _finding(source, Category.SPELLING, 0.98),
+        behavior,
+        source_policy_version=SOURCE_POLICY_VERSION,
+    )
+
+
 def test_language_tool_behavior_is_no_longer_eligible() -> None:
     source = Source(SourceKind.RULE, "languagetool.pl")
     behavior = SourceBehavior(

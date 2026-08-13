@@ -45,7 +45,7 @@ from polis.evaluation.holdout_preregistration import (
     TAXONOMY,
     THRESHOLDS,
 )
-from polis.evaluation.holdout_sources import current_sources, parse_sources
+from polis.evaluation.holdout_sources import parse_sources, qualification_sources
 
 canonical_sha256 = _canonical_sha256
 HoldoutContractError = _HoldoutContractError
@@ -108,7 +108,7 @@ def parse_holdout_config(
     ) != THRESHOLDS:
         _fail("thresholds must match the approved thresholds")
     sources = parse_sources(
-        raw["source_identities"], source_snapshot or current_sources
+        raw["source_identities"], source_snapshot or qualification_sources
     )
     exclusions = _strings(raw["exclusions"], "exclusions")
     if exclusions != ("style", "tone", "meaning", "model", "network"):

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import Final
 
 from polis.core import (
     AnalysisOptions,
@@ -14,11 +15,16 @@ from polis.core import (
     SourceKind,
 )
 
+_MENTION_WRAPPERS: Final = frozenset(
+    {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
+)
+
 
 class _CasePatternRule:
     """Simple word-level spelling replacement rule."""
 
     _CATEGORY = Category.SPELLING
+    _IGNORE_WRAPPED_MENTIONS = False
 
     def __init__(
         self, source_name: str, typed: str, corrected: str, confidence: float
@@ -35,12 +41,19 @@ class _CasePatternRule:
 
         findings: list[Finding] = []
         for match in self._pattern.finditer(text):
+            start = match.start()
+            end = match.end()
+            if (
+                self._IGNORE_WRAPPED_MENTIONS
+                and start > 0
+                and end < len(text)
+                and (text[start - 1], text[end]) in _MENTION_WRAPPERS
+            ):
+                continue
             observed = match.group()
             candidate = self._apply_case(observed, self._corrected)
             if candidate == observed:
                 continue
-            start = match.start()
-            end = match.end()
             findings.append(
                 Finding.create(
                     category=self._CATEGORY,
@@ -175,9 +188,30 @@ class SpellingNapewnoRule(TypoSpellingRule):
         return "spelling-napewno/1.0"
 
 
+class SpellingWogoleRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wogole",
+            typed="wogole",
+            corrected="w ogóle",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wogole/1.0"
+
+
 __all__ = [
     "SpellingJestesRule",
     "SpellingNapewnoRule",
+    "SpellingWogoleRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

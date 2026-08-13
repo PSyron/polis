@@ -25,10 +25,11 @@ def test_analyzer_exposes_immutable_public_source_identity_snapshot() -> None:
     snapshot = Analyzer(AnalyzerConfig()).source_identity_snapshot
 
     assert isinstance(snapshot, tuple)
-    assert len(snapshot) == 20
+    assert len(snapshot) == 21
     assert snapshot[0].source == "rule:agreement.copula"
     assert snapshot[0].operation == "replace.copula_form"
     assert snapshot[0].behavior_version == "agreement-copula/1.0"
+    assert any(item.source == "rule:spelling.wogole" for item in snapshot)
 
 
 class _SourceIdentityView(Protocol):
@@ -74,7 +75,9 @@ def _contract() -> _ContractApi:
 
 
 def test_strict_contract_accepts_complete_synthetic_preregistration() -> None:
-    parsed = _contract().parse_holdout_config(synthetic_config())
+    parsed = _contract().parse_holdout_config(
+        synthetic_config(), source_snapshot=_source_snapshot
+    )
 
     assert parsed.experiment_id == "polis-a-b-one-shot-v1"
     assert parsed.dataset.case_count == 52
@@ -91,7 +94,7 @@ def test_strict_contract_rejects_missing_required_field(field: str) -> None:
     with pytest.raises(
         _contract().HoldoutContractError, match="exactly the required fields"
     ):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 def test_strict_contract_rejects_unknown_field() -> None:
@@ -101,7 +104,7 @@ def test_strict_contract_rejects_unknown_field() -> None:
     with pytest.raises(
         _contract().HoldoutContractError, match="exactly the required fields"
     ):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 @pytest.mark.parametrize(
@@ -123,7 +126,7 @@ def test_exact_twenty_source_tuple_binding_rejects_drift(
         identities.pop()
 
     with pytest.raises(_contract().HoldoutContractError, match=message):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 def test_source_identity_reordering_is_allowed() -> None:
@@ -133,7 +136,7 @@ def test_source_identity_reordering_is_allowed() -> None:
 
     identities.reverse()
 
-    _contract().parse_holdout_config(raw)
+    _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 def test_source_snapshot_missing_identity_is_reported() -> None:
@@ -215,7 +218,7 @@ def test_strict_contract_rejects_unapproved_identity_or_threshold(
     nested[field] = value
 
     with pytest.raises(_contract().HoldoutContractError, match=message):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 def test_canonical_config_digest_changes_for_one_byte_of_metadata() -> None:
@@ -244,7 +247,7 @@ def test_signature_requirements_are_fail_closed(field: str, value: JsonValue) ->
     signature[field] = value
 
     with pytest.raises(_contract().HoldoutContractError, match="signature"):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)
 
 
 @pytest.mark.parametrize(
@@ -270,4 +273,4 @@ def test_authorization_signature_requirements_are_exact(
     signature[field] = value
 
     with pytest.raises(_contract().HoldoutContractError, match="authorization"):
-        _contract().parse_holdout_config(raw)
+        _contract().parse_holdout_config(raw, source_snapshot=_source_snapshot)

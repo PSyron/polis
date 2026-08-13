@@ -132,3 +132,13 @@ def test_napewno_rule_respects_token_and_clause_boundaries() -> None:
         .issues
         == ()
     )
+
+
+def test_default_analyzer_detects_wogole_review_only_correction() -> None:
+    text = "Wogole tego nie pamiętam."
+
+    result = Analyzer(AnalyzerConfig()).analyze(text)
+
+    assert tuple(str(finding.source) for finding in result.issues) == (
+        "rule:spelling.wogole",
+    )

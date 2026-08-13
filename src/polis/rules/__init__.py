@@ -21,6 +21,7 @@ from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingNapewnoRule,
     SpellingWlasnieRule,
+    SpellingWogoleRule,
     SpellingZebyRule,
     TypoSpellingRule,
 )
@@ -215,6 +216,7 @@ __all__ = [
     "IncompatibleRuleOutputError",
     "SpellingJestesRule",
     "SpellingNapewnoRule",
+    "SpellingWogoleRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
     "TypoSpellingRule",

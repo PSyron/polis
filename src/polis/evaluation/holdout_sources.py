@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from polis.analyzer import Analyzer, AnalyzerConfig
 from polis.correction.policy import SOURCE_POLICY_VERSION
+from polis.evaluation.calibration_source_rows import SOURCE_ROWS
 from polis.evaluation.holdout_models import (
     HoldoutConfig,
     HoldoutContractError,
@@ -25,6 +26,7 @@ _CATEGORY_BY_SOURCE = {
     "rule:spelling.napewno": "spelling",
     "rule:spelling.wlasnie": "spelling",
     "rule:spelling.zeby": "spelling",
+    "rule:spelling.wogole": "spelling",
     "rule:syntax.comma_space": "punctuation",
     "rule:syntax.duplicate_comma": "punctuation",
     "rule:syntax.initial_conditional_comma": "syntax",
@@ -38,6 +40,8 @@ _CATEGORY_BY_SOURCE = {
 
 
 def current_sources() -> tuple[SourceIdentity, ...]:
+    """Return the expanding runtime composition-root snapshot."""
+
     try:
         registrations = Analyzer(AnalyzerConfig()).source_identity_snapshot
         return tuple(
@@ -61,6 +65,21 @@ def current_sources() -> tuple[SourceIdentity, ...]:
         raise HoldoutContractError(
             "current source identity snapshot is unavailable"
         ) from error
+
+
+def qualification_sources() -> tuple[SourceIdentity, ...]:
+    """Return the immutable 20-source qualification cohort (ADR-0025)."""
+
+    return tuple(
+        SourceIdentity(
+            source=row.source,
+            category=row.category,
+            operation=row.operation,
+            behavior_version=row.behavior_version,
+            source_policy_version=row.source_policy_version,
+        )
+        for row in SOURCE_ROWS
+    )
 
 
 def parse_sources(

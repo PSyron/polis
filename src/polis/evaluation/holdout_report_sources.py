@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from polis.evaluation.calibration_sources import SOURCE_ROWS
 from polis.evaluation.holdout_models import (
     HoldoutReportError,
     HoldoutSourceOutcome,
     JsonObject,
     JsonValue,
 )
-from polis.evaluation.holdout_sources import current_sources
 
 _FIELDS = {
     "identity",
@@ -40,6 +40,8 @@ _VERDICTS = {"pass", "fail_threshold", "insufficient_evidence", "invalid"}
 def parse_source_outcomes(value: JsonValue) -> tuple[HoldoutSourceOutcome, ...]:
     if not isinstance(value, list):
         raise HoldoutReportError("per_source must be a list")
+    # Historical holdout evidence is bound to the immutable 20-source qualification
+    # cohort (ADR-0025), not the expanding runtime composition root.
     expected = tuple(
         (
             item.source,
@@ -48,7 +50,7 @@ def parse_source_outcomes(value: JsonValue) -> tuple[HoldoutSourceOutcome, ...]:
             item.behavior_version,
             item.source_policy_version,
         )
-        for item in current_sources()
+        for item in SOURCE_ROWS
     )
     outcomes: list[HoldoutSourceOutcome] = []
     for value_item in value:
