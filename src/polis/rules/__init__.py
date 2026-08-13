@@ -18,6 +18,7 @@ from polis.rules.inflection import (
     InflectionNegatedWidziecNominalGroupRule,
     InflectionNegatedWidziecRule,
 )
+from polis.rules.przygladac import InflectionPrzygladacSieNowyBudynekRule
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingNapewnoRule,
@@ -237,6 +238,7 @@ __all__ = [
     "InflectionNegatedWidziecNominalGroupRule",
     "InflectionNegatedWidziecRule",
     "InflectionGovernmentPotrzebowacPomocRule",
+    "InflectionPrzygladacSieNowyBudynekRule",
     "SyntaxCommaSpacingRule",
     "SyntaxDuplicateCommaRule",
     "SyntaxInitialConditionalCommaRule",

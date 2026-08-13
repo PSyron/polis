@@ -23,6 +23,7 @@ _CATEGORY_BY_SOURCE = {
     "rule:agreement.subject_verb_my_czyta": "agreement",
     "rule:inflection.negated_widziec": "inflection",
     "rule:inflection.negated_widziec_nominal_group": "inflection",
+    "rule:inflection.przygladac_sie_nowy_budynek": "inflection",
     "rule:inflection.government_potrzebowac_pomoc": "inflection",
     "rule:spelling.jestes": "spelling",
     "rule:spelling.napewno": "spelling",
