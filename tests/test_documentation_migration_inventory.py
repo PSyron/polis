@@ -112,6 +112,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:agreement.copula",
     "rule:agreement.te_zdanie",
     "rule:agreement.nominal_group_te_duze_okno",
+    "rule:agreement.nominal_group_ta_nowy_ksiazka",
     "rule:agreement.subject_verb_oni_czyta",
     "rule:inflection.negated_widziec",
     "rule:inflection.negated_widziec_nominal_group",

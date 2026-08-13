@@ -47,6 +47,18 @@ _ADJECTIVE_SOURCE_TAGS: Final = frozenset(
 _NOMINAL_HEAD_LEMMA: Final = "okno"
 _NOMINAL_HEAD_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc.voc:n:ncol"})
 _DEMONSTRATIVE_TARGET_TAG: Final = "adj:sg:nom.voc:n:pos"
+_TA_DEMONSTRATIVE_LEMMA: Final = "ten"
+_TA_DEMONSTRATIVE_SOURCE_TAGS: Final = frozenset({"adj:sg:nom.voc:f:pos"})
+_TA_ADJECTIVE_LEMMA: Final = "nowy:A"
+_TA_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
+    {
+        "adj:sg:acc:m3:pos",
+        "adj:sg:nom.voc:m1.m2.m3:pos",
+    }
+)
+_TA_NOMINAL_HEAD_LEMMA: Final = "książka"
+_TA_NOMINAL_HEAD_SOURCE_TAGS: Final = frozenset({"subst:sg:nom:f"})
+_TA_ADJECTIVE_TARGET_TAG: Final = "adj:sg:nom.voc:f:pos"
 
 
 class _QualifiedMorfeuszBackend(Protocol):
@@ -156,6 +168,49 @@ class _QualifiedMorfeusz:
         ):
             return None
         return "To"
+
+    def nominal_group_ta_nowy_ksiazka_replacement(self) -> str | None:
+        if self.identity != _qualified_identity():
+            return None
+        try:
+            demonstrative_analyses = _analyses(self.backend.analyse("Ta"), "Ta")
+            adjective_analyses = _analyses(self.backend.analyse("nowy"), "nowy")
+            nominal_head_analyses = _analyses(
+                self.backend.analyse("książka"), "książka"
+            )
+            adjective_forms = _forms(
+                self.backend.generate(_TA_ADJECTIVE_LEMMA),
+                lemma=_TA_ADJECTIVE_LEMMA,
+                target_tag=_TA_ADJECTIVE_TARGET_TAG,
+            )
+        except (KeyError, RuntimeError, TypeError, ValueError):
+            return None
+        if (
+            not _has_one_supported_lemma(
+                demonstrative_analyses,
+                lemma=_TA_DEMONSTRATIVE_LEMMA,
+                source_tags=_TA_DEMONSTRATIVE_SOURCE_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                adjective_analyses,
+                lemma=_TA_ADJECTIVE_LEMMA,
+                source_tags=_TA_ADJECTIVE_SOURCE_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                nominal_head_analyses,
+                lemma=_TA_NOMINAL_HEAD_LEMMA,
+                source_tags=_TA_NOMINAL_HEAD_SOURCE_TAGS,
+            )
+            or _tags_for_lemma(demonstrative_analyses, _TA_DEMONSTRATIVE_LEMMA)
+            != _TA_DEMONSTRATIVE_SOURCE_TAGS
+            or _tags_for_lemma(adjective_analyses, _TA_ADJECTIVE_LEMMA)
+            != _TA_ADJECTIVE_SOURCE_TAGS
+            or _tags_for_lemma(nominal_head_analyses, _TA_NOMINAL_HEAD_LEMMA)
+            != _TA_NOMINAL_HEAD_SOURCE_TAGS
+            or adjective_forms != {"nowa"}
+        ):
+            return None
+        return "nowa"
 
 
 def _qualified_identity() -> _ProviderIdentity:

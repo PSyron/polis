@@ -242,6 +242,26 @@ def test_llm_finding_is_ineligible_at_full_confidence() -> None:
     )
 
 
+def test_nominal_group_ta_nowy_ksiazka_full_policy_key_remains_review_only() -> None:
+    source = Source(SourceKind.RULE, "agreement.nominal_group_ta_nowy_ksiazka")
+    behavior = SourceBehavior(
+        source,
+        "replace.adjective_gender",
+        (
+            "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+            "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
+            "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+        ),
+    )
+
+    assert SOURCE_POLICY_VERSION == "1.2"
+    assert not is_automatic_correction_eligible(
+        _finding(source, Category.AGREEMENT, 0.9),
+        behavior,
+        source_policy_version=SOURCE_POLICY_VERSION,
+    )
+
+
 def test_wogole_full_policy_key_remains_review_only() -> None:
     source = Source(SourceKind.RULE, "spelling.wogole")
     behavior = SourceBehavior(
