@@ -142,3 +142,13 @@ def test_default_analyzer_detects_wogole_review_only_correction() -> None:
     assert tuple(str(finding.source) for finding in result.issues) == (
         "rule:spelling.wogole",
     )
+
+
+def test_default_analyzer_detects_narazie_review_only_correction() -> None:
+    text = "Narazie zostaję w domu."
+
+    result = Analyzer(AnalyzerConfig()).analyze(text)
+
+    assert tuple(str(finding.source) for finding in result.issues) == (
+        "rule:spelling.narazie",
+    )

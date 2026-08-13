@@ -20,6 +20,7 @@ from polis.rules.inflection import (
 from polis.rules.spelling import (
     SpellingJestesRule,
     SpellingNapewnoRule,
+    SpellingNarazieRule,
     SpellingWlasnieRule,
     SpellingWogoleRule,
     SpellingZebyRule,
@@ -216,6 +217,7 @@ __all__ = [
     "IncompatibleRuleOutputError",
     "SpellingJestesRule",
     "SpellingNapewnoRule",
+    "SpellingNarazieRule",
     "SpellingWogoleRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
