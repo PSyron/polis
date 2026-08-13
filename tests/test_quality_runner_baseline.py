@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import TYPE_CHECKING
 
 import pytest
@@ -14,7 +15,12 @@ from tests.quality_runner_helpers import (
 )
 
 from polis import AnalyzerConfig
-from polis.evaluation.quality_dataset import QUALITY_MANIFEST_PATH
+from polis.evaluation.quality_dataset import (
+    QUALITY_MANIFEST_PATH,
+    QualityDatasetVersion,
+    load_quality_dataset,
+)
+from polis.evaluation.quality_protocol import InstallationProfile, RunProfile
 
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
@@ -94,6 +100,65 @@ def test_reviewed_baseline_uses_exact_default_analyzer_and_writes_report(
     }
     assert "thresholds" not in payload
     assert not any(key == "text" for key in _all_keys(payload))
+
+
+def test_v2_baseline_uses_v2_manifest_schema_identity(
+    monkeypatch: MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    # Given
+    from polis.evaluation import quality_runner
+
+    dataset = load_quality_dataset(version=QualityDatasetVersion.V2)
+    monkeypatch.setattr(
+        quality_runner, "load_quality_dataset", lambda **_kwargs: dataset
+    )
+    monkeypatch.setattr(
+        quality_runner,
+        "_profile_identity",
+        lambda _profile: RunProfile(
+            id=InstallationProfile.DEFAULT,
+            morphology_provider=None,
+            planned_morphology_source_semantics="provider-absent-abstention",
+            planned_non_morphology_source_semantics="sources-not-implemented",
+        ),
+    )
+
+    class EmptyAnalyzer:
+        def __init__(self, _config: AnalyzerConfig) -> None:
+            pass
+
+        def analyze(self, _text: str) -> SimpleNamespace:
+            return SimpleNamespace(issues=())
+
+    monkeypatch.setattr(quality_runner, "Analyzer", EmptyAnalyzer)
+    output = tmp_path / "baseline-v2.json"
+
+    # When
+    result = quality_runner.run(
+        [
+            "baseline",
+            "--dataset-version",
+            "v2",
+            "--profile",
+            "default",
+            "--source-sha",
+            "0840e1e432f4962f74b2535fc00fa84553617131",
+            "--warmup",
+            "0",
+            "--repetitions",
+            "2",
+            "--artifact-sha256",
+            _ARTIFACT_SHA256,
+            "--output",
+            str(output),
+        ]
+    )
+
+    # Then
+    assert result == 0
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["dataset"]["manifest"]["schema_version"] == 2
 
 
 def test_baseline_refuses_overwrite_without_replace(

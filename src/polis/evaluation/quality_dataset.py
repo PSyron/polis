@@ -30,6 +30,9 @@ from polis.evaluation._quality_types import (
     QualityDatasetError as QualityDatasetError,
 )
 from polis.evaluation._quality_types import (
+    QualityDatasetVersion as QualityDatasetVersion,
+)
+from polis.evaluation._quality_types import (
     QualityExpectedFinding as QualityExpectedFinding,
 )
 from polis.evaluation._quality_types import (
@@ -40,6 +43,9 @@ from polis.evaluation._quality_types import (
 )
 from polis.evaluation._quality_types import (
     QualityReview as QualityReview,
+)
+from polis.evaluation._quality_types import (
+    quality_dataset_paths as quality_dataset_paths,
 )
 from polis.evaluation.dataset import EvaluationCase, EvaluationDataset, ExpectedFinding
 

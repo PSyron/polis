@@ -17,24 +17,30 @@ from polis.evaluation._quality_parsing import (
     require_sha256,
 )
 from polis.evaluation._quality_types import (
-    QUALITY_DATASET_PATH,
-    QUALITY_MANIFEST_PATH,
     JsonValue,
     QualityCase,
     QualityCaseKind,
     QualityDataset,
     QualityDatasetError,
+    QualityDatasetVersion,
     QualityFeature,
     QualityPhenomenon,
+    quality_dataset_paths,
 )
+from polis.evaluation._quality_v2 import V2_MANIFEST_FIELDS, validate_v2_manifest
 
 
 def load_quality_dataset(
-    dataset_path: Path = QUALITY_DATASET_PATH,
-    manifest_path: Path = QUALITY_MANIFEST_PATH,
+    dataset_path: Path | None = None,
+    manifest_path: Path | None = None,
+    *,
+    version: QualityDatasetVersion = QualityDatasetVersion.V1,
 ) -> QualityDataset:
     """Load and strictly validate the active UTF-8 dataset and manifest."""
 
+    selected_dataset_path, selected_manifest_path = quality_dataset_paths(version)
+    dataset_path = dataset_path or selected_dataset_path
+    manifest_path = manifest_path or selected_manifest_path
     try:
         dataset_raw = json.loads(dataset_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as error:
@@ -54,19 +60,30 @@ def validate_quality_dataset(
     dataset = require_object(dataset_raw, "quality dataset")
     manifest = require_object(manifest_raw, "quality manifest")
     require_exact_fields(dataset, DATASET_FIELDS, "quality dataset")
-    require_exact_fields(manifest, MANIFEST_FIELDS, "quality manifest")
+    raw_schema_version = dataset.get("schema_version")
+    if (
+        isinstance(raw_schema_version, bool)
+        or not isinstance(raw_schema_version, int)
+        or raw_schema_version not in {1, 2}
+    ):
+        raise QualityDatasetError("quality dataset schema_version must be 1 or 2")
+    schema_version = raw_schema_version
+    expected_manifest_fields = (
+        MANIFEST_FIELDS if schema_version == 1 else V2_MANIFEST_FIELDS
+    )
+    require_exact_fields(manifest, expected_manifest_fields, "quality manifest")
     require_literal(
         dataset, "schema_id", "polis.quality-development-dataset", "quality dataset"
     )
-    require_literal(dataset, "schema_version", 1, "quality dataset")
-    require_literal(dataset, "id", "polis_v1_quality_development", "quality dataset")
-    require_literal(dataset, "dataset_version", 1, "quality dataset")
+    expected_id = f"polis_v{schema_version}_quality_development"
+    require_literal(dataset, "id", expected_id, "quality dataset")
+    require_literal(dataset, "dataset_version", schema_version, "quality dataset")
     require_literal(dataset, "license", "CC0-1.0", "quality dataset")
     require_literal(dataset, "source", "project-authored", "quality dataset")
     require_literal(
         manifest, "schema_id", "polis.quality-development-manifest", "quality manifest"
     )
-    require_literal(manifest, "schema_version", 1, "quality manifest")
+    require_literal(manifest, "schema_version", schema_version, "quality manifest")
     require_literal(manifest, "dataset_id", dataset["id"], "quality manifest")
     require_literal(
         manifest, "dataset_version", dataset["dataset_version"], "quality manifest"
@@ -84,7 +101,10 @@ def validate_quality_dataset(
     if manifest_hash != canonical_sha256:
         raise QualityDatasetError("quality dataset canonical_sha256 mismatch")
 
-    review = parse_review(manifest["review"])
+    review = parse_review(
+        manifest["review"],
+        checklist_version=f"quality-development-review-v{schema_version}",
+    )
     if review.canonical_sha256 != canonical_sha256:
         raise QualityDatasetError("quality review canonical_sha256 mismatch")
     if review.status == "maintainer-reviewed" and (
@@ -92,12 +112,14 @@ def validate_quality_dataset(
         or len(review.reviewed_case_ids) != len(cases)
     ):
         raise QualityDatasetError("reviewed_case_ids must equal all case ids")
+    if schema_version == 2:
+        validate_v2_manifest(manifest, cases, raw_cases)
     _validate_matrix(cases)
     return QualityDataset(
         schema_id="polis.quality-development-dataset",
-        schema_version=1,
-        id="polis_v1_quality_development",
-        dataset_version=1,
+        schema_version=schema_version,
+        id=expected_id,
+        dataset_version=schema_version,
         license="CC0-1.0",
         source="project-authored",
         cases=cases,

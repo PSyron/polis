@@ -82,11 +82,14 @@ PUBLIC_EVAL_IMPORTS = (
     "polis.evaluation.datasets",
     "polis.evaluation.datasets.quality",
     "polis.evaluation.datasets.quality.v1",
+    "polis.evaluation.datasets.quality.v2",
     "polis.evaluation.datasets.v1",
 )
 PUBLIC_EVAL_RESOURCES = (
     ("polis.evaluation.datasets.quality.v1", "cases.json"),
     ("polis.evaluation.datasets.quality.v1", "manifest.json"),
+    ("polis.evaluation.datasets.quality.v2", "cases.json"),
+    ("polis.evaluation.datasets.quality.v2", "manifest.json"),
     ("polis.evaluation.datasets.v1", "cases.json"),
 )
 EVALUATION_SOURCE = Path(__file__).resolve().parents[1] / "src" / "polis" / "evaluation"
