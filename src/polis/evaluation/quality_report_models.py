@@ -69,3 +69,53 @@ class ThresholdProposal:
     maximum_false_alarm_rate: float | None
     status: str
     enforced: bool
+
+
+@dataclass(frozen=True, slots=True)
+class QualityFloors:
+    minimum_precision: float | None
+    minimum_recall: float | None
+    minimum_f1: float | None
+    minimum_exact_span_accuracy: float | None
+    minimum_exact_correction_accuracy: float | None
+    maximum_false_alarm_rate: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class PerformanceComparison:
+    maximum_p95_latency_ns: int
+    minimum_throughput_cases_per_second: float
+    maximum_peak_rss_bytes: int
+    required_warmup_repetitions: int
+    required_measured_repetitions: int
+    require_identical_repetition_hashes: bool
+    required_environment_match: tuple[str, ...]
+    allowed_regression_fraction: float
+    missing_metric: str
+    nondeterminism: str
+    environment_mismatch: str
+    performance_regression: str
+
+
+@dataclass(frozen=True, slots=True)
+class ProfileThresholdProposal:
+    baseline_path: str
+    baseline_sha256: str
+    planned_morphology_source_semantics: str
+    planned_non_morphology_source_semantics: str
+    quality: QualityFloors
+    performance: PerformanceComparison
+
+
+@dataclass(frozen=True, slots=True)
+class ThresholdProposalV2:
+    dataset_sha256: str
+    artifact_sha256: str
+    source_git_sha: str
+    default: ProfileThresholdProposal
+    morphology: ProfileThresholdProposal
+    status: str
+    enforced: bool
+
+
+type ThresholdProposalArtifact = ThresholdProposal | ThresholdProposalV2

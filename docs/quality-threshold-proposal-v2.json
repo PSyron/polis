@@ -1,0 +1,79 @@
+{
+  "dataset_sha256": "f65055ff500146bdd727b78d2838c19ed15e38705ecdf27f4a3d35349552f217",
+  "enforced": false,
+  "measurement_identity": {
+    "artifact_sha256": "51e865182de68914584a2214d3d1db4a869ed3aeb7f1b273082ae3006dc47ad3",
+    "source_git_sha": "c2f1dbfec00d46cb6286caaba958ae088eeb0f53"
+  },
+  "profiles": {
+    "default": {
+      "baseline_path": "docs/quality-baseline-v2-default.json",
+      "baseline_sha256": "c1d0c19d6b0a5f7dbec1c36df28917b908b3d0a78dba32285f45e990e64f8b95",
+      "performance_comparison": {
+        "allowed_regression_fraction": 0.0,
+        "environment_mismatch": "fail",
+        "maximum_p95_latency_ns": 23541,
+        "maximum_peak_rss_bytes": 29736960,
+        "minimum_throughput_cases_per_second": 57530.59908738961,
+        "missing_metric": "fail",
+        "nondeterminism": "fail",
+        "performance_regression": "fail",
+        "require_identical_repetition_hashes": true,
+        "required_environment_match": [
+          "python_version",
+          "platform_system",
+          "platform_release",
+          "platform_machine"
+        ],
+        "required_measured_repetitions": 5,
+        "required_warmup_repetitions": 1
+      },
+      "planned_morphology_source_semantics": "provider-absent-abstention",
+      "planned_non_morphology_source_semantics": "sources-not-implemented",
+      "quality_floors": {
+        "maximum_false_alarm_rate": 0.0,
+        "minimum_exact_correction_accuracy": 1.0,
+        "minimum_exact_span_accuracy": 0.13043478260869565,
+        "minimum_f1": 0.23076923076923078,
+        "minimum_precision": 1.0,
+        "minimum_recall": 0.13043478260869565
+      }
+    },
+    "morphology": {
+      "baseline_path": "docs/quality-baseline-v2-morphology.json",
+      "baseline_sha256": "6ee2fea48983d8c29346a9e8eebf3859cfc1d6e12d9c48e05a3ef399af4415a7",
+      "performance_comparison": {
+        "allowed_regression_fraction": 0.0,
+        "environment_mismatch": "fail",
+        "maximum_p95_latency_ns": 35875,
+        "maximum_peak_rss_bytes": 76169216,
+        "minimum_throughput_cases_per_second": 33720.135047674776,
+        "missing_metric": "fail",
+        "nondeterminism": "fail",
+        "performance_regression": "fail",
+        "require_identical_repetition_hashes": true,
+        "required_environment_match": [
+          "python_version",
+          "platform_system",
+          "platform_release",
+          "platform_machine"
+        ],
+        "required_measured_repetitions": 5,
+        "required_warmup_repetitions": 1
+      },
+      "planned_morphology_source_semantics": "qualified-provider-exercised-sources-not-implemented",
+      "planned_non_morphology_source_semantics": "sources-not-implemented",
+      "quality_floors": {
+        "maximum_false_alarm_rate": 0.0,
+        "minimum_exact_correction_accuracy": 1.0,
+        "minimum_exact_span_accuracy": 0.21739130434782608,
+        "minimum_f1": 0.35714285714285715,
+        "minimum_precision": 1.0,
+        "minimum_recall": 0.21739130434782608
+      }
+    }
+  },
+  "schema_id": "polis.quality-threshold-proposal",
+  "schema_version": 2,
+  "status": "pending_maintainer_approval"
+}

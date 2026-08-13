@@ -236,6 +236,53 @@ związana byte-for-byte z tym baseline'em, ma
 `status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
 jakości ani dowodem zatwierdzenia przypadków.
 
+### Oczekująca propozycja progów v2
+
+Issue #304 zapisuje w `docs/quality-threshold-proposal-v2.json` schemat w
+wersji `2`, ponieważ jedna propozycja wiąże dwa niezależnie oceniane profile.
+Oba baseline'y pochodzą z tego samego koła o SHA-256
+`51e865182de68914584a2214d3d1db4a869ed3aeb7f1b273082ae3006dc47ad3`
+i snapshotu źródła
+`c2f1dbfec00d46cb6286caaba958ae088eeb0f53`. Wiążą ten sam kanoniczny hash
+datasetu
+`f65055ff500146bdd727b78d2838c19ed15e38705ecdf27f4a3d35349552f217`.
+Surowe bajty baseline'u `default` mają SHA-256
+`c1d0c19d6b0a5f7dbec1c36df28917b908b3d0a78dba32285f45e990e64f8b95`,
+a baseline'u `morphology` —
+`6ee2fea48983d8c29346a9e8eebf3859cfc1d6e12d9c48e05a3ef399af4415a7`.
+Każdy raport zapisuje jedno rozgrzanie, pięć mierzonych powtórzeń i pięć
+identycznych hashy znalezisk. Środowisko Pythona i platformy jest wspólne.
+
+Profil `default` zachowuje semantykę `provider-absent-abstention` dla
+planowanych źródeł morfologicznych. Jego proponowane minima wynoszą: precision
+`1.0`, recall i dokładność dokładnego zakresu `0.13043478260869565`, F1
+`0.23076923076923078`, dokładność dokładnej korekty `1.0`; maksymalny false
+alarm rate wynosi `0.0`. Profil `morphology` zachowuje semantykę
+`qualified-provider-exercised-sources-not-implemented`. Jego proponowane minima
+wynoszą: precision `1.0`, recall i dokładność dokładnego zakresu
+`0.21739130434782608`, F1 `0.35714285714285715`, dokładność dokładnej korekty
+`1.0`; maksymalny false alarm rate wynosi `0.0`. Każda wartość jest dokładnie
+równa odpowiedniej metryce zmierzonego baseline'u danego profilu.
+
+Porównanie wydajności wymaga dla każdego profilu tego samego Pythona,
+`platform_system`, `platform_release` i `platform_machine`, jednego rozgrzania,
+pięciu mierzonych powtórzeń oraz identycznych hashy znalezisk. Maksymalne p95,
+minimalna przepustowość przypadków na sekundę i maksymalny peak RSS są równe
+odpowiednio `23541 ns`, `57530.59908738961` i `29736960 B` dla `default` oraz
+`35875 ns`, `33720.135047674776` i `76169216 B` dla `morphology`. Brak metryki,
+niedeterminizm, niezgodność środowiska lub przekroczenie któregokolwiek z tych
+progów kończy porównanie wynikiem negatywnym. Brak tolerancji względnej
+(`allowed_regression_fraction: 0.0`) oznacza, że szum nie może ukryć regresji;
+nowy pomiar musi spełnić zapisane granice bez zaokrąglania ani łagodzenia.
+
+Propozycja pozostaje niewymuszana i ma
+`status: pending_maintainer_approval` oraz `enforced: false`. Jej SHA-256 to
+`982a4c91809d71ccd90fc3575ea5ae812c92126e964515f2a5f183be95ed3875`.
+To jest identyfikator dokładnych proponowanych bajtów, a nie aprobata.
+Późniejsza jawna decyzja maintainera musi wskazać dokładnie ten hash albo hash
+nowej wersji propozycji. Egzekwowanie pozostaje osobną, później autoryzowaną
+zmianą.
+
 ## Syntetyczny kontrakt kalibracji per dokładny klucz
 
 Issue #267 dodaje powtarzalny, działający offline kontrakt kalibracji dla 20

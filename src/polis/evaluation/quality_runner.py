@@ -127,6 +127,7 @@ def _build_parser() -> argparse.ArgumentParser:
         allow_abbrev=False,
     )
     proposal.add_argument("--baseline", type=Path, required=True)
+    proposal.add_argument("--morphology-baseline", type=Path)
     proposal.add_argument("--proposal", type=Path, required=True)
     return parser
 
@@ -226,7 +227,11 @@ def _run_baseline(args: argparse.Namespace) -> None:
 
 def _validate_proposal(args: argparse.Namespace) -> None:
     proposal = load_threshold_proposal(args.proposal)
-    validate_threshold_proposal(proposal, baseline_path=args.baseline)
+    validate_threshold_proposal(
+        proposal,
+        baseline_path=args.baseline,
+        morphology_baseline_path=args.morphology_baseline,
+    )
     print("threshold proposal valid and pending maintainer approval")
 
 
