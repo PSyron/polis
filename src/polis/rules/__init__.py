@@ -28,7 +28,10 @@ from polis.rules.spelling import (
     SpellingZebyRule,
     TypoSpellingRule,
 )
-from polis.rules.subject_verb import AgreementSubjectVerbOniCzytaRule
+from polis.rules.subject_verb import (
+    AgreementSubjectVerbMyCzytaRule,
+    AgreementSubjectVerbOniCzytaRule,
+)
 from polis.rules.syntax import (
     SyntaxCommaSpacingRule,
     SyntaxDuplicateCommaRule,
@@ -228,6 +231,7 @@ __all__ = [
     "AgreementCopulaRule",
     "AgreementNominalGroupTaNowyKsiazkaRule",
     "AgreementNominalGroupTeDuzeOknoRule",
+    "AgreementSubjectVerbMyCzytaRule",
     "AgreementSubjectVerbOniCzytaRule",
     "AgreementTeZdanieRule",
     "InflectionNegatedWidziecNominalGroupRule",
