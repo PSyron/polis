@@ -16,6 +16,7 @@
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
 | `rule:spelling.wogole` | `spelling` | `wogole` → `w ogóle`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
+| `rule:spelling.narazie` | `spelling` | `narazie` → `na razie`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
 | `rule:syntax.duplicate_comma` | `punctuation` | usuwa drugi przecinek wyłącznie z bezpiecznej pary `,,` |
 | `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
@@ -38,10 +39,10 @@ pozostają do przeglądu. Reguły zgody grupy nominalnej i podmiotu z czasowniki
 oraz druga i trzecia z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo
-niejednoznaczność kończy się abstencją. `rule:spelling.napewno` i
-`rule:spelling.wogole` również pozostają wyłącznie do przeglądu, dopóki osobne
-issue nie zakwalifikują ich dokładnych kluczy polityki `(source, category,
-operation, behavior_version, source_policy_version)`. Pozostałe źródła mogą zostać zastosowane automatycznie
+niejednoznaczność kończy się abstencją. `rule:spelling.napewno`,
+`rule:spelling.wogole` i `rule:spelling.narazie` również pozostają wyłącznie do
+przeglądu, dopóki osobne issue nie zakwalifikują ich dokładnych kluczy polityki
+`(source, category, operation, behavior_version, source_policy_version)`. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości przez politykę `1.2`.
 Reguła `rule:inflection.government_potrzebowac_pomoc` ma dokładną tożsamość
 zachowania `inflection-government-potrzebowac-pomoc/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393`

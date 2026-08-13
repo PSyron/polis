@@ -27,6 +27,7 @@ _CATEGORY_BY_SOURCE = {
     "rule:spelling.wlasnie": "spelling",
     "rule:spelling.zeby": "spelling",
     "rule:spelling.wogole": "spelling",
+    "rule:spelling.narazie": "spelling",
     "rule:syntax.comma_space": "punctuation",
     "rule:syntax.duplicate_comma": "punctuation",
     "rule:syntax.initial_conditional_comma": "syntax",

@@ -208,9 +208,30 @@ class SpellingWogoleRule(TypoSpellingRule):
         return "spelling-wogole/1.0"
 
 
+class SpellingNarazieRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.narazie",
+            typed="narazie",
+            corrected="na razie",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-narazie/1.0"
+
+
 __all__ = [
     "SpellingJestesRule",
     "SpellingNapewnoRule",
+    "SpellingNarazieRule",
     "SpellingWogoleRule",
     "SpellingWlasnieRule",
     "SpellingZebyRule",
