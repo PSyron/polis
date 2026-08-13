@@ -23,6 +23,7 @@ from polis.rules.spelling import (
     SpellingNarazieRule,
     SpellingWlasnieRule,
     SpellingWogoleRule,
+    SpellingWziascRule,
     SpellingZebyRule,
     TypoSpellingRule,
 )
@@ -220,6 +221,7 @@ __all__ = [
     "SpellingNarazieRule",
     "SpellingWogoleRule",
     "SpellingWlasnieRule",
+    "SpellingWziascRule",
     "SpellingZebyRule",
     "TypoSpellingRule",
     "AgreementCopulaRule",
