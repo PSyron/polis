@@ -12,6 +12,7 @@
 | `rule:agreement.subject_verb_my_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `My czyta książkę.` → `My czytamy książkę.`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
+| `rule:inflection.przygladac_sie_nowy_budynek` | `inflection` | opcjonalna zamknięta konstrukcja `Przyglądam się nowy budynek.` → `Przyglądam się nowemu budynkowi.`, wyłącznie do przeglądu |
 | `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
@@ -36,6 +37,7 @@ Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:agreement.subject_verb_my_czyta`,
 `rule:inflection.negated_widziec`,
 `rule:inflection.negated_widziec_nominal_group`,
+`rule:inflection.przygladac_sie_nowy_budynek`,
 `rule:inflection.government_potrzebowac_pomoc`,
 `rule:syntax.initial_conditional_comma`, `rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i

@@ -113,7 +113,7 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_twenty_five_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_twenty_six_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
@@ -125,6 +125,7 @@ def test_default_analyzer_composes_exactly_twenty_five_conservative_v1_rules() -
         "rule:agreement.subject_verb_my_czyta",
         "rule:inflection.negated_widziec",
         "rule:inflection.negated_widziec_nominal_group",
+        "rule:inflection.przygladac_sie_nowy_budynek",
         "rule:inflection.government_potrzebowac_pomoc",
         "rule:spelling.jestes",
         "rule:spelling.napewno",

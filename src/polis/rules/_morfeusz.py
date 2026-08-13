@@ -59,6 +59,19 @@ _TA_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
 _TA_NOMINAL_HEAD_LEMMA: Final = "książka"
 _TA_NOMINAL_HEAD_SOURCE_TAGS: Final = frozenset({"subst:sg:nom:f"})
 _TA_ADJECTIVE_TARGET_TAG: Final = "adj:sg:nom.voc:f:pos"
+_PRZYGLADAC_GOVERNOR_LEMMA: Final = "przyglądać"
+_PRZYGLADAC_GOVERNOR_TAGS: Final = frozenset({"fin:sg:pri:imperf"})
+_PRZYGLADAC_ADJECTIVE_LEMMA: Final = "nowy:A"
+_PRZYGLADAC_ADJECTIVE_SOURCE_TAGS: Final = frozenset(
+    {
+        "adj:sg:acc:m3:pos",
+        "adj:sg:nom.voc:m1.m2.m3:pos",
+    }
+)
+_PRZYGLADAC_NOUN_LEMMA: Final = "budynek"
+_PRZYGLADAC_NOUN_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc:m3"})
+_PRZYGLADAC_ADJECTIVE_TARGET_TAG: Final = "adj:sg:dat:m1.m2.m3.n:pos"
+_PRZYGLADAC_NOUN_TARGET_TAG: Final = "subst:sg:dat:m3"
 
 
 class _QualifiedMorfeuszBackend(Protocol):
@@ -211,6 +224,55 @@ class _QualifiedMorfeusz:
         ):
             return None
         return "nowa"
+
+    def przygladac_sie_nowy_budynek_replacement(self) -> str | None:
+        if self.identity != _qualified_identity():
+            return None
+        try:
+            governor_analyses = _analyses(
+                self.backend.analyse("przyglądam"), "przyglądam"
+            )
+            adjective_analyses = _analyses(self.backend.analyse("nowy"), "nowy")
+            noun_analyses = _analyses(self.backend.analyse("budynek"), "budynek")
+            adjective_forms = _forms(
+                self.backend.generate(_PRZYGLADAC_ADJECTIVE_LEMMA),
+                lemma=_PRZYGLADAC_ADJECTIVE_LEMMA,
+                target_tag=_PRZYGLADAC_ADJECTIVE_TARGET_TAG,
+            )
+            noun_forms = _forms(
+                self.backend.generate(_PRZYGLADAC_NOUN_LEMMA),
+                lemma=_PRZYGLADAC_NOUN_LEMMA,
+                target_tag=_PRZYGLADAC_NOUN_TARGET_TAG,
+            )
+        except (KeyError, RuntimeError, TypeError, ValueError):
+            return None
+        if (
+            not _has_one_supported_lemma(
+                governor_analyses,
+                lemma=_PRZYGLADAC_GOVERNOR_LEMMA,
+                source_tags=_PRZYGLADAC_GOVERNOR_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                adjective_analyses,
+                lemma=_PRZYGLADAC_ADJECTIVE_LEMMA,
+                source_tags=_PRZYGLADAC_ADJECTIVE_SOURCE_TAGS,
+            )
+            or not _has_one_supported_lemma(
+                noun_analyses,
+                lemma=_PRZYGLADAC_NOUN_LEMMA,
+                source_tags=_PRZYGLADAC_NOUN_SOURCE_TAGS,
+            )
+            or _tags_for_lemma(governor_analyses, _PRZYGLADAC_GOVERNOR_LEMMA)
+            != _PRZYGLADAC_GOVERNOR_TAGS
+            or _tags_for_lemma(adjective_analyses, _PRZYGLADAC_ADJECTIVE_LEMMA)
+            != _PRZYGLADAC_ADJECTIVE_SOURCE_TAGS
+            or _tags_for_lemma(noun_analyses, _PRZYGLADAC_NOUN_LEMMA)
+            != _PRZYGLADAC_NOUN_SOURCE_TAGS
+            or adjective_forms != {"nowemu"}
+            or noun_forms != {"budynkowi"}
+        ):
+            return None
+        return "nowemu budynkowi"
 
 
 def _qualified_identity() -> _ProviderIdentity:

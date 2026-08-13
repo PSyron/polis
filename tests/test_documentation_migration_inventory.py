@@ -117,6 +117,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:agreement.subject_verb_my_czyta",
     "rule:inflection.negated_widziec",
     "rule:inflection.negated_widziec_nominal_group",
+    "rule:inflection.przygladac_sie_nowy_budynek",
     "rule:inflection.government_potrzebowac_pomoc",
     "rule:spelling.jestes",
     "rule:spelling.napewno",
