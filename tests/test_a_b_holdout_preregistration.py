@@ -9,8 +9,11 @@ from tests.holdout_config_fixture import synthetic_config
 from tests.holdout_test_helpers import (
     CONFIG_SHA256,
     DATASET_SHA256,
+    SOURCE_IDENTITIES,
     JsonObject,
 )
+
+from polis.evaluation.holdout_models import SourceIdentity
 
 
 class _DatasetView(Protocol):
@@ -56,9 +59,18 @@ class _ParsedConfigView(Protocol):
 
 @runtime_checkable
 class _ContractApi(Protocol):
-    def parse_holdout_config(self, raw: JsonObject) -> _ParsedConfigView: ...
+    def parse_holdout_config(
+        self,
+        raw: JsonObject,
+        *,
+        source_snapshot: object | None = None,
+    ) -> _ParsedConfigView: ...
 
     def canonical_sha256(self, raw: JsonObject) -> str: ...
+
+
+def _frozen_sources() -> tuple[SourceIdentity, ...]:
+    return tuple(SourceIdentity(*identity) for identity in SOURCE_IDENTITIES)
 
 
 def _contract() -> _ContractApi:
@@ -75,7 +87,7 @@ def _contract() -> _ContractApi:
 
 def test_preregistration_binds_approved_decisions_without_plaintext() -> None:
     raw = synthetic_config()
-    parsed = _contract().parse_holdout_config(raw)
+    parsed = _contract().parse_holdout_config(raw, source_snapshot=_frozen_sources)
 
     assert parsed.dataset.sha256 == DATASET_SHA256
     assert parsed.dataset.case_count == 52
@@ -90,7 +102,9 @@ def test_preregistration_binds_approved_decisions_without_plaintext() -> None:
 
 
 def test_preregistered_paths_contain_only_future_artifact_names() -> None:
-    parsed = _contract().parse_holdout_config(synthetic_config())
+    parsed = _contract().parse_holdout_config(
+        synthetic_config(), source_snapshot=_frozen_sources
+    )
 
     assert parsed.paths.marker.name == "holdout.started"
     assert parsed.paths.raw_report.name == "report.json"
@@ -107,7 +121,7 @@ def test_tracked_preregistration_uses_the_strict_contract() -> None:
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     assert isinstance(raw, dict)
 
-    parsed = _contract().parse_holdout_config(raw)
+    parsed = _contract().parse_holdout_config(raw, source_snapshot=_frozen_sources)
 
     assert parsed.dataset.sha256 == DATASET_SHA256
     assert _contract().canonical_sha256(raw) == CONFIG_SHA256

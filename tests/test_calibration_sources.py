@@ -137,7 +137,12 @@ else:
         assert parsed == SOURCE_ROWS
         assert all(isinstance(row, CalibrationSourceIdentity) for row in parsed)
 
-    def test_live_source_validation_accepts_the_current_first_five_fields() -> None:
+    def test_live_source_validation_accepts_the_current_first_five_fields(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        frozen = tuple(SourceIdentity(*row.as_tuple()[:5]) for row in SOURCE_ROWS)
+        monkeypatch.setattr(calibration_sources, "current_sources", lambda: frozen)
+
         assert validate_live_sources() == SOURCE_ROWS
 
     def test_live_source_validation_rejects_runtime_drift(

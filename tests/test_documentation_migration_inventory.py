@@ -120,6 +120,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:spelling.napewno",
     "rule:spelling.wlasnie",
     "rule:spelling.zeby",
+    "rule:spelling.wogole",
     "rule:syntax.comma_space",
     "rule:syntax.duplicate_comma",
     "rule:syntax.initial_conditional_comma",
