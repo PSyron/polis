@@ -43,11 +43,8 @@ class _CasePatternRule:
         for match in self._pattern.finditer(text):
             start = match.start()
             end = match.end()
-            if (
-                self._IGNORE_WRAPPED_MENTIONS
-                and start > 0
-                and end < len(text)
-                and (text[start - 1], text[end]) in _MENTION_WRAPPERS
+            if self._IGNORE_WRAPPED_MENTIONS and self._is_wrapped_mention(
+                text, start, end
             ):
                 continue
             observed = match.group()
@@ -73,6 +70,20 @@ class _CasePatternRule:
 
     def _severity(self) -> Severity:
         return Severity.SUGGESTION
+
+    @staticmethod
+    def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
+        if start <= 0 or end >= len(text):
+            return False
+        left = text[start - 1]
+        right = text[end]
+        if (left, right) in _MENTION_WRAPPERS:
+            return True
+        # Code-like mentions: `token` or `token()`.
+        if left == "`":
+            rest = text[end:]
+            return rest.startswith("`") or rest.startswith("()`")
+        return False
 
     @staticmethod
     def _apply_case(observed: str, replacement: str) -> str:
@@ -228,12 +239,33 @@ class SpellingNarazieRule(TypoSpellingRule):
         return "spelling-narazie/1.0"
 
 
+class SpellingWziascRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wziasc",
+            typed="wziasc",
+            corrected="wziąć",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wziasc/1.0"
+
+
 __all__ = [
     "SpellingJestesRule",
     "SpellingNapewnoRule",
     "SpellingNarazieRule",
     "SpellingWogoleRule",
     "SpellingWlasnieRule",
+    "SpellingWziascRule",
     "SpellingZebyRule",
     "TypoSpellingRule",
 ]

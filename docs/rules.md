@@ -17,6 +17,7 @@
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
 | `rule:spelling.wogole` | `spelling` | `wogole` → `w ogóle`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
 | `rule:spelling.narazie` | `spelling` | `narazie` → `na razie`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
+| `rule:spelling.wziasc` | `spelling` | `wziasc` → `wziąć`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
 | `rule:syntax.duplicate_comma` | `punctuation` | usuwa drugi przecinek wyłącznie z bezpiecznej pary `,,` |
 | `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
@@ -40,8 +41,9 @@ oraz druga i trzecia z reguł fleksyjnych działają wyłącznie po lokalnym za�
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo
 niejednoznaczność kończy się abstencją. `rule:spelling.napewno`,
-`rule:spelling.wogole` i `rule:spelling.narazie` również pozostają wyłącznie do
-przeglądu, dopóki osobne issue nie zakwalifikują ich dokładnych kluczy polityki
+`rule:spelling.wogole`, `rule:spelling.narazie` i `rule:spelling.wziasc`
+również pozostają wyłącznie do przeglądu, dopóki osobne issue nie
+zakwalifikują ich dokładnych kluczy polityki
 `(source, category, operation, behavior_version, source_policy_version)`. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości przez politykę `1.2`.
 Reguła `rule:inflection.government_potrzebowac_pomoc` ma dokładną tożsamość

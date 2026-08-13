@@ -274,6 +274,22 @@ def test_narazie_full_policy_key_remains_review_only() -> None:
     )
 
 
+def test_wziasc_full_policy_key_remains_review_only() -> None:
+    source = Source(SourceKind.RULE, "spelling.wziasc")
+    behavior = SourceBehavior(
+        source,
+        "replace.common_typo",
+        "spelling-wziasc/1.0",
+    )
+
+    assert SOURCE_POLICY_VERSION == "1.2"
+    assert not is_automatic_correction_eligible(
+        _finding(source, Category.SPELLING, 0.98),
+        behavior,
+        source_policy_version=SOURCE_POLICY_VERSION,
+    )
+
+
 def test_language_tool_behavior_is_no_longer_eligible() -> None:
     source = Source(SourceKind.RULE, "languagetool.pl")
     behavior = SourceBehavior(
