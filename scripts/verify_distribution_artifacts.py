@@ -64,6 +64,8 @@ EXPECTED_SOURCE_MEMBERS = tuple(
         "src/polis/evaluation/quality_report_baseline.py "
         "src/polis/evaluation/quality_report_models.py "
         "src/polis/evaluation/quality_report_proposal.py "
+        "src/polis/evaluation/quality_report_proposal_v2.py "
+        "src/polis/evaluation/quality_report_proposal_v2_validation.py "
         "src/polis/evaluation/quality_report_validation.py "
         "src/polis/evaluation/quality_runner.py "
         "src/polis/evaluation/safety_corpus.py src/polis/py.typed "

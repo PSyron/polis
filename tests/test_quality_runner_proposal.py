@@ -72,3 +72,37 @@ def test_validate_proposal_reads_artifacts_without_constructing_analyzer(
         capsys.readouterr().out
         == "threshold proposal valid and pending maintainer approval\n"
     )
+
+
+def test_validate_proposal_accepts_dual_profile_v2_artifact(
+    monkeypatch: MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    # Given
+    from polis.evaluation import quality_runner
+
+    class ForbiddenAnalyzer:
+        def __init__(self, _config: AnalyzerConfig) -> None:
+            pytest.fail("validate-proposal must not construct an analyzer")
+
+    monkeypatch.setattr(quality_runner, "Analyzer", ForbiddenAnalyzer)
+
+    # When
+    result = quality_runner.run(
+        [
+            "validate-proposal",
+            "--baseline",
+            "docs/quality-baseline-v2-default.json",
+            "--morphology-baseline",
+            "docs/quality-baseline-v2-morphology.json",
+            "--proposal",
+            "docs/quality-threshold-proposal-v2.json",
+        ]
+    )
+
+    # Then
+    assert result == 0
+    assert (
+        capsys.readouterr().out
+        == "threshold proposal valid and pending maintainer approval\n"
+    )

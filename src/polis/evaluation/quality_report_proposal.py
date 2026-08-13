@@ -3,19 +3,27 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import Final, assert_never
 
 from polis.evaluation.quality_report_baseline import (
     baseline_file_sha256,
     load_quality_report,
 )
 from polis.evaluation.quality_report_models import (
+    JsonObject,
     QualityReportError,
     ThresholdProposal,
+    ThresholdProposalArtifact,
+    ThresholdProposalV2,
+)
+from polis.evaluation.quality_report_proposal_v2 import parse_threshold_proposal_v2
+from polis.evaluation.quality_report_proposal_v2_validation import (
+    validate_threshold_proposal_v2,
 )
 from polis.evaluation.quality_report_validation import (
     _boolean,
     _exact,
+    _integer,
     _load_json_object,
     _nested,
     _ratio,
@@ -28,10 +36,23 @@ _PROPOSAL_SCHEMA_ID: Final = "polis.quality-threshold-proposal"
 _PENDING_STATUS: Final = "pending_maintainer_approval"
 
 
-def load_threshold_proposal(path: Path) -> ThresholdProposal:
+def load_threshold_proposal(path: Path) -> ThresholdProposalArtifact:
     """Parse a threshold proposal without granting approval or enforcement."""
 
     root = _load_json_object(path, "threshold proposal")
+    schema_version = _integer(root, "schema_version", "threshold proposal")
+    match schema_version:
+        case 1:
+            return _load_threshold_proposal_v1(root)
+        case 2:
+            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+                raise QualityReportError("threshold proposal schema_id mismatch")
+            return parse_threshold_proposal_v2(root)
+        case _:
+            raise QualityReportError("threshold proposal schema_version must be 1 or 2")
+
+
+def _load_threshold_proposal_v1(root: JsonObject) -> ThresholdProposal:
     _exact(
         root,
         {
@@ -75,11 +96,29 @@ def load_threshold_proposal(path: Path) -> ThresholdProposal:
 
 
 def validate_threshold_proposal(
-    proposal: ThresholdProposal,
+    proposal: ThresholdProposalArtifact,
     *,
     baseline_path: Path,
+    morphology_baseline_path: Path | None = None,
 ) -> None:
     """Require exact baseline binding, measured values, and pending policy."""
+
+    match proposal:
+        case ThresholdProposal():
+            if morphology_baseline_path is not None:
+                raise QualityReportError("v1 threshold proposal accepts one baseline")
+            _validate_threshold_proposal_v1(proposal, baseline_path)
+        case ThresholdProposalV2():
+            validate_threshold_proposal_v2(
+                proposal, baseline_path, morphology_baseline_path
+            )
+        case unreachable:
+            assert_never(unreachable)
+
+
+def _validate_threshold_proposal_v1(
+    proposal: ThresholdProposal, baseline_path: Path
+) -> None:
 
     if proposal.baseline_path != str(baseline_path):
         raise QualityReportError("threshold proposal baseline_path mismatch")
