@@ -119,6 +119,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:inflection.negated_widziec_nominal_group",
     "rule:inflection.przygladac_sie_nowy_budynek",
     "rule:inflection.government_potrzebowac_pomoc",
+    "rule:inflection.government_szukac_klucz",
     "rule:spelling.jestes",
     "rule:spelling.napewno",
     "rule:spelling.wlasnie",

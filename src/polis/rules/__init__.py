@@ -13,7 +13,10 @@ from polis.rules.agreement import (
     AgreementNominalGroupTeDuzeOknoRule,
     AgreementTeZdanieRule,
 )
-from polis.rules.government import InflectionGovernmentPotrzebowacPomocRule
+from polis.rules.government import (
+    InflectionGovernmentPotrzebowacPomocRule,
+    InflectionGovernmentSzukacKluczRule,
+)
 from polis.rules.inflection import (
     InflectionNegatedWidziecNominalGroupRule,
     InflectionNegatedWidziecRule,
@@ -238,6 +241,7 @@ __all__ = [
     "InflectionNegatedWidziecNominalGroupRule",
     "InflectionNegatedWidziecRule",
     "InflectionGovernmentPotrzebowacPomocRule",
+    "InflectionGovernmentSzukacKluczRule",
     "InflectionPrzygladacSieNowyBudynekRule",
     "SyntaxCommaSpacingRule",
     "SyntaxDuplicateCommaRule",
