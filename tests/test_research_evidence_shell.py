@@ -21,6 +21,7 @@ RETAINED_EVIDENCE_SHA256 = {
     "experiments/a-b-qualification-v2/README.md": "ae30be74932a9eaab21f6a96f6c771463e61a2e468d2a80b03626f5297ecbc24",
     "experiments/a-b-qualification-v2/calibration.dataset.manifest.json": "62d47cce9f1e3e0b01a20a250766563a7ab869a240cf4ca18cd2c4e43070c0e3",
     "experiments/a-b-qualification-v2/calibration.review.json": "5d02e95e29d635015074b0bf33e3d47dfd20f74c676b6b24b36d84fb939f2d68",
+    "experiments/a-b-qualification-v2/config.json": "8375538fe94c6dfc777d95a68f70e9d8eaae05d039b34e5f406bce63c5d32d93",
     "experiments/a-b-qualification-v2/dataset-overlap.report.json": "129e29340dd1563cbbd8b0adebc469d49e04fee5edaf3a2f5707980496fa6d99",
     "experiments/a-b-qualification-v2/freeze-verification.json": "9b6fc4f12ea911200b04eacc4f2018af7c7801886f3519a1862f0af548a20937",
     "experiments/a-b-qualification-v2/holdout.dataset.manifest.json": "65a7e2eeede21d91785aab0e3941021886b1ede132416ec41941ff7ce72425c4",
