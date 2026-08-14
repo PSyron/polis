@@ -141,6 +141,7 @@
         "experiments/a-b-qualification-v2/README.md",
         "experiments/a-b-qualification-v2/calibration.dataset.manifest.json",
         "experiments/a-b-qualification-v2/calibration.review.json",
+        "experiments/a-b-qualification-v2/config.json",
         "experiments/a-b-qualification-v2/dataset-overlap.report.json",
         "experiments/a-b-qualification-v2/freeze-verification.json",
         "experiments/a-b-qualification-v2/holdout.dataset.manifest.json",
