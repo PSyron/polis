@@ -14,6 +14,9 @@ from polis.evaluation.quality_report_baseline import (
 from polis.evaluation.quality_report_baseline import (
     write_quality_report as write_quality_report,
 )
+from polis.evaluation.quality_report_comparison import (
+    load_quality_comparison as load_quality_comparison,
+)
 from polis.evaluation.quality_report_models import (
     QualityReportError as QualityReportError,
 )
@@ -23,11 +26,16 @@ from polis.evaluation.quality_report_proposal import (
 from polis.evaluation.quality_report_proposal import (
     validate_threshold_proposal as validate_threshold_proposal,
 )
+from polis.evaluation.quality_report_result import (
+    load_quality_result as load_quality_result,
+)
 
 __all__ = (
     "QualityReportError",
     "baseline_file_sha256",
+    "load_quality_comparison",
     "load_quality_report",
+    "load_quality_result",
     "load_threshold_proposal",
     "quality_report_json",
     "validate_threshold_proposal",

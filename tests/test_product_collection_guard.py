@@ -96,10 +96,12 @@ def test_all_quality_modules_stay_inside_the_product_boundary() -> None:
         "quality_protocol.py",
         "quality_report.py",
         "quality_report_baseline.py",
+        "quality_report_comparison.py",
         "quality_report_models.py",
         "quality_report_proposal.py",
         "quality_report_proposal_v2.py",
         "quality_report_proposal_v2_validation.py",
+        "quality_report_result.py",
         "quality_report_validation.py",
         "quality_runner.py",
     }

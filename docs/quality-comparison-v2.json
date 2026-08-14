@@ -1,0 +1,400 @@
+{
+  "aggregate_verdict": "fail",
+  "artifacts": {
+    "sdist_filename": "polis_nlp-0.2.0.tar.gz",
+    "sdist_sha256": "3ed18402f66e9dc5a648ff6c6331309c7fcf7febd33906c0ad42ba6b253cdf93",
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "563784267c25f75d255a432a47deb076292ba21b04e3e56f9e3fcd9074079cd1"
+  },
+  "dataset_sha256": "f65055ff500146bdd727b78d2838c19ed15e38705ecdf27f4a3d35349552f217",
+  "environment_baseline": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "environment_result": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "notes": [
+    "Quality floors evaluated against approved v2 proposal floors.",
+    "Performance absolute caps and environment match follow proposal fail-closed rules.",
+    "Measurements from clean installed wheel under Python 3.13.12 matching baseline platform identity."
+  ],
+  "profiles": {
+    "default": {
+      "baseline_path": "docs/quality-baseline-v2-default.json",
+      "baseline_sha256": "c1d0c19d6b0a5f7dbec1c36df28917b908b3d0a78dba32285f45e990e64f8b95",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.4782608695652174 floor=0.13043478260869565",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.6470588235294118 floor=0.23076923076923078",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.4782608695652174 floor=0.13043478260869565",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=36167 max=23541",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "tput=37554.48155180996 min=57530.59908738961",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": false
+        },
+        {
+          "detail": "rss=30425088 max=29736960",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": false
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.13043478260869565,
+          "delta": 0.34782608695652173,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.4782608695652174
+        },
+        {
+          "baseline": 0.23076923076923078,
+          "delta": 0.416289592760181,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.6470588235294118
+        },
+        {
+          "baseline": 0.13043478260869565,
+          "delta": 0.34782608695652173,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.4782608695652174
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 23541,
+          "delta": 12626,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 36167
+        },
+        {
+          "baseline": 57530.59908738961,
+          "delta": -19976.11753557965,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 37554.48155180996
+        },
+        {
+          "baseline": 29736960,
+          "delta": 688128,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 30425088
+        },
+        {
+          "baseline": 6,
+          "delta": 16,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 22
+        },
+        {
+          "baseline": 40,
+          "delta": -16,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 24
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "default",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 55,
+        "correction_matches": 6,
+        "expected_findings": 46,
+        "false_negatives": 40,
+        "false_positives": 0,
+        "predicted_findings": 6,
+        "span_matches": 6,
+        "true_positives": 6
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 55,
+        "correction_matches": 22,
+        "expected_findings": 46,
+        "false_negatives": 24,
+        "false_positives": 0,
+        "predicted_findings": 22,
+        "span_matches": 22,
+        "true_positives": 22
+      },
+      "result_path": "docs/quality-result-v2-default.json",
+      "result_sha256": "6d1c96f0922644d12f91d80a3a922d20f00877a40e54c1965ab505d1c65c0c20",
+      "verdict": "fail"
+    },
+    "morphology": {
+      "baseline_path": "docs/quality-baseline-v2-morphology.json",
+      "baseline_sha256": "6ee2fea48983d8c29346a9e8eebf3859cfc1d6e12d9c48e05a3ef399af4415a7",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.9347826086956522 floor=0.21739130434782608",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.9662921348314607 floor=0.35714285714285715",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.9347826086956522 floor=0.21739130434782608",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=205750 max=35875",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "tput=18531.08519041999 min=33720.135047674776",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": false
+        },
+        {
+          "detail": "rss=74219520 max=76169216",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": true
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.21739130434782608,
+          "delta": 0.7173913043478262,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.9347826086956522
+        },
+        {
+          "baseline": 0.35714285714285715,
+          "delta": 0.6091492776886036,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.9662921348314607
+        },
+        {
+          "baseline": 0.21739130434782608,
+          "delta": 0.7173913043478262,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.9347826086956522
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 35875,
+          "delta": 169875,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 205750
+        },
+        {
+          "baseline": 33720.135047674776,
+          "delta": -15189.049857254784,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 18531.08519041999
+        },
+        {
+          "baseline": 76169216,
+          "delta": -1949696,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 74219520
+        },
+        {
+          "baseline": 10,
+          "delta": 33,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 43
+        },
+        {
+          "baseline": 36,
+          "delta": -33,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 3
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "morphology",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 55,
+        "correction_matches": 10,
+        "expected_findings": 46,
+        "false_negatives": 36,
+        "false_positives": 0,
+        "predicted_findings": 10,
+        "span_matches": 10,
+        "true_positives": 10
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 55,
+        "correction_matches": 43,
+        "expected_findings": 46,
+        "false_negatives": 3,
+        "false_positives": 0,
+        "predicted_findings": 43,
+        "span_matches": 43,
+        "true_positives": 43
+      },
+      "result_path": "docs/quality-result-v2-morphology.json",
+      "result_sha256": "3cf8f60838c1cfe79306cec816457f5f2102cd12199f181cb9a88311fcee6880",
+      "verdict": "fail"
+    }
+  },
+  "proposal_path": "docs/quality-threshold-proposal-v2.json",
+  "proposal_sha256": "982a4c91809d71ccd90fc3575ea5ae812c92126e964515f2a5f183be95ed3875",
+  "schema_id": "polis.quality-comparison",
+  "schema_version": 1,
+  "source_git_sha": "4c1895d75a3ebbed7db5712714ae4a487e835aa0"
+}
