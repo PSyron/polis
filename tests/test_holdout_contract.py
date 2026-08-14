@@ -25,7 +25,7 @@ def test_analyzer_exposes_immutable_public_source_identity_snapshot() -> None:
     snapshot = Analyzer(AnalyzerConfig()).source_identity_snapshot
 
     assert isinstance(snapshot, tuple)
-    assert len(snapshot) == 27
+    assert len(snapshot) == 28
     assert snapshot[0].source == "rule:agreement.copula"
     assert snapshot[0].operation == "replace.copula_form"
     assert snapshot[0].behavior_version == "agreement-copula/1.0"
@@ -43,6 +43,7 @@ def test_analyzer_exposes_immutable_public_source_identity_snapshot() -> None:
     assert any(
         item.source == "rule:inflection.government_szukac_klucz" for item in snapshot
     )
+    assert any(item.source == "rule:syntax.initial_temporal_comma" for item in snapshot)
     assert any(item.source == "rule:spelling.wogole" for item in snapshot)
     assert any(item.source == "rule:spelling.narazie" for item in snapshot)
     assert any(item.source == "rule:spelling.wziasc" for item in snapshot)

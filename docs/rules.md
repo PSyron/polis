@@ -25,6 +25,7 @@
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
 | `rule:syntax.duplicate_comma` | `punctuation` | usuwa drugi przecinek wyłącznie z bezpiecznej pary `,,` |
 | `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
+| `rule:syntax.initial_temporal_comma` | `syntax` | zamknięte konstrukcje `Gdy/Kiedy …` z brakującym przecinkiem po początkowym zdaniu czasowym, wyłącznie do przeglądu |
 | `rule:syntax.list_space` | `syntax` | brakująca spacja po znaczniku listy |
 | `rule:syntax.missing_correlative` | `syntax` | lokalna konstrukcja `Im …, bardziej …` z brakującym `tym` |
 | `rule:syntax.missing_destination_preposition` | `syntax` | zamknięta konstrukcja `Pojechałem Warszawy.` → `Pojechałem do Warszawy.`, wyłącznie do przeglądu |
@@ -41,7 +42,8 @@ Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:inflection.przygladac_sie_nowy_budynek`,
 `rule:inflection.government_potrzebowac_pomoc`,
 `rule:inflection.government_szukac_klucz`,
-`rule:syntax.initial_conditional_comma`, `rule:syntax.missing_correlative`,
+`rule:syntax.initial_conditional_comma`, `rule:syntax.initial_temporal_comma`,
+`rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
 pozostają do przeglądu. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
