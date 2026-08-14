@@ -14,6 +14,7 @@
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.przygladac_sie_nowy_budynek` | `inflection` | opcjonalna zamknięta konstrukcja `Przyglądam się nowy budynek.` → `Przyglądam się nowemu budynkowi.`, wyłącznie do przeglądu |
 | `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`, wyłącznie do przeglądu |
+| `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta konstrukcja `Szukam klucz.` → `Szukam klucza.`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
@@ -39,6 +40,7 @@ Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:inflection.negated_widziec_nominal_group`,
 `rule:inflection.przygladac_sie_nowy_budynek`,
 `rule:inflection.government_potrzebowac_pomoc`,
+`rule:inflection.government_szukac_klucz`,
 `rule:syntax.initial_conditional_comma`, `rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
