@@ -236,6 +236,20 @@ związana byte-for-byte z tym baseline'em, ma
 `status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
 jakości ani dowodem zatwierdzenia przypadków.
 
+### Wynik weryfikacji expanded runtime v2
+
+Issue #317 zapisuje post-change pomiary zainstalowanego wheel w:
+
+- `docs/quality-result-v2-default.json`
+- `docs/quality-result-v2-morphology.json`
+- `docs/quality-comparison-v2.json`
+
+Schematy `polis.quality-result` i `polis.quality-comparison` są repozytorium-only.
+Pre-change baseline'y v2 oraz propozycja progów pozostają byte-identyczne.
+Porównanie jakości względem zatwierdzonych floorów v2 przechodzi; absolutne
+limity performance z propozycji (zero-tolerance względem pre-change baseline)
+pozostają fail-closed przy regresie p95/throughput po dodaniu ośmiu źródeł.
+
 ### Oczekująca propozycja progów v2
 
 Issue #304 zapisuje w `docs/quality-threshold-proposal-v2.json` schemat w
