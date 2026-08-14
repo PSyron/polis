@@ -25,6 +25,10 @@ _INITIAL_CONDITIONAL_COMMA_PATTERN: Final = re.compile(
     r"(?P<lower>jeśli pada) zostaję w domu|"
     r"(?P<upper>JEŚLI PADA) ZOSTAJĘ W DOMU)\.\Z"
 )
+_INITIAL_TEMPORAL_COMMA_PATTERN: Final = re.compile(
+    r"(?<!\w)(?P<head>Gdy pada|Kiedy pada|Kiedy wieje|Kiedy wrócisz) (?=\S)",
+    re.IGNORECASE,
+)
 
 
 class SyntaxCommaSpacingRule:
@@ -469,6 +473,53 @@ class SyntaxInitialConditionalCommaRule:
         )
 
 
+class SyntaxInitialTemporalCommaRule:
+    """Insert commas after closed initial temporal clause heads only."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.initial_temporal_comma")
+
+    @property
+    def operation(self) -> str:
+        return "insert.temporal_clause_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        return "syntax-initial-temporal-comma/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+
+        findings: list[Finding] = []
+        for match in _INITIAL_TEMPORAL_COMMA_PATTERN.finditer(text):
+            start = match.end("head")
+            if _is_quoted_position(text, match.start("head")):
+                continue
+            if start < len(text) and text[start] == ",":
+                continue
+            findings.append(
+                _make_insertion_or_replacement(
+                    start,
+                    start,
+                    "",
+                    ",",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje przecinka po początkowym zdaniu czasowym.",
+                    explanation=(
+                        "W tej zamkniętej konstrukcji po początkowym zdaniu "
+                        "czasowym stawiamy przecinek."
+                    ),
+                )
+            )
+        return tuple(findings)
+
+
 def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:
     before = text[:comma_end].rsplit(" ", 1)[-1]
     if before.lower() in _ABBREVIATIONS:
@@ -523,6 +574,7 @@ __all__ = [
     "SyntaxMissingCorrelativeRule",
     "SyntaxMissingDestinationPrepositionRule",
     "SyntaxInitialConditionalCommaRule",
+    "SyntaxInitialTemporalCommaRule",
     "SyntaxMissingReflexiveRule",
     "SyntaxQuoteSpacingRule",
 ]

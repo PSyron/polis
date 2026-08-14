@@ -36,6 +36,7 @@ _CATEGORY_BY_SOURCE = {
     "rule:syntax.comma_space": "punctuation",
     "rule:syntax.duplicate_comma": "punctuation",
     "rule:syntax.initial_conditional_comma": "syntax",
+    "rule:syntax.initial_temporal_comma": "syntax",
     "rule:syntax.list_space": "syntax",
     "rule:syntax.missing_correlative": "syntax",
     "rule:syntax.missing_destination_preposition": "syntax",

@@ -322,6 +322,22 @@ def test_subject_verb_my_czyta_full_policy_key_remains_review_only() -> None:
     )
 
 
+def test_initial_temporal_comma_full_policy_key_remains_review_only() -> None:
+    source = Source(SourceKind.RULE, "syntax.initial_temporal_comma")
+    behavior = SourceBehavior(
+        source,
+        "insert.temporal_clause_comma",
+        "syntax-initial-temporal-comma/1.0",
+    )
+
+    assert SOURCE_POLICY_VERSION == "1.2"
+    assert not is_automatic_correction_eligible(
+        _finding(source, Category.SYNTAX, 0.9),
+        behavior,
+        source_policy_version=SOURCE_POLICY_VERSION,
+    )
+
+
 def test_wogole_full_policy_key_remains_review_only() -> None:
     source = Source(SourceKind.RULE, "spelling.wogole")
     behavior = SourceBehavior(
