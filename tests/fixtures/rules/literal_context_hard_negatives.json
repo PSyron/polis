@@ -1,0 +1,138 @@
+{
+  "schema_id": "polis.literal-context-hard-negatives",
+  "schema_version": 1,
+  "id": "polis_literal_context_hard_negatives_v1",
+  "language": "pl-PL",
+  "license": "CC0-1.0",
+  "source": "project-authored",
+  "purpose": "Protected hard negatives for closed literal spelling rules after #338 F0.1 context guard.",
+  "notes": "Separate from the frozen 240-case polish_correction_corpus_v3 (exact-count contract). These cases document measured false-positive contexts that must remain zero-finding under the literal family.",
+  "cases": [
+    {
+      "id": "literal_hn_url_wogole",
+      "protected_phenomenon": "literal_token_in_url",
+      "input": "https://example.org/wogole/index.html",
+      "expected_output": "https://example.org/wogole/index.html",
+      "description": "Measured #338 false positive: path segment wogole inside an HTTPS URL must not emit rule:spelling.wogole.",
+      "tags": ["hard_negative", "url", "spelling", "wogole"],
+      "measured_defect": true
+    },
+    {
+      "id": "literal_hn_email_wogole",
+      "protected_phenomenon": "literal_token_in_email",
+      "input": "Napisz do mnie: wogole@example.org",
+      "expected_output": "Napisz do mnie: wogole@example.org",
+      "description": "Measured #338 false positive: local-part of an e-mail address must not emit rule:spelling.wogole.",
+      "tags": ["hard_negative", "email", "spelling", "wogole"],
+      "measured_defect": true
+    },
+    {
+      "id": "literal_hn_quoted_historical_wogole",
+      "protected_phenomenon": "literal_token_in_balanced_quotation",
+      "input": "Cytat: „Zdanie to jest wogole dziwne, jak pisano w 1925 r.” tak brzmi.",
+      "expected_output": "Cytat: „Zdanie to jest wogole dziwne, jak pisano w 1925 r.” tak brzmi.",
+      "description": "Measured #338 false positive: joint spelling inside a balanced historical quotation must not emit rule:spelling.wogole.",
+      "tags": ["hard_negative", "quotation", "spelling", "wogole", "historical_orthography"],
+      "measured_defect": true
+    },
+    {
+      "id": "literal_hn_bare_domain_path_wogole",
+      "protected_phenomenon": "literal_token_in_bare_domain_path",
+      "input": "Zobacz example.org/wogole/index.html przed instalacją.",
+      "expected_output": "Zobacz example.org/wogole/index.html przed instalacją.",
+      "description": "Bare domain path containing the closed literal must abstain.",
+      "tags": ["hard_negative", "domain", "spelling", "wogole"],
+      "measured_defect": false
+    },
+    {
+      "id": "literal_hn_query_param_wogole",
+      "protected_phenomenon": "literal_token_in_url_query",
+      "input": "http://example.org/path?x=wogole",
+      "expected_output": "http://example.org/path?x=wogole",
+      "description": "Query parameter value matching a closed literal must abstain.",
+      "tags": ["hard_negative", "url", "spelling", "wogole"],
+      "measured_defect": false
+    },
+    {
+      "id": "literal_hn_email_domain_label_wogole",
+      "protected_phenomenon": "literal_token_in_email_domain",
+      "input": "Kontakt: admin@wogole.example.org",
+      "expected_output": "Kontakt: admin@wogole.example.org",
+      "description": "Domain label of an e-mail address matching a closed literal must abstain.",
+      "tags": ["hard_negative", "email", "spelling", "wogole"],
+      "measured_defect": false
+    },
+    {
+      "id": "literal_hn_identifier_hyphen_wogole",
+      "protected_phenomenon": "literal_token_in_identifier",
+      "input": "Identyfikator foo-wogole-bar nie jest literówką zdaniową.",
+      "expected_output": "Identyfikator foo-wogole-bar nie jest literówką zdaniową.",
+      "description": "Hyphenated identifier host token must abstain.",
+      "tags": ["hard_negative", "identifier", "spelling", "wogole"],
+      "measured_defect": false
+    },
+    {
+      "id": "literal_hn_identifier_underscore_wogole",
+      "protected_phenomenon": "literal_token_in_identifier",
+      "input": "Kod: wogole_v2 w konfiguracji.",
+      "expected_output": "Kod: wogole_v2 w konfiguracji.",
+      "description": "Underscored identifier host token must abstain.",
+      "tags": ["hard_negative", "identifier", "spelling", "wogole"],
+      "measured_defect": false
+    },
+    {
+      "id": "literal_hn_url_zeby",
+      "protected_phenomenon": "literal_token_in_url",
+      "input": "https://example.org/zeby/docs",
+      "expected_output": "https://example.org/zeby/docs",
+      "description": "Guard applies to the whole literal family, not only spelling.wogole.",
+      "tags": ["hard_negative", "url", "spelling", "zeby"],
+      "measured_defect": false
+    }
+  ],
+  "red_green_evidence": {
+    "issue": 338,
+    "slice": "F0.2",
+    "guard_pr": 343,
+    "guard_commit": "b8470bbeb715ce101f2cafcc6136d97818cb412d",
+    "baseline_runtime_commit": "98190f11e243075311d78ac6d753ad27a666285c",
+    "measured_case_ids": [
+      "literal_hn_url_wogole",
+      "literal_hn_email_wogole",
+      "literal_hn_quoted_historical_wogole"
+    ],
+    "red_behavior": {
+      "summary": "On installed runtime at 98190f1, each measured case emitted rule:spelling.wogole.",
+      "findings": [
+        {
+          "case_id": "literal_hn_url_wogole",
+          "source": "rule:spelling.wogole",
+          "start": 20,
+          "end": 26,
+          "original": "wogole",
+          "suggestion": "w ogóle"
+        },
+        {
+          "case_id": "literal_hn_email_wogole",
+          "source": "rule:spelling.wogole",
+          "start": 16,
+          "end": 22,
+          "original": "wogole",
+          "suggestion": "w ogóle"
+        },
+        {
+          "case_id": "literal_hn_quoted_historical_wogole",
+          "source": "rule:spelling.wogole",
+          "start": 23,
+          "end": 29,
+          "original": "wogole",
+          "suggestion": "w ogóle"
+        }
+      ]
+    },
+    "green_behavior": {
+      "summary": "After F0.1 shared context guard, each measured case and the extended hard-negative set emit zero findings.",
+      "expected_findings": []
+    }
+  }
+}
