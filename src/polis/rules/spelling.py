@@ -178,6 +178,58 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
     return False
 
 
+# Shared token stream for the closed-literal family: one left-to-right pass
+# over word tokens, with O(1) typed-form lookup per token (Wave 0 / #338 F0.3).
+_LITERAL_TOKEN_RE: Final = re.compile(r"(?<!\w)\w+(?!\w)", re.UNICODE)
+
+
+def collect_closed_literal_findings(
+    text: str, rules: tuple[_CasePatternRule, ...]
+) -> dict[Source, tuple[Finding, ...]]:
+    """Scan ``text`` once and bucket findings by closed-literal rule source.
+
+    Behavior is identical to invoking each rule's historical per-pattern
+    ``find`` independently: context abstention, case mapping, confidence,
+    source identity, and per-source left-to-right order are preserved.
+    """
+    if not rules:
+        return {}
+    lookup: dict[str, _CasePatternRule] = {}
+    for rule in rules:
+        key = rule._typed.lower()
+        if key in lookup:
+            raise ValueError(f"duplicate closed literal typed form: {rule._typed}")
+        lookup[key] = rule
+    buckets: dict[Source, list[Finding]] = {rule.source: [] for rule in rules}
+    for match in _LITERAL_TOKEN_RE.finditer(text):
+        observed = match.group()
+        matched_rule = lookup.get(observed.lower())
+        if matched_rule is None:
+            continue
+        start = match.start()
+        end = match.end()
+        if should_abstain_literal_context(text, start, end):
+            continue
+        candidate = matched_rule._apply_case(observed, matched_rule._corrected)
+        if candidate == observed:
+            continue
+        buckets[matched_rule.source].append(
+            Finding.create(
+                category=matched_rule._CATEGORY,
+                severity=matched_rule._severity(),
+                message=matched_rule._message(observed),
+                explanation=matched_rule._explanation(observed, candidate),
+                original=observed,
+                suggestion=candidate,
+                start=start,
+                end=end,
+                confidence=matched_rule._confidence,
+                source=matched_rule.source,
+            )
+        )
+    return {source: tuple(items) for source, items in buckets.items()}
+
+
 class _CasePatternRule:
     """Simple word-level spelling replacement rule."""
 
@@ -196,36 +248,8 @@ class _CasePatternRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-
-        findings: list[Finding] = []
-        for match in self._pattern.finditer(text):
-            start = match.start()
-            end = match.end()
-            # Shared context guard for the whole literal family (Wave 0 / #338):
-            # URL, domain, e-mail, identifier host tokens, balanced quotes, and
-            # adjacent mention wrappers. Fail-closed on ambiguous contexts.
-            if should_abstain_literal_context(text, start, end):
-                continue
-            observed = match.group()
-            candidate = self._apply_case(observed, self._corrected)
-            if candidate == observed:
-                continue
-            findings.append(
-                Finding.create(
-                    category=self._CATEGORY,
-                    severity=self._severity(),
-                    message=self._message(observed),
-                    explanation=self._explanation(observed, candidate),
-                    original=observed,
-                    suggestion=candidate,
-                    start=start,
-                    end=end,
-                    confidence=self._confidence,
-                    source=self.source,
-                )
-            )
-
-        return tuple(findings)
+        # Standalone path: same single-pass token stream, filtered to this rule.
+        return collect_closed_literal_findings(text, (self,)).get(self.source, ())
 
     def _severity(self) -> Severity:
         return Severity.SUGGESTION

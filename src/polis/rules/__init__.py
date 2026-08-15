@@ -31,6 +31,8 @@ from polis.rules.spelling import (
     SpellingWziascRule,
     SpellingZebyRule,
     TypoSpellingRule,
+    _CasePatternRule,
+    collect_closed_literal_findings,
 )
 from polis.rules.subject_verb import (
     AgreementSubjectVerbMyCzytaRule,
@@ -161,8 +163,29 @@ class DeterministicRuleRegistry:
         findings: list[Finding] = []
         seen = set[str]()
 
+        # Closed-literal spelling rules share one token-stream pass when several
+        # are selected together (Wave 0 / #338 F0.3). Non-literal rules keep
+        # their independent find() paths. Emission order remains registration
+        # order for exact source identity compatibility.
+        literal_entries = tuple(
+            entry for entry in selected if isinstance(entry.rule, _CasePatternRule)
+        )
+        literal_buckets: dict[Source, tuple[Finding, ...]] = {}
+        if literal_entries:
+            literal_rules: list[_CasePatternRule] = []
+            for entry in literal_entries:
+                rule = entry.rule
+                assert isinstance(rule, _CasePatternRule)
+                literal_rules.append(rule)
+            literal_buckets = collect_closed_literal_findings(
+                text, tuple(literal_rules)
+            )
+
         for entry in selected:
-            emitted = entry.rule.find(text, options=options)
+            if isinstance(entry.rule, _CasePatternRule):
+                emitted = literal_buckets.get(entry.rule.source, ())
+            else:
+                emitted = entry.rule.find(text, options=options)
             for finding in emitted:
                 if finding.source != entry.rule.source:
                     raise IncompatibleRuleOutputError(
