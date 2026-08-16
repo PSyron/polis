@@ -9,7 +9,11 @@ from typing import Final
 
 from polis.evaluation.quality_report_baseline import load_quality_report
 from polis.evaluation.quality_report_models import QualityReport, QualityReportError
-from polis.evaluation.quality_report_validation import _load_json_object, _string
+from polis.evaluation.quality_report_validation import (
+    _integer,
+    _load_json_object,
+    _string,
+)
 
 _RESULT_SCHEMA_ID: Final = "polis.quality-result"
 _RESULT_SCHEMA_VERSION: Final = 1
@@ -26,10 +30,18 @@ def load_quality_result(path: Path) -> QualityReport:
     if schema_version != _RESULT_SCHEMA_VERSION:
         raise QualityReportError("quality result schema_version must be 1")
 
-    # Result reports share the measured field contract with v2 baselines.
+    dataset = root.get("dataset")
+    if not isinstance(dataset, dict):
+        raise QualityReportError("quality result dataset must be an object")
+    dataset_schema_version = _integer(dataset, "schema_version", "dataset")
+    if dataset_schema_version not in {2, 3}:
+        raise QualityReportError("quality result dataset schema_version must be 2 or 3")
+
+    # Result reports share the measured field contract with baselines of the
+    # same dataset schema generation (v2 or v3).
     rewritten = dict(root)
     rewritten["schema_id"] = "polis.quality-baseline"
-    rewritten["schema_version"] = 2
+    rewritten["schema_version"] = dataset_schema_version
     with tempfile.NamedTemporaryFile(
         mode="w",
         encoding="utf-8",

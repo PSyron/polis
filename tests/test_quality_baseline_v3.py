@@ -8,7 +8,7 @@ from polis.evaluation.quality_report import load_quality_report
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT = ROOT / "docs/quality-baseline-v3-default.json"
 MORPHOLOGY = ROOT / "docs/quality-baseline-v3-morphology.json"
-V3_DATASET_SHA = "0cd1b7d8c1ad141e17972a5035a1b0742c81df212e0a8bea7b83d3f73763904e"
+V3_DATASET_SHA = "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276"
 
 
 def test_v3_baselines_exist_for_both_profiles_with_shared_provenance() -> None:

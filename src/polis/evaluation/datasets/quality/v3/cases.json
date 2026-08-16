@@ -4732,15 +4732,15 @@
       "features": [
         "unicode"
       ],
-      "text": "ŻÓŁĆ: SPOTKAMY SIĘ W PONIEDZIAŁEK.",
+      "text": "ŻÓŁĆ: Spotkamy się w Poniedziałek.",
       "expected_findings": [
         {
           "category": "spelling",
           "start": 21,
           "end": 33,
-          "original": "PONIEDZIAŁEK",
+          "original": "Poniedziałek",
           "suggestion": "poniedziałek",
-          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+          "rationale": "Prefiks Unicode nie zmienia offsetów, a korekta ma sens tylko w mieszanej wielkości liter (nie w całym wersaliku)."
         }
       ],
       "rationale": null
@@ -4862,15 +4862,15 @@
       "features": [
         "unicode"
       ],
-      "text": "ŻÓŁĆ: UCZĘ SIĘ JĘZYKA POLSKIEGO.",
+      "text": "ŻÓŁĆ: Uczę się języka Polskiego.",
       "expected_findings": [
         {
           "category": "spelling",
           "start": 22,
           "end": 31,
-          "original": "POLSKIEGO",
+          "original": "Polskiego",
           "suggestion": "polskiego",
-          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+          "rationale": "Prefiks Unicode nie zmienia offsetów, a korekta ma sens tylko w mieszanej wielkości liter (nie w całym wersaliku)."
         }
       ],
       "rationale": null

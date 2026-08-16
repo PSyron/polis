@@ -118,6 +118,19 @@ Artefakt propozycji:
   progi wydajności z wave0; `enforced: false`, status
   `pending_maintainer_approval`.
 
+Issue #353 publikuje zamykającą weryfikację zainstalowanego runtime'u po
+Umbrella F oraz korektę dwóch wadliwych przypadków `unicode_casing_offset`
+dla reguł case-lowering:
+
+- `docs/quality-result-v3-default.json`
+- `docs/quality-result-v3-morphology.json`
+- `docs/quality-comparison-v3.json`
+
+Floors jakości w propozycji v3 zostały ponownie związane z re-pomierzonymi
+baseline'ami v3 po korekcie datasetu. Absolutne capy wydajności z wave0
+**nie** zostały ponownie wyprowadzone; porównanie zapisuje ich wynik
+fail-closed.
+
 ## Definicje pomiarów
 
 Protokół ocenia tylko niezmieniony `Analyzer(AnalyzerConfig())`. Dopasowanie
@@ -288,6 +301,20 @@ Pre-change baseline'y v2 oraz propozycja progów pozostają byte-identyczne.
 Porównanie jakości względem zatwierdzonych floorów v2 przechodzi; absolutne
 limity performance z propozycji (zero-tolerance względem pre-change baseline)
 pozostają fail-closed przy regresie p95/throughput po dodaniu ośmiu źródeł.
+
+### Wynik zamykającej weryfikacji Umbrella F (v3)
+
+Issue #353 zapisuje post-change pomiary zainstalowanego wheel po kohorcie
+`exact-ordered-59` w:
+
+- `docs/quality-result-v3-default.json`
+- `docs/quality-result-v3-morphology.json`
+- `docs/quality-comparison-v3.json`
+
+Jakość względem floorów v3 (po re-pomiarze baseline'ów i korekcie dwóch
+case'ów) przechodzi w obu profilach z precyzją `1.0` i FAR `0`. Absolutne
+capy performance z propozycji v3 (wave0) pozostają fail-closed; issue nie
+poszerza capów i wskazuje osobny tor na dispatch-performance.
 
 ### Oczekująca propozycja progów v2
 
