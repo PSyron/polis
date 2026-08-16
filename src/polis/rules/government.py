@@ -414,12 +414,16 @@ class _Wave4MorphologyGovernmentRule:
             return ()
         if self._provider is None:
             return ()
+        # Pattern-first: avoid morphology work when the closed surface is absent.
+        matches = tuple(self._spec.pattern.finditer(text))
+        if not matches:
+            return ()
         confirmed = _governed_form_replacement(self._provider, self._spec.form)
         if confirmed != self._spec.form.target_form:
             return ()
         replacement = confirmed
         findings: list[Finding] = []
-        for match in self._spec.pattern.finditer(text):
+        for match in matches:
             start = match.start("governed")
             end = match.end("governed")
             if _is_wrapped_mention(text, match.start(0), match.end(0)):
@@ -488,11 +492,49 @@ def _is_title_case(token: str) -> bool:
     return len(token) >= 2 and token[0].isupper() and token[1:].islower()
 
 
+# Process-local cache of closed-form morphology qualifications. Keyed by
+# provider identity, backend object id, and the exact surface/lemma/tag
+# contract so identity drift still fails closed.
+_GOVERNED_FORM_CACHE: dict[
+    tuple[
+        str,
+        str,
+        str,
+        int,
+        str,
+        str,
+        frozenset[str],
+        str,
+        str,
+        frozenset[str],
+        str,
+        str,
+    ],
+    str | None,
+] = {}
+
+
 def _governed_form_replacement(
     provider: _QualifiedMorfeusz, row: _GovernedFormProp
 ) -> str | None:
     if provider.identity != _qualified_identity():
         return None
+    cache_key = (
+        provider.identity.package_version,
+        provider.identity.dictionary_id,
+        provider.identity.dictionary_notice_sha256,
+        id(provider.backend),
+        row.governor_surface,
+        row.governor_lemma,
+        row.governor_tags,
+        row.governed_surface,
+        row.governed_lemma,
+        row.governed_tags,
+        row.target_tag,
+        row.target_form,
+    )
+    if cache_key in _GOVERNED_FORM_CACHE:
+        return _GOVERNED_FORM_CACHE[cache_key]
     try:
         governor_analyses = _analyses(
             provider.backend.analyse(row.governor_surface),
@@ -508,6 +550,7 @@ def _governed_form_replacement(
             target_tag=row.target_tag,
         )
     except (KeyError, RuntimeError, TypeError, ValueError):
+        _GOVERNED_FORM_CACHE[cache_key] = None
         return None
     if (
         not _has_one_supported_lemma(
@@ -524,7 +567,9 @@ def _governed_form_replacement(
         or _tags_for_lemma(governed_analyses, row.governed_lemma) != row.governed_tags
         or target_forms != {row.target_form}
     ):
+        _GOVERNED_FORM_CACHE[cache_key] = None
         return None
+    _GOVERNED_FORM_CACHE[cache_key] = row.target_form
     return row.target_form
 
 

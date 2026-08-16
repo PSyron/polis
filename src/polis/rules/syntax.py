@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import Final
 
 from polis.core import (
@@ -14,7 +15,22 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
-from polis.segmentation import segment_sentences
+from polis.segmentation import Sentence
+from polis.segmentation import segment_sentences as _segment_sentences_uncached
+
+
+@lru_cache(maxsize=256)
+def _segment_sentences_cached(text: str) -> tuple[Sentence, ...]:
+    """Cache sentence segmentation for repeated single-text rule probes."""
+
+    return _segment_sentences_uncached(text)
+
+
+def segment_sentences(text: str) -> tuple[Sentence, ...]:
+    """Registry-local wrapper used by syntax rules during one analysis pass."""
+
+    return _segment_sentences_cached(text)
+
 
 _DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
     r"(?:(?:Pojechałem|pojechałem) (?P<lower>Warszawy)|"
