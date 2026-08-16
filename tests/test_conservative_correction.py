@@ -113,28 +113,45 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_twenty_eight_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_forty_five_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
         "rule:agreement.copula",
+        "rule:agreement.copula_ja",
         "rule:agreement.te_zdanie",
+        "rule:agreement.te_neuter_noun",
         "rule:agreement.nominal_group_te_duze_okno",
         "rule:agreement.nominal_group_ta_nowy_ksiazka",
         "rule:agreement.subject_verb_oni_czyta",
         "rule:agreement.subject_verb_my_czyta",
         "rule:inflection.negated_widziec",
         "rule:inflection.negated_widziec_nominal_group",
+        "rule:inflection.negated_miec_czas",
         "rule:inflection.przygladac_sie_nowy_budynek",
         "rule:inflection.government_potrzebowac_pomoc",
         "rule:inflection.government_szukac_klucz",
+        "rule:inflection.numeral_five_genitive_plural",
         "rule:spelling.jestes",
         "rule:spelling.napewno",
         "rule:spelling.wlasnie",
         "rule:spelling.zeby",
         "rule:spelling.wogole",
+        "rule:spelling.wogole_diacritic",
         "rule:spelling.narazie",
         "rule:spelling.wziasc",
+        "rule:spelling.wziasc_diacritic",
+        "rule:spelling.conajmniej",
+        "rule:spelling.poprostu",
+        "rule:spelling.pozatym",
+        "rule:spelling.przedewszystkim",
+        "rule:spelling.wkoncu",
+        "rule:spelling.spowrotem",
+        "rule:spelling.tymbardziej",
+        "rule:spelling.naprawde",
+        "rule:spelling.nie_byc_joint",
+        "rule:spelling.poszlem",
+        "rule:spelling.wlanczac",
         "rule:syntax.comma_space",
         "rule:syntax.duplicate_comma",
         "rule:syntax.initial_conditional_comma",

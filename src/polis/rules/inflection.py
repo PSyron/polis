@@ -132,7 +132,112 @@ class InflectionNegatedWidziecNominalGroupRule:
         )
 
 
+_MIEC_CZAS_PATTERN: Final = re.compile(
+    r"(?:(?:Nie|nie) mam (?P<lower>czas)|NIE MAM (?P<upper>CZAS))\.\Z"
+)
+_NUMERAL_FIVE_PATTERN: Final = re.compile(
+    r"(?:\A|(?<=[.!?]\s))"
+    r"(?P<head>Pięć|pięć|PIĘĆ)\s+"
+    r"(?P<object>książki|KSIĄŻKI)"
+    r"(?=\s)",
+)
+
+
+class InflectionNegatedMiecCzasRule:
+    """Closed whole-input ``Nie mam czas.`` → ``czasu`` (no morphology)."""
+
+    _CATEGORY = Category.INFLECTION
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "inflection.negated_miec_czas")
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.governed_form"
+
+    @property
+    def behavior_version(self) -> str:
+        return "inflection-negated-miec-czas/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        match = _MIEC_CZAS_PATTERN.fullmatch(text)
+        if match is None:
+            return ()
+        group = "upper" if match.group("upper") is not None else "lower"
+        original = match.group(group)
+        suggestion = "CZASU" if group == "upper" else "czasu"
+        return (
+            Finding.create(
+                category=self._CATEGORY,
+                severity=Severity.SUGGESTION,
+                message="Niepoprawna forma dopełnienia po zaprzeczonym „mieć”.",
+                explanation=(
+                    "W tej zamkniętej konstrukcji zaprzeczenie wymaga formy "
+                    f"„{suggestion}”."
+                ),
+                original=original,
+                suggestion=suggestion,
+                start=match.start(group),
+                end=match.end(group),
+                confidence=self._confidence,
+                source=self.source,
+            ),
+        )
+
+
+class InflectionNumeralFiveGenitivePluralRule:
+    """Sentence-anchored closed map ``Pięć książki`` → ``książek``."""
+
+    _CATEGORY = Category.INFLECTION
+    _MAP: Final = {"książki": "książek", "KSIĄŻKI": "KSIĄŻEK"}
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "inflection.numeral_five_genitive_plural")
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.governed_form"
+
+    @property
+    def behavior_version(self) -> str:
+        return "inflection-numeral-five-genitive-plural/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in _NUMERAL_FIVE_PATTERN.finditer(text):
+            original = match.group("object")
+            suggestion = self._MAP.get(original)
+            if suggestion is None:
+                continue
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niepoprawna forma rzeczownika po liczebniku „pięć”.",
+                    explanation=(
+                        "Po liczebniku „pięć” w tej zamkniętej konstrukcji "
+                        f"potrzebna jest forma „{suggestion}”."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=match.start("object"),
+                    end=match.end("object"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
 __all__ = [
+    "InflectionNegatedMiecCzasRule",
     "InflectionNegatedWidziecNominalGroupRule",
     "InflectionNegatedWidziecRule",
+    "InflectionNumeralFiveGenitivePluralRule",
 ]

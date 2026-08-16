@@ -191,26 +191,31 @@ def collect_closed_literal_findings(
     Behavior is identical to invoking each rule's historical per-pattern
     ``find`` independently: context abstention, case mapping, confidence,
     source identity, and per-source left-to-right order are preserved.
+
+    A rule may own one typed form (``_typed``/``_corrected``) or a closed
+    multi-surface map (``_surfaces``: typed → corrected).
     """
     if not rules:
         return {}
-    lookup: dict[str, _CasePatternRule] = {}
+    lookup: dict[str, tuple[_CasePatternRule, str]] = {}
     for rule in rules:
-        key = rule._typed.lower()
-        if key in lookup:
-            raise ValueError(f"duplicate closed literal typed form: {rule._typed}")
-        lookup[key] = rule
+        for typed, corrected in rule._surface_map().items():
+            key = typed.lower()
+            if key in lookup:
+                raise ValueError(f"duplicate closed literal typed form: {typed}")
+            lookup[key] = (rule, corrected)
     buckets: dict[Source, list[Finding]] = {rule.source: [] for rule in rules}
     for match in _LITERAL_TOKEN_RE.finditer(text):
         observed = match.group()
-        matched_rule = lookup.get(observed.lower())
-        if matched_rule is None:
+        entry = lookup.get(observed.lower())
+        if entry is None:
             continue
+        matched_rule, corrected = entry
         start = match.start()
         end = match.end()
         if should_abstain_literal_context(text, start, end):
             continue
-        candidate = matched_rule._apply_case(observed, matched_rule._corrected)
+        candidate = matched_rule._apply_case(observed, corrected)
         if candidate == observed:
             continue
         buckets[matched_rule.source].append(
@@ -237,13 +242,25 @@ class _CasePatternRule:
     _IGNORE_WRAPPED_MENTIONS = False
 
     def __init__(
-        self, source_name: str, typed: str, corrected: str, confidence: float
+        self,
+        source_name: str,
+        typed: str,
+        corrected: str,
+        confidence: float,
+        *,
+        surfaces: dict[str, str] | None = None,
     ) -> None:
         self.source = Source(SourceKind.RULE, source_name)
         self._typed = typed
         self._corrected = corrected
         self._confidence = Confidence(confidence)
+        self._surfaces = dict(surfaces) if surfaces is not None else None
         self._pattern = re.compile(rf"(?<!\w){re.escape(typed)}(?!\w)", re.IGNORECASE)
+
+    def _surface_map(self) -> dict[str, str]:
+        if self._surfaces is not None:
+            return self._surfaces
+        return {self._typed: self._corrected}
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
@@ -428,12 +445,315 @@ class SpellingWziascRule(TypoSpellingRule):
         return "spelling-wziasc/1.0"
 
 
+class SpellingWogoleDiacriticRule(TypoSpellingRule):
+    """Corrects the diacritic-bearing joint form ``wogóle`` → ``w ogóle``."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wogole_diacritic",
+            typed="wogóle",
+            corrected="w ogóle",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wogole-diacritic/1.0"
+
+
+class SpellingWziascDiacriticRule(TypoSpellingRule):
+    """Corrects the diacritic-bearing form ``wziąść`` → ``wziąć`` only."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wziasc_diacritic",
+            typed="wziąść",
+            corrected="wziąć",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wziasc-diacritic/1.0"
+
+
+class SpellingConajmniejRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.conajmniej",
+            typed="conajmniej",
+            corrected="co najmniej",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-conajmniej/1.0"
+
+
+class SpellingPoprostuRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.poprostu",
+            typed="poprostu",
+            corrected="po prostu",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-poprostu/1.0"
+
+
+class SpellingPozatymRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.pozatym",
+            typed="pozatym",
+            corrected="poza tym",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-pozatym/1.0"
+
+
+class SpellingPrzedewszystkimRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.przedewszystkim",
+            typed="przedewszystkim",
+            corrected="przede wszystkim",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-przedewszystkim/1.0"
+
+
+class SpellingWkoncuRule(TypoSpellingRule):
+    """Closed surfaces for ``w końcu`` joint errors (F2.6 identity fix).
+
+    Source id remains ``spelling.wkoncu`` (ADR-0026). Both diacritic-bearing
+    and diacritic-free joint surfaces are registered explicitly.
+    """
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wkoncu",
+            typed="wkońcu",
+            corrected="w końcu",
+            confidence=0.98,
+            surfaces={"wkońcu": "w końcu", "wkoncu": "w końcu"},
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wkoncu/1.0"
+
+
+class SpellingSpowrotemRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.spowrotem",
+            typed="spowrotem",
+            corrected="z powrotem",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-spowrotem/1.0"
+
+
+class SpellingTymbardziejRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.tymbardziej",
+            typed="tymbardziej",
+            corrected="tym bardziej",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-tymbardziej/1.0"
+
+
+class SpellingNaprawdeRule(TypoSpellingRule):
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.naprawde",
+            typed="naprawde",
+            corrected="naprawdę",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-naprawde/1.0"
+
+
+class SpellingNieBycJointRule(TypoSpellingRule):
+    """Closed ``być`` joint-spelling surfaces only (no ``niejestes``)."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.nie_byc_joint",
+            typed="niejestem",
+            corrected="nie jestem",
+            confidence=0.98,
+            surfaces={
+                "niejestem": "nie jestem",
+                "niebędzie": "nie będzie",
+                "niebedzie": "nie będzie",
+                "niebył": "nie był",
+                "niebyl": "nie był",
+            },
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-nie-byc-joint/1.0"
+
+
+class SpellingPoszlemRule(TypoSpellingRule):
+    """Only ``poszłem`` → ``poszedłem`` (no ``przeszłem`` / ``przyszłem``)."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.poszlem",
+            typed="poszłem",
+            corrected="poszedłem",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-poszlem/1.0"
+
+
+class SpellingWlanczacRule(TypoSpellingRule):
+    """Literal per-surface map only — no productive ``łancz`` rewrite."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.wlanczac",
+            typed="włanczać",
+            corrected="włączać",
+            confidence=0.98,
+            surfaces={
+                "włanczać": "włączać",
+                "wlanczac": "włączać",
+                "wyłanczać": "wyłączać",
+                "wylanczac": "wyłączać",
+            },
+        )
+
+    @property
+    def operation(self) -> str:
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-wlanczac/1.0"
+
+
 __all__ = [
+    "SpellingConajmniejRule",
     "SpellingJestesRule",
     "SpellingNapewnoRule",
+    "SpellingNaprawdeRule",
     "SpellingNarazieRule",
+    "SpellingNieBycJointRule",
+    "SpellingPoprostuRule",
+    "SpellingPoszlemRule",
+    "SpellingPozatymRule",
+    "SpellingPrzedewszystkimRule",
+    "SpellingSpowrotemRule",
+    "SpellingTymbardziejRule",
+    "SpellingWkoncuRule",
+    "SpellingWlanczacRule",
+    "SpellingWogoleDiacriticRule",
     "SpellingWogoleRule",
     "SpellingWlasnieRule",
+    "SpellingWziascDiacriticRule",
     "SpellingWziascRule",
     "SpellingZebyRule",
     "TypoSpellingRule",
