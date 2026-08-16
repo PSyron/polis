@@ -150,6 +150,118 @@ class AgreementTeZdanieRule:
         return tuple(findings)
 
 
+_TE_NEUTER_NOUNS: Final = ("dziecko", "okno", "słońce", "morze")
+_TE_NEUTER_PATTERN: Final = re.compile(
+    rf"(?<!\w)(?P<pronoun>Te|te|TE)(?P<space>[ \t]+)"
+    rf"(?P<noun>{'|'.join(_TE_NEUTER_NOUNS)})(?!\w)",
+)
+_COPULA_JA_PATTERN: Final = re.compile(
+    r"(?<!\w)(?P<subject>Ja|ja|JA)\s+(?P<verb>jest|JEST)(?!\w)",
+)
+
+
+class AgreementTeNeuterNounRule:
+    """Closed ``Te`` + neuter noun → ``To``; excludes ``zdanie`` and comma vocative."""
+
+    _CATEGORY = Category.AGREEMENT
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "agreement.te_neuter_noun")
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.pronoun_gender"
+
+    @property
+    def behavior_version(self) -> str:
+        return "agreement-te-neuter-noun/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in _TE_NEUTER_PATTERN.finditer(text):
+            after = text[match.end("noun") :]
+            # Abstain on optional-space comma (vocative / address reading).
+            if re.match(r"[ \t]*,", after) is not None:
+                continue
+            pronoun = match.group("pronoun")
+            if pronoun.isupper():
+                suggestion = "TO"
+            elif pronoun[:1].isupper():
+                suggestion = "To"
+            else:
+                suggestion = "to"
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niezgodność rodzaju zaimka i rzeczownika nijakiego.",
+                    explanation=(
+                        f"Przed rzeczownikiem „{match.group('noun')}” w tej "
+                        f"zamkniętej regule potrzebna jest forma „{suggestion}”."
+                    ),
+                    original=pronoun,
+                    suggestion=suggestion,
+                    start=match.start("pronoun"),
+                    end=match.end("pronoun"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
+class AgreementCopulaJaRule:
+    """Closed ``Ja jest`` → ``jestem`` (no ``jestes`` contention)."""
+
+    _CATEGORY = Category.AGREEMENT
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "agreement.copula_ja")
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.copula_person"
+
+    @property
+    def behavior_version(self) -> str:
+        return "agreement-copula-ja/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in _COPULA_JA_PATTERN.finditer(text):
+            verb = match.group("verb")
+            if verb.isupper():
+                suggestion = "JESTEM"
+            elif verb[:1].isupper():
+                suggestion = "Jestem"
+            else:
+                suggestion = "jestem"
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niepasująca forma czasownika 'być' po podmiocie „Ja”.",
+                    explanation=(
+                        f"Podmiot „{match.group('subject')}” wymaga formy "
+                        f"„{suggestion}”."
+                    ),
+                    original=verb,
+                    suggestion=suggestion,
+                    start=match.start("verb"),
+                    end=match.end("verb"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
 class AgreementNominalGroupTeDuzeOknoRule:
     """Review one exact demonstrative error using qualified morphology."""
 
@@ -345,8 +457,10 @@ _CORRECTIONS: dict[tuple[str, str], str] = {
 
 
 __all__ = [
+    "AgreementCopulaJaRule",
     "AgreementCopulaRule",
     "AgreementNominalGroupTaNowyKsiazkaRule",
     "AgreementNominalGroupTeDuzeOknoRule",
+    "AgreementTeNeuterNounRule",
     "AgreementTeZdanieRule",
 ]

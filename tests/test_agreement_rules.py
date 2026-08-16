@@ -96,7 +96,6 @@ def test_agreement_te_zdanie_rule_finds_allowlisted_phrase_with_exact_offsets(
     "text",
     (
         "To zdanie jest poprawne.",
-        "Te dziecko jest gotowe.",
         "Te zdania są poprawne.",
         "moTe zdanie jest poprawne.",
         "Te zdaniem zajmuje się redaktor.",
@@ -114,6 +113,17 @@ def test_agreement_te_zdanie_rule_abstains_outside_the_closed_pattern(
     ).issues
 
     assert findings == ()
+
+
+def test_agreement_te_zdanie_rule_does_not_own_te_dziecko_surface() -> None:
+    """``Te dziecko`` belongs to ``agreement.te_neuter_noun``, not te_zdanie."""
+    analyzer = Analyzer(AnalyzerConfig())
+    findings = analyzer.analyze(
+        "Te dziecko jest gotowe.",
+        options=AnalysisOptions(categories={Category.AGREEMENT}),
+    ).issues
+    assert all(str(item.source) != "rule:agreement.te_zdanie" for item in findings)
+    assert any(str(item.source) == "rule:agreement.te_neuter_noun" for item in findings)
 
 
 def test_agreement_te_zdanie_rule_has_closed_behavior_metadata() -> None:
