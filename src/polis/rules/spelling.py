@@ -735,9 +735,270 @@ class SpellingWlanczacRule(TypoSpellingRule):
         return "spelling-wlanczac/1.0"
 
 
+_WEEKDAYS_MONTHS: Final = frozenset(
+    {
+        "poniedziałek",
+        "wtorek",
+        "środa",
+        "czwartek",
+        "piątek",
+        "sobota",
+        "niedziela",
+        "styczeń",
+        "luty",
+        "marzec",
+        "kwiecień",
+        "maj",
+        "czerwiec",
+        "lipiec",
+        "sierpień",
+        "wrzesień",
+        "październik",
+        "listopad",
+        "grudzień",
+    }
+)
+_NATIONALITY_HEADS: Final = frozenset(
+    {"języka", "język", "literatury", "historii", "kultury", "narodu"}
+)
+_NATIONALITY_ADJECTIVES: Final = frozenset(
+    {
+        "polskiego",
+        "polska",
+        "polski",
+        "angielskiego",
+        "francuskiego",
+        "niemieckiego",
+        "rosyjskiego",
+    }
+)
+_SENTENCE_OPENERS: Final = frozenset(
+    {
+        "potem",
+        "później",
+        "następnie",
+        "jednak",
+        "natomiast",
+        "dlatego",
+        "wtedy",
+        "teraz",
+        "tutaj",
+        "tam",
+    }
+)
+_SENTENCE_INITIAL_ABBREV_EXCLUSIONS: Final = frozenset(
+    {
+        "oprac",
+        "porówn",
+        "miejsc",
+        "wspomn",
+        "przekł",
+        "właśc",
+        "ewent",
+        "rozdz",
+        "załącz",
+        "itp",
+        "itd",
+        "tzn",
+        "np",
+        "tj",
+        "tzw",
+        "m.in",
+        "prof",
+        "dr",
+        "mgr",
+        "ul",
+        "al",
+        "pl",
+        "nr",
+        "str",
+        "tom",
+        "vol",
+        "rys",
+        "tab",
+        "zob",
+        "por",
+        "ww",
+        "ww.",
+    }
+)
+
+
+class SpellingMonthWeekdayLowercaseRule:
+    """Lowercase calendar forms after lowercase ``w``/``we`` only."""
+
+    _CATEGORY = Category.SPELLING
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "spelling.month_weekday_lowercase")
+        self._pattern = re.compile(
+            r"(?<!\w)(?P<pre>w|we) (?P<form>[A-ZĄĆĘŁŃÓŚŹŻ]"
+            r"[a-ząćęłńóśźż]+)(?!\w)"
+        )
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.case"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-month-weekday-lowercase/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            form = match.group("form")
+            if form.casefold() not in _WEEKDAYS_MONTHS:
+                continue
+            # Load-bearing: abstain when the next token is uppercase
+            # (holiday / multi-word proper name, e.g. w Poniedziałek Wielkanocny).
+            rest = text[match.end("form") :].lstrip()
+            if rest and rest[0].isupper():
+                continue
+            suggestion = form.casefold()
+            if suggestion == form:
+                continue
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message=(
+                        "Nazwa dnia lub miesiąca w tej pozycji pisze się małą literą."
+                    ),
+                    explanation=(
+                        f"Po przyimku „{match.group('pre')}” forma kalendarzowa "
+                        f"„{form}” zapisuje się małą literą."
+                    ),
+                    original=form,
+                    suggestion=suggestion,
+                    start=match.start("form"),
+                    end=match.end("form"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
+class SpellingProperAdjectiveLowercaseRule:
+    """Lowercase closed nationality adjectives after closed common-noun heads."""
+
+    _CATEGORY = Category.SPELLING
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "spelling.proper_adjective_lowercase")
+        self._pattern = re.compile(
+            r"(?<!\w)(?P<head>[a-ząćęłńóśźż]+) (?P<adj>[A-ZĄĆĘŁŃÓŚŹŻ]"
+            r"[a-ząćęłńóśźż]+)(?!\w)"
+        )
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.case"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-proper-adjective-lowercase/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            head = match.group("head")
+            adj = match.group("adj")
+            if head not in _NATIONALITY_HEADS:
+                continue
+            if adj.casefold() not in _NATIONALITY_ADJECTIVES:
+                continue
+            suggestion = adj.casefold()
+            if suggestion == adj:
+                continue
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Przymiotnik narodowościowy po rzeczowniku pospolitym.",
+                    explanation=(
+                        f"Po rzeczowniku „{head}” forma „{adj}” zapisuje się "
+                        "małą literą."
+                    ),
+                    original=adj,
+                    suggestion=suggestion,
+                    start=match.start("adj"),
+                    end=match.end("adj"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
+class SpellingSentenceInitialCapitalRule:
+    """Capitalize closed sentence openers after a full stop."""
+
+    _CATEGORY = Category.SPELLING
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "spelling.sentence_initial_capital")
+        self._pattern = re.compile(
+            r"(?P<pre>[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]{6,})\. "
+            r"(?P<open>[a-ząćęłńóśźż]+)(?!\w)"
+        )
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.case"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-sentence-initial-capital/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            pre = match.group("pre")
+            opener = match.group("open")
+            if pre.casefold() in _SENTENCE_INITIAL_ABBREV_EXCLUSIONS:
+                continue
+            if not pre.isalpha():
+                continue
+            if opener not in _SENTENCE_OPENERS:
+                continue
+            suggestion = opener[:1].upper() + opener[1:]
+            if suggestion == opener:
+                continue
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Początek zdania wymaga wielkiej litery.",
+                    explanation=(
+                        f"Po kropce forma „{opener}” w tej zamkniętej regule "
+                        f"zapisuje się jako „{suggestion}”."
+                    ),
+                    original=opener,
+                    suggestion=suggestion,
+                    start=match.start("open"),
+                    end=match.end("open"),
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
+
 __all__ = [
     "SpellingConajmniejRule",
     "SpellingJestesRule",
+    "SpellingMonthWeekdayLowercaseRule",
     "SpellingNapewnoRule",
     "SpellingNaprawdeRule",
     "SpellingNarazieRule",
@@ -745,7 +1006,9 @@ __all__ = [
     "SpellingPoprostuRule",
     "SpellingPoszlemRule",
     "SpellingPozatymRule",
+    "SpellingProperAdjectiveLowercaseRule",
     "SpellingPrzedewszystkimRule",
+    "SpellingSentenceInitialCapitalRule",
     "SpellingSpowrotemRule",
     "SpellingTymbardziejRule",
     "SpellingWkoncuRule",

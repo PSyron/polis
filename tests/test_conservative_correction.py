@@ -113,7 +113,7 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_forty_five_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_fifty_two_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
@@ -152,16 +152,23 @@ def test_default_analyzer_composes_exactly_forty_five_conservative_v1_rules() ->
         "rule:spelling.nie_byc_joint",
         "rule:spelling.poszlem",
         "rule:spelling.wlanczac",
+        "rule:spelling.month_weekday_lowercase",
+        "rule:spelling.proper_adjective_lowercase",
+        "rule:spelling.sentence_initial_capital",
         "rule:syntax.comma_space",
         "rule:syntax.duplicate_comma",
         "rule:syntax.initial_conditional_comma",
         "rule:syntax.initial_temporal_comma",
+        "rule:syntax.comma_before_ze_reporting",
+        "rule:syntax.comma_before_zeby_purpose",
+        "rule:syntax.comma_before_bo",
         "rule:syntax.list_space",
         "rule:syntax.missing_correlative",
         "rule:syntax.missing_destination_preposition",
         "rule:syntax.missing_reflexive",
         "rule:syntax.quote_space",
         "rule:syntax.sentence_space",
+        "rule:punctuation.abbreviation_dot",
     )
 
 

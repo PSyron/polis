@@ -39,16 +39,23 @@
 | `rule:spelling.nie_byc_joint` | `spelling` | zamknięte formy łączne `być` (`niejestem`, `niebędzie`, `niebył`; bez `niejestes`), wyłącznie do przeglądu |
 | `rule:spelling.poszlem` | `spelling` | `poszłem` → `poszedłem` (bez `przeszłem`/`przyszłem`), wyłącznie do przeglądu |
 | `rule:spelling.wlanczac` | `spelling` | dosłowna mapa `włanczać`/`wyłanczać` → `włączać`/`wyłączać`, wyłącznie do przeglądu |
+| `rule:spelling.month_weekday_lowercase` | `spelling` | `w`/`we` + zamknięta forma kalendarzowa z wielkiej litery → mała; abstencja gdy następny token wielką literą (święta), wyłącznie do przeglądu |
+| `rule:spelling.proper_adjective_lowercase` | `spelling` | zamknięty przymiotnik narodowościowy po zamkniętym rzeczowniku pospolitym → mała litera, wyłącznie do przeglądu |
+| `rule:spelling.sentence_initial_capital` | `spelling` | zamknięty otwieracz zdania po kropce → wielka litera, wyłącznie do przeglądu |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
 | `rule:syntax.duplicate_comma` | `punctuation` | usuwa drugi przecinek wyłącznie z bezpiecznej pary `,,` |
 | `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
 | `rule:syntax.initial_temporal_comma` | `syntax` | zamknięte konstrukcje `Gdy/Kiedy …` z brakującym przecinkiem po początkowym zdaniu czasowym, wyłącznie do przeglądu |
+| `rule:syntax.comma_before_ze_reporting` | `syntax` | przecinek po zamkniętym czasowniku raportującym/kognitywnym przed `że`, wyłącznie do przeglądu |
+| `rule:syntax.comma_before_zeby_purpose` | `syntax` | przecinek po zamkniętym czasowniku wolicjonalnym przed `żeby`/`żebyś`, wyłącznie do przeglądu |
+| `rule:syntax.comma_before_bo` | `syntax` | przecinek przed `bo`/`ponieważ`/`gdyż` z zamkniętym zbiorem wykluczeń prekursora, wyłącznie do przeglądu |
 | `rule:syntax.list_space` | `syntax` | brakująca spacja po znaczniku listy |
 | `rule:syntax.missing_correlative` | `syntax` | lokalna konstrukcja `Im …, bardziej …` z brakującym `tym` |
 | `rule:syntax.missing_destination_preposition` | `syntax` | zamknięta konstrukcja `Pojechałem Warszawy.` → `Pojechałem do Warszawy.`, wyłącznie do przeglądu |
 | `rule:syntax.missing_reflexive` | `syntax` | trzy lokalne konstrukcje z brakującym `się` |
 | `rule:syntax.quote_space` | `punctuation` | brakująca spacja po otwierającym cudzysłowie |
 | `rule:syntax.sentence_space` | `punctuation` | brakująca spacja po kropce na granicy zdania |
+| `rule:punctuation.abbreviation_dot` | `punctuation` | kropka po zamkniętych skrótach `{itp, itd, tzn}` (`np` trwale wykluczone), wyłącznie do przeglądu |
 
 Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:agreement.nominal_group_ta_nowy_ksiazka`,

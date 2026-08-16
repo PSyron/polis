@@ -50,16 +50,23 @@ _CATEGORY_BY_SOURCE = {
     "rule:spelling.nie_byc_joint": "spelling",
     "rule:spelling.poszlem": "spelling",
     "rule:spelling.wlanczac": "spelling",
+    "rule:spelling.month_weekday_lowercase": "spelling",
+    "rule:spelling.proper_adjective_lowercase": "spelling",
+    "rule:spelling.sentence_initial_capital": "spelling",
     "rule:syntax.comma_space": "punctuation",
     "rule:syntax.duplicate_comma": "punctuation",
     "rule:syntax.initial_conditional_comma": "syntax",
     "rule:syntax.initial_temporal_comma": "syntax",
+    "rule:syntax.comma_before_ze_reporting": "syntax",
+    "rule:syntax.comma_before_zeby_purpose": "syntax",
+    "rule:syntax.comma_before_bo": "syntax",
     "rule:syntax.list_space": "syntax",
     "rule:syntax.missing_correlative": "syntax",
     "rule:syntax.missing_destination_preposition": "syntax",
     "rule:syntax.missing_reflexive": "syntax",
     "rule:syntax.quote_space": "punctuation",
     "rule:syntax.sentence_space": "punctuation",
+    "rule:punctuation.abbreviation_dot": "punctuation",
 }
 
 

@@ -565,8 +565,302 @@ def _make_insertion_or_replacement(
 
 _ABBREVIATIONS = frozenset({"itp", "np", "tj", "m.in", "i.e", "np."})
 
+# Case-explicit governors only (never IGNORECASE). Participles/nominalizations
+# are intentionally absent.
+_ZE_REPORTING_GOVERNORS: Final = frozenset(
+    {
+        "Wiem",
+        "wiem",
+        "WIEM",
+        "Myślę",
+        "myślę",
+        "MYŚLĘ",
+        "Sądzę",
+        "sądzę",
+        "SĄDZĘ",
+        "Uważam",
+        "uważam",
+        "UWAŻAM",
+        "Mówię",
+        "mówię",
+        "MÓWIĘ",
+        "Powiedział",
+        "powiedział",
+        "POWIEDZIAŁ",
+        "Powiedziałam",
+        "powiedziałam",
+        "POWIEDZIAŁAM",
+        "Wiemy",
+        "wiemy",
+        "WIEMY",
+    }
+)
+_ZEBY_PURPOSE_GOVERNORS: Final = frozenset(
+    {
+        "Chcę",
+        "chcę",
+        "CHCĘ",
+        "Pragnę",
+        "pragnę",
+        "PRAGNĘ",
+        "Proszę",
+        "proszę",
+        "PROSZĘ",
+        "Chcemy",
+        "chcemy",
+        "CHCEMY",
+    }
+)
+_CAUSAL_CONJUNCTIONS: Final = frozenset({"bo", "ponieważ", "gdyż"})
+_CAUSAL_PRECURSOR_EXCLUSIONS: Final = frozenset(
+    {
+        "no",
+        "a",
+        "i",
+        "oraz",
+        "ale",
+        "lecz",
+        "czy",
+        "to",
+        "więc",
+        "lub",
+        "albo",
+        "ani",
+        "bądź",
+        "nie",
+        "tylko",
+        "jedynie",
+        "właśnie",
+        "jak",
+        "jako",
+        "niż",
+    }
+)
+_POLISH_LETTER: Final = re.compile(r"[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]")
+# Permanent exclusion for abbreviation-dot: ``np`` is never covered (docstring).
+_ABBREVIATION_DOT_FORMS: Final = frozenset({"itp", "itd", "tzn"})
+
+
+class SyntaxCommaBeforeZeReportingRule:
+    """Insert a comma after a closed reporting/cognition governor before ``że``."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.comma_before_ze_reporting")
+        self._pattern = re.compile(r"(?<!\w)(?P<gov>\w+) (?P<conj>że|Że|ŻE)(?=\s+\S)")
+
+    @property
+    def operation(self) -> str:
+        return "insert.reporting_clause_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        return "syntax-comma-before-ze-reporting/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            gov = match.group("gov")
+            if gov not in _ZE_REPORTING_GOVERNORS:
+                continue
+            if _is_quoted_position(text, match.start("gov")):
+                continue
+            insert_at = match.end("gov")
+            if insert_at < len(text) and text[insert_at] == ",":
+                continue
+            findings.append(
+                _make_insertion_or_replacement(
+                    insert_at,
+                    insert_at,
+                    "",
+                    ",",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje przecinka przed spójnikiem „że”.",
+                    explanation=(
+                        "Po czasowniku raportującym/kognitywnym przed „że” "
+                        "stawiamy przecinek."
+                    ),
+                )
+            )
+        return tuple(findings)
+
+
+class SyntaxCommaBeforeZebyPurposeRule:
+    """Insert a comma after a closed volition governor before ``żeby``/``żebyś``."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.comma_before_zeby_purpose")
+        self._pattern = re.compile(
+            r"(?<!\w)(?P<gov>\w+) (?P<conj>żebyś|żeby|Żebyś|Żeby|ŻEBYŚ|ŻEBY)(?=\s+\S)"
+        )
+
+    @property
+    def operation(self) -> str:
+        return "insert.purpose_clause_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        return "syntax-comma-before-zeby-purpose/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            gov = match.group("gov")
+            if gov not in _ZEBY_PURPOSE_GOVERNORS:
+                continue
+            if _is_quoted_position(text, match.start("gov")):
+                continue
+            insert_at = match.end("gov")
+            if insert_at < len(text) and text[insert_at] == ",":
+                continue
+            findings.append(
+                _make_insertion_or_replacement(
+                    insert_at,
+                    insert_at,
+                    "",
+                    ",",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje przecinka przed spójnikiem „żeby”.",
+                    explanation=(
+                        "Po czasowniku wolicjonalnym przed „żeby” stawiamy przecinek."
+                    ),
+                )
+            )
+        return tuple(findings)
+
+
+class SyntaxCommaBeforeBoRule:
+    """Insert a comma before closed causal conjunctions with exclusion guards."""
+
+    _CATEGORY = Category.SYNTAX
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "syntax.comma_before_bo")
+        self._pattern = re.compile(
+            r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż) (?P<after>[a-ząćęłńóśźż])"
+        )
+
+    @property
+    def operation(self) -> str:
+        return "insert.causal_clause_comma"
+
+    @property
+    def behavior_version(self) -> str:
+        return "syntax-comma-before-bo/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if len(segment_sentences(text)) != 1:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            pre_char = match.group("pre")
+            if _POLISH_LETTER.fullmatch(pre_char) is None:
+                continue
+            # Preceding token (word) exclusion set.
+            left = text[: match.start("conj")].rstrip()
+            token = left.rsplit(None, 1)[-1] if left else ""
+            token_core = re.sub(r"[^\w]+$", "", token)
+            if token_core.casefold() in _CAUSAL_PRECURSOR_EXCLUSIONS:
+                continue
+            if _is_quoted_position(text, match.start("conj")):
+                continue
+            insert_at = match.start("conj") - 1  # space before conj → insert comma
+            # Insert between preceding letter and space: "ę bo" → "ę, bo"
+            # match is: pre + " " + conj + " " + after; insert after pre.
+            insert_at = match.start("pre") + 1
+            if insert_at < len(text) and text[insert_at] == ",":
+                continue
+            findings.append(
+                _make_insertion_or_replacement(
+                    insert_at,
+                    insert_at,
+                    "",
+                    ",",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje przecinka przed spójnikiem przyczynowym.",
+                    explanation=(
+                        "Przed spójnikiem przyczynowym „bo”/„ponieważ”/„gdyż” "
+                        "stawiamy przecinek."
+                    ),
+                )
+            )
+        return tuple(findings)
+
+
+class PunctuationAbbreviationDotRule:
+    """Insert a period after closed abbreviations ``itp``/``itd``/``tzn`` only.
+
+    ``np`` is a permanent exclusion — never add it without a full re-verification.
+    """
+
+    _CATEGORY = Category.PUNCTUATION
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "punctuation.abbreviation_dot")
+        self._pattern = re.compile(
+            r"(?<!\w)(?P<form>itp|itd|tzn)(?=\s+\S)", re.IGNORECASE
+        )
+
+    @property
+    def operation(self) -> str:
+        return "insert.abbreviation_dot"
+
+    @property
+    def behavior_version(self) -> str:
+        return "punctuation-abbreviation-dot/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        for match in self._pattern.finditer(text):
+            form = match.group("form").casefold()
+            if form not in _ABBREVIATION_DOT_FORMS:
+                continue
+            if _is_quoted_position(text, match.start("form")):
+                continue
+            insert_at = match.end("form")
+            if insert_at < len(text) and text[insert_at] == ".":
+                continue
+            findings.append(
+                _make_insertion_or_replacement(
+                    insert_at,
+                    insert_at,
+                    "",
+                    ".",
+                    self.source,
+                    category=self._CATEGORY,
+                    message="Brakuje kropki po skrócie.",
+                    explanation=(
+                        f"Po skrócie „{match.group('form')}” w tej zamkniętej "
+                        "regule stawiamy kropkę."
+                    ),
+                )
+            )
+        return tuple(findings)
+
 
 __all__ = [
+    "PunctuationAbbreviationDotRule",
+    "SyntaxCommaBeforeBoRule",
+    "SyntaxCommaBeforeZeReportingRule",
+    "SyntaxCommaBeforeZebyPurposeRule",
     "SyntaxCommaSpacingRule",
     "SyntaxDuplicateCommaRule",
     "SyntaxSentenceSpacingRule",
