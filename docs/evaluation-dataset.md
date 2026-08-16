@@ -112,6 +112,11 @@ Dualne baseline'y pre-change z zainstalowanego wheel (profile `default` i
 
 Progi porównawcze v3 zatwierdza osobny slice F1.3 na podstawie pomiaru Wave 0
 z #338 (`docs/quality-result-wave0-*.json`), a nie na podstawie progów v2.
+Artefakt propozycji:
+
+- `docs/quality-threshold-proposal-v3.json` — floors jakości z baseline'ów v3,
+  progi wydajności z wave0; `enforced: false`, status
+  `pending_maintainer_approval`.
 
 ## Definicje pomiarów
 

@@ -15,10 +15,15 @@ from polis.evaluation.quality_report_models import (
     ThresholdProposal,
     ThresholdProposalArtifact,
     ThresholdProposalV2,
+    ThresholdProposalV3,
 )
 from polis.evaluation.quality_report_proposal_v2 import parse_threshold_proposal_v2
 from polis.evaluation.quality_report_proposal_v2_validation import (
     validate_threshold_proposal_v2,
+)
+from polis.evaluation.quality_report_proposal_v3 import parse_threshold_proposal_v3
+from polis.evaluation.quality_report_proposal_v3_validation import (
+    validate_threshold_proposal_v3,
 )
 from polis.evaluation.quality_report_validation import (
     _boolean,
@@ -48,8 +53,14 @@ def load_threshold_proposal(path: Path) -> ThresholdProposalArtifact:
             if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
                 raise QualityReportError("threshold proposal schema_id mismatch")
             return parse_threshold_proposal_v2(root)
+        case 3:
+            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+                raise QualityReportError("threshold proposal schema_id mismatch")
+            return parse_threshold_proposal_v3(root)
         case _:
-            raise QualityReportError("threshold proposal schema_version must be 1 or 2")
+            raise QualityReportError(
+                "threshold proposal schema_version must be 1, 2, or 3"
+            )
 
 
 def _load_threshold_proposal_v1(root: JsonObject) -> ThresholdProposal:
@@ -110,6 +121,10 @@ def validate_threshold_proposal(
             _validate_threshold_proposal_v1(proposal, baseline_path)
         case ThresholdProposalV2():
             validate_threshold_proposal_v2(
+                proposal, baseline_path, morphology_baseline_path
+            )
+        case ThresholdProposalV3():
+            validate_threshold_proposal_v3(
                 proposal, baseline_path, morphology_baseline_path
             )
         case unreachable:
