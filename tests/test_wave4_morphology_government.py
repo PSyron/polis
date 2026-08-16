@@ -201,8 +201,15 @@ def test_wave4_missing_provider_abstains(monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 def test_wave4_provider_identity_drift_abstains() -> None:
+    class _UnusedBackend:
+        def analyse(self, text: str) -> list[object]:
+            raise AssertionError(text)
+
+        def generate(self, lemma: str) -> list[object]:
+            raise AssertionError(lemma)
+
     drifted = _QualifiedMorfeusz(
-        backend=object(),  # type: ignore[arg-type]
+        backend=_UnusedBackend(),
         identity=_ProviderIdentity(
             package_version="1.99.16",
             dictionary_id="pl.sgjp.sgjp-2026.06.01",
