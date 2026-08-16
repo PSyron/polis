@@ -1,0 +1,402 @@
+{
+  "aggregate_verdict": "fail",
+  "artifacts": {
+    "sdist_filename": "polis_nlp-0.2.0.tar.gz",
+    "sdist_sha256": "7cd176673548e25d3fa80b4559799bb5024823646f541b7cb061dab7cd891bcd",
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "94affc45154f12ddcfbacbe6b98785a86d65e4520e0a70210a6e8f22a12b1d63"
+  },
+  "dataset_sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+  "environment_baseline": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "environment_result": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "notes": [
+    "F6.1 reclassified two defective all-uppercase case-lowering unicode_casing_offset cases to mixed-case Unicode-prefixed texts.",
+    "F6.2 re-measured dual v3 baselines from clean installed wheel after dataset correction; quality floors rebound to those measured baselines.",
+    "Performance caps remain the #339 F1.3 wave0-derived values and were not re-derived.",
+    "F6.3 measurements from clean installed wheel under Python 3.13.12 matching baseline platform identity.",
+    "Quality gates pass; absolute performance caps fail-closed (do not widen caps in this issue)."
+  ],
+  "profiles": {
+    "default": {
+      "baseline_path": "docs/quality-baseline-v3-default.json",
+      "baseline_sha256": "b8283fdeb2105d46bf0cb11b70161d454776c963694cc929d40fbde93b94c2f3",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.7900355871886121 floor=0.7900355871886121",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=76917 max=39167",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "tput=17450.74005098408 min=33979.186566343364",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": false
+        },
+        {
+          "detail": "rss=32555008 max=30572544",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": false
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.6529411764705882,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.6529411764705882
+        },
+        {
+          "baseline": 0.7900355871886121,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.7900355871886121
+        },
+        {
+          "baseline": 0.6529411764705882,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.6529411764705882
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 76917,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 76917
+        },
+        {
+          "baseline": 17450.74005098408,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 17450.74005098408
+        },
+        {
+          "baseline": 32555008,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 32555008
+        },
+        {
+          "baseline": 111,
+          "delta": 0,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 111
+        },
+        {
+          "baseline": 59,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 59
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "default",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 111,
+        "expected_findings": 170,
+        "false_negatives": 59,
+        "false_positives": 0,
+        "predicted_findings": 111,
+        "span_matches": 111,
+        "true_positives": 111
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 111,
+        "expected_findings": 170,
+        "false_negatives": 59,
+        "false_positives": 0,
+        "predicted_findings": 111,
+        "span_matches": 111,
+        "true_positives": 111
+      },
+      "result_path": "docs/quality-result-v3-default.json",
+      "result_sha256": "c197be833f3e6f0a588e029be63d1265456fd7dfefad08f8d16a0e877e5c768e",
+      "verdict": "fail"
+    },
+    "morphology": {
+      "baseline_path": "docs/quality-baseline-v3-morphology.json",
+      "baseline_sha256": "30d7d05479e18ee54d492fd67f57f401b9bdf5d6afcb2e688dd56f1909ebe454",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.940809968847352 floor=0.940809968847352",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=403042 max=197625",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "tput=2727.262293671418 min=18262.21596348732",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": false
+        },
+        {
+          "detail": "rss=81674240 max=74366976",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": false
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.888235294117647,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.888235294117647
+        },
+        {
+          "baseline": 0.940809968847352,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.940809968847352
+        },
+        {
+          "baseline": 0.888235294117647,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.888235294117647
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 403042,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 403042
+        },
+        {
+          "baseline": 2727.262293671418,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 2727.262293671418
+        },
+        {
+          "baseline": 81674240,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 81674240
+        },
+        {
+          "baseline": 151,
+          "delta": 0,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 151
+        },
+        {
+          "baseline": 19,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 19
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "morphology",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 151,
+        "expected_findings": 170,
+        "false_negatives": 19,
+        "false_positives": 0,
+        "predicted_findings": 151,
+        "span_matches": 151,
+        "true_positives": 151
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 151,
+        "expected_findings": 170,
+        "false_negatives": 19,
+        "false_positives": 0,
+        "predicted_findings": 151,
+        "span_matches": 151,
+        "true_positives": 151
+      },
+      "result_path": "docs/quality-result-v3-morphology.json",
+      "result_sha256": "f0b052c397afb349c470fb085376947ee41fddcfc841a8d902ffe9cb1f95f073",
+      "verdict": "fail"
+    }
+  },
+  "proposal_path": "docs/quality-threshold-proposal-v3.json",
+  "proposal_sha256": "c747365bec66b2f3642d617ba53cd234da4098e6405b9ba5cbf79ff3ead28b6a",
+  "schema_id": "polis.quality-comparison",
+  "schema_version": 1,
+  "source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5"
+}

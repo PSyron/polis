@@ -83,8 +83,8 @@
     "stable_repetitions": 5,
     "warmup_repetitions": 1
   },
-  "schema_id": "polis.quality-baseline",
-  "schema_version": 3,
+  "schema_id": "polis.quality-result",
+  "schema_version": 1,
   "source": {
     "git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5"
   }
