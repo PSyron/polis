@@ -23,7 +23,7 @@ from polis.segmentation import segment_sentences as _segment_sentences_uncached
 def _segment_sentences_cached(text: str) -> tuple[Sentence, ...]:
     """Cache sentence segmentation for repeated single-text rule probes."""
 
-    return _segment_sentences_uncached(text)
+    return tuple(_segment_sentences_uncached(text))
 
 
 def segment_sentences(text: str) -> tuple[Sentence, ...]:

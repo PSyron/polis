@@ -99,6 +99,13 @@ def test_v3_comparison_exists_and_records_quality_pass_performance_fail() -> Non
             for gate in profile.gates
         )
         assert profile.verdict == "fail"
+    # #355: morphology latency/throughput may pass while RSS remains red.
+    morph = comparison.profiles["morphology"]
+    morph_gates = {gate.gate: gate.passed for gate in morph.gates}
+    assert morph_gates["performance.maximum_peak_rss_bytes"] is False
+    default = comparison.profiles["default"]
+    default_gates = {gate.gate: gate.passed for gate in default.gates}
+    assert default_gates["performance.maximum_p95_latency_ns"] is False
 
 
 def test_v3_results_parse_and_bind_to_proposal_dataset() -> None:

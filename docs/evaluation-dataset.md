@@ -316,6 +316,11 @@ case'ów) przechodzi w obu profilach z precyzją `1.0` i FAR `0`. Absolutne
 capy performance z propozycji v3 (wave0) pozostają fail-closed; issue nie
 poszerza capów i wskazuje osobny tor na dispatch-performance.
 
+Issue #355 zapisuje re-pomiar po optymalizacji dispatchu (pattern-first
+government + cache form morfologii + LRU segmentacji zdań). Capów v3 nie
+zmieniono; morph p95/throughput przechodzą, RSS i default latency/throughput
+pozostają fail-closed w `docs/quality-comparison-v3.json`.
+
 ### Oczekująca propozycja progów v2
 
 Issue #304 zapisuje w `docs/quality-threshold-proposal-v2.json` schemat w

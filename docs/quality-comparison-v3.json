@@ -2,9 +2,9 @@
   "aggregate_verdict": "fail",
   "artifacts": {
     "sdist_filename": "polis_nlp-0.2.0.tar.gz",
-    "sdist_sha256": "7cd176673548e25d3fa80b4559799bb5024823646f541b7cb061dab7cd891bcd",
+    "sdist_sha256": "50b4674b46b8666a385004fa42000175e9451b0e43542ca3ef6e6406ef23a4d1",
     "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
-    "wheel_sha256": "94affc45154f12ddcfbacbe6b98785a86d65e4520e0a70210a6e8f22a12b1d63"
+    "wheel_sha256": "ca297f732af584018f31a22ac11ed730df3230562299b9b35baff4f2d14791b8"
   },
   "dataset_sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
   "environment_baseline": {
@@ -40,11 +40,11 @@
     }
   },
   "notes": [
-    "F6.1 reclassified two defective all-uppercase case-lowering unicode_casing_offset cases to mixed-case Unicode-prefixed texts.",
-    "F6.2 re-measured dual v3 baselines from clean installed wheel after dataset correction; quality floors rebound to those measured baselines.",
-    "Performance caps remain the #339 F1.3 wave0-derived values and were not re-derived.",
-    "F6.3 measurements from clean installed wheel under Python 3.13.12 matching baseline platform identity.",
-    "Quality gates pass; absolute performance caps fail-closed (do not widen caps in this issue)."
+    "Post-#355 dispatch optimization re-measure from clean installed wheel (Python 3.13.12).",
+    "Quality floors remain green; v3 performance_comparison caps are byte-identical to #353/#339 F1.3 and were not re-derived.",
+    "Morphology p95 and throughput now pass absolute caps; peak RSS still fails.",
+    "Default p95/throughput/RSS remain fail-closed despite latency/throughput improvement vs #353.",
+    "Optimizations: Wave4 government pattern-first + morphology form cache; syntax sentence-segmentation LRU."
   ],
   "profiles": {
     "default": {
@@ -92,17 +92,17 @@
           "pass": true
         },
         {
-          "detail": "p95=76917 max=39167",
+          "detail": "p95=62459 max=39167",
           "gate": "performance.maximum_p95_latency_ns",
           "pass": false
         },
         {
-          "detail": "tput=17450.74005098408 min=33979.186566343364",
+          "detail": "tput=24070.960739158603 min=33979.186566343364",
           "gate": "performance.minimum_throughput_cases_per_second",
           "pass": false
         },
         {
-          "detail": "rss=32555008 max=30572544",
+          "detail": "rss=37339136 max=30572544",
           "gate": "performance.maximum_peak_rss_bytes",
           "pass": false
         }
@@ -152,24 +152,24 @@
         },
         {
           "baseline": 76917,
-          "delta": 0,
+          "delta": -14458,
           "higher_is_better": false,
           "metric": "p95_latency_ns",
-          "result": 76917
+          "result": 62459
         },
         {
           "baseline": 17450.74005098408,
-          "delta": 0.0,
+          "delta": 6620.220688174522,
           "higher_is_better": true,
           "metric": "throughput_cases_per_second",
-          "result": 17450.74005098408
+          "result": 24070.960739158603
         },
         {
           "baseline": 32555008,
-          "delta": 0,
+          "delta": 4784128,
           "higher_is_better": false,
           "metric": "peak_rss_bytes",
-          "result": 32555008
+          "result": 37339136
         },
         {
           "baseline": 111,
@@ -217,7 +217,7 @@
         "true_positives": 111
       },
       "result_path": "docs/quality-result-v3-default.json",
-      "result_sha256": "c197be833f3e6f0a588e029be63d1265456fd7dfefad08f8d16a0e877e5c768e",
+      "result_sha256": "b061484af2a0a2d25571f7f2c2b066e91c8f5d8cbefdfeea379650a4f3177a19",
       "verdict": "fail"
     },
     "morphology": {
@@ -265,17 +265,17 @@
           "pass": true
         },
         {
-          "detail": "p95=403042 max=197625",
+          "detail": "p95=73583 max=197625",
           "gate": "performance.maximum_p95_latency_ns",
-          "pass": false
+          "pass": true
         },
         {
-          "detail": "tput=2727.262293671418 min=18262.21596348732",
+          "detail": "tput=18690.122756066612 min=18262.21596348732",
           "gate": "performance.minimum_throughput_cases_per_second",
-          "pass": false
+          "pass": true
         },
         {
-          "detail": "rss=81674240 max=74366976",
+          "detail": "rss=82296832 max=74366976",
           "gate": "performance.maximum_peak_rss_bytes",
           "pass": false
         }
@@ -325,24 +325,24 @@
         },
         {
           "baseline": 403042,
-          "delta": 0,
+          "delta": -329459,
           "higher_is_better": false,
           "metric": "p95_latency_ns",
-          "result": 403042
+          "result": 73583
         },
         {
           "baseline": 2727.262293671418,
-          "delta": 0.0,
+          "delta": 15962.860462395194,
           "higher_is_better": true,
           "metric": "throughput_cases_per_second",
-          "result": 2727.262293671418
+          "result": 18690.122756066612
         },
         {
           "baseline": 81674240,
-          "delta": 0,
+          "delta": 622592,
           "higher_is_better": false,
           "metric": "peak_rss_bytes",
-          "result": 81674240
+          "result": 82296832
         },
         {
           "baseline": 151,
@@ -390,7 +390,7 @@
         "true_positives": 151
       },
       "result_path": "docs/quality-result-v3-morphology.json",
-      "result_sha256": "f0b052c397afb349c470fb085376947ee41fddcfc841a8d902ffe9cb1f95f073",
+      "result_sha256": "9233abaa5726875c908d8a54719320e931796451bb5f74b8d772fac2f7962328",
       "verdict": "fail"
     }
   },
@@ -398,5 +398,5 @@
   "proposal_sha256": "c747365bec66b2f3642d617ba53cd234da4098e6405b9ba5cbf79ff3ead28b6a",
   "schema_id": "polis.quality-comparison",
   "schema_version": 1,
-  "source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5"
+  "source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a"
 }
