@@ -5,6 +5,16 @@
 - Właściciel: Paweł Cyroń
 - Issue: #302
 
+## Status celu runtime'u
+
+Aktywny cel composition root po planowaniu Umbrella F określa
+[ADR-0026](0026-runtime-source-cohort-umbrella-f.md)
+(`runtime_source_cohort_id` = `polis-runtime-source-cohort-59-v1`,
+`runtime_target_validation` = `exact-ordered-59`). Niniejszy ADR pozostaje
+autorytetem dla niezmiennej kohorty kwalifikacji 20 wierszy oraz historycznego
+celu `exact-ordered-28` dostawy Umbrella E. Literały tabeli kontraktu poniżej
+opisują decyzję z #302 i nie są już aktywnym celem dalszej ekspansji runtime'u.
+
 ## Kontekst
 
 Kwalifikacja zaprojektowana w #265 i wdrożona przez #267 oraz #269 zamroziła
