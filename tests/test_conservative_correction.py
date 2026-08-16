@@ -113,7 +113,7 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_fifty_two_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_fifty_nine_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
@@ -128,9 +128,16 @@ def test_default_analyzer_composes_exactly_fifty_two_conservative_v1_rules() -> 
         "rule:inflection.negated_widziec",
         "rule:inflection.negated_widziec_nominal_group",
         "rule:inflection.negated_miec_czas",
+        "rule:inflection.negated_lubic_kawe",
         "rule:inflection.przygladac_sie_nowy_budynek",
         "rule:inflection.government_potrzebowac_pomoc",
         "rule:inflection.government_szukac_klucz",
+        "rule:inflection.government_sluchac_radio",
+        "rule:inflection.government_uzywac_telefon",
+        "rule:inflection.government_interesowac_sie_historia",
+        "rule:inflection.government_byc_nauczyciel",
+        "rule:inflection.government_do_sklep",
+        "rule:inflection.government_ufac_lekarz",
         "rule:inflection.numeral_five_genitive_plural",
         "rule:spelling.jestes",
         "rule:spelling.napewno",

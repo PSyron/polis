@@ -15,9 +15,16 @@
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_miec_czas` | `inflection` | zamknięta konstrukcja `Nie mam czas.` → `czasu`, wyłącznie do przeglądu (bez morfologii) |
+| `rule:inflection.negated_lubic_kawe` | `inflection` | opcjonalna zamknięta konstrukcja `Nie lubię kawę.` → `kawy`, wyłącznie do przeglądu (wymaga morfologii) |
 | `rule:inflection.przygladac_sie_nowy_budynek` | `inflection` | opcjonalna zamknięta konstrukcja `Przyglądam się nowy budynek.` → `Przyglądam się nowemu budynkowi.`, wyłącznie do przeglądu |
 | `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`, wyłącznie do przeglądu |
 | `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta konstrukcja `Szukam klucz.` → `Szukam klucza.`, wyłącznie do przeglądu |
+| `rule:inflection.government_sluchac_radio` | `inflection` | opcjonalna zamknięta konstrukcja `Słucham radio.` → `radia`, wyłącznie do przeglądu |
+| `rule:inflection.government_uzywac_telefon` | `inflection` | opcjonalna zamknięta konstrukcja `Używam telefon.` → `telefonu`, wyłącznie do przeglądu |
+| `rule:inflection.government_interesowac_sie_historia` | `inflection` | opcjonalna zamknięta konstrukcja `Interesuję się historia.` → `historią`, wyłącznie do przeglądu |
+| `rule:inflection.government_byc_nauczyciel` | `inflection` | opcjonalna zamknięta konstrukcja `Jestem nauczyciel.` → `nauczycielem`, wyłącznie do przeglądu |
+| `rule:inflection.government_do_sklep` | `inflection` | opcjonalna zamknięta konstrukcja `Idę do sklep.` → `sklepu`, wyłącznie do przeglądu |
+| `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta konstrukcja `Ufam lekarz.` → `lekarzowi`, wyłącznie do przeglądu |
 | `rule:inflection.numeral_five_genitive_plural` | `inflection` | zamknięta, zakotwiczona konstrukcja `Pięć książki` → `książek`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |

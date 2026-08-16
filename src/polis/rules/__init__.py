@@ -16,8 +16,15 @@ from polis.rules.agreement import (
     AgreementTeZdanieRule,
 )
 from polis.rules.government import (
+    InflectionGovernmentBycNauczycielRule,
+    InflectionGovernmentDoSklepRule,
+    InflectionGovernmentInteresowacSieHistoriaRule,
     InflectionGovernmentPotrzebowacPomocRule,
+    InflectionGovernmentSluchacRadioRule,
     InflectionGovernmentSzukacKluczRule,
+    InflectionGovernmentUfacLekarzRule,
+    InflectionGovernmentUzywacTelefonRule,
+    InflectionNegatedLubicKaweRule,
 )
 from polis.rules.inflection import (
     InflectionNegatedMiecCzasRule,
@@ -308,8 +315,15 @@ __all__ = [
     "InflectionNegatedWidziecNominalGroupRule",
     "InflectionNegatedWidziecRule",
     "InflectionNumeralFiveGenitivePluralRule",
+    "InflectionGovernmentBycNauczycielRule",
+    "InflectionGovernmentDoSklepRule",
+    "InflectionGovernmentInteresowacSieHistoriaRule",
     "InflectionGovernmentPotrzebowacPomocRule",
+    "InflectionGovernmentSluchacRadioRule",
     "InflectionGovernmentSzukacKluczRule",
+    "InflectionGovernmentUfacLekarzRule",
+    "InflectionGovernmentUzywacTelefonRule",
+    "InflectionNegatedLubicKaweRule",
     "InflectionPrzygladacSieNowyBudynekRule",
     "PunctuationAbbreviationDotRule",
     "SyntaxCommaBeforeBoRule",
