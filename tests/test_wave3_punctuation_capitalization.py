@@ -249,6 +249,23 @@ def test_wave3_sources_remain_review_only(source: str) -> None:
     )
 
 
+def test_wave3_quotation_mentions_abstain() -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+    for text, source in (
+        (
+            "Cytat „w Poniedziałek” omawiamy bez zmiany.",
+            "rule:spelling.month_weekday_lowercase",
+        ),
+        (
+            "Cytat „języka Polskiego” omawiamy bez zmiany.",
+            "rule:spelling.proper_adjective_lowercase",
+        ),
+    ):
+        assert not any(
+            str(item.source) == source for item in analyzer.analyze(text).issues
+        )
+
+
 def test_wave3_v3_error_cases_flip_fn_to_tp() -> None:
     dataset = load_quality_dataset(version=QualityDatasetVersion.V3)
     analyzer = Analyzer(AnalyzerConfig())

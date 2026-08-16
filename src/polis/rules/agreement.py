@@ -182,6 +182,12 @@ class AgreementTeNeuterNounRule:
             return ()
         findings: list[Finding] = []
         for match in _TE_NEUTER_PATTERN.finditer(text):
+            phrase_start = match.start("pronoun")
+            phrase_end = match.end("noun")
+            if _is_wrapped_mention(text, phrase_start, phrase_end):
+                continue
+            if _is_quoted_position(text, phrase_start):
+                continue
             after = text[match.end("noun") :]
             # Abstain on optional-space comma (vocative / address reading).
             if re.match(r"[ \t]*,", after) is not None:
@@ -235,6 +241,12 @@ class AgreementCopulaJaRule:
             return ()
         findings: list[Finding] = []
         for match in _COPULA_JA_PATTERN.finditer(text):
+            phrase_start = match.start("subject")
+            phrase_end = match.end("verb")
+            if _is_wrapped_mention(text, phrase_start, phrase_end):
+                continue
+            if _is_quoted_position(text, phrase_start):
+                continue
             verb = match.group("verb")
             if verb.isupper():
                 suggestion = "JESTEM"
@@ -381,6 +393,17 @@ _MENTION_WRAPPERS: Final = frozenset(
 )
 
 
+def _is_quoted_position(text: str, position: int) -> bool:
+    for opening, closing in (('"', '"'), ("„", "”"), ("“", "”"), ("«", "»")):
+        before = text[:position]
+        if opening == closing:
+            if before.count(opening) % 2 == 1:
+                return True
+        elif before.rfind(opening) > before.rfind(closing):
+            return True
+    return False
+
+
 def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
     if start <= 0 or end >= len(text):
         return False
@@ -390,7 +413,7 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
         return True
     if left == "`":
         rest = text[end:]
-        return rest.startswith("`") or rest.startswith("`()")
+        return rest.startswith("`") or rest.startswith("()`")
     return False
 
 
