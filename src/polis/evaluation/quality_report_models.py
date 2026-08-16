@@ -118,4 +118,31 @@ class ThresholdProposalV2:
     enforced: bool
 
 
-type ThresholdProposalArtifact = ThresholdProposal | ThresholdProposalV2
+@dataclass(frozen=True, slots=True)
+class ProfileThresholdProposalV3:
+    baseline_path: str
+    baseline_sha256: str
+    performance_result_path: str
+    performance_result_sha256: str
+    planned_morphology_source_semantics: str
+    planned_non_morphology_source_semantics: str
+    quality: QualityFloors
+    performance: PerformanceComparison
+
+
+@dataclass(frozen=True, slots=True)
+class ThresholdProposalV3:
+    dataset_sha256: str
+    quality_artifact_sha256: str
+    quality_source_git_sha: str
+    performance_artifact_sha256: str
+    performance_source_git_sha: str
+    default: ProfileThresholdProposalV3
+    morphology: ProfileThresholdProposalV3
+    status: str
+    enforced: bool
+
+
+type ThresholdProposalArtifact = (
+    ThresholdProposal | ThresholdProposalV2 | ThresholdProposalV3
+)
