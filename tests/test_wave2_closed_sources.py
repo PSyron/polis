@@ -297,6 +297,35 @@ def test_wave2_sources_remain_review_only(source: str) -> None:
     )
 
 
+def test_wave2_group_b_quotation_mentions_abstain() -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+    for text, source in (
+        (
+            "Cytat „Ja jest gotowy” omawiamy bez zmiany.",
+            "rule:agreement.copula_ja",
+        ),
+        (
+            "Cytat „Te dziecko” omawiamy bez zmiany.",
+            "rule:agreement.te_neuter_noun",
+        ),
+    ):
+        assert not any(
+            str(item.source) == source for item in analyzer.analyze(text).issues
+        )
+
+
+def test_wave2_mixed_uppercase_diacritic_surfaces_map_to_full_upper() -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+    for text, source, suggestion in (
+        ("ŁÓDŹ: WOGóLE NIE PADA.", "rule:spelling.wogole_diacritic", "W OGÓLE"),
+        ("ŻÓŁĆ: WKOńCU WRÓCIŁEM.", "rule:spelling.wkoncu", "W KOŃCU"),
+    ):
+        hits = [
+            item for item in analyzer.analyze(text).issues if str(item.source) == source
+        ]
+        assert hits and hits[0].suggestion == suggestion
+
+
 def test_wave2_v3_error_cases_flip_fn_to_tp_for_implemented_sources() -> None:
     dataset = load_quality_dataset(version=QualityDatasetVersion.V3)
     analyzer = Analyzer(AnalyzerConfig())

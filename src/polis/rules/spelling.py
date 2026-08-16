@@ -275,6 +275,20 @@ class _CasePatternRule:
     def _apply_case(observed: str, replacement: str) -> str:
         if observed.isupper():
             return replacement.upper()
+        # Mixed "mostly uppercase with a lowercase diacritic" (e.g. WOGóLE /
+        # WKOńCU): treat as uppercase. Do not promote ordinary camel/title
+        # mixtures such as NaRaZiE.
+        letters = [char for char in observed if char.isalpha()]
+        if letters:
+            upper = sum(1 for char in letters if char.isupper())
+            lower_letters = [char for char in letters if char.islower()]
+            if (
+                upper > len(lower_letters)
+                and lower_letters
+                and all(ord(char) > 127 for char in lower_letters)
+                and not (observed[:1].isupper() and observed[1:].islower())
+            ):
+                return replacement.upper()
         if observed[:1].isupper():
             return replacement[:1].upper() + replacement[1:]
         return replacement
@@ -853,6 +867,10 @@ class SpellingMonthWeekdayLowercaseRule:
             form = match.group("form")
             if form.casefold() not in _WEEKDAYS_MONTHS:
                 continue
+            span_start = match.start("pre")
+            span_end = match.end("form")
+            if should_abstain_literal_context(text, span_start, span_end):
+                continue
             # Load-bearing: abstain when the next token is uppercase
             # (holiday / multi-word proper name, e.g. w Poniedziałek Wielkanocny).
             rest = text[match.end("form") :].lstrip()
@@ -914,6 +932,10 @@ class SpellingProperAdjectiveLowercaseRule:
             if head not in _NATIONALITY_HEADS:
                 continue
             if adj.casefold() not in _NATIONALITY_ADJECTIVES:
+                continue
+            span_start = match.start("head")
+            span_end = match.end("adj")
+            if should_abstain_literal_context(text, span_start, span_end):
                 continue
             suggestion = adj.casefold()
             if suggestion == adj:
