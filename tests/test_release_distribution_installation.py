@@ -183,6 +183,14 @@ def _add_distribution_member(dist: Path, member: str) -> None:
             "src/polis/evaluation/datasets/quality/v2/manifest.json",
             id="quality_v2_manifest",
         ),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v3/cases.json",
+            id="quality_v3_cases",
+        ),
+        pytest.param(
+            "src/polis/evaluation/datasets/quality/v3/manifest.json",
+            id="quality_v3_manifest",
+        ),
     ),
 )
 def test_distribution_artifact_verifier_rejects_missing_quality_members(

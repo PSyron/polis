@@ -79,6 +79,40 @@ tożsamością źródła, kohortą `polis-runtime-source-cohort-28-v1`, ADR-0025
 stanem `review-only`. Nie jest to holdout, kwalifikacja automatyczna ani dowód,
 że planowane źródła są już obecne w runtime.
 
+## Zbiór deweloperski jakości v3
+
+Issue #339 (F1.2) dodaje odrębny, nadal edytowalny zbiór CC0 służący wyłącznie do
+rozwoju 31 planowanych źródeł Umbrella F zatwierdzonych w ADR-0026:
+
+- dane: `src/polis/evaluation/datasets/quality/v3/cases.json`;
+- manifest: `src/polis/evaluation/datasets/quality/v3/manifest.json`.
+
+Pierwsze 92 obiekty przypadków stanowią dokładne przeniesienie zatwierdzonych
+przypadków v2 (w tym 28 z v1). Manifest wiąże ich identyfikatory, tożsamość
+`polis_v2_quality_development@2`, licencję `CC0-1.0` oraz kanoniczny SHA-256
+v2 `f65055ff500146bdd727b78d2838c19ed15e38705ecdf27f4a3d35349552f217`.
+Pliki v1 i v2 nie są zmieniane ani reinterpretowane.
+
+Zbiór v3 dodaje po osiem ręcznie przejrzanych przypadków dla każdego z 31
+źródeł planowanych w ADR-0026: błąd, poprawioną parę, wzmiankę w cytacie,
+wzmiankę podobną do kodu, negatywny podciąg lub leksem, negatywny tekst
+wielozdaniowy, powtórzone wystąpienie oraz przypadek Unicode z kontrolą
+wielkości liter i offsetu. Razem daje to 248 nowych przypadków i 340 przypadków
+ogółem. Manifest v3 wiąże każdą klasę dowodu z jednym stabilnym identyfikatorem,
+dokładną planowaną tożsamością źródła, kohortą
+`polis-runtime-source-cohort-59-v1`, ADR-0026 i stanem `review-only`. Nie jest
+to holdout, kwalifikacja automatyczna ani dowód, że planowane źródła są już
+obecne w runtime.
+
+Dualne baseline'y pre-change z zainstalowanego wheel (profile `default` i
+`morphology`) zapisuje F1.2 w:
+
+- `docs/quality-baseline-v3-default.json`;
+- `docs/quality-baseline-v3-morphology.json`.
+
+Progi porównawcze v3 zatwierdza osobny slice F1.3 na podstawie pomiaru Wave 0
+z #338 (`docs/quality-result-wave0-*.json`), a nie na podstawie progów v2.
+
 ## Definicje pomiarów
 
 Protokół ocenia tylko niezmieniony `Analyzer(AnalyzerConfig())`. Dopasowanie

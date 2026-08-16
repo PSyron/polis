@@ -88,13 +88,13 @@ def load_quality_report(path: Path) -> QualityReport:
 
     root = _load_json_object(path, "quality report")
     schema_version = _integer(root, "schema_version", "quality report")
-    if schema_version not in {1, 2}:
-        raise QualityReportError("quality report schema_version must be 1 or 2")
+    if schema_version not in {1, 2, 3}:
+        raise QualityReportError("quality report schema_version must be 1, 2, or 3")
     root_fields: set[str] = set(
         "schema_id schema_version analyzer artifact dataset "
         "quality performance environment reproducibility".split()
     )
-    if schema_version == 2:
+    if schema_version in {2, 3}:
         root_fields.update({"source", "profile"})
     _exact(
         root,
@@ -243,14 +243,17 @@ def _validate_active_dataset_identity(value: JsonValue) -> None:
 def _report_payload(result: QualityProtocolResult) -> JsonObject:
     identity = result.run_identity
     counts = result.baseline.aggregate
-    is_v2 = identity.dataset_schema_version == 2
-    if is_v2 != (identity.source_sha is not None and identity.profile is not None):
+    uses_profile = identity.dataset_schema_version in {2, 3}
+    has_profile_identity = (
+        identity.source_sha is not None and identity.profile is not None
+    )
+    if uses_profile != has_profile_identity:
         raise QualityReportError(
-            "v2 quality report requires source and profile identity"
+            "v2/v3 quality report requires source and profile identity"
         )
     payload: JsonObject = {
         "schema_id": _REPORT_SCHEMA_ID,
-        "schema_version": 2 if is_v2 else 1,
+        "schema_version": identity.dataset_schema_version if uses_profile else 1,
         "analyzer": identity.analyzer,
         "artifact": {"sha256": identity.artifact_sha256},
         "dataset": {
@@ -297,7 +300,7 @@ def _report_payload(result: QualityProtocolResult) -> JsonObject:
             "repetition_hashes": list(result.repetition_hashes),
         },
     }
-    if is_v2:
+    if uses_profile:
         assert identity.source_sha is not None
         assert identity.profile is not None
         if _SOURCE_SHA.fullmatch(identity.source_sha) is None:
