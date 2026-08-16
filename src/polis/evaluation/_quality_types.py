@@ -20,6 +20,7 @@ QUALITY_MANIFEST_PATH: Final = QUALITY_DATASET_PATH.with_name("manifest.json")
 class QualityDatasetVersion(StrEnum):
     V1 = "v1"
     V2 = "v2"
+    V3 = "v3"
 
 
 def quality_dataset_paths(version: QualityDatasetVersion) -> tuple[Path, Path]:

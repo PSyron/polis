@@ -28,6 +28,7 @@ from polis.evaluation._quality_types import (
     quality_dataset_paths,
 )
 from polis.evaluation._quality_v2 import V2_MANIFEST_FIELDS, validate_v2_manifest
+from polis.evaluation._quality_v3 import V3_MANIFEST_FIELDS, validate_v3_manifest
 
 
 def load_quality_dataset(
@@ -64,13 +65,16 @@ def validate_quality_dataset(
     if (
         isinstance(raw_schema_version, bool)
         or not isinstance(raw_schema_version, int)
-        or raw_schema_version not in {1, 2}
+        or raw_schema_version not in {1, 2, 3}
     ):
-        raise QualityDatasetError("quality dataset schema_version must be 1 or 2")
+        raise QualityDatasetError("quality dataset schema_version must be 1, 2, or 3")
     schema_version = raw_schema_version
-    expected_manifest_fields = (
-        MANIFEST_FIELDS if schema_version == 1 else V2_MANIFEST_FIELDS
-    )
+    if schema_version == 1:
+        expected_manifest_fields = MANIFEST_FIELDS
+    elif schema_version == 2:
+        expected_manifest_fields = V2_MANIFEST_FIELDS
+    else:
+        expected_manifest_fields = V3_MANIFEST_FIELDS
     require_exact_fields(manifest, expected_manifest_fields, "quality manifest")
     require_literal(
         dataset, "schema_id", "polis.quality-development-dataset", "quality dataset"
@@ -114,6 +118,8 @@ def validate_quality_dataset(
         raise QualityDatasetError("reviewed_case_ids must equal all case ids")
     if schema_version == 2:
         validate_v2_manifest(manifest, cases, raw_cases)
+    if schema_version == 3:
+        validate_v3_manifest(manifest, cases, raw_cases)
     _validate_matrix(cases)
     return QualityDataset(
         schema_id="polis.quality-development-dataset",

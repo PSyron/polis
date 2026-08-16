@@ -238,7 +238,10 @@ def _validate_proposal(args: argparse.Namespace) -> None:
 def run(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
-    if args.command == "baseline" and args.dataset_version is QualityDatasetVersion.V2:
+    if args.command == "baseline" and args.dataset_version in {
+        QualityDatasetVersion.V2,
+        QualityDatasetVersion.V3,
+    }:
         missing = tuple(
             flag
             for flag, value in (
@@ -248,10 +251,11 @@ def run(argv: list[str] | None = None) -> int:
             if value is None
         )
         if missing:
-            parser.error(f"v2 baseline requires {' and '.join(missing)}")
+            label = args.dataset_version.value
+            parser.error(f"{label} baseline requires {' and '.join(missing)}")
     if args.command == "baseline" and args.dataset_version is QualityDatasetVersion.V1:
         if args.source_sha is not None or args.profile is not None:
-            parser.error("source SHA and profile are reserved for v2 baselines")
+            parser.error("source SHA and profile are reserved for v2/v3 baselines")
     try:
         if args.command == "baseline":
             _run_baseline(args)

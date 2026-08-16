@@ -1,0 +1,5529 @@
+{
+  "schema_id": "polis.quality-development-dataset",
+  "schema_version": 3,
+  "id": "polis_v3_quality_development",
+  "dataset_version": 3,
+  "license": "CC0-1.0",
+  "source": "project-authored",
+  "cases": [
+    {
+      "id": "quality_inflection_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection",
+      "features": [
+        "unicode"
+      ],
+      "text": "Przyglądam się nowy budynek.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 15,
+          "end": 27,
+          "original": "nowy budynek",
+          "suggestion": "nowemu budynkowi",
+          "rationale": "Po czasowniku „przyglądać się” potrzebny jest celownik."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection",
+      "features": [
+        "unicode"
+      ],
+      "text": "Przyglądam się nowemu budynkowi.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_rection_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "pair_rection",
+      "features": [],
+      "text": "Potrzebuję pomoc.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 11,
+          "end": 16,
+          "original": "pomoc",
+          "suggestion": "pomocy",
+          "rationale": "Czasownik „potrzebować” łączy się z dopełniaczem."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_rection_correct",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "pair_rection",
+      "features": [],
+      "text": "Potrzebuję pomocy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement",
+      "features": [],
+      "text": "Te zdanie jest poprawne.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 9,
+          "original": "Te zdanie",
+          "suggestion": "To zdanie",
+          "rationale": "Forma „Te” nie zgadza się z allowlistowanym rzeczownikiem „zdanie”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement",
+      "features": [],
+      "text": "To zdanie jest poprawne.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_spelling_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling",
+      "features": [
+        "unicode"
+      ],
+      "text": "Napewno przyjdę.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Napewno",
+          "suggestion": "Na pewno",
+          "rationale": "Wyrażenie „na pewno” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_spelling_correct",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling",
+      "features": [
+        "unicode"
+      ],
+      "text": "Na pewno przyjdę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax",
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę żebyś wrócił. Potem porozmawiamy.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Zdanie podrzędne wprowadzone przez „żeby” wymaga przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax",
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę, żebyś wrócił. Potem porozmawiamy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_punctuation_error",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation",
+      "features": [],
+      "text": "Cześć,, Anno.",
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 6,
+          "end": 7,
+          "original": ",",
+          "suggestion": "",
+          "rationale": "W tej pozycji wystarcza jeden przecinek."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_punctuation_correct",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation",
+      "features": [],
+      "text": "Cześć, Anno.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_overlapping_conflict",
+      "kind": "conflict",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "conflict",
+        "unicode"
+      ],
+      "text": "Te dziecko przyszło.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "Zaimek powinien mieć rodzaj nijaki."
+        },
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 10,
+          "original": "Te dziecko",
+          "suggestion": "To dziecko",
+          "rationale": "Cała grupa nominalna zawiera błąd zgodności."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_abstain_temporal",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention",
+        "unicode"
+      ],
+      "text": "W przyszłym tygodniu byłem już gotowy.",
+      "expected_findings": [],
+      "rationale": "Ocena zgodności czasu wymaga znajomości zamierzonej perspektywy autora, więc zbiór nie oczekuje korekty."
+    },
+    {
+      "id": "quality_abstain_style",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention",
+        "multi_sentence"
+      ],
+      "text": "Raport przygotowano starannie. Jego układ jest jednak nietypowy.",
+      "expected_findings": [],
+      "rationale": "Nietypowy układ wypowiedzi jest kwestią stylu, a nie bezpieczną korektą językową."
+    },
+    {
+      "id": "quality_abstain_intent",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention",
+        "unicode"
+      ],
+      "text": "Marta poprosiła Olę, żeby później zadzwoniła.",
+      "expected_findings": [],
+      "rationale": "Rozstrzygnięcie, która osoba ma zadzwonić, wymaga wiedzy o intencji autora."
+    },
+    {
+      "id": "quality_inflection_negated_government_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie widzę samochód.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 18,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "Po zaprzeczonym czasowniku „widzieć” w tej zamkniętej konstrukcji potrzebny jest dopełniacz."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_negated_government_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie widzę samochodu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_negated_government_nominal_group_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government_nominal_group",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie widzę czerwony samochód.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 27,
+          "original": "czerwony samochód",
+          "suggestion": "czerwonego samochodu",
+          "rationale": "Po zaprzeczonym czasowniku „widzieć” w tej zamkniętej konstrukcji grupa nominalna wymaga dopełniacza."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_inflection_negated_government_nominal_group_correct",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_negated_government_nominal_group",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie widzę czerwonego samochodu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_nominal_group_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_nominal_group",
+      "features": [
+        "unicode"
+      ],
+      "text": "Te duże okno jest otwarte.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "W tej zamkniętej konstrukcji forma demonstratywna wymaga rodzaju nijakiego liczby pojedynczej."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_nominal_group_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_nominal_group",
+      "features": [
+        "unicode"
+      ],
+      "text": "To duże okno jest otwarte.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_subject_verb_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_subject_verb",
+      "features": [
+        "unicode"
+      ],
+      "text": "Oni czyta książkę.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 4,
+          "end": 9,
+          "original": "czyta",
+          "suggestion": "czytają",
+          "rationale": "W zatwierdzonej zamkniętej konstrukcji podmiot „Oni” wymaga liczby mnogiej czasownika."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_agreement_subject_verb_correct",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_subject_verb",
+      "features": [
+        "unicode"
+      ],
+      "text": "Oni czytają książkę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_destination_preposition_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_destination_preposition",
+      "features": [
+        "unicode"
+      ],
+      "text": "Pojechałem Warszawy.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 11,
+          "end": 11,
+          "original": "",
+          "suggestion": "do ",
+          "rationale": "W zatwierdzonej zamkniętej konstrukcji przed nazwą celu podróży brakuje przyimka „do”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_destination_preposition_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_destination_preposition",
+      "features": [
+        "unicode"
+      ],
+      "text": "Pojechałem do Warszawy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_initial_conditional_comma_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_initial_conditional_comma",
+      "features": [
+        "unicode"
+      ],
+      "text": "Jeśli pada zostaję w domu.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "W zatwierdzonej zamkniętej konstrukcji po początkowym zdaniu warunkowym brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "quality_syntax_initial_conditional_comma_correct",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_initial_conditional_comma",
+      "features": [
+        "unicode"
+      ],
+      "text": "Jeśli pada, zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "v2_pair_ta_nowy_ksiazka",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ta nowy książka leży.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 7,
+          "original": "nowy",
+          "suggestion": "nowa",
+          "rationale": "Przymiotnik w grupie z rzeczownikiem „książka” wymaga rodzaju żeńskiego."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "v2_pair_ta_nowy_ksiazka",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ta nowa książka leży.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Napis „Ta nowy książka” omawiamy na zajęciach.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Stała `ta_nowy_ksiazka` jest identyfikatorem testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Termin „odnowy” nie tworzy grupy nominalnej z książką.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Ta nowa książka leży. Później trafi na półkę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Ta nowy książka leży, a ta nowy książka spadła.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 7,
+          "original": "nowy",
+          "suggestion": "nowa",
+          "rationale": "Pierwsza grupa nominalna wymaga rodzaju żeńskiego."
+        },
+        {
+          "category": "agreement",
+          "start": 27,
+          "end": 31,
+          "original": "nowy",
+          "suggestion": "nowa",
+          "rationale": "Druga grupa nominalna wymaga rodzaju żeńskiego."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_ta_nowy_ksiazka_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: TA NOWY KSIĄŻKA LEŻY.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 9,
+          "end": 13,
+          "original": "NOWY",
+          "suggestion": "NOWA",
+          "rationale": "Wersalikowy przymiotnik zachowuje wielkość liter i przyjmuje rodzaj żeński."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "v2_pair_my_czyta",
+      "features": [
+        "unicode"
+      ],
+      "text": "My czyta książkę.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 8,
+          "original": "czyta",
+          "suggestion": "czytamy",
+          "rationale": "Podmiot „My” wymaga pierwszej osoby liczby mnogiej."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "v2_pair_my_czyta",
+      "features": [
+        "unicode"
+      ],
+      "text": "My czytamy książkę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „My czyta książkę” jest przedmiotem rozmowy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Klucz `my_czyta` wskazuje wariant testowy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Czytanka dla dzieci leży na biurku.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "My czytamy książkę. Potem omawiamy rozdział.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "My czyta książkę, a potem my czyta gazetę.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 8,
+          "original": "czyta",
+          "suggestion": "czytamy",
+          "rationale": "Pierwszy czasownik wymaga pierwszej osoby liczby mnogiej."
+        },
+        {
+          "category": "agreement",
+          "start": 29,
+          "end": 34,
+          "original": "czyta",
+          "suggestion": "czytamy",
+          "rationale": "Drugi czasownik wymaga pierwszej osoby liczby mnogiej."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_my_czyta_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: MY CZYTA KSIĄŻKĘ.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 9,
+          "end": 14,
+          "original": "CZYTA",
+          "suggestion": "CZYTAMY",
+          "rationale": "Wersalikowy czasownik zachowuje wielkość liter i przyjmuje liczbę mnogą."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "v2_pair_przygladac_budynek",
+      "features": [
+        "unicode"
+      ],
+      "text": "Dziś przyglądam się nowy budynek.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 20,
+          "end": 32,
+          "original": "nowy budynek",
+          "suggestion": "nowemu budynkowi",
+          "rationale": "Po czasowniku „przyglądać się” grupa nominalna wymaga celownika."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "v2_pair_przygladac_budynek",
+      "features": [
+        "unicode"
+      ],
+      "text": "Dziś przyglądam się nowemu budynkowi.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „przyglądam się nowy budynek” zapisano w notatce.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Nazwa `przygladac_sie_nowy_budynek` opisuje przypadek.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Przyglądam się odnowie budynku.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Przyglądam się nowemu budynkowi. Potem robię zdjęcie.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Przyglądam się nowy budynek i przyglądam się nowy budynek.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 15,
+          "end": 27,
+          "original": "nowy budynek",
+          "suggestion": "nowemu budynkowi",
+          "rationale": "Pierwsza grupa po czasowniku wymaga celownika."
+        },
+        {
+          "category": "inflection",
+          "start": 45,
+          "end": 57,
+          "original": "nowy budynek",
+          "suggestion": "nowemu budynkowi",
+          "rationale": "Druga grupa po czasowniku wymaga celownika."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_przygladac_budynek_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻANETA: PRZYGLĄDAM SIĘ NOWY BUDYNEK.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 23,
+          "end": 35,
+          "original": "NOWY BUDYNEK",
+          "suggestion": "NOWEMU BUDYNKOWI",
+          "rationale": "Wersalikowa grupa zachowuje wielkość liter i przyjmuje celownik."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v2_pair_szukac_klucz",
+      "features": [
+        "unicode"
+      ],
+      "text": "Szukam klucz.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 12,
+          "original": "klucz",
+          "suggestion": "klucza",
+          "rationale": "Czasownik „szukać” łączy się z dopełniaczem."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v2_pair_szukac_klucz",
+      "features": [
+        "unicode"
+      ],
+      "text": "Szukam klucza.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Szukam klucz” pozostaje w omówieniu błędu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `szukac_klucz` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Poszukiwacz kluczy sprawdza kieszenie.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Szukam klucza. Później sprawdzę szufladę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Szukam klucz i znów szukam klucz.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 12,
+          "original": "klucz",
+          "suggestion": "klucza",
+          "rationale": "Pierwszy rzeczownik po czasowniku wymaga dopełniacza."
+        },
+        {
+          "category": "inflection",
+          "start": 27,
+          "end": 32,
+          "original": "klucz",
+          "suggestion": "klucza",
+          "rationale": "Drugi rzeczownik po czasowniku wymaga dopełniacza."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_szukac_klucz_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: SZUKAM KLUCZ.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 13,
+          "end": 18,
+          "original": "KLUCZ",
+          "suggestion": "KLUCZA",
+          "rationale": "Wersalikowy rzeczownik zachowuje wielkość liter i przyjmuje dopełniacz."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_wogole",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wogole tego nie pamiętam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wogole",
+          "suggestion": "W ogóle",
+          "rationale": "Wyrażenie „w ogóle” zapisuje się rozdzielnie i z literą „ó”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_wogole",
+      "features": [
+        "unicode"
+      ],
+      "text": "W ogóle tego nie pamiętam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „wogole” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `wogole` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Token wogolex pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "W ogóle tego nie pamiętam. Sprawdzę notatki.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Wogole nie idę i wogole nie dzwonię.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wogole",
+          "suggestion": "W ogóle",
+          "rationale": "Pierwsze wystąpienie wymaga poprawnego zapisu."
+        },
+        {
+          "category": "spelling",
+          "start": 17,
+          "end": 23,
+          "original": "wogole",
+          "suggestion": "w ogóle",
+          "rationale": "Drugie wystąpienie wymaga poprawnego zapisu."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wogole_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: WOGOLE NIE PADA.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "WOGOLE",
+          "suggestion": "W OGÓLE",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawne „ó”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_narazie",
+      "features": [
+        "unicode"
+      ],
+      "text": "Narazie zostaję w domu.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Narazie",
+          "suggestion": "Na razie",
+          "rationale": "Wyrażenie „na razie” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_narazie",
+      "features": [
+        "unicode"
+      ],
+      "text": "Na razie zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „narazie” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `narazie` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Token naraziex nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Na razie zostaję w domu. Później wyjdę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Narazie czekam, ale narazie nie wychodzę.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Narazie",
+          "suggestion": "Na razie",
+          "rationale": "Pierwsze wystąpienie wymaga zapisu rozdzielnego."
+        },
+        {
+          "category": "spelling",
+          "start": 20,
+          "end": 27,
+          "original": "narazie",
+          "suggestion": "na razie",
+          "rationale": "Drugie wystąpienie wymaga zapisu rozdzielnego."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_narazie_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NARAZIE CZEKAM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 13,
+          "original": "NARAZIE",
+          "suggestion": "NA RAZIE",
+          "rationale": "Wersalikowe wyrażenie zachowuje wielkość liter i otrzymuje odstęp."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_wziasc",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę wziasc parasol.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 5,
+          "end": 11,
+          "original": "wziasc",
+          "suggestion": "wziąć",
+          "rationale": "Bezokolicznik „wziąć” wymaga liter „iąć”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v2_pair_wziasc",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę wziąć parasol.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Zapis „wziasc” cytujemy bez ingerencji.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Funkcja `wziasc()` pochodzi ze starego przykładu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Token wziasc2 pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę wziąć parasol. Potem wyjdę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Muszę wziasc płaszcz i wziasc parasol.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "wziasc",
+          "suggestion": "wziąć",
+          "rationale": "Pierwsze wystąpienie wymaga poprawnego bezokolicznika."
+        },
+        {
+          "category": "spelling",
+          "start": 23,
+          "end": 29,
+          "original": "wziasc",
+          "suggestion": "wziąć",
+          "rationale": "Drugie wystąpienie wymaga poprawnego bezokolicznika."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_wziasc_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: CHCĘ WZIASC PARASOL.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 11,
+          "end": 17,
+          "original": "WZIASC",
+          "suggestion": "WZIĄĆ",
+          "rationale": "Wersalikowy bezokolicznik zachowuje wielkość liter i otrzymuje polskie znaki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "v2_pair_initial_temporal_comma",
+      "features": [
+        "unicode"
+      ],
+      "text": "Kiedy pada zostaję w domu.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po początkowym zdaniu czasowym brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "v2_pair_initial_temporal_comma",
+      "features": [
+        "unicode"
+      ],
+      "text": "Kiedy pada, zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Kiedy pada zostaję” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Reguła `initial_temporal_comma` ma osobny identyfikator.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Kiedykolwiek pada, zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Kiedy pada, zostaję w domu. Później czytam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Kiedy pada zostaję, a kiedy wieje wracam.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po pierwszym początkowym zdaniu czasowym brakuje przecinka."
+        },
+        {
+          "category": "syntax",
+          "start": 33,
+          "end": 33,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po drugim zdaniu czasowym brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v2_initial_temporal_comma_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: KIEDY PADA ZOSTAJĘ.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 16,
+          "end": 16,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po wersalikowym początkowym zdaniu czasowym brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "v3_pair_copula_ja",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ja jest gotowy.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 7,
+          "original": "jest",
+          "suggestion": "jestem",
+          "rationale": "Podmiot „Ja” wymaga pierwszej osoby liczby pojedynczej czasownika."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "v3_pair_copula_ja",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ja jestem gotowy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Ja jest gotowy” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `copula_ja` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Jeszcze jest gotowy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Ja jestem gotowy. Potem wychodzę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Ja jest gotowy i ja jest pewny.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 7,
+          "original": "jest",
+          "suggestion": "jestem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "agreement",
+          "start": 20,
+          "end": 24,
+          "original": "jest",
+          "suggestion": "jestem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_copula_ja_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: JA JEST GOTOWY.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 9,
+          "end": 13,
+          "original": "JEST",
+          "suggestion": "JESTEM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_error",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "v3_pair_te_neuter_noun",
+      "features": [
+        "unicode"
+      ],
+      "text": "Te dziecko przyszło.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "Zaimek przed rzeczownikiem nijakim wymaga formy „To”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "v3_pair_te_neuter_noun",
+      "features": [
+        "unicode"
+      ],
+      "text": "To dziecko przyszło.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Te dziecko” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `te_neuter_noun` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Termin teatr nie tworzy zaimka nijakiego.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "To dziecko przyszło. Potem usiadło.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Te dziecko przyszło i te dziecko odeszło.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "agreement",
+          "start": 22,
+          "end": 24,
+          "original": "te",
+          "suggestion": "to",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_te_neuter_noun_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: TE DZIECKO PRZYSZŁO.",
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 6,
+          "end": 8,
+          "original": "TE",
+          "suggestion": "TO",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_negated_miec_czas",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie mam czas.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 12,
+          "original": "czas",
+          "suggestion": "czasu",
+          "rationale": "Po zaprzeczonym „mieć” w tej konstrukcji potrzebny jest dopełniacz."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_negated_miec_czas",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie mam czasu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Nie mam czas” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `negated_miec_czas` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie mam czasownika na liście.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Nie mam czasu. Potem wrócę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie mam czas i znów nie mam czas.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 12,
+          "original": "czas",
+          "suggestion": "czasu",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 28,
+          "end": 32,
+          "original": "czas",
+          "suggestion": "czasu",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_miec_czas_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NIE MAM CZAS.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 14,
+          "end": 18,
+          "original": "CZAS",
+          "suggestion": "CZASU",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_negated_lubic_kawe",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie lubię kawę.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 14,
+          "original": "kawę",
+          "suggestion": "kawy",
+          "rationale": "Po zaprzeczonym „lubić” w tej konstrukcji potrzebny jest dopełniacz."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_negated_lubic_kawe",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie lubię kawy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Nie lubię kawę” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `negated_lubic_kawe` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token kawęx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Nie lubię kawy. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie lubię kawę i znów nie lubię kawę.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 14,
+          "original": "kawę",
+          "suggestion": "kawy",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 32,
+          "end": 36,
+          "original": "kawę",
+          "suggestion": "kawy",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_negated_lubic_kawe_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NIE LUBIĘ KAWĘ.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 16,
+          "end": 20,
+          "original": "KAWĘ",
+          "suggestion": "KAWY",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_sluchac_radio",
+      "features": [
+        "unicode"
+      ],
+      "text": "Słucham radio.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 13,
+          "original": "radio",
+          "suggestion": "radia",
+          "rationale": "Czasownik „słuchać” łączy się z dopełniaczem."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_sluchac_radio",
+      "features": [
+        "unicode"
+      ],
+      "text": "Słucham radia.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Słucham radio” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_sluchac_radio` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token radiox pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Słucham radia. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Słucham radio i znów słucham radio.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 13,
+          "original": "radio",
+          "suggestion": "radia",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 29,
+          "end": 34,
+          "original": "radio",
+          "suggestion": "radia",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_sluchac_radio_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: SŁUCHAM RADIO.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 14,
+          "end": 19,
+          "original": "RADIO",
+          "suggestion": "RADIA",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_uzywac_telefon",
+      "features": [
+        "unicode"
+      ],
+      "text": "Używam telefon.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 14,
+          "original": "telefon",
+          "suggestion": "telefonu",
+          "rationale": "Czasownik „używać” łączy się z dopełniaczem."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_uzywac_telefon",
+      "features": [
+        "unicode"
+      ],
+      "text": "Używam telefonu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Używam telefon” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_uzywac_telefon` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token telefonx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Używam telefonu. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Używam telefon i znów używam telefon.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 14,
+          "original": "telefon",
+          "suggestion": "telefonu",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 29,
+          "end": 36,
+          "original": "telefon",
+          "suggestion": "telefonu",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_uzywac_telefon_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: UŻYWAM TELEFON.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 13,
+          "end": 20,
+          "original": "TELEFON",
+          "suggestion": "TELEFONU",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_interesowac_sie_historia",
+      "features": [
+        "unicode"
+      ],
+      "text": "Interesuję się historia.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 15,
+          "end": 23,
+          "original": "historia",
+          "suggestion": "historią",
+          "rationale": "Po „interesować się” w tej konstrukcji potrzebny jest narzędnik."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_interesowac_sie_historia",
+      "features": [
+        "unicode"
+      ],
+      "text": "Interesuję się historią.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Interesuję się historia” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_interesowac_sie_historia` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token historix pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Interesuję się historią. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Interesuję się historia i znów interesuję się historia.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 15,
+          "end": 23,
+          "original": "historia",
+          "suggestion": "historią",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 46,
+          "end": 54,
+          "original": "historia",
+          "suggestion": "historią",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_interesowac_sie_historia_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: INTERESUJĘ SIĘ HISTORIA.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 21,
+          "end": 29,
+          "original": "HISTORIA",
+          "suggestion": "HISTORIĄ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_byc_nauczyciel",
+      "features": [
+        "unicode"
+      ],
+      "text": "Jestem nauczyciel.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 17,
+          "original": "nauczyciel",
+          "suggestion": "nauczycielem",
+          "rationale": "Po „być” w tej konstrukcji potrzebny jest narzędnik."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_byc_nauczyciel",
+      "features": [
+        "unicode"
+      ],
+      "text": "Jestem nauczycielem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Jestem nauczyciel” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_byc_nauczyciel` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token nauczycielx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Jestem nauczycielem. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Jestem nauczyciel i znów jestem nauczyciel.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 17,
+          "original": "nauczyciel",
+          "suggestion": "nauczycielem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 32,
+          "end": 42,
+          "original": "nauczyciel",
+          "suggestion": "nauczycielem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_byc_nauczyciel_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: JESTEM NAUCZYCIEL.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 13,
+          "end": 23,
+          "original": "NAUCZYCIEL",
+          "suggestion": "NAUCZYCIELEM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_do_sklep",
+      "features": [
+        "unicode"
+      ],
+      "text": "Idę do sklep.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 12,
+          "original": "sklep",
+          "suggestion": "sklepu",
+          "rationale": "Po przyimku „do” potrzebny jest dopełniacz."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_do_sklep",
+      "features": [
+        "unicode"
+      ],
+      "text": "Idę do sklepu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Idę do sklep” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_do_sklep` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token sklepx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Idę do sklepu. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Idę do sklep i znów idę do sklep.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 12,
+          "original": "sklep",
+          "suggestion": "sklepu",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 27,
+          "end": 32,
+          "original": "sklep",
+          "suggestion": "sklepu",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_do_sklep_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: IDĘ DO SKLEP.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 13,
+          "end": 18,
+          "original": "SKLEP",
+          "suggestion": "SKLEPU",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_error",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_ufac_lekarz",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ufam lekarz.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 5,
+          "end": 11,
+          "original": "lekarz",
+          "suggestion": "lekarzowi",
+          "rationale": "Czasownik „ufać” łączy się z celownikiem."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "v3_pair_government_ufac_lekarz",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ufam lekarzowi.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Ufam lekarz” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `government_ufac_lekarz` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token lekarzx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Ufam lekarzowi. Potem wracam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Ufam lekarz i znów ufam lekarz.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 5,
+          "end": 11,
+          "original": "lekarz",
+          "suggestion": "lekarzowi",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 24,
+          "end": 30,
+          "original": "lekarz",
+          "suggestion": "lekarzowi",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_government_ufac_lekarz_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: UFAM LEKARZ.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 11,
+          "end": 17,
+          "original": "LEKARZ",
+          "suggestion": "LEKARZOWI",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_error",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_numeral_five_genitive_plural",
+      "features": [
+        "unicode"
+      ],
+      "text": "Pięć książki leży na stole.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 5,
+          "end": 12,
+          "original": "książki",
+          "suggestion": "książek",
+          "rationale": "Po liczebniku „pięć” rzeczownik wymaga dopełniacza liczby mnogiej."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "v3_pair_numeral_five_genitive_plural",
+      "features": [
+        "unicode"
+      ],
+      "text": "Pięć książek leży na stole.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Pięć książki” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `numeral_five_genitive_plural` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Pięćksiążki to token techniczny.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Pięć książek leży na stole. Potem je biorę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Pięć książki leży i pięć książki czeka.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 5,
+          "end": 12,
+          "original": "książki",
+          "suggestion": "książek",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "inflection",
+          "start": 25,
+          "end": 32,
+          "original": "książki",
+          "suggestion": "książek",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_numeral_five_genitive_plural_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: PIĘĆ KSIĄŻKI LEŻY.",
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 11,
+          "end": 18,
+          "original": "KSIĄŻKI",
+          "suggestion": "KSIĄŻEK",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wogole_diacritic",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wogóle tego nie pamiętam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wogóle",
+          "suggestion": "W ogóle",
+          "rationale": "Wyrażenie „w ogóle” zapisuje się rozdzielnie i z literą „ó”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wogole_diacritic",
+      "features": [
+        "unicode"
+      ],
+      "text": "W ogóle tego nie pamiętam.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „wogóle” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `wogole_diacritic` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token wogolex pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "W ogóle tego nie pamiętam. Sprawdzę notatki.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Wogóle nie idę i wogóle nie dzwonię.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wogóle",
+          "suggestion": "W ogóle",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 17,
+          "end": 23,
+          "original": "wogóle",
+          "suggestion": "w ogóle",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wogole_diacritic_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: WOGóLE NIE PADA.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "WOGóLE",
+          "suggestion": "W OGÓLE",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wziasc_diacritic",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę wziąść parasol.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 5,
+          "end": 11,
+          "original": "wziąść",
+          "suggestion": "wziąć",
+          "rationale": "Bezokolicznik „wziąć” nie zawiera litery „ś”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wziasc_diacritic",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę wziąć parasol.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Zapis „wziąść” cytujemy bez ingerencji.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Funkcja `wziasc_diacritic()` pochodzi ze starego przykładu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token wziąść2 pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę wziąć parasol. Potem wyjdę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Muszę wziąść płaszcz i wziąść parasol.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "wziąść",
+          "suggestion": "wziąć",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 23,
+          "end": 29,
+          "original": "wziąść",
+          "suggestion": "wziąć",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wziasc_diacritic_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: CHCĘ WZIĄŚĆ PARASOL.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 11,
+          "end": 17,
+          "original": "WZIĄŚĆ",
+          "suggestion": "WZIĄĆ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_conajmniej",
+      "features": [
+        "unicode"
+      ],
+      "text": "Conajmniej spróbuj raz.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 10,
+          "original": "Conajmniej",
+          "suggestion": "Co najmniej",
+          "rationale": "Wyrażenie „co najmniej” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_conajmniej",
+      "features": [
+        "unicode"
+      ],
+      "text": "Co najmniej spróbuj raz.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „conajmniej” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `conajmniej` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token conajmniejx nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Co najmniej spróbuj raz. Potem napisz.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Conajmniej raz próbowałem i conajmniej raz odpuściłem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 10,
+          "original": "Conajmniej",
+          "suggestion": "Co najmniej",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 28,
+          "end": 38,
+          "original": "conajmniej",
+          "suggestion": "co najmniej",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_conajmniej_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: CONAJMNIEJ SPRÓBUJ.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 16,
+          "original": "CONAJMNIEJ",
+          "suggestion": "CO NAJMNIEJ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_poprostu",
+      "features": [
+        "unicode"
+      ],
+      "text": "Poprostu to powiedz.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 8,
+          "original": "Poprostu",
+          "suggestion": "Po prostu",
+          "rationale": "Wyrażenie „po prostu” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_poprostu",
+      "features": [
+        "unicode"
+      ],
+      "text": "Po prostu to powiedz.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „poprostu” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `poprostu` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token poprostux pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Po prostu to powiedz. Potem wyjdź.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Poprostu idę i poprostu wracam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 8,
+          "original": "Poprostu",
+          "suggestion": "Po prostu",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 15,
+          "end": 23,
+          "original": "poprostu",
+          "suggestion": "po prostu",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poprostu_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: POPROSTU TO POWIEDZ.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 14,
+          "original": "POPROSTU",
+          "suggestion": "PO PROSTU",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_pozatym",
+      "features": [
+        "unicode"
+      ],
+      "text": "Pozatym nic nie wiem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Pozatym",
+          "suggestion": "Poza tym",
+          "rationale": "Wyrażenie „poza tym” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_pozatym",
+      "features": [
+        "unicode"
+      ],
+      "text": "Poza tym nic nie wiem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „pozatym” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `pozatym` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token pozatymx nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Poza tym nic nie wiem. Sprawdzę jutro.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Pozatym czekam i pozatym milczę.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Pozatym",
+          "suggestion": "Poza tym",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 17,
+          "end": 24,
+          "original": "pozatym",
+          "suggestion": "poza tym",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_pozatym_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: POZATYM CZEKAM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 13,
+          "original": "POZATYM",
+          "suggestion": "POZA TYM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_przedewszystkim",
+      "features": [
+        "unicode"
+      ],
+      "text": "Przedewszystkim usiądź spokojnie.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 15,
+          "original": "Przedewszystkim",
+          "suggestion": "Przede wszystkim",
+          "rationale": "Wyrażenie „przede wszystkim” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_przedewszystkim",
+      "features": [
+        "unicode"
+      ],
+      "text": "Przede wszystkim usiądź spokojnie.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „przedewszystkim” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `przedewszystkim` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token przedewszystkimx pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Przede wszystkim usiądź spokojnie. Potem mów.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Przedewszystkim czytam i przedewszystkim notuję.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 15,
+          "original": "Przedewszystkim",
+          "suggestion": "Przede wszystkim",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 25,
+          "end": 40,
+          "original": "przedewszystkim",
+          "suggestion": "przede wszystkim",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_przedewszystkim_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: PRZEDEWSZYSTKIM CZYTAM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 21,
+          "original": "PRZEDEWSZYSTKIM",
+          "suggestion": "PRZEDE WSZYSTKIM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wkoncu",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wkońcu wróciłem do domu.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wkońcu",
+          "suggestion": "W końcu",
+          "rationale": "Wyrażenie „w końcu” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wkoncu",
+      "features": [
+        "unicode"
+      ],
+      "text": "W końcu wróciłem do domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „wkońcu” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `wkoncu` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token wkońcux nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "W końcu wróciłem do domu. Potem odpocząłem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Wkońcu idę i wkońcu wracam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wkońcu",
+          "suggestion": "W końcu",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 13,
+          "end": 19,
+          "original": "wkońcu",
+          "suggestion": "w końcu",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wkoncu_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: WKOńCU WRÓCIŁEM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "WKOńCU",
+          "suggestion": "W KOńCU",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_spowrotem",
+      "features": [
+        "unicode"
+      ],
+      "text": "Spowrotem wracam do pracy.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 9,
+          "original": "Spowrotem",
+          "suggestion": "Z powrotem",
+          "rationale": "Wyrażenie „z powrotem” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_spowrotem",
+      "features": [
+        "unicode"
+      ],
+      "text": "Z powrotem wracam do pracy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „spowrotem” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `spowrotem` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token spowrotemx pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Z powrotem wracam do pracy. Potem dzwonię.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Spowrotem idę i spowrotem wracam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 9,
+          "original": "Spowrotem",
+          "suggestion": "Z powrotem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 16,
+          "end": 25,
+          "original": "spowrotem",
+          "suggestion": "z powrotem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_spowrotem_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: SPOWROTEM WRACAM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 15,
+          "original": "SPOWROTEM",
+          "suggestion": "Z POWROTEM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_tymbardziej",
+      "features": [
+        "unicode"
+      ],
+      "text": "Tymbardziej nie idę.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 11,
+          "original": "Tymbardziej",
+          "suggestion": "Tym bardziej",
+          "rationale": "Wyrażenie „tym bardziej” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_tymbardziej",
+      "features": [
+        "unicode"
+      ],
+      "text": "Tym bardziej nie idę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „tymbardziej” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `tymbardziej` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token tymbardziejx nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Tym bardziej nie idę. Zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Tymbardziej czytam i tymbardziej notuję.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 11,
+          "original": "Tymbardziej",
+          "suggestion": "Tym bardziej",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 21,
+          "end": 32,
+          "original": "tymbardziej",
+          "suggestion": "tym bardziej",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_tymbardziej_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: TYMBARDZIEJ CZYTAM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 17,
+          "original": "TYMBARDZIEJ",
+          "suggestion": "TYM BARDZIEJ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_naprawde",
+      "features": [
+        "unicode"
+      ],
+      "text": "Naprawde nie wiem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 8,
+          "original": "Naprawde",
+          "suggestion": "Naprawdę",
+          "rationale": "Przysłówek „naprawdę” wymaga litery „ę”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_naprawde",
+      "features": [
+        "unicode"
+      ],
+      "text": "Naprawdę nie wiem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „naprawde” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `naprawde` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token naprawdex pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Naprawdę nie wiem. Sprawdzę później.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Naprawde idę i naprawde wracam.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 8,
+          "original": "Naprawde",
+          "suggestion": "Naprawdę",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 15,
+          "end": 23,
+          "original": "naprawde",
+          "suggestion": "naprawdę",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_naprawde_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NAPRAWDE NIE WIEM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 14,
+          "original": "NAPRAWDE",
+          "suggestion": "NAPRAWDĘ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_nie_byc_joint",
+      "features": [
+        "unicode"
+      ],
+      "text": "Niejestem gotowy dziś.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 9,
+          "original": "Niejestem",
+          "suggestion": "Nie jestem",
+          "rationale": "Zaprzeczenie „nie jestem” zapisuje się rozdzielnie."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_nie_byc_joint",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie jestem gotowy dziś.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „niejestem” widnieje w cytowanym komentarzu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Pole `nie_byc_joint` zachowujemy dla zgodności formatu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token niejestemx nie jest polskim wyrazem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Nie jestem gotowy dziś. Wrócę jutro.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Niejestem gotowy i niejestem pewny.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 9,
+          "original": "Niejestem",
+          "suggestion": "Nie jestem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 19,
+          "end": 28,
+          "original": "niejestem",
+          "suggestion": "nie jestem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_nie_byc_joint_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NIEJESTEM GOTOWY.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 15,
+          "original": "NIEJESTEM",
+          "suggestion": "NIE JESTEM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_poszlem",
+      "features": [
+        "unicode"
+      ],
+      "text": "Poszłem już do sklepu.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Poszłem",
+          "suggestion": "Poszedłem",
+          "rationale": "Forma męska „poszedłem” wymaga wstawki „ed”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_poszlem",
+      "features": [
+        "unicode"
+      ],
+      "text": "Poszedłem już do sklepu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Forma „poszłem” jest omawiana jako przykład.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wartość `poszlem` występuje w starym formacie danych.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token poszłemx pozostaje niezmieniony.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Poszedłem już do sklepu. Potem wróciłem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Poszłem rano i poszłem wieczorem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Poszłem",
+          "suggestion": "Poszedłem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 15,
+          "end": 22,
+          "original": "poszłem",
+          "suggestion": "poszedłem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_poszlem_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: POSZŁEM JUŻ.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 13,
+          "original": "POSZŁEM",
+          "suggestion": "POSZEDŁEM",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wlanczac",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę włanczać światło.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 5,
+          "end": 13,
+          "original": "włanczać",
+          "suggestion": "włączać",
+          "rationale": "Bezokolicznik „włączać” wymaga litery „ą”."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_wlanczac",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę włączać światło.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Zapis „włanczać” cytujemy bez ingerencji.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Funkcja `wlanczac()` pochodzi ze starego przykładu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token włanczać2 pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę włączać światło. Potem gaszę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Muszę włanczać radio i włanczać lampę.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 14,
+          "original": "włanczać",
+          "suggestion": "włączać",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 23,
+          "end": 31,
+          "original": "włanczać",
+          "suggestion": "włączać",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_wlanczac_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: CHCĘ WŁANCZAĆ ŚWIATŁO.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 11,
+          "end": 19,
+          "original": "WŁANCZAĆ",
+          "suggestion": "WŁĄCZAĆ",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_month_weekday_lowercase",
+      "features": [
+        "unicode"
+      ],
+      "text": "Spotkamy się w Poniedziałek.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 15,
+          "end": 27,
+          "original": "Poniedziałek",
+          "suggestion": "poniedziałek",
+          "rationale": "Nazwa dnia tygodnia w tej pozycji zapisuje się małą literą."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_month_weekday_lowercase",
+      "features": [
+        "unicode"
+      ],
+      "text": "Spotkamy się w poniedziałek.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „w Poniedziałek” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `month_weekday_lowercase` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Spotkamy się w PoniedziałekWielkanocny bez spacji.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Spotkamy się w poniedziałek. Potem wrócimy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Byłem w Poniedziałek i wracam w Poniedziałek.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 8,
+          "end": 20,
+          "original": "Poniedziałek",
+          "suggestion": "poniedziałek",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 32,
+          "end": 44,
+          "original": "Poniedziałek",
+          "suggestion": "poniedziałek",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_month_weekday_lowercase_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: SPOTKAMY SIĘ W PONIEDZIAŁEK.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 21,
+          "end": 33,
+          "original": "PONIEDZIAŁEK",
+          "suggestion": "poniedziałek",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_proper_adjective_lowercase",
+      "features": [
+        "unicode"
+      ],
+      "text": "Uczę się języka Polskiego.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 16,
+          "end": 25,
+          "original": "Polskiego",
+          "suggestion": "polskiego",
+          "rationale": "Przymiotnik narodowościowy po rzeczowniku pospolitym zapisuje się małą literą."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_proper_adjective_lowercase",
+      "features": [
+        "unicode"
+      ],
+      "text": "Uczę się języka polskiego.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „języka Polskiego” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `proper_adjective_lowercase` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Uczę się języka polskiegox w module.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Uczę się języka polskiego. Potem piszę.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Uczę się języka Polskiego i czytam języka Polskiego.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 16,
+          "end": 25,
+          "original": "Polskiego",
+          "suggestion": "polskiego",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 42,
+          "end": 51,
+          "original": "Polskiego",
+          "suggestion": "polskiego",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_proper_adjective_lowercase_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: UCZĘ SIĘ JĘZYKA POLSKIEGO.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 22,
+          "end": 31,
+          "original": "POLSKIEGO",
+          "suggestion": "polskiego",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_error",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_sentence_initial_capital",
+      "features": [
+        "unicode"
+      ],
+      "text": "To działa. potem wróciłem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 11,
+          "end": 16,
+          "original": "potem",
+          "suggestion": "Potem",
+          "rationale": "Początek zdania wymaga wielkiej litery."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "v3_pair_sentence_initial_capital",
+      "features": [
+        "unicode"
+      ],
+      "text": "To działa. Potem wróciłem.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „. potem” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Identyfikator `sentence_initial_capital` należy do testu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "To działa. potempisanie jest błędem technicznym.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "To działa. Potem wróciłem. Jeszcze raz.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "To działa. potem wróciłem i potem usiadłem.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 11,
+          "end": 16,
+          "original": "potem",
+          "suggestion": "Potem",
+          "rationale": "Pierwsze wystąpienie wymaga poprawki."
+        },
+        {
+          "category": "spelling",
+          "start": 28,
+          "end": 33,
+          "original": "potem",
+          "suggestion": "Potem",
+          "rationale": "Drugie wystąpienie wymaga poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_sentence_initial_capital_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŁÓDŹ: TO DZIAŁA. potem WRÓCIŁEM.",
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 17,
+          "end": 22,
+          "original": "potem",
+          "suggestion": "Potem",
+          "rationale": "Wersalikowy zapis zachowuje wielkość liter i otrzymuje poprawną formę."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_ze_reporting",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wiem że Ania już wróciła.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po czasowniku raportującym przed „że” brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_ze_reporting",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wiem, że Ania już wróciła.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Wiem że Ania” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Reguła `comma_before_ze_reporting` ma osobny identyfikator.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Twierdzenie że Ania już wróciła, jest osobne.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Wiem, że Ania już wróciła. Potem dzwonię.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Wiem że Ania wróciła i wiem że Ola wróciła.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po pierwszej konstrukcji brakuje poprawki."
+        },
+        {
+          "category": "syntax",
+          "start": 27,
+          "end": 27,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po drugiej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_ze_reporting_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: WIEM ŻE ANIA WRÓCIŁA.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po wersalikowej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_zeby_purpose",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę żebyś wrócił.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po czasowniku wolicjonalnym przed „żeby” brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_zeby_purpose",
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę, żebyś wrócił.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Chcę żebyś” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Reguła `comma_before_zeby_purpose` ma osobny identyfikator.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcężebyś to token techniczny.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Chcę, żebyś wrócił. Potem porozmawiamy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Chcę żebyś wrócił i chcę żebyś usiadł.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po pierwszej konstrukcji brakuje poprawki."
+        },
+        {
+          "category": "syntax",
+          "start": 24,
+          "end": 24,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po drugiej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_zeby_purpose_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: CHCĘ ŻEBYŚ WRÓCIŁ.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po wersalikowej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_error",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_bo",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie idę bo pada.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 7,
+          "end": 7,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Przed spójnikiem przyczynowym „bo” brakuje przecinka."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "v3_pair_comma_before_bo",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie idę, bo pada.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „Nie idę bo” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Reguła `comma_before_bo` ma osobny identyfikator.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie idę bohemii w teatrze.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "Nie idę, bo pada. Zostaję w domu.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie idę bo pada i nie wracam bo pada.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 7,
+          "end": 7,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po pierwszej konstrukcji brakuje poprawki."
+        },
+        {
+          "category": "syntax",
+          "start": 28,
+          "end": 28,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po drugiej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_comma_before_bo_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: NIE IDĘ BO PADA.",
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 13,
+          "end": 13,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Po wersalikowej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_error",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "v3_pair_abbreviation_dot",
+      "features": [
+        "unicode"
+      ],
+      "text": "owoce, warzywa itp i wróciliśmy",
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 18,
+          "end": 18,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Po skrócie „itp” brakuje kropki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_corrected_pair",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "v3_pair_abbreviation_dot",
+      "features": [
+        "unicode"
+      ],
+      "text": "owoce, warzywa itp. i wróciliśmy",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_quotation_mention",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Cytat „itp i” omawiamy bez zmiany.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_code_like_mention",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Reguła `abbreviation_dot` ma osobny identyfikator.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_substring_lexeme_negative",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Token itpx pozostaje nazwą techniczną.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_multi_sentence_negative",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "multi_sentence",
+        "unicode"
+      ],
+      "text": "owoce, warzywa itp. i wróciliśmy. Potem wyszliśmy.",
+      "expected_findings": [],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_repeated_occurrence",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "owoce itp i warzywa itd i wróciliśmy",
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 9,
+          "end": 9,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Po pierwszej konstrukcji brakuje poprawki."
+        },
+        {
+          "category": "punctuation",
+          "start": 23,
+          "end": 23,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Po drugiej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    },
+    {
+      "id": "v3_abbreviation_dot_unicode_casing_offset",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "ŻÓŁĆ: OWOCE ITP I WRÓCILIŚMY",
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 15,
+          "end": 15,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Po wersalikowej konstrukcji brakuje poprawki."
+        }
+      ],
+      "rationale": null
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "analyzer": "Analyzer(AnalyzerConfig())",
+  "artifact": {
+    "sha256": "c8f4aade6c7819227c9a647a6ec1cf998e9216d351cca6268b0c458c920a07a3"
+  },
+  "dataset": {
+    "cases": 340,
+    "id": "polis_v3_quality_development",
+    "manifest": {
+      "schema_id": "polis.quality-development-manifest",
+      "schema_version": 3,
+      "sha256": "56613f571973aa7b9683f1a838c28124a7a0034c687b49e1b42d13db84c0792c"
+    },
+    "schema_id": "polis.quality-development-dataset",
+    "schema_version": 3,
+    "sha256": "1ccbd78b877c68191057d5f08a96f7d87010018f76f0e797b25dd535823909e8",
+    "source": "quality:polis_v3_quality_development@3"
+  },
+  "environment": {
+    "package_version": "0.2.0",
+    "platform_machine": "arm64",
+    "platform_release": "24.3.0",
+    "platform_system": "Darwin",
+    "python_version": "3.13.12"
+  },
+  "performance": {
+    "latency_ns": {
+      "max": 223250,
+      "mean": 33699,
+      "min": 17625,
+      "p50": 27084,
+      "p95": 58042,
+      "sample_count": 1700
+    },
+    "peak_rss_bytes": 74858496,
+    "throughput": {
+      "cases_per_second": 29674.306852267004,
+      "code_points_per_second": 1022716.2579260728,
+      "measured_cases": 1700,
+      "measured_code_points": 58590,
+      "total_duration_ns": 57288617
+    }
+  },
+  "profile": {
+    "id": "morphology",
+    "morphology_provider": {
+      "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+      "dictionary_notice_sha256": "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "package_version": "1.99.15",
+      "provider": "morfeusz2"
+    },
+    "planned_morphology_source_semantics": "qualified-provider-exercised-sources-not-implemented",
+    "planned_non_morphology_source_semantics": "sources-not-implemented"
+  },
+  "quality": {
+    "correction_accuracy": 1.0,
+    "counts": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 210,
+      "correction_matches": 43,
+      "expected_findings": 170,
+      "false_negatives": 127,
+      "false_positives": 0,
+      "predicted_findings": 43,
+      "span_matches": 43,
+      "true_positives": 43
+    },
+    "f1": 0.40375586854460094,
+    "false_alarm_rate": 0.0,
+    "precision": 1.0,
+    "recall": 0.2529411764705882,
+    "span_accuracy": 0.2529411764705882
+  },
+  "reproducibility": {
+    "measured_repetitions": 5,
+    "repetition_hashes": [
+      "f209ca182a1a92129ac2c5d233e30bfd662c1f3f7d35b7aee54114790287d55d",
+      "f209ca182a1a92129ac2c5d233e30bfd662c1f3f7d35b7aee54114790287d55d",
+      "f209ca182a1a92129ac2c5d233e30bfd662c1f3f7d35b7aee54114790287d55d",
+      "f209ca182a1a92129ac2c5d233e30bfd662c1f3f7d35b7aee54114790287d55d",
+      "f209ca182a1a92129ac2c5d233e30bfd662c1f3f7d35b7aee54114790287d55d"
+    ],
+    "stable_repetitions": 5,
+    "warmup_repetitions": 1
+  },
+  "schema_id": "polis.quality-baseline",
+  "schema_version": 3,
+  "source": {
+    "git_sha": "70ab5cf4c3d2303742eae13519ab27df7692daf4"
+  }
+}
