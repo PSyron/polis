@@ -1,7 +1,7 @@
 {
   "analyzer": "Analyzer(AnalyzerConfig())",
   "artifact": {
-    "sha256": "94affc45154f12ddcfbacbe6b98785a86d65e4520e0a70210a6e8f22a12b1d63"
+    "sha256": "ca297f732af584018f31a22ac11ed730df3230562299b9b35baff4f2d14791b8"
   },
   "dataset": {
     "cases": 340,
@@ -25,20 +25,20 @@
   },
   "performance": {
     "latency_ns": {
-      "max": 585250,
-      "mean": 366668,
-      "min": 327500,
-      "p50": 358750,
-      "p95": 403042,
+      "max": 305250,
+      "mean": 53504,
+      "min": 31458,
+      "p50": 46916,
+      "p95": 73583,
       "sample_count": 1700
     },
-    "peak_rss_bytes": 81674240,
+    "peak_rss_bytes": 82296832,
     "throughput": {
-      "cases_per_second": 2727.262293671418,
-      "code_points_per_second": 93994.29281541669,
+      "cases_per_second": 18690.122756066612,
+      "code_points_per_second": 644149.5836929075,
       "measured_cases": 1700,
       "measured_code_points": 58590,
-      "total_duration_ns": 623335718
+      "total_duration_ns": 90957134
     }
   },
   "profile": {
@@ -86,6 +86,6 @@
   "schema_id": "polis.quality-result",
   "schema_version": 1,
   "source": {
-    "git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5"
+    "git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a"
   }
 }
