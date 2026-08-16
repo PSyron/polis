@@ -243,7 +243,8 @@
         "docs/architecture/decisions/0022-conservative-v1-product-scope.md",
         "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
         "docs/architecture/decisions/0024-automatic-review-abstention-quality-contract.md",
-        "docs/architecture/decisions/0025-runtime-source-cohort-evolution.md"
+        "docs/architecture/decisions/0025-runtime-source-cohort-evolution.md",
+        "docs/architecture/decisions/0026-runtime-source-cohort-umbrella-f.md"
       ],
       "prefixes": []
     },
