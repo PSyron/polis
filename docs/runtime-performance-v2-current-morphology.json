@@ -1,7 +1,7 @@
 {
   "artifact": {
     "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
-    "wheel_sha256": "7d0a7ebf990030e022b3d7d885864b697224e578c959888e4a10da3fe7ea241c"
+    "wheel_sha256": "abd69b7d2d3ca3ebf211d47f1c83f33140ca4a5c61fd4519bfe181214c66b72c"
   },
   "dataset": {
     "cases": 340,
@@ -26,19 +26,19 @@
   },
   "performance": {
     "latency_ns": {
-      "max": 55709,
-      "mean": 29097,
-      "min": 16584,
-      "p50": 28458,
-      "p95": 42333,
+      "max": 62625,
+      "mean": 29444,
+      "min": 15292,
+      "p50": 29041,
+      "p95": 44291,
       "sample_count": 1700
     },
     "throughput": {
-      "cases_per_second": 34366.89617216861,
-      "code_points_per_second": 1184444.9686631523,
+      "cases_per_second": 33962.60445548615,
+      "code_points_per_second": 1170511.1735570198,
       "measured_cases": 1700,
       "measured_code_points": 58590,
-      "total_duration_ns": 49466207
+      "total_duration_ns": 50055054
     }
   },
   "profile": "morphology",
@@ -75,15 +75,15 @@
   },
   "role": "current",
   "rss": {
-    "harness_peak_rss_bytes": 33669120,
+    "harness_peak_rss_bytes": 33882112,
     "worker_measured_incremental_peak_rss_bytes": 0,
-    "worker_measurement_start_rss_bytes": 77643776,
-    "worker_peak_rss_bytes": 77643776,
-    "worker_startup_rss_bytes": 74465280
+    "worker_measurement_start_rss_bytes": 77627392,
+    "worker_peak_rss_bytes": 77627392,
+    "worker_startup_rss_bytes": 74448896
   },
   "schema_id": "polis.runtime-performance-result",
   "schema_version": 1,
   "source": {
-    "git_sha": "f259f23d75616a15b6d6de86eca8d3dc273c55d2"
+    "git_sha": "e34d14d2899028773f011787259d42503ad34f83"
   }
 }

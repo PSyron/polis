@@ -131,7 +131,7 @@ def test_thresholds_are_reference_derived_and_comparison_is_fail_closed() -> Non
         reference = _result("reference", profile)
         current = _result("current", profile)
         assert current["source"]["git_sha"] == (
-            "f259f23d75616a15b6d6de86eca8d3dc273c55d2"
+            "e34d14d2899028773f011787259d42503ad34f83"
         )
         profile_thresholds = thresholds["profiles"][profile]
         caps = profile_thresholds["performance_caps"]
