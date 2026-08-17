@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from functools import lru_cache
-from typing import Final
+from typing import Final, cast
 
 from polis.core import (
     AnalysisOptions,
@@ -179,11 +179,6 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
     return False
 
 
-# Shared token stream for the closed-literal family: one left-to-right pass
-# over word tokens, with O(1) typed-form lookup per token (Wave 0 / #338 F0.3).
-_LITERAL_TOKEN_RE: Final = re.compile(r"(?<!\w)\w+(?!\w)", re.UNICODE)
-
-
 @lru_cache(maxsize=32)
 def _closed_literal_lookup(
     rules: tuple[_CasePatternRule, ...],
@@ -198,6 +193,40 @@ def _closed_literal_lookup(
                 raise ValueError(f"duplicate closed literal typed form: {typed}")
             lookup[key] = (rule, corrected)
     return lookup
+
+
+@lru_cache(maxsize=32)
+def _closed_literal_pattern(rules: tuple[_CasePatternRule, ...]) -> re.Pattern[str]:
+    """Compile one exact mixed-case matcher for the registry's closed surfaces."""
+
+    lookup = _closed_literal_lookup(rules)
+    alternatives = sorted(
+        (_explicit_case_pattern(surface) for surface in lookup),
+        key=len,
+        reverse=True,
+    )
+    return re.compile(rf"(?<!\w)(?:{'|'.join(alternatives)})(?!\w)")
+
+
+@lru_cache(maxsize=32)
+def _closed_literal_empty_buckets(
+    rules: tuple[_CasePatternRule, ...],
+) -> dict[Source, tuple[Finding, ...]]:
+    """Build the ordered empty-source template copied by each collector call."""
+
+    return {rule.source: () for rule in rules}
+
+
+def _explicit_case_pattern(surface: str) -> str:
+    parts: list[str] = []
+    for char in surface:
+        lower = char.lower()
+        upper = char.upper()
+        if len(lower) == len(upper) == 1 and lower != upper:
+            parts.append(f"[{re.escape(lower + upper)}]")
+        else:
+            parts.append(re.escape(char))
+    return "".join(parts)
 
 
 def collect_closed_literal_findings(
@@ -215,8 +244,12 @@ def collect_closed_literal_findings(
     if not rules:
         return {}
     lookup = _closed_literal_lookup(rules)
-    buckets: dict[Source, list[Finding]] = {rule.source: [] for rule in rules}
-    for match in _LITERAL_TOKEN_RE.finditer(text):
+    pattern = _closed_literal_pattern(rules)
+    buckets = cast(
+        dict[Source, tuple[Finding, ...] | list[Finding]],
+        _closed_literal_empty_buckets(rules).copy(),
+    )
+    for match in pattern.finditer(text):
         observed = match.group()
         entry = lookup.get(observed.lower())
         if entry is None:
@@ -229,21 +262,27 @@ def collect_closed_literal_findings(
         candidate = matched_rule._apply_case(observed, corrected)
         if candidate == observed:
             continue
-        buckets[matched_rule.source].append(
-            Finding.create(
-                category=matched_rule._CATEGORY,
-                severity=matched_rule._severity(),
-                message=matched_rule._message(observed),
-                explanation=matched_rule._explanation(observed, candidate),
-                original=observed,
-                suggestion=candidate,
-                start=start,
-                end=end,
-                confidence=matched_rule._confidence,
-                source=matched_rule.source,
-            )
+        finding = Finding.create(
+            category=matched_rule._CATEGORY,
+            severity=matched_rule._severity(),
+            message=matched_rule._message(observed),
+            explanation=matched_rule._explanation(observed, candidate),
+            original=observed,
+            suggestion=candidate,
+            start=start,
+            end=end,
+            confidence=matched_rule._confidence,
+            source=matched_rule.source,
         )
-    return {source: tuple(items) for source, items in buckets.items()}
+        current = buckets[matched_rule.source]
+        if isinstance(current, tuple):
+            buckets[matched_rule.source] = [finding]
+        else:
+            current.append(finding)
+    for source, items in buckets.items():
+        if isinstance(items, list):
+            buckets[source] = tuple(items)
+    return cast(dict[Source, tuple[Finding, ...]], buckets)
 
 
 class _CasePatternRule:
