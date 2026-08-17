@@ -152,8 +152,10 @@ class AgreementTeZdanieRule:
 
 _TE_NEUTER_NOUNS: Final = ("dziecko", "okno", "słońce", "morze")
 _TE_NEUTER_PATTERN: Final = re.compile(
-    rf"(?<!\w)(?P<pronoun>Te|te|TE)(?P<space>[ \t]+)"
-    rf"(?P<noun>{'|'.join(_TE_NEUTER_NOUNS)})(?!\w)",
+    rf"(?<!\w)(?:(?P<pronoun>Te|te|TE)(?P<space>[ \t]+)"
+    rf"(?P<noun>{'|'.join(_TE_NEUTER_NOUNS)})(?!\w)|"
+    rf"(?P<upper_pronoun>TE)[ \t]+"
+    rf"(?P<upper_noun>{'|'.join(noun.upper() for noun in _TE_NEUTER_NOUNS)})(?!\w))",
 )
 _COPULA_JA_PATTERN: Final = re.compile(
     r"(?<!\w)(?P<subject>Ja|ja|JA)\s+(?P<verb>jest|JEST)(?!\w)",
@@ -175,25 +177,33 @@ class AgreementTeNeuterNounRule:
 
     @property
     def behavior_version(self) -> str:
-        return "agreement-te-neuter-noun/1.0"
+        return "agreement-te-neuter-noun/2.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
         findings: list[Finding] = []
         for match in _TE_NEUTER_PATTERN.finditer(text):
-            phrase_start = match.start("pronoun")
-            phrase_end = match.end("noun")
+            upper_branch = match.group("upper_pronoun") is not None
+            pronoun_group = "upper_pronoun" if upper_branch else "pronoun"
+            noun_group = "upper_noun" if upper_branch else "noun"
+            phrase_start = match.start(pronoun_group)
+            phrase_end = match.end(noun_group)
             if _is_wrapped_mention(text, phrase_start, phrase_end):
                 continue
             if _is_quoted_position(text, phrase_start):
                 continue
-            after = text[match.end("noun") :]
+            after = text[phrase_end:]
             # Abstain on optional-space comma (vocative / address reading).
             if re.match(r"[ \t]*,", after) is not None:
                 continue
-            pronoun = match.group("pronoun")
-            if pronoun.isupper():
+            pronoun = match.group(pronoun_group)
+            noun = match.group(noun_group)
+            assert pronoun is not None
+            assert noun is not None
+            if upper_branch:
+                suggestion = "TO"
+            elif pronoun.isupper():
                 suggestion = "TO"
             elif pronoun[:1].isupper():
                 suggestion = "To"
@@ -205,13 +215,13 @@ class AgreementTeNeuterNounRule:
                     severity=Severity.SUGGESTION,
                     message="Niezgodność rodzaju zaimka i rzeczownika nijakiego.",
                     explanation=(
-                        f"Przed rzeczownikiem „{match.group('noun')}” w tej "
-                        f"zamkniętej regule potrzebna jest forma „{suggestion}”."
+                        f"Przed rzeczownikiem „{noun}” w tej zamkniętej regule "
+                        f"potrzebna jest forma „{suggestion}”."
                     ),
                     original=pronoun,
                     suggestion=suggestion,
-                    start=match.start("pronoun"),
-                    end=match.end("pronoun"),
+                    start=match.start(pronoun_group),
+                    end=match.end(pronoun_group),
                     confidence=self._confidence,
                     source=self.source,
                 )

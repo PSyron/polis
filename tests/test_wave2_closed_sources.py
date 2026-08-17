@@ -253,7 +253,7 @@ def test_wave2_sources_remain_review_only(source: str) -> None:
         "spelling.poszlem": "spelling-poszlem/1.0",
         "spelling.wlanczac": "spelling-wlanczac/1.0",
         "inflection.negated_miec_czas": "inflection-negated-miec-czas/1.0",
-        "agreement.te_neuter_noun": "agreement-te-neuter-noun/1.0",
+        "agreement.te_neuter_noun": "agreement-te-neuter-noun/2.0",
         "agreement.copula_ja": "agreement-copula-ja/1.0",
         "inflection.numeral_five_genitive_plural": (
             "inflection-numeral-five-genitive-plural/1.0"
