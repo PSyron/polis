@@ -36,7 +36,7 @@ _CASES = (
         ",",
         13,
         13,
-        "syntax-comma-before-bo/2.0",
+        "syntax-comma-before-bo/3.0",
         "insert.causal_clause_comma",
     ),
 )
@@ -152,7 +152,7 @@ def test_f52_preserves_lowercase_and_existing_mixed_outputs(
 @pytest.mark.parametrize(
     ("source", "text"),
     (
-        # F5.2 must not become a general casefold or mixed-case expansion.
+        # F5.2's legacy mixed-case and boundary abstentions remain closed.
         ("rule:agreement.te_neuter_noun", "Te DZIECKO przyszło."),
         ("rule:agreement.te_neuter_noun", "TE Dziecko przyszło."),
         ("rule:agreement.te_neuter_noun", "TE ZDANIE przyszło."),
@@ -166,9 +166,6 @@ def test_f52_preserves_lowercase_and_existing_mixed_outputs(
         ("rule:inflection.government_do_sklep", "IDĘ DO SKLEP, TERAZ."),
         ("rule:syntax.comma_before_bo", "NIE IDĘ bo PADA."),
         ("rule:syntax.comma_before_bo", "NIE IDĘ BO pada."),
-        ("rule:syntax.comma_before_bo", "NIE IDĘ PONIEWAŻ PADA."),
-        ("rule:syntax.comma_before_bo", "NIE IDĘ BO DESZCZ."),
-        ("rule:syntax.comma_before_bo", "DZISIAJ NIE IDĘ BO PADA."),
         ("rule:syntax.comma_before_bo", "NIE IDĘ BO PADA"),
         ("rule:syntax.comma_before_bo", "NIE IDĘ BO PADA!"),
     ),

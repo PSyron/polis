@@ -657,6 +657,7 @@ _CAUSAL_PRECURSOR_EXCLUSIONS: Final = frozenset(
     }
 )
 _POLISH_LETTER: Final = re.compile(r"[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]")
+_UPPERCASE_POLISH_LETTER: Final = re.compile(r"[A-ZĄĆĘŁŃÓŚŹŻ]")
 # Permanent exclusion for abbreviation-dot: ``np`` is never covered (docstring).
 _ABBREVIATION_DOT_FORMS: Final = frozenset({"itp", "itd", "tzn"})
 
@@ -765,6 +766,29 @@ class SyntaxCommaBeforeZebyPurposeRule:
         return tuple(findings)
 
 
+def _is_coherent_uppercase_causal_clause(
+    text: str, sentence: Sentence, match: re.Match[str]
+) -> bool:
+    """Accept only a closed, punctuation-neutral uppercase causal sentence."""
+
+    colon = text.rfind(":", sentence.start, match.start("upper_conj"))
+    clause_start = colon + 1 if colon >= sentence.start else sentence.start
+    prefix = text[sentence.start : colon].strip() if colon >= sentence.start else ""
+    if prefix and not all(
+        character.isspace() or _POLISH_LETTER.fullmatch(character) is not None
+        for character in prefix
+    ):
+        return False
+    clause = text[clause_start : sentence.end].strip()
+    if not clause.endswith(".") or clause.endswith(".."):
+        return False
+    body = clause[:-1]
+    return bool(body) and all(
+        character.isspace() or _UPPERCASE_POLISH_LETTER.fullmatch(character) is not None
+        for character in body
+    )
+
+
 class SyntaxCommaBeforeBoRule:
     """Insert a comma before closed causal conjunctions with exclusion guards."""
 
@@ -775,8 +799,8 @@ class SyntaxCommaBeforeBoRule:
         self._pattern = re.compile(
             r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż) "
             r"(?P<after>[a-ząćęłńóśźż])|"
-            r"(?<!\w)(?P<upper_prefix>NIE ID)(?P<upper_pre>Ę) "
-            r"(?P<upper_conj>BO) (?P<upper_after>P)ADA(?=\.)"
+            r"(?P<upper_pre>[A-ZĄĆĘŁŃÓŚŹŻ]) (?P<upper_conj>BO|PONIEWAŻ|GDYŻ) "
+            r"(?P<upper_after>[A-ZĄĆĘŁŃÓŚŹŻ])"
         )
 
     @property
@@ -785,25 +809,27 @@ class SyntaxCommaBeforeBoRule:
 
     @property
     def behavior_version(self) -> str:
-        return "syntax-comma-before-bo/2.0"
+        return "syntax-comma-before-bo/3.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
         if (
             " bo " not in text
-            and "NIE IDĘ BO PADA" not in text
             and " ponieważ " not in text
             and " gdyż " not in text
+            and " BO " not in text
+            and " PONIEWAŻ " not in text
+            and " GDYŻ " not in text
         ):
             return ()
         findings: list[Finding] = []
         for sentence, match in iter_sentence_matches(text, self._pattern):
             upper_branch = match.group("upper_conj") is not None
-            if upper_branch:
-                prefix = text[sentence.start : match.start("upper_prefix")].rstrip()
-                if prefix and not prefix.endswith(":"):
-                    continue
+            if upper_branch and not _is_coherent_uppercase_causal_clause(
+                text, sentence, match
+            ):
+                continue
             pre_group = "upper_pre" if upper_branch else "pre"
             conj_group = "upper_conj" if upper_branch else "conj"
             pre_char = match.group(pre_group)
