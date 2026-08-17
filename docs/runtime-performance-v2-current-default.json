@@ -1,0 +1,84 @@
+{
+  "artifact": {
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "649f15999455203bc1d2ce5d003fc045a340424abfa2714629c7db691c6e63b8"
+  },
+  "dataset": {
+    "cases": 340,
+    "id": "polis_v3_quality_development",
+    "manifest_sha256": "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17",
+    "schema_id": "polis.quality-development-dataset",
+    "schema_version": 3,
+    "sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276"
+  },
+  "environment": {
+    "package_version": "0.2.0",
+    "platform_machine": "arm64",
+    "platform_release": "24.3.0",
+    "platform_system": "Darwin",
+    "python_version": "3.13.12"
+  },
+  "morphology_provider": null,
+  "performance": {
+    "latency_ns": {
+      "max": 54209,
+      "mean": 26403,
+      "min": 16333,
+      "p50": 25875,
+      "p95": 39833,
+      "sample_count": 1700
+    },
+    "throughput": {
+      "cases_per_second": 37873.995400626554,
+      "code_points_per_second": 1305316.1120721824,
+      "measured_cases": 1700,
+      "measured_code_points": 58590,
+      "total_duration_ns": 44885679
+    }
+  },
+  "profile": "default",
+  "protocol_implementation": {
+    "overlay_applied": false,
+    "runtime_performance_protocol_sha256": "7a165da5c857bc8df57cda8d6edd02ed224d79e225713b3d8f57b815a0d317db",
+    "runtime_performance_worker_sha256": "56003ed9abdcaac364067425b737c1202aa1eedeb7d41402b458c78686e6c1db"
+  },
+  "protocol_version": 2,
+  "quality": {
+    "correction_accuracy": 1.0,
+    "counts": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 210,
+      "correction_matches": 111,
+      "expected_findings": 170,
+      "false_negatives": 59,
+      "false_positives": 0,
+      "predicted_findings": 111,
+      "span_matches": 111,
+      "true_positives": 111
+    },
+    "f1": 0.7900355871886121,
+    "false_alarm_rate": 0.0,
+    "precision": 1.0,
+    "recall": 0.6529411764705882,
+    "span_accuracy": 0.6529411764705882
+  },
+  "reproducibility": {
+    "findings_sha256": "98b1c7891851e654e37600d44f9942b5320f98bb6e95214edd6623881d7e4941",
+    "measured_repetitions": 5,
+    "stable_repetitions": 5,
+    "warmup_repetitions": 1
+  },
+  "role": "current",
+  "rss": {
+    "harness_peak_rss_bytes": 32948224,
+    "worker_measured_incremental_peak_rss_bytes": 16384,
+    "worker_measurement_start_rss_bytes": 32636928,
+    "worker_peak_rss_bytes": 32653312,
+    "worker_startup_rss_bytes": 32325632
+  },
+  "schema_id": "polis.runtime-performance-result",
+  "schema_version": 1,
+  "source": {
+    "git_sha": "698ddb7fdae2b899e2fed8300266693280da0b92"
+  }
+}

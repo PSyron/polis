@@ -1,6 +1,6 @@
 # ADR-0027: izolowany protokół pomiaru wydajności runtime'u
 
-- Status: Zaakceptowany
+- Status: Accepted
 - Data: 2026-08-17
 - Decydent: Paweł Cyroń
 
@@ -40,7 +40,8 @@ protokół pomiarowy z izolowanym procesem workera.
 - importuje wyłącznie zainstalowany wheel i tworzy jeden `Analyzer`;
 - nie ładuje datasetu, manifestu, goldów ani scoringu;
 - mierzy czas wyłącznie wokół `Analyzer.analyze`;
-- raportuje startup RSS, peak RSS, kanoniczne findings i tożsamość środowiska;
+- raportuje startup RSS, checkpoint RSS po warmupie, peak RSS, kanoniczne
+  findings i tożsamość środowiska;
 - dla `default` wymaga braku Morfeusz2;
 - dla `morphology` wymaga dokładnie Morfeusz2 1.99.15, słownika
   `pl.sgjp.sgjp-2026.06.01` i zaakceptowanego hasha noty;
@@ -56,6 +57,17 @@ tego mierzymy referencję Wave 0 i bieżący runtime tym samym protokołem v2, n
 tym samym datasecie v3, Pythonie, platformie, profilach i liczbie powtórzeń.
 Nowy addytywny artefakt governance wiąże capy protokołu v2 z pomiarem Wave 0 i
 zachowuje zero tolerance.
+
+Gate pamięci używa wyłącznie różnicy `worker_peak_rss_bytes -
+worker_measurement_start_rss_bytes`, czyli przyrostu szczytu po zakończeniu
+warmupu. `startup_rss_bytes` pozostaje diagnostyczne, a RSS procesu nadrzędnego
+jest zapisane osobno i nie uczestniczy w gate.
+
+Historyczny commit Wave 0 nie zawierał jeszcze workera protokołu v2. Jego clean
+wheel powstaje zatem z dokładnego drzewa runtime'u Wave 0 oraz wyłącznie dwóch
+nałożonych modułów pomiarowych v2. Artefakt referencyjny zapisuje osobno SHA
+źródła Wave 0, hash wheel i hashe obu modułów overlay. Żaden plik zachowania
+runtime'u nie może pochodzić z overlay.
 
 ## Co zostaje w mocy
 

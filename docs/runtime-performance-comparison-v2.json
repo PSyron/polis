@@ -1,0 +1,165 @@
+{
+  "aggregate_verdict": "fail",
+  "dataset_sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+  "notes": [
+    "Quality floors remain bound to quality-development-v3.",
+    "Performance caps are derived from the Wave 0 reference measured with protocol v2 on the same v3 dataset.",
+    "Harness RSS is recorded separately and excluded from runtime gates.",
+    "The Wave 0 wheel contains a hash-bound overlay of the two protocol-v2 modules only; runtime behavior files come from source commit 6b4f53970049ba30ceca212e1b6fbc3ecb613b0a."
+  ],
+  "profiles": {
+    "default": {
+      "current_result_path": "docs/runtime-performance-v2-current-default.json",
+      "current_result_sha256": "7157e80b1fc6badf577be0536392aabb179536ef3665afebf7a8c2ec4b7feed8",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.7900355871886121 floor=0.7900355871886121",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: reference=3.13.12 current=3.13.12; platform_system: reference=Darwin current=Darwin; platform_release: reference=24.3.0 current=24.3.0; platform_machine: reference=arm64 current=arm64",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "reference=8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276 current=8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+          "gate": "performance.dataset_identity",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 stable=5 for reference/current",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "current=39833 maximum=36416",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "current=37873.995400626554 minimum=34425.22032141006",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": true
+        },
+        {
+          "detail": "current=16384 maximum=131072; harness RSS excluded",
+          "gate": "performance.maximum_worker_measured_incremental_peak_rss_bytes",
+          "pass": true
+        }
+      ],
+      "metric_deltas": {
+        "p95_latency_ns": 3417,
+        "throughput_cases_per_second": 3448.775079216495,
+        "worker_measured_incremental_peak_rss_bytes": -114688
+      },
+      "reference_result_path": "docs/runtime-performance-v2-reference-default.json",
+      "reference_result_sha256": "047d386a47848c0b18ca8c53157fd90950f50810d74c9f1df7c3cea0b775b802",
+      "verdict": "fail"
+    },
+    "morphology": {
+      "current_result_path": "docs/runtime-performance-v2-current-morphology.json",
+      "current_result_sha256": "ac2fb70e6a0c62dafd006819b3c0463f37460d70607373194aa10e85c31b9ca7",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.940809968847352 floor=0.940809968847352",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: reference=3.13.12 current=3.13.12; platform_system: reference=Darwin current=Darwin; platform_release: reference=24.3.0 current=24.3.0; platform_machine: reference=arm64 current=arm64",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "reference=8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276 current=8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+          "gate": "performance.dataset_identity",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 stable=5 for reference/current",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "current=44875 maximum=61209",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": true
+        },
+        {
+          "detail": "current=30312.942256911956 minimum=27049.581389429753",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": true
+        },
+        {
+          "detail": "current=0 maximum=196608; harness RSS excluded",
+          "gate": "performance.maximum_worker_measured_incremental_peak_rss_bytes",
+          "pass": true
+        }
+      ],
+      "metric_deltas": {
+        "p95_latency_ns": -16334,
+        "throughput_cases_per_second": 3263.3608674822026,
+        "worker_measured_incremental_peak_rss_bytes": -196608
+      },
+      "reference_result_path": "docs/runtime-performance-v2-reference-morphology.json",
+      "reference_result_sha256": "f49ed6d28050b648d4a42b9cb9ab7295c3937db626a911206874b3637506eb18",
+      "verdict": "pass"
+    }
+  },
+  "protocol_version": 2,
+  "schema_id": "polis.runtime-performance-comparison",
+  "schema_version": 1,
+  "thresholds_path": "docs/runtime-performance-thresholds-v2.json",
+  "thresholds_sha256": "111e305d7c0052cd2a30c908855a445dd773e5320c4ac957544c18998c579056"
+}

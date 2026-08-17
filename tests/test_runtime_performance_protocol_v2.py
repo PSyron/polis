@@ -24,6 +24,7 @@ def _line(value: dict[str, object]) -> str:
 
 
 def test_worker_strict_round_trip_without_dataset_import() -> None:
+    dataset_module_before = sys.modules.get("polis.evaluation.quality_dataset")
     stdin = io.StringIO(
         _line(
             {
@@ -69,7 +70,7 @@ def test_worker_strict_round_trip_without_dataset_import() -> None:
         responses[2]["measurement_start_rss_bytes"] >= responses[0]["startup_rss_bytes"]
     )
     assert responses[3]["peak_rss_bytes"] >= responses[2]["measurement_start_rss_bytes"]
-    assert "polis.evaluation.quality_dataset" not in sys.modules
+    assert sys.modules.get("polis.evaluation.quality_dataset") is dataset_module_before
 
 
 def test_worker_rejects_unknown_fields_fail_closed() -> None:
