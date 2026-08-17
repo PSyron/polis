@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Final
 
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
@@ -139,6 +140,21 @@ class DeterministicRuleRegistry:
 
     def __init__(self, registrations: Iterable[RuleRegistration]) -> None:
         self._registrations = _normalize_registrations(registrations)
+        self._active_registrations = tuple(
+            entry
+            for entry in self._registrations
+            if not _is_absent_morphology_consumer(entry.rule)
+        )
+        self._literal_registrations = tuple(
+            entry
+            for entry in self._active_registrations
+            if isinstance(entry.rule, _CasePatternRule)
+        )
+        self._literal_rules = tuple(
+            entry.rule
+            for entry in self._literal_registrations
+            if isinstance(entry.rule, _CasePatternRule)
+        )
         self._behaviors = {
             entry.rule.source: SourceBehavior(
                 source=entry.rule.source,
@@ -186,11 +202,24 @@ class DeterministicRuleRegistry:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Execute selected rules and validate their findings."""
 
-        selected = tuple(
-            entry
-            for entry in self._registrations
-            if _selected_by_categories(entry.categories, options.categories)
-        )
+        if options.categories is None:
+            selected = self._active_registrations
+            literal_entries = self._literal_registrations
+            literal_rules = self._literal_rules
+        else:
+            selected = tuple(
+                entry
+                for entry in self._active_registrations
+                if _selected_by_categories(entry.categories, options.categories)
+            )
+            literal_entries = tuple(
+                entry for entry in selected if isinstance(entry.rule, _CasePatternRule)
+            )
+            literal_rules = tuple(
+                entry.rule
+                for entry in literal_entries
+                if isinstance(entry.rule, _CasePatternRule)
+            )
         findings: list[Finding] = []
         seen = set[str]()
 
@@ -198,19 +227,9 @@ class DeterministicRuleRegistry:
         # are selected together (Wave 0 / #338 F0.3). Non-literal rules keep
         # their independent find() paths. Emission order remains registration
         # order for exact source identity compatibility.
-        literal_entries = tuple(
-            entry for entry in selected if isinstance(entry.rule, _CasePatternRule)
-        )
         literal_buckets: dict[Source, tuple[Finding, ...]] = {}
         if literal_entries:
-            literal_rules: list[_CasePatternRule] = []
-            for entry in literal_entries:
-                rule = entry.rule
-                assert isinstance(rule, _CasePatternRule)
-                literal_rules.append(rule)
-            literal_buckets = collect_closed_literal_findings(
-                text, tuple(literal_rules)
-            )
+            literal_buckets = collect_closed_literal_findings(text, literal_rules)
 
         for entry in selected:
             if isinstance(entry.rule, _CasePatternRule):
@@ -240,6 +259,21 @@ class DeterministicRuleRegistry:
                 findings.append(finding)
 
         return tuple(findings)
+
+
+def _is_absent_morphology_consumer(rule: Rule) -> bool:
+    """Skip provider-gated consumers when the optional morphology backend is absent.
+
+    Rules store ``_provider is None`` after composition without Morfeusz2. Their
+    ``find`` methods already return ``()`` in that state; skipping the call is
+    behavior-identical and avoids dispatch overhead on the default profile.
+    """
+
+    provider = getattr(rule, "_provider", _PROVIDER_SENTINEL)
+    return provider is None
+
+
+_PROVIDER_SENTINEL: Final = object()
 
 
 def _selected_by_categories(

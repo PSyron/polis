@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import Final
 
 from polis.core import (
@@ -183,6 +184,22 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
 _LITERAL_TOKEN_RE: Final = re.compile(r"(?<!\w)\w+(?!\w)", re.UNICODE)
 
 
+@lru_cache(maxsize=32)
+def _closed_literal_lookup(
+    rules: tuple[_CasePatternRule, ...],
+) -> dict[str, tuple[_CasePatternRule, str]]:
+    """Build the immutable-per-registry surface lookup once."""
+
+    lookup: dict[str, tuple[_CasePatternRule, str]] = {}
+    for rule in rules:
+        for typed, corrected in rule._surface_map().items():
+            key = typed.lower()
+            if key in lookup:
+                raise ValueError(f"duplicate closed literal typed form: {typed}")
+            lookup[key] = (rule, corrected)
+    return lookup
+
+
 def collect_closed_literal_findings(
     text: str, rules: tuple[_CasePatternRule, ...]
 ) -> dict[Source, tuple[Finding, ...]]:
@@ -197,13 +214,7 @@ def collect_closed_literal_findings(
     """
     if not rules:
         return {}
-    lookup: dict[str, tuple[_CasePatternRule, str]] = {}
-    for rule in rules:
-        for typed, corrected in rule._surface_map().items():
-            key = typed.lower()
-            if key in lookup:
-                raise ValueError(f"duplicate closed literal typed form: {typed}")
-            lookup[key] = (rule, corrected)
+    lookup = _closed_literal_lookup(rules)
     buckets: dict[Source, list[Finding]] = {rule.source: [] for rule in rules}
     for match in _LITERAL_TOKEN_RE.finditer(text):
         observed = match.group()
