@@ -349,7 +349,7 @@ _WAVE4_SPECS: Final = (
         source_name="inflection.government_do_sklep",
         behavior_stem="inflection-government-do-sklep",
         pattern=re.compile(
-            rf"(?<!\w)(?P<governor>Idę|idę|IDĘ) do "
+            rf"(?<!\w)(?P<governor>Idę|idę|IDĘ) (?P<preposition>do|DO) "
             rf"(?P<governed>sklep|Sklep|SKLEP){_TRAIL}{_NP_FINAL}"
         ),
         form=_DO_SKLEP_FORM,
@@ -429,6 +429,10 @@ class _Wave4MorphologyGovernmentRule:
             if _is_wrapped_mention(text, match.start(0), match.end(0)):
                 continue
             original = match.group("governed")
+            if match.groupdict().get("preposition") == "DO" and not (
+                match.group("governor").isupper() and original.isupper()
+            ):
+                continue
             # Title-case guard: morphology cannot replace proper-name / address
             # detection for mid-template capitalized nouns.
             if _is_title_case(original):

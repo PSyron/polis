@@ -151,9 +151,10 @@ class AgreementTeZdanieRule:
 
 
 _TE_NEUTER_NOUNS: Final = ("dziecko", "okno", "słońce", "morze")
+_TE_NEUTER_NOUNS_UPPER: Final = tuple(noun.upper() for noun in _TE_NEUTER_NOUNS)
 _TE_NEUTER_PATTERN: Final = re.compile(
     rf"(?<!\w)(?P<pronoun>Te|te|TE)(?P<space>[ \t]+)"
-    rf"(?P<noun>{'|'.join(_TE_NEUTER_NOUNS)})(?!\w)",
+    rf"(?P<noun>{'|'.join((*_TE_NEUTER_NOUNS, *_TE_NEUTER_NOUNS_UPPER))})(?!\w)",
 )
 _COPULA_JA_PATTERN: Final = re.compile(
     r"(?<!\w)(?P<subject>Ja|ja|JA)\s+(?P<verb>jest|JEST)(?!\w)",
@@ -193,6 +194,9 @@ class AgreementTeNeuterNounRule:
             if re.match(r"[ \t]*,", after) is not None:
                 continue
             pronoun = match.group("pronoun")
+            noun = match.group("noun")
+            if noun.isupper() and not pronoun.isupper():
+                continue
             if pronoun.isupper():
                 suggestion = "TO"
             elif pronoun[:1].isupper():

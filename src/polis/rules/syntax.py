@@ -773,8 +773,8 @@ class SyntaxCommaBeforeBoRule:
     def __init__(self) -> None:
         self.source = Source(SourceKind.RULE, "syntax.comma_before_bo")
         self._pattern = re.compile(
-            r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż) "
-            r"(?P<after>[a-ząćęłńóśźż])"
+            r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż|BO|PONIEWAŻ|GDYŻ) "
+            r"(?P<after>[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ])"
         )
 
     @property
@@ -788,12 +788,28 @@ class SyntaxCommaBeforeBoRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if " bo " not in text and " ponieważ " not in text and " gdyż " not in text:
+        if not any(
+            conjunction in text
+            for conjunction in (
+                " bo ",
+                " ponieważ ",
+                " gdyż ",
+                " BO ",
+                " PONIEWAŻ ",
+                " GDYŻ ",
+            )
+        ):
             return ()
         findings: list[Finding] = []
         for sentence, match in iter_sentence_matches(text, self._pattern):
             pre_char = match.group("pre")
             if _POLISH_LETTER.fullmatch(pre_char) is None:
+                continue
+            conjunction = match.group("conj")
+            follower = match.group("after")
+            if (conjunction.isupper() or follower.isupper()) and not (
+                pre_char.isupper() and conjunction.isupper() and follower.isupper()
+            ):
                 continue
             # Preceding token (word) exclusion set.
             left = text[sentence.start : match.start("conj")].rstrip()
