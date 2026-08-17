@@ -86,6 +86,8 @@ EXPECTED_SOURCE_MEMBERS = tuple(
         "src/polis/rules/spelling.py "
         "src/polis/rules/subject_verb.py "
         "src/polis/rules/syntax.py "
+        "src/polis/runtime_performance_protocol.py "
+        "src/polis/runtime_performance_worker.py "
         "src/polis/segmentation/__init__.py"
     ).split()
 )

@@ -1,0 +1,69 @@
+{
+  "comparison_policy": {
+    "allowed_regression_fraction": 0.0,
+    "environment_mismatch": "fail",
+    "harness_rss_is_gate_input": false,
+    "missing_metric": "fail",
+    "nondeterminism": "fail",
+    "performance_regression": "fail",
+    "required_environment_match": [
+      "python_version",
+      "platform_system",
+      "platform_release",
+      "platform_machine"
+    ],
+    "required_measured_repetitions": 5,
+    "required_warmup_repetitions": 1,
+    "rss_gate_metric": "worker_measured_incremental_peak_rss_bytes"
+  },
+  "dataset_sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+  "enforced": true,
+  "profiles": {
+    "default": {
+      "performance_caps": {
+        "maximum_p95_latency_ns": 37833,
+        "maximum_worker_measured_incremental_peak_rss_bytes": 114688,
+        "minimum_throughput_cases_per_second": 33773.74092834835
+      },
+      "quality_floors": {
+        "maximum_false_alarm_rate": 0.0,
+        "minimum_exact_correction_accuracy": 1.0,
+        "minimum_exact_span_accuracy": 0.6529411764705882,
+        "minimum_f1": 0.7900355871886121,
+        "minimum_precision": 1.0,
+        "minimum_recall": 0.6529411764705882
+      },
+      "reference_result_path": "docs/runtime-performance-v2-reference-default.json",
+      "reference_result_sha256": "783fb42d03ad753d1604ed56f04367c5bb325971e5b18742c1661c28e87bd495",
+      "reference_source_git_sha": "6b4f53970049ba30ceca212e1b6fbc3ecb613b0a",
+      "reference_wheel_sha256": "f2316d953616eafbaeb64769399c7726f95e3ca2891e8d79934b5bec9411809c"
+    },
+    "morphology": {
+      "performance_caps": {
+        "maximum_p95_latency_ns": 64000,
+        "maximum_worker_measured_incremental_peak_rss_bytes": 98304,
+        "minimum_throughput_cases_per_second": 27096.30482590608
+      },
+      "quality_floors": {
+        "maximum_false_alarm_rate": 0.0,
+        "minimum_exact_correction_accuracy": 1.0,
+        "minimum_exact_span_accuracy": 0.888235294117647,
+        "minimum_f1": 0.940809968847352,
+        "minimum_precision": 1.0,
+        "minimum_recall": 0.888235294117647
+      },
+      "reference_result_path": "docs/runtime-performance-v2-reference-morphology.json",
+      "reference_result_sha256": "239eb0222b2e29ffd7ffd17878a6774abd5cca542301d59056c20b6f555f3c6e",
+      "reference_source_git_sha": "6b4f53970049ba30ceca212e1b6fbc3ecb613b0a",
+      "reference_wheel_sha256": "f2316d953616eafbaeb64769399c7726f95e3ca2891e8d79934b5bec9411809c"
+    }
+  },
+  "protocol_version": 2,
+  "schema_id": "polis.runtime-performance-thresholds",
+  "schema_version": 1,
+  "status": "accepted_by_adr_0027",
+  "supersedes": {
+    "artifact_path": "docs/quality-threshold-proposal-v3.json",
+    "scope": "whole-process performance denominator only"
+  }
+}

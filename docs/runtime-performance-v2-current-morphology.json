@@ -1,0 +1,89 @@
+{
+  "artifact": {
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "7efbb8df4ad232661a79eacdedd0974bedc6db61076a6265b13cdd69feb92310"
+  },
+  "dataset": {
+    "cases": 340,
+    "id": "polis_v3_quality_development",
+    "manifest_sha256": "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17",
+    "schema_id": "polis.quality-development-dataset",
+    "schema_version": 3,
+    "sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276"
+  },
+  "environment": {
+    "package_version": "0.2.0",
+    "platform_machine": "arm64",
+    "platform_release": "24.3.0",
+    "platform_system": "Darwin",
+    "python_version": "3.13.12"
+  },
+  "morphology_provider": {
+    "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+    "dictionary_notice_sha256": "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    "package_version": "1.99.15",
+    "provider": "morfeusz2"
+  },
+  "performance": {
+    "latency_ns": {
+      "max": 64875,
+      "mean": 34561,
+      "min": 21541,
+      "p50": 34084,
+      "p95": 46334,
+      "sample_count": 1700
+    },
+    "throughput": {
+      "cases_per_second": 28934.165752261928,
+      "code_points_per_second": 997207.5126029567,
+      "measured_cases": 1700,
+      "measured_code_points": 58590,
+      "total_duration_ns": 58754070
+    }
+  },
+  "profile": "morphology",
+  "protocol_implementation": {
+    "overlay_applied": false,
+    "runtime_performance_protocol_sha256": "510e9f8799f52768ff9535c0d7657be1f761f39e58f06dd2db99edb0b7beb225",
+    "runtime_performance_worker_sha256": "08c0311953255ebc136ecb7a49bb1d2776e5e6bd74cf99d90d298e001f750752"
+  },
+  "protocol_version": 2,
+  "quality": {
+    "correction_accuracy": 1.0,
+    "counts": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 210,
+      "correction_matches": 151,
+      "expected_findings": 170,
+      "false_negatives": 19,
+      "false_positives": 0,
+      "predicted_findings": 151,
+      "span_matches": 151,
+      "true_positives": 151
+    },
+    "f1": 0.940809968847352,
+    "false_alarm_rate": 0.0,
+    "precision": 1.0,
+    "recall": 0.888235294117647,
+    "span_accuracy": 0.888235294117647
+  },
+  "reproducibility": {
+    "findings_sha256": "77c006d6a9070e9097f30ed02b463f8cf5fa8498ae12514a687b5afe23f4fa91",
+    "measured_repetitions": 5,
+    "stable_repetitions": 5,
+    "warmup_repetitions": 1
+  },
+  "role": "current",
+  "rss": {
+    "harness_peak_rss_bytes": 33996800,
+    "worker_measured_incremental_peak_rss_bytes": 0,
+    "worker_measurement_start_rss_bytes": 77971456,
+    "worker_peak_rss_bytes": 77971456,
+    "worker_startup_rss_bytes": 75284480
+  },
+  "schema_id": "polis.runtime-performance-result",
+  "schema_version": 1,
+  "source": {
+    "git_sha": "11fc4e0001622d2ce51b0a1c5cfb66def45b6a94"
+  }
+}
