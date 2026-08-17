@@ -51,8 +51,8 @@ def test_protocol_v2_evidence_is_additive_to_protected_history() -> None:
 
 
 def test_protocol_v2_results_share_dataset_environment_and_protocol_identity() -> None:
-    protocol_sha = _sha(ROOT / "src/polis/evaluation/runtime_performance_protocol.py")
-    worker_sha = _sha(ROOT / "src/polis/evaluation/runtime_performance_worker.py")
+    protocol_sha = _sha(ROOT / "src/polis/runtime_performance_protocol.py")
+    worker_sha = _sha(ROOT / "src/polis/runtime_performance_worker.py")
     environments = []
     for role in ROLES:
         for profile in PROFILES:

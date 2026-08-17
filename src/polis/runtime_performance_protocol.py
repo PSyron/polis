@@ -5,7 +5,9 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
+import math
 import platform
+import re
 import resource
 import subprocess
 import time
@@ -17,6 +19,32 @@ _REQUEST_SCHEMA: Final = "polis.runtime-performance.request"
 _RESPONSE_SCHEMA: Final = "polis.runtime-performance.response"
 _SCHEMA_VERSION: Final = 2
 _PROFILE_IDS: Final = frozenset({"default", "morphology"})
+_ENVIRONMENT_FIELDS: Final = frozenset(
+    {
+        "package_version",
+        "platform_machine",
+        "platform_release",
+        "platform_system",
+        "python_version",
+    }
+)
+_FINDING_FIELDS: Final = frozenset(
+    {
+        "id",
+        "category",
+        "severity",
+        "message",
+        "explanation",
+        "original",
+        "suggestion",
+        "start",
+        "end",
+        "confidence",
+        "source",
+    }
+)
+_FINDING_ID: Final = re.compile(r"finding_[0-9a-f]{32}\Z")
+_SOURCE: Final = re.compile(r"(?:rule|llm):[a-z0-9][a-z0-9._-]*\Z")
 _NOTICE_SHA256: Final = (
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
@@ -57,6 +85,67 @@ def _read_object(line: str, *, label: str) -> dict[str, object]:
 def _exact(value: Mapping[str, object], fields: set[str], label: str) -> None:
     if set(value) != fields:
         raise RuntimePerformanceProtocolError(f"{label} fields mismatch")
+
+
+def _validate_finding_payload(value: object) -> dict[str, object]:
+    if not isinstance(value, dict) or any(not isinstance(key, str) for key in value):
+        raise RuntimePerformanceProtocolError("finding must be an object")
+    finding = cast(dict[str, object], value)
+    _exact(finding, set(_FINDING_FIELDS), "finding")
+    finding_id = finding["id"]
+    category = finding["category"]
+    severity = finding["severity"]
+    message = finding["message"]
+    explanation = finding["explanation"]
+    original = finding["original"]
+    suggestion = finding["suggestion"]
+    start = finding["start"]
+    end = finding["end"]
+    confidence = finding["confidence"]
+    source = finding["source"]
+    if not isinstance(finding_id, str) or _FINDING_ID.fullmatch(finding_id) is None:
+        raise RuntimePerformanceProtocolError("finding id malformed")
+    if category not in {
+        "inflection",
+        "agreement",
+        "syntax",
+        "spelling",
+        "punctuation",
+        "style",
+    }:
+        raise RuntimePerformanceProtocolError("finding category malformed")
+    if severity not in {"error", "warning", "suggestion"}:
+        raise RuntimePerformanceProtocolError("finding severity malformed")
+    if not isinstance(message, str) or not message.strip():
+        raise RuntimePerformanceProtocolError("finding message malformed")
+    if not isinstance(explanation, str) or not explanation.strip():
+        raise RuntimePerformanceProtocolError("finding explanation malformed")
+    if not isinstance(original, str):
+        raise RuntimePerformanceProtocolError("finding original malformed")
+    if suggestion is not None and not isinstance(suggestion, str):
+        raise RuntimePerformanceProtocolError("finding suggestion malformed")
+    if suggestion is not None and suggestion == original:
+        raise RuntimePerformanceProtocolError("finding suggestion is unchanged")
+    if (
+        isinstance(start, bool)
+        or not isinstance(start, int)
+        or start < 0
+        or isinstance(end, bool)
+        or not isinstance(end, int)
+        or end < start
+        or end - start != len(original)
+    ):
+        raise RuntimePerformanceProtocolError("finding range malformed")
+    if (
+        isinstance(confidence, bool)
+        or not isinstance(confidence, (int, float))
+        or not math.isfinite(confidence)
+        or not 0.0 <= confidence <= 1.0
+    ):
+        raise RuntimePerformanceProtocolError("finding confidence malformed")
+    if not isinstance(source, str) or _SOURCE.fullmatch(source) is None:
+        raise RuntimePerformanceProtocolError("finding source malformed")
+    return finding
 
 
 def _require_protocol(value: Mapping[str, object], *, schema: str, label: str) -> str:
@@ -180,6 +269,7 @@ def run_worker(stdin: TextIO, stdout: TextIO) -> int:
     stdout.flush()
 
     measurement_checkpoint_seen = False
+    expected_sequence = 0
     while True:
         line = stdin.readline()
         if not line:
@@ -206,6 +296,8 @@ def run_worker(stdin: TextIO, stdout: TextIO) -> int:
                 )
             if not isinstance(text, str):
                 raise RuntimePerformanceProtocolError("text must be a string")
+            if sequence != expected_sequence:
+                raise RuntimePerformanceProtocolError("worker sequence mismatch")
             before = time.perf_counter_ns()
             findings = analyzer.analyze(text).issues
             after = time.perf_counter_ns()
@@ -223,6 +315,7 @@ def run_worker(stdin: TextIO, stdout: TextIO) -> int:
                 + "\n"
             )
             stdout.flush()
+            expected_sequence += 1
             continue
         if operation == "measurement_start":
             _exact(
@@ -285,7 +378,7 @@ def run_isolated_measurement(
     if warmup_repetitions < 0 or measured_repetitions < 2:
         raise RuntimePerformanceProtocolError("invalid repetition counts")
     process = subprocess.Popen(
-        [python, "-m", "polis.evaluation.runtime_performance_worker"],
+        [python, "-m", "polis.runtime_performance_worker"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -431,11 +524,11 @@ def run_isolated_measurement(
                 raise RuntimePerformanceProtocolError(
                     "duration_ns must be non-negative"
                 )
-            if not isinstance(findings, list) or any(
-                not isinstance(item, dict) for item in findings
-            ):
+            if not isinstance(findings, list):
                 raise RuntimePerformanceProtocolError("findings must be an object list")
-            parsed_findings = tuple(cast(dict[str, object], item) for item in findings)
+            parsed_findings = tuple(
+                _validate_finding_payload(item) for item in findings
+            )
             if repetition >= warmup_repetitions:
                 durations.append(duration)
                 repetition_findings.append(parsed_findings)
@@ -482,9 +575,14 @@ def run_isolated_measurement(
     morphology_provider = started.get("morphology_provider")
     startup_rss = started.get("startup_rss_bytes")
     peak_rss = finished.get("peak_rss_bytes")
-    if not isinstance(environment, dict) or not all(
-        isinstance(key, str) and isinstance(value, str)
-        for key, value in environment.items()
+    if (
+        not isinstance(environment, dict)
+        or set(environment) != _ENVIRONMENT_FIELDS
+        or not all(
+            isinstance(key, str) and isinstance(value, str)
+            for key, value in environment.items()
+        )
+        or any(not value for value in environment.values())
     ):
         raise RuntimePerformanceProtocolError("worker environment malformed")
     expected_provider = (

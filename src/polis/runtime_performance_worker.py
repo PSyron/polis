@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from typing import cast
 
-from polis.evaluation.runtime_performance_protocol import (
+from polis.runtime_performance_protocol import (
     RuntimePerformanceProtocolError,
     run_worker,
 )

@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from polis.evaluation.runtime_performance_protocol import (
+from polis.runtime_performance_protocol import (
     RuntimePerformanceProtocolError,
     run_isolated_measurement,
     run_worker,
@@ -113,6 +113,34 @@ def test_worker_rejects_unknown_operation_fail_closed() -> None:
         run_worker(stdin, io.StringIO())
 
 
+@pytest.mark.parametrize("sequences", ((7,), (0, 0), (0, 2)))
+def test_worker_rejects_non_monotonic_sequences(sequences: tuple[int, ...]) -> None:
+    requests = _line(
+        {
+            "schema_id": REQUEST,
+            "schema_version": 2,
+            "operation": "start",
+            "profile": "morphology",
+        }
+    )
+    requests += "".join(
+        _line(
+            {
+                "schema_id": REQUEST,
+                "schema_version": 2,
+                "operation": "analyze",
+                "sequence": sequence,
+                "text": "tekst",
+            }
+        )
+        for sequence in sequences
+    )
+    with pytest.raises(
+        RuntimePerformanceProtocolError, match="worker sequence mismatch"
+    ):
+        run_worker(io.StringIO(requests), io.StringIO())
+
+
 def test_worker_rejects_malformed_measurement_start_request() -> None:
     stdin = io.StringIO(
         _line(
@@ -173,7 +201,7 @@ def test_worker_enforces_single_measurement_start_before_finish(
 
 def test_worker_module_exits_two_for_malformed_input() -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "polis.evaluation.runtime_performance_worker"],
+        [sys.executable, "-m", "polis.runtime_performance_worker"],
         input="{}\n",
         capture_output=True,
         text=True,
@@ -196,9 +224,15 @@ class _FakeStdout:
 
 
 class _FakeStdin:
-    def __init__(self, stdout: _FakeStdout, events: list[dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        stdout: _FakeStdout,
+        events: list[dict[str, Any]],
+        findings: list[dict[str, object]] | None = None,
+    ) -> None:
         self._stdout = stdout
         self.events = events
+        self.findings = findings or []
 
     def write(self, value: str) -> int:
         request = json.loads(value)
@@ -213,7 +247,7 @@ class _FakeStdin:
                     "operation": "analyzed",
                     "sequence": request["sequence"],
                     "duration_ns": 1,
-                    "findings": [],
+                    "findings": self.findings,
                 }
             )
         elif operation == "measurement_start":
@@ -244,7 +278,21 @@ class _FakeStdin:
 
 
 class _FakeProcess:
-    def __init__(self, events: list[dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        events: list[dict[str, Any]],
+        *,
+        environment: dict[str, str] | None = None,
+        findings: list[dict[str, object]] | None = None,
+    ) -> None:
+        if environment is None:
+            environment = {
+                "package_version": "0.2.0",
+                "platform_machine": "arm64",
+                "platform_release": "24.3.0",
+                "platform_system": "Darwin",
+                "python_version": "3.13.12",
+            }
         stdout = _FakeStdout(
             [
                 _line(
@@ -253,14 +301,14 @@ class _FakeProcess:
                         "schema_version": 2,
                         "operation": "started",
                         "profile": "default",
-                        "environment": {"python_version": "3.13.12"},
+                        "environment": environment,
                         "morphology_provider": None,
                         "startup_rss_bytes": 10,
                     }
                 )
             ]
         )
-        self.stdin = _FakeStdin(stdout, events)
+        self.stdin = _FakeStdin(stdout, events, findings)
         self.stdout = stdout
         self.stderr = io.StringIO()
 
@@ -278,9 +326,7 @@ def test_parent_requests_checkpoint_between_warmup_and_measurement(
     def popen(*_args: object, **_kwargs: object) -> _FakeProcess:
         return process
 
-    monkeypatch.setattr(
-        "polis.evaluation.runtime_performance_protocol.subprocess.Popen", popen
-    )
+    monkeypatch.setattr("polis.runtime_performance_protocol.subprocess.Popen", popen)
 
     measurement = run_isolated_measurement(
         python=sys.executable,
@@ -299,6 +345,32 @@ def test_parent_requests_checkpoint_between_warmup_and_measurement(
         "finish",
     ]
     assert measurement.measurement_start_rss_bytes == 20
+
+
+@pytest.mark.parametrize(
+    ("process", "message"),
+    [
+        (_FakeProcess([], environment={}), "worker environment malformed"),
+        (_FakeProcess([], findings=[{}]), "finding fields mismatch"),
+    ],
+)
+def test_parent_rejects_semantically_malformed_worker_output(
+    monkeypatch: pytest.MonkeyPatch,
+    process: _FakeProcess,
+    message: str,
+) -> None:
+    monkeypatch.setattr(
+        "polis.runtime_performance_protocol.subprocess.Popen",
+        lambda *_args, **_kwargs: process,
+    )
+    with pytest.raises(RuntimePerformanceProtocolError, match=message):
+        run_isolated_measurement(
+            python=sys.executable,
+            profile="default",
+            texts=("tekst",),
+            warmup_repetitions=1,
+            measured_repetitions=2,
+        )
 
 
 def test_parent_client_measures_deterministically_in_fresh_worker() -> None:
@@ -329,10 +401,8 @@ def test_parent_client_measures_deterministically_in_fresh_worker() -> None:
 
 
 def test_worker_source_contains_no_dataset_or_scoring_import() -> None:
-    worker = Path("src/polis/evaluation/runtime_performance_worker.py").read_text(
-        encoding="utf-8"
-    )
-    protocol = Path("src/polis/evaluation/runtime_performance_protocol.py").read_text(
+    worker = Path("src/polis/runtime_performance_worker.py").read_text(encoding="utf-8")
+    protocol = Path("src/polis/runtime_performance_protocol.py").read_text(
         encoding="utf-8"
     )
     banned = (
@@ -350,3 +420,23 @@ def test_worker_source_contains_no_dataset_or_scoring_import() -> None:
         )
     ]
     assert all(name not in worker_loop for name in banned)
+
+
+def test_importing_worker_does_not_initialize_evaluation_package() -> None:
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; import polis.runtime_performance_worker; "
+                "print(sorted(name for name in sys.modules "
+                "if name in {'polis.evaluation.dataset', "
+                "'polis.evaluation.metrics', 'polis.evaluation.safety_corpus'}))"
+            ),
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    assert completed.stdout.strip() == "[]"
