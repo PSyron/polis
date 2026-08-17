@@ -1,7 +1,7 @@
 {
   "artifact": {
     "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
-    "wheel_sha256": "5ca24aa2fa768893e628daf8196b24fc40ef66d797ffc56631a04ee608780a17"
+    "wheel_sha256": "f2316d953616eafbaeb64769399c7726f95e3ca2891e8d79934b5bec9411809c"
   },
   "dataset": {
     "cases": 340,
@@ -21,26 +21,26 @@
   "morphology_provider": null,
   "performance": {
     "latency_ns": {
-      "max": 135791,
-      "mean": 29048,
-      "min": 20334,
-      "p50": 28834,
-      "p95": 36416,
+      "max": 89292,
+      "mean": 29608,
+      "min": 20792,
+      "p50": 29333,
+      "p95": 37833,
       "sample_count": 1700
     },
     "throughput": {
-      "cases_per_second": 34425.22032141006,
-      "code_points_per_second": 1186455.0933125971,
+      "cases_per_second": 33773.74092834835,
+      "code_points_per_second": 1164002.0476423118,
       "measured_cases": 1700,
       "measured_code_points": 58590,
-      "total_duration_ns": 49382400
+      "total_duration_ns": 50334963
     }
   },
   "profile": "default",
   "protocol_implementation": {
     "overlay_applied": true,
-    "runtime_performance_protocol_sha256": "7a165da5c857bc8df57cda8d6edd02ed224d79e225713b3d8f57b815a0d317db",
-    "runtime_performance_worker_sha256": "56003ed9abdcaac364067425b737c1202aa1eedeb7d41402b458c78686e6c1db"
+    "runtime_performance_protocol_sha256": "510e9f8799f52768ff9535c0d7657be1f761f39e58f06dd2db99edb0b7beb225",
+    "runtime_performance_worker_sha256": "08c0311953255ebc136ecb7a49bb1d2776e5e6bd74cf99d90d298e001f750752"
   },
   "protocol_version": 2,
   "quality": {
@@ -70,11 +70,11 @@
   },
   "role": "reference",
   "rss": {
-    "harness_peak_rss_bytes": 32194560,
-    "worker_measured_incremental_peak_rss_bytes": 131072,
-    "worker_measurement_start_rss_bytes": 32079872,
-    "worker_peak_rss_bytes": 32210944,
-    "worker_startup_rss_bytes": 32030720
+    "harness_peak_rss_bytes": 32374784,
+    "worker_measured_incremental_peak_rss_bytes": 114688,
+    "worker_measurement_start_rss_bytes": 30490624,
+    "worker_peak_rss_bytes": 30605312,
+    "worker_startup_rss_bytes": 30408704
   },
   "schema_id": "polis.runtime-performance-result",
   "schema_version": 1,

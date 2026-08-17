@@ -30,6 +30,8 @@ protokół pomiarowy z izolowanym procesem workera.
 
 ### Proces nadrzędny
 
+Repozytoryjny harness `scripts/run_runtime_performance_v2.py`:
+
 - ładuje dataset, goldy i scoring;
 - uruchamia workera z czystego środowiska zainstalowanego wheel;
 - przesyła tekst lokalnym JSON Lines przez stdin/stdout;
