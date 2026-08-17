@@ -130,6 +130,9 @@ def test_thresholds_are_reference_derived_and_comparison_is_fail_closed() -> Non
     for profile in PROFILES:
         reference = _result("reference", profile)
         current = _result("current", profile)
+        assert current["source"]["git_sha"] == (
+            "f259f23d75616a15b6d6de86eca8d3dc273c55d2"
+        )
         profile_thresholds = thresholds["profiles"][profile]
         caps = profile_thresholds["performance_caps"]
         assert profile_thresholds["reference_result_sha256"] == _sha(
@@ -167,6 +170,6 @@ def test_thresholds_are_reference_derived_and_comparison_is_fail_closed() -> Non
             <= caps["maximum_worker_measured_incremental_peak_rss_bytes"]
         )
 
-    assert comparison["profiles"]["default"]["verdict"] == "fail"
+    assert comparison["profiles"]["default"]["verdict"] == "pass"
     assert comparison["profiles"]["morphology"]["verdict"] == "pass"
-    assert comparison["aggregate_verdict"] == "fail"
+    assert comparison["aggregate_verdict"] == "pass"
