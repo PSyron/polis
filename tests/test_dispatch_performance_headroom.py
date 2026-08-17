@@ -15,6 +15,12 @@ from polis.rules.government import (
     InflectionGovernmentSluchacRadioRule,
     _governed_form_replacement,
 )
+from polis.rules.spelling import (
+    SpellingConajmniejRule,
+    SpellingWogoleRule,
+    _closed_literal_lookup,
+)
+from polis.segmentation import is_single_sentence, segment_sentences
 
 PROPOSAL = Path("docs/quality-threshold-proposal-v3.json")
 # Absolute performance caps must remain the #339 F1.3 / wave0 values.
@@ -61,6 +67,21 @@ def test_governed_form_replacement_caches_closed_form() -> None:
     second = _governed_form_replacement(provider, _SLUCHAC_FORM)
     assert first == second == "radia"
     assert len(_GOVERNED_FORM_CACHE) == size_after_first == 1
+
+
+def test_closed_literal_surface_lookup_is_cached_per_rule_tuple() -> None:
+    rules = (SpellingWogoleRule(), SpellingConajmniejRule())
+    _closed_literal_lookup.cache_clear()
+    first = _closed_literal_lookup(rules)
+    second = _closed_literal_lookup(rules)
+    assert first is second
+    assert _closed_literal_lookup.cache_info().hits == 1
+
+
+def test_single_sentence_fast_probe_matches_segmenter_on_v3() -> None:
+    dataset = load_quality_dataset(version=QualityDatasetVersion.V3)
+    for case in dataset.cases:
+        assert is_single_sentence(case.text) is (len(segment_sentences(case.text)) == 1)
 
 
 def test_quality_floors_remain_green_after_dispatch_optimization() -> None:

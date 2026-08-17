@@ -135,6 +135,45 @@ def segment_sentences(text: str) -> tuple[Sentence, ...]:
     return tuple(sentences)
 
 
+def is_single_sentence(text: str) -> bool:
+    """Return True when ``text`` contains exactly one sentence span.
+
+    Equivalent to ``len(segment_sentences(text)) == 1`` but exits early after
+    the second sentence boundary is confirmed, avoiding full segment materialization.
+    """
+
+    if not isinstance(text, str):
+        raise TypeError("text must be a string")
+    if not text:
+        return False
+
+    sentence_count = 0
+    for paragraph in segment_paragraphs(text):
+        if not paragraph.text:
+            continue
+        local_start = 0
+        paragraph_text = paragraph.text
+        i = 0
+        while i < len(paragraph_text):
+            if _is_sentence_boundary(paragraph_text, i):
+                boundary_end = _consume_sentence_run(paragraph_text, i)
+                boundary_end = _consume_trailing_marks(paragraph_text, boundary_end)
+                boundary_end = _consume_blank_line_ending(paragraph_text, boundary_end)
+                if boundary_end > local_start:
+                    sentence_count += 1
+                    if sentence_count > 1:
+                        return False
+                local_start = boundary_end
+                i = boundary_end
+                continue
+            i += 1
+        if local_start < len(paragraph_text):
+            sentence_count += 1
+            if sentence_count > 1:
+                return False
+    return sentence_count == 1
+
+
 def _is_sentence_boundary(text: str, index: int) -> bool:
     """Return True if text[index] ends a sentence by a deterministic heuristic."""
 
@@ -251,6 +290,7 @@ __all__ = [
     "Paragraph",
     "Sentence",
     "Segment",
+    "is_single_sentence",
     "segment_paragraphs",
     "segment_sentences",
 ]

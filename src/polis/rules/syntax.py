@@ -16,6 +16,7 @@ from polis.core import (
 )
 from polis.core.models import Severity
 from polis.segmentation import Sentence
+from polis.segmentation import is_single_sentence as _is_single_sentence_uncached
 from polis.segmentation import segment_sentences as _segment_sentences_uncached
 
 
@@ -26,10 +27,23 @@ def _segment_sentences_cached(text: str) -> tuple[Sentence, ...]:
     return tuple(_segment_sentences_uncached(text))
 
 
+@lru_cache(maxsize=256)
+def _is_single_sentence_cached(text: str) -> bool:
+    """Cache single-sentence probes for closed syntax templates."""
+
+    return bool(_is_single_sentence_uncached(text))
+
+
 def segment_sentences(text: str) -> tuple[Sentence, ...]:
     """Registry-local wrapper used by syntax rules during one analysis pass."""
 
     return _segment_sentences_cached(text)
+
+
+def is_single_sentence(text: str) -> bool:
+    """Registry-local single-sentence probe with the same cache policy."""
+
+    return _is_single_sentence_cached(text)
 
 
 _DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
@@ -319,13 +333,13 @@ class SyntaxMissingReflexiveRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
-            return ()
 
         for pattern in self._PREFIXES:
             match = pattern.match(text)
             if match is None:
                 continue
+            if not is_single_sentence(text):
+                return ()
             following = text[match.end() :]
             if not following or not following[0].isspace():
                 return ()
@@ -373,11 +387,9 @@ class SyntaxMissingCorrelativeRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
-            return ()
 
         match = self._PATTERN.match(text)
-        if match is None:
+        if match is None or not is_single_sentence(text):
             return ()
         start = match.start("bardziej")
         return (
@@ -508,11 +520,12 @@ class SyntaxInitialTemporalCommaRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
-            return ()
 
+        matches = tuple(_INITIAL_TEMPORAL_COMMA_PATTERN.finditer(text))
+        if not matches or not is_single_sentence(text):
+            return ()
         findings: list[Finding] = []
-        for match in _INITIAL_TEMPORAL_COMMA_PATTERN.finditer(text):
+        for match in matches:
             start = match.end("head")
             if _is_quoted_position(text, match.start("head")):
                 continue
@@ -677,10 +690,11 @@ class SyntaxCommaBeforeZeReportingRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
+        matches = tuple(self._pattern.finditer(text))
+        if not matches or not is_single_sentence(text):
             return ()
         findings: list[Finding] = []
-        for match in self._pattern.finditer(text):
+        for match in matches:
             gov = match.group("gov")
             if gov not in _ZE_REPORTING_GOVERNORS:
                 continue
@@ -729,10 +743,11 @@ class SyntaxCommaBeforeZebyPurposeRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
+        matches = tuple(self._pattern.finditer(text))
+        if not matches or not is_single_sentence(text):
             return ()
         findings: list[Finding] = []
-        for match in self._pattern.finditer(text):
+        for match in matches:
             gov = match.group("gov")
             if gov not in _ZEBY_PURPOSE_GOVERNORS:
                 continue
@@ -780,10 +795,11 @@ class SyntaxCommaBeforeBoRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        if len(segment_sentences(text)) != 1:
+        matches = tuple(self._pattern.finditer(text))
+        if not matches or not is_single_sentence(text):
             return ()
         findings: list[Finding] = []
-        for match in self._pattern.finditer(text):
+        for match in matches:
             pre_char = match.group("pre")
             if _POLISH_LETTER.fullmatch(pre_char) is None:
                 continue
