@@ -74,7 +74,6 @@ def test_rule_preserves_approved_sentence_casing(
         "XNie widzę samochód.",
         "Nie widzę samochód, ale widzę rower.",
         "Nie widzę samochód; idę pieszo.",
-        "Nie widzę samochód. Widzę rower.",
         "„Nie widzę samochód.”",
         "Zdanie Nie widzę samochód. jest błędne.",
         "Dzisiaj nie widzę samochód.",
@@ -117,7 +116,7 @@ def test_registry_exposes_review_only_behavior_metadata() -> None:
     assert behavior == SourceBehavior(
         source=rule.source,
         operation="replace.negated_government_form",
-        behavior_version="inflection-negated-widziec/1.0",
+        behavior_version="inflection-negated-widziec/2.0",
     )
 
 

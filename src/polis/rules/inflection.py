@@ -15,10 +15,15 @@ from polis.core import (
 )
 from polis.core.models import Severity
 from polis.rules._morfeusz import _QualifiedMorfeusz
+from polis.segmentation import (
+    _iter_sentence_template_matches as iter_sentence_template_matches,
+)
 
 _PATTERN: Final = re.compile(
-    r"(?:(?:Nie|nie) widzę (?P<lower>samochód)|NIE WIDZĘ (?P<upper>SAMOCHÓD))\.\Z"
+    r"(?<!\w)(?:(?:Nie|nie) widzę (?P<lower>samochód)|"
+    r"NIE WIDZĘ (?P<upper>SAMOCHÓD))(?!\w)"
 )
+_NEGATED_REPEAT_SEPARATOR: Final = re.compile(r"\s+(?:i znów|I ZNÓW)\s+")
 _NOMINAL_GROUP_PATTERN: Final = re.compile(
     r"Nie widzę (?P<nominal_group>czerwony samochód)\.\Z"
 )
@@ -48,36 +53,44 @@ class InflectionNegatedWidziecRule:
     def behavior_version(self) -> str:
         """Return the review-only implementation behavior version."""
 
-        return "inflection-negated-widziec/1.0"
+        return "inflection-negated-widziec/2.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Return the one closed finding when its exact sentence is present."""
 
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        match = _PATTERN.fullmatch(text)
-        if match is None:
+        if "widzę" not in text and "WIDZĘ" not in text:
             return ()
-        group = "upper" if match.group("upper") is not None else "lower"
-        original = match.group(group)
-        suggestion = "SAMOCHODU" if group == "upper" else "samochodu"
-        return (
-            Finding.create(
-                category=self._CATEGORY,
-                severity=Severity.SUGGESTION,
-                message="Niepoprawna forma dopełnienia po zaprzeczonym „widzieć”.",
-                explanation=(
-                    "W tej zamkniętej konstrukcji zaprzeczenie wymaga formy "
-                    f"„{suggestion}”."
-                ),
-                original=original,
-                suggestion=suggestion,
-                start=match.start(group),
-                end=match.end(group),
-                confidence=self._confidence,
-                source=self.source,
-            ),
-        )
+        findings: list[Finding] = []
+        for _sentence, match in iter_sentence_template_matches(
+            text,
+            _PATTERN,
+            require_terminal=True,
+            repeat_separator=_NEGATED_REPEAT_SEPARATOR,
+        ):
+            group = "upper" if match.group("upper") is not None else "lower"
+            original = match.group(group)
+            suggestion = "SAMOCHODU" if group == "upper" else "samochodu"
+            start, end = match.start(group), match.end(group)
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niepoprawna forma dopełnienia po zaprzeczonym „widzieć”.",
+                    explanation=(
+                        "W tej zamkniętej konstrukcji zaprzeczenie wymaga formy "
+                        f"„{suggestion}”."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=start,
+                    end=end,
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
 
 
 class InflectionNegatedWidziecNominalGroupRule:
@@ -133,13 +146,12 @@ class InflectionNegatedWidziecNominalGroupRule:
 
 
 _MIEC_CZAS_PATTERN: Final = re.compile(
-    r"(?:(?:Nie|nie) mam (?P<lower>czas)|NIE MAM (?P<upper>CZAS))\.\Z"
+    r"(?<!\w)(?:(?:Nie|nie) mam (?P<lower>czas)|"
+    r"NIE MAM (?P<upper>CZAS))(?!\w)"
 )
 _NUMERAL_FIVE_PATTERN: Final = re.compile(
-    r"(?:\A|(?<=[.!?]\s))"
-    r"(?P<head>Pięć|pięć|PIĘĆ)\s+"
-    r"(?P<object>książki|KSIĄŻKI)"
-    r"(?=\s)",
+    r"(?<!\w)(?P<head>Pięć|pięć|PIĘĆ)\s+"
+    r"(?P<object>książki|KSIĄŻKI)(?=\s)",
 )
 
 
@@ -163,29 +175,37 @@ class InflectionNegatedMiecCzasRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        match = _MIEC_CZAS_PATTERN.fullmatch(text)
-        if match is None:
+        if "mam" not in text and "MAM" not in text:
             return ()
-        group = "upper" if match.group("upper") is not None else "lower"
-        original = match.group(group)
-        suggestion = "CZASU" if group == "upper" else "czasu"
-        return (
-            Finding.create(
-                category=self._CATEGORY,
-                severity=Severity.SUGGESTION,
-                message="Niepoprawna forma dopełnienia po zaprzeczonym „mieć”.",
-                explanation=(
-                    "W tej zamkniętej konstrukcji zaprzeczenie wymaga formy "
-                    f"„{suggestion}”."
-                ),
-                original=original,
-                suggestion=suggestion,
-                start=match.start(group),
-                end=match.end(group),
-                confidence=self._confidence,
-                source=self.source,
-            ),
-        )
+        findings: list[Finding] = []
+        for _sentence, match in iter_sentence_template_matches(
+            text,
+            _MIEC_CZAS_PATTERN,
+            require_terminal=True,
+            repeat_separator=_NEGATED_REPEAT_SEPARATOR,
+        ):
+            group = "upper" if match.group("upper") is not None else "lower"
+            original = match.group(group)
+            suggestion = "CZASU" if group == "upper" else "czasu"
+            start, end = match.start(group), match.end(group)
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Niepoprawna forma dopełnienia po zaprzeczonym „mieć”.",
+                    explanation=(
+                        "W tej zamkniętej konstrukcji zaprzeczenie wymaga formy "
+                        f"„{suggestion}”."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=start,
+                    end=end,
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
 
 
 class InflectionNumeralFiveGenitivePluralRule:
@@ -209,12 +229,17 @@ class InflectionNumeralFiveGenitivePluralRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
+        if "książki" not in text and "KSIĄŻKI" not in text:
+            return ()
         findings: list[Finding] = []
-        for match in _NUMERAL_FIVE_PATTERN.finditer(text):
+        for _sentence, match in iter_sentence_template_matches(
+            text, _NUMERAL_FIVE_PATTERN
+        ):
             original = match.group("object")
             suggestion = self._MAP.get(original)
             if suggestion is None:
                 continue
+            start, end = match.start("object"), match.end("object")
             findings.append(
                 Finding.create(
                     category=self._CATEGORY,
@@ -226,8 +251,8 @@ class InflectionNumeralFiveGenitivePluralRule:
                     ),
                     original=original,
                     suggestion=suggestion,
-                    start=match.start("object"),
-                    end=match.end("object"),
+                    start=start,
+                    end=end,
                     confidence=self._confidence,
                     source=self.source,
                 )

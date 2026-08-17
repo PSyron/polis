@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from functools import lru_cache
 from typing import Final
 
 from polis.core import (
@@ -15,35 +14,27 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
-from polis.segmentation import Sentence
-from polis.segmentation import is_single_sentence as _is_single_sentence_uncached
-from polis.segmentation import segment_sentences as _segment_sentences_uncached
-
-
-@lru_cache(maxsize=256)
-def _segment_sentences_cached(text: str) -> tuple[Sentence, ...]:
-    """Cache sentence segmentation for repeated single-text rule probes."""
-
-    return tuple(_segment_sentences_uncached(text))
-
-
-@lru_cache(maxsize=256)
-def _is_single_sentence_cached(text: str) -> bool:
-    """Cache single-sentence probes for closed syntax templates."""
-
-    return bool(_is_single_sentence_uncached(text))
+from polis.segmentation import (
+    Sentence,
+)
+from polis.segmentation import (
+    _iter_sentence_matches as iter_sentence_matches,
+)
+from polis.segmentation import (
+    _sentence_segments_cached as sentence_segments,
+)
 
 
 def segment_sentences(text: str) -> tuple[Sentence, ...]:
-    """Registry-local wrapper used by syntax rules during one analysis pass."""
+    """Registry-local wrapper over the shared bounded sentence cache."""
 
-    return _segment_sentences_cached(text)
+    return tuple(sentence_segments(text))
 
 
 def is_single_sentence(text: str) -> bool:
-    """Registry-local single-sentence probe with the same cache policy."""
+    """Return whether the shared segmentation contains one sentence."""
 
-    return _is_single_sentence_cached(text)
+    return len(sentence_segments(text)) == 1
 
 
 _DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
@@ -690,11 +681,10 @@ class SyntaxCommaBeforeZeReportingRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        matches = tuple(self._pattern.finditer(text))
-        if not matches or not is_single_sentence(text):
+        if " że" not in text and " Że" not in text and " ŻE" not in text:
             return ()
         findings: list[Finding] = []
-        for match in matches:
+        for _sentence, match in iter_sentence_matches(text, self._pattern):
             gov = match.group("gov")
             if gov not in _ZE_REPORTING_GOVERNORS:
                 continue
@@ -743,11 +733,13 @@ class SyntaxCommaBeforeZebyPurposeRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        matches = tuple(self._pattern.finditer(text))
-        if not matches or not is_single_sentence(text):
+        if not any(
+            conjunction in text
+            for conjunction in (" żeby", " żebyś", " Żeby", " Żebyś", " ŻEBY", " ŻEBYŚ")
+        ):
             return ()
         findings: list[Finding] = []
-        for match in matches:
+        for _sentence, match in iter_sentence_matches(text, self._pattern):
             gov = match.group("gov")
             if gov not in _ZEBY_PURPOSE_GOVERNORS:
                 continue
@@ -781,7 +773,8 @@ class SyntaxCommaBeforeBoRule:
     def __init__(self) -> None:
         self.source = Source(SourceKind.RULE, "syntax.comma_before_bo")
         self._pattern = re.compile(
-            r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż) (?P<after>[a-ząćęłńóśźż])"
+            r"(?P<pre>\S) (?P<conj>bo|ponieważ|gdyż) "
+            r"(?P<after>[a-ząćęłńóśźż])"
         )
 
     @property
@@ -795,25 +788,22 @@ class SyntaxCommaBeforeBoRule:
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        matches = tuple(self._pattern.finditer(text))
-        if not matches or not is_single_sentence(text):
+        if " bo " not in text and " ponieważ " not in text and " gdyż " not in text:
             return ()
         findings: list[Finding] = []
-        for match in matches:
+        for sentence, match in iter_sentence_matches(text, self._pattern):
             pre_char = match.group("pre")
             if _POLISH_LETTER.fullmatch(pre_char) is None:
                 continue
             # Preceding token (word) exclusion set.
-            left = text[: match.start("conj")].rstrip()
+            left = text[sentence.start : match.start("conj")].rstrip()
             token = left.rsplit(None, 1)[-1] if left else ""
             token_core = re.sub(r"[^\w]+$", "", token)
             if token_core.casefold() in _CAUSAL_PRECURSOR_EXCLUSIONS:
                 continue
             if _is_quoted_position(text, match.start("conj")):
                 continue
-            insert_at = match.start("conj") - 1  # space before conj → insert comma
-            # Insert between preceding letter and space: "ę bo" → "ę, bo"
-            # match is: pre + " " + conj + " " + after; insert after pre.
+            # Insert between preceding letter and space: "ę bo" → "ę, bo".
             insert_at = match.start("pre") + 1
             if insert_at < len(text) and text[insert_at] == ",":
                 continue
