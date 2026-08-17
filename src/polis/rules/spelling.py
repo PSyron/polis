@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from functools import lru_cache
 from types import MappingProxyType
 from typing import Final, cast
@@ -214,7 +215,7 @@ def _closed_literal_pattern(rules: tuple[_CasePatternRule, ...]) -> re.Pattern[s
 def _closed_literal_empty_buckets(
     rules: tuple[_CasePatternRule, ...],
 ) -> MappingProxyType[Source, tuple[Finding, ...]]:
-    """Build the ordered empty-source template copied by each collector call."""
+    """Cache an immutable ordered empty-source mapping."""
 
     return MappingProxyType({rule.source: () for rule in rules})
 
@@ -234,7 +235,7 @@ def _explicit_case_pattern(surface: str) -> str:
 
 def collect_closed_literal_findings(
     text: str, rules: tuple[_CasePatternRule, ...]
-) -> dict[Source, tuple[Finding, ...]]:
+) -> Mapping[Source, tuple[Finding, ...]]:
     """Scan ``text`` once and bucket findings by closed-literal rule source.
 
     Behavior is identical to invoking each rule's historical per-pattern
@@ -248,10 +249,8 @@ def collect_closed_literal_findings(
         return {}
     lookup = _closed_literal_lookup(rules)
     pattern = _closed_literal_pattern(rules)
-    buckets = cast(
-        dict[Source, tuple[Finding, ...] | list[Finding]],
-        _closed_literal_empty_buckets(rules).copy(),
-    )
+    empty_buckets = _closed_literal_empty_buckets(rules)
+    buckets: dict[Source, tuple[Finding, ...] | list[Finding]] | None = None
     for match in pattern.finditer(text):
         observed = match.group()
         entry = lookup.get(observed.lower())
@@ -277,11 +276,18 @@ def collect_closed_literal_findings(
             confidence=matched_rule._confidence,
             source=matched_rule.source,
         )
+        if buckets is None:
+            buckets = cast(
+                dict[Source, tuple[Finding, ...] | list[Finding]],
+                empty_buckets.copy(),
+            )
         current = buckets[matched_rule.source]
         if isinstance(current, tuple):
             buckets[matched_rule.source] = [finding]
         else:
             current.append(finding)
+    if buckets is None:
+        return empty_buckets
     for source, items in buckets.items():
         if isinstance(items, list):
             buckets[source] = tuple(items)

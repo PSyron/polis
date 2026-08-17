@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Final, Protocol
 
@@ -250,7 +250,7 @@ class DeterministicRuleRegistry:
         # are selected together (Wave 0 / #338 F0.3). Non-literal rules keep
         # their independent find() paths. Emission order remains registration
         # order for exact source identity compatibility.
-        literal_buckets: dict[Source, tuple[Finding, ...]] = {}
+        literal_buckets: Mapping[Source, tuple[Finding, ...]] = {}
         if literal_rules:
             literal_buckets = collect_closed_literal_findings(text, literal_rules)
 

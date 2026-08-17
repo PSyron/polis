@@ -100,16 +100,18 @@ def test_closed_literal_pattern_is_cached_and_case_explicit() -> None:
     assert first.search("ſogole") is None
 
 
-def test_closed_literal_collector_copies_cached_empty_bucket_template() -> None:
+def test_closed_literal_collector_uses_immutable_cached_empty_mapping() -> None:
     rules = (SpellingWogoleRule(), SpellingConajmniejRule())
     _closed_literal_empty_buckets.cache_clear()
     template = _closed_literal_empty_buckets(rules)
 
+    empty_result = collect_closed_literal_findings("Poprawny tekst.", rules)
     result = collect_closed_literal_findings("Wogole błąd.", rules)
 
-    assert result is not template
-    assert all(findings == () for findings in template.values())
+    assert empty_result is template
     assert not hasattr(template, "clear")
+    assert result is not template
+    assert tuple(result) == tuple(rule.source for rule in rules)
     assert result[rules[0].source]
     assert result[rules[1].source] == ()
 
