@@ -17,7 +17,13 @@ from polis.rules._morfeusz import _ProviderIdentity, _QualifiedMorfeusz
 from polis.rules.government import InflectionGovernmentSluchacRadioRule
 
 _NOTICE = "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
-_BEHAVIOR_SUFFIX = "1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-" + _NOTICE
+_PROVIDER_SUFFIX = "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-" + _NOTICE
+
+
+def _behavior_version(source: str, stem: str) -> str:
+    major = 2 if source == "rule:inflection.government_do_sklep" else 1
+    return f"{stem}/{major}.0+{_PROVIDER_SUFFIX}"
+
 
 _CASES = (
     (
@@ -134,7 +140,7 @@ def test_wave4_emits_exact_contract_with_provider(
     behavior = analyzer._registry.source_behavior(finding.source)
     assert behavior is not None
     assert behavior.operation == "replace.governed_form"
-    assert behavior.behavior_version == f"{stem}/{_BEHAVIOR_SUFFIX}"
+    assert behavior.behavior_version == _behavior_version(source, stem)
     correction = analyzer.correct(text)
     assert correction.applied_findings == ()
     assert any(str(item.source) == source for item in correction.skipped_findings)
@@ -250,7 +256,7 @@ def test_wave4_sources_remain_review_only(source: str) -> None:
     behavior = SourceBehavior(
         source=source_obj,
         operation="replace.governed_form",
-        behavior_version=f"{stem}/{_BEHAVIOR_SUFFIX}",
+        behavior_version=_behavior_version(source, stem),
     )
     assert not is_automatic_correction_eligible(
         finding, behavior, source_policy_version=SOURCE_POLICY_VERSION

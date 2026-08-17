@@ -210,10 +210,11 @@ class _Wave4GovernmentSpec:
     form: _GovernedFormProp
     message: str
     explanation: str
+    behavior_major: int = 1
 
 
-def _wave4_behavior(stem: str) -> str:
-    return f"{stem}/1.0+{_NOTICE}"
+def _wave4_behavior(stem: str, major: int = 1) -> str:
+    return f"{stem}/{major}.0+{_NOTICE}"
 
 
 _SLUCHAC_FORM: Final = _GovernedFormProp(
@@ -349,14 +350,17 @@ _WAVE4_SPECS: Final = (
         source_name="inflection.government_do_sklep",
         behavior_stem="inflection-government-do-sklep",
         pattern=re.compile(
-            rf"(?<!\w)(?P<governor>Idę|idę|IDĘ) do "
-            rf"(?P<governed>sklep|Sklep|SKLEP){_TRAIL}{_NP_FINAL}"
+            rf"(?<!\w)(?:(?P<governor>Idę|idę|IDĘ) do "
+            rf"(?P<governed>sklep|Sklep|SKLEP)|"
+            rf"(?P<upper_governor>IDĘ) DO (?P<upper_governed>SKLEP))"
+            rf"{_TRAIL}{_NP_FINAL}"
         ),
         form=_DO_SKLEP_FORM,
         message="Niepoprawna forma dopełnienia po przyimku „do”.",
         explanation=(
             "W tej zamkniętej konstrukcji po „do” wymagany jest dopełniacz „sklepu”."
         ),
+        behavior_major=2,
     ),
     _Wave4GovernmentSpec(
         source_name="inflection.government_ufac_lekarz",
@@ -407,7 +411,10 @@ class _Wave4MorphologyGovernmentRule:
 
     @property
     def behavior_version(self) -> str:
-        return _wave4_behavior(self._spec.behavior_stem)
+        return _wave4_behavior(
+            self._spec.behavior_stem,
+            self._spec.behavior_major,
+        )
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
@@ -424,16 +431,22 @@ class _Wave4MorphologyGovernmentRule:
         replacement = confirmed
         findings: list[Finding] = []
         for match in matches:
-            start = match.start("governed")
-            end = match.end("governed")
+            upper_branch = match.groupdict().get("upper_governed") is not None
+            governed_group = "upper_governed" if upper_branch else "governed"
+            start = match.start(governed_group)
+            end = match.end(governed_group)
             if _is_wrapped_mention(text, match.start(0), match.end(0)):
                 continue
-            original = match.group("governed")
+            original = match.group(governed_group)
             # Title-case guard: morphology cannot replace proper-name / address
             # detection for mid-template capitalized nouns.
             if _is_title_case(original):
                 continue
-            suggestion = _match_case(original, replacement)
+            suggestion = (
+                replacement.upper()
+                if upper_branch
+                else _match_case(original, replacement)
+            )
             if suggestion == original:
                 continue
             findings.append(
