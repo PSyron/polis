@@ -17,6 +17,7 @@ from polis.rules.government import (
 )
 from polis.rules.spelling import (
     SpellingConajmniejRule,
+    SpellingWkoncuRule,
     SpellingWogoleRule,
     _closed_literal_empty_buckets,
     _closed_literal_lookup,
@@ -82,16 +83,17 @@ def test_closed_literal_surface_lookup_is_cached_per_rule_tuple() -> None:
 
 
 def test_closed_literal_pattern_is_cached_and_case_explicit() -> None:
-    rules = (SpellingWogoleRule(), SpellingConajmniejRule())
+    rules = (SpellingWogoleRule(), SpellingWkoncuRule(), SpellingConajmniejRule())
     _closed_literal_pattern.cache_clear()
 
     first = _closed_literal_pattern(rules)
     second = _closed_literal_pattern(rules)
 
     assert first is second
-    assert first.findall("wogole WOGole conajmniej CONAJMNIEJ") == [
+    assert first.findall("wogole WOGole wKoncu conajmniej CONAJMNIEJ") == [
         "wogole",
         "WOGole",
+        "wKoncu",
         "conajmniej",
         "CONAJMNIEJ",
     ]
@@ -107,6 +109,7 @@ def test_closed_literal_collector_copies_cached_empty_bucket_template() -> None:
 
     assert result is not template
     assert all(findings == () for findings in template.values())
+    assert not hasattr(template, "clear")
     assert result[rules[0].source]
     assert result[rules[1].source] == ()
 

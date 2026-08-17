@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from functools import lru_cache
+from types import MappingProxyType
 from typing import Final, cast
 
 from polis.core import (
@@ -29,6 +30,7 @@ _SCHEME_RE: Final = re.compile(r"(?i)\b(?:https?|ftp)://")
 _DOMAINISH_RE: Final = re.compile(
     r"(?i)\b(?:www\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b"
 )
+_LOWER_COMPATIBILITY_VARIANTS: Final = {"k": "K"}
 
 
 def _host_token_span(text: str, start: int, end: int) -> tuple[int, int]:
@@ -211,10 +213,10 @@ def _closed_literal_pattern(rules: tuple[_CasePatternRule, ...]) -> re.Pattern[s
 @lru_cache(maxsize=32)
 def _closed_literal_empty_buckets(
     rules: tuple[_CasePatternRule, ...],
-) -> dict[Source, tuple[Finding, ...]]:
+) -> MappingProxyType[Source, tuple[Finding, ...]]:
     """Build the ordered empty-source template copied by each collector call."""
 
-    return {rule.source: () for rule in rules}
+    return MappingProxyType({rule.source: () for rule in rules})
 
 
 def _explicit_case_pattern(surface: str) -> str:
@@ -223,7 +225,8 @@ def _explicit_case_pattern(surface: str) -> str:
         lower = char.lower()
         upper = char.upper()
         if len(lower) == len(upper) == 1 and lower != upper:
-            parts.append(f"[{re.escape(lower + upper)}]")
+            variants = lower + upper + _LOWER_COMPATIBILITY_VARIANTS.get(lower, "")
+            parts.append(f"[{re.escape(variants)}]")
         else:
             parts.append(re.escape(char))
     return "".join(parts)
