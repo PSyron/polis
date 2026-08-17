@@ -9,6 +9,7 @@ import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
+from functools import lru_cache
 from typing import Self, cast
 
 _SOURCE_NAME = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
@@ -495,6 +496,7 @@ def _require_non_blank_text(value: object, name: str) -> None:
         raise ValueError(f"{name} must not be blank")
 
 
+@lru_cache(maxsize=4096)
 def _stable_finding_id(
     *,
     category: Category,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import Final
 
 from polis.core import (
@@ -165,6 +166,7 @@ class AgreementSubjectVerbMyCzytaRule:
         return tuple(findings)
 
 
+@lru_cache(maxsize=8)
 def _oni_subject_verb_replacement(provider: _QualifiedMorfeusz) -> str | None:
     if provider.identity != _qualified_identity():
         return None
@@ -197,6 +199,7 @@ def _oni_subject_verb_replacement(provider: _QualifiedMorfeusz) -> str | None:
     return "czytają"
 
 
+@lru_cache(maxsize=8)
 def _my_subject_verb_replacement(provider: _QualifiedMorfeusz) -> str | None:
     if provider.identity != _qualified_identity():
         return None

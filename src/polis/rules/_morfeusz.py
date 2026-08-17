@@ -7,6 +7,7 @@ import importlib
 import importlib.metadata
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Final, Protocol, runtime_checkable
 
 type _AnalysisRow = tuple[object, ...]
@@ -104,6 +105,7 @@ class _QualifiedMorfeusz:
     backend: _QualifiedMorfeuszBackend
     identity: _ProviderIdentity
 
+    @lru_cache(maxsize=64)  # noqa: B019 - bounded provider lifecycle cache
     def negated_widziec_nominal_group_replacement(
         self, adjective: str, noun: str
     ) -> str | None:
@@ -141,6 +143,7 @@ class _QualifiedMorfeusz:
             return None
         return "czerwonego samochodu"
 
+    @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def nominal_group_te_duze_okno_replacement(self) -> str | None:
         if self.identity != _qualified_identity():
             return None
@@ -182,6 +185,7 @@ class _QualifiedMorfeusz:
             return None
         return "To"
 
+    @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def nominal_group_ta_nowy_ksiazka_replacement(self) -> str | None:
         if self.identity != _qualified_identity():
             return None
@@ -225,6 +229,7 @@ class _QualifiedMorfeusz:
             return None
         return "nowa"
 
+    @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def przygladac_sie_nowy_budynek_replacement(self) -> str | None:
         if self.identity != _qualified_identity():
             return None
