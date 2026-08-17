@@ -12,15 +12,34 @@ def normalize_findings(
 ) -> tuple[Finding, ...]:
     """Normalize, filter, deduplicate, and order analyzer findings deterministically."""
 
-    return prioritize_findings(
-        deduplicate_findings(filter_findings(findings, options=options))
-    )
+    filtered = filter_findings(findings, options=options)
+    if len(filtered) < 2:
+        return filtered
+    deduplicated = deduplicate_findings(filtered)
+    if len(deduplicated) < 2:
+        return deduplicated
+    return prioritize_findings(deduplicated)
 
 
 def filter_findings(
     findings: Iterable[Finding], *, options: AnalysisOptions
 ) -> tuple[Finding, ...]:
     """Filter findings by option categories and confidence threshold."""
+
+    if isinstance(findings, tuple) and len(findings) < 2:
+        if not findings:
+            return ()
+        finding = findings[0]
+        if not isinstance(finding, Finding):
+            raise TypeError("every finding must be a Finding")
+        if finding.confidence.value < options.minimum_confidence.value:
+            return ()
+        if (
+            options.categories is not None
+            and finding.category not in options.categories
+        ):
+            return ()
+        return findings
 
     if not isinstance(findings, Iterable):
         raise TypeError("findings must be an iterable of Finding")

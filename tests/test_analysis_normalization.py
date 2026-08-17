@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from typing import cast
+
+import pytest
+
 from polis.analysis import (
     deduplicate_findings,
     filter_findings,
@@ -63,6 +67,13 @@ def test_filter_findings_by_category_and_confidence() -> None:
 
     assert len(filtered) == 1
     assert filtered[0].category == Category.SPELLING
+
+
+def test_filter_findings_validates_single_tuple_before_fast_return() -> None:
+    invalid = cast(tuple[Finding, ...], ("not-a-finding",))
+
+    with pytest.raises(TypeError, match="every finding must be a Finding"):
+        filter_findings(invalid, options=AnalysisOptions())
 
 
 def test_deduplicate_findings_keeps_preferred_confidence() -> None:
@@ -162,3 +173,20 @@ def test_normalize_findings_runs_filter_deduplicate_and_prioritize() -> None:
     )
 
     assert normalized == (keep,)
+
+
+def test_normalize_findings_returns_zero_or_one_filtered_item_without_reordering() -> (
+    None
+):
+    single = make_finding(
+        category=Category.SPELLING,
+        source="rule:single",
+        start=0,
+        end=1,
+        original="x",
+        suggestion="y",
+        confidence=0.9,
+    )
+
+    assert normalize_findings((), options=AnalysisOptions()) == ()
+    assert normalize_findings((single,), options=AnalysisOptions()) == (single,)

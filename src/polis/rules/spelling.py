@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from functools import lru_cache
-from typing import Final
+from types import MappingProxyType
+from typing import Final, cast
 
 from polis.core import (
     AnalysisOptions,
@@ -29,6 +31,7 @@ _SCHEME_RE: Final = re.compile(r"(?i)\b(?:https?|ftp)://")
 _DOMAINISH_RE: Final = re.compile(
     r"(?i)\b(?:www\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b"
 )
+_LOWER_COMPATIBILITY_VARIANTS: Final = {"k": "K"}
 
 
 def _host_token_span(text: str, start: int, end: int) -> tuple[int, int]:
@@ -179,11 +182,6 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
     return False
 
 
-# Shared token stream for the closed-literal family: one left-to-right pass
-# over word tokens, with O(1) typed-form lookup per token (Wave 0 / #338 F0.3).
-_LITERAL_TOKEN_RE: Final = re.compile(r"(?<!\w)\w+(?!\w)", re.UNICODE)
-
-
 @lru_cache(maxsize=32)
 def _closed_literal_lookup(
     rules: tuple[_CasePatternRule, ...],
@@ -200,9 +198,44 @@ def _closed_literal_lookup(
     return lookup
 
 
+@lru_cache(maxsize=32)
+def _closed_literal_pattern(rules: tuple[_CasePatternRule, ...]) -> re.Pattern[str]:
+    """Compile one exact mixed-case matcher for the registry's closed surfaces."""
+
+    lookup = _closed_literal_lookup(rules)
+    alternatives = sorted(
+        (_explicit_case_pattern(surface) for surface in lookup),
+        key=len,
+        reverse=True,
+    )
+    return re.compile(rf"(?<!\w)(?:{'|'.join(alternatives)})(?!\w)")
+
+
+@lru_cache(maxsize=32)
+def _closed_literal_empty_buckets(
+    rules: tuple[_CasePatternRule, ...],
+) -> MappingProxyType[Source, tuple[Finding, ...]]:
+    """Cache an immutable ordered empty-source mapping."""
+
+    return MappingProxyType({rule.source: () for rule in rules})
+
+
+def _explicit_case_pattern(surface: str) -> str:
+    parts: list[str] = []
+    for char in surface:
+        lower = char.lower()
+        upper = char.upper()
+        if len(lower) == len(upper) == 1 and lower != upper:
+            variants = lower + upper + _LOWER_COMPATIBILITY_VARIANTS.get(lower, "")
+            parts.append(f"[{re.escape(variants)}]")
+        else:
+            parts.append(re.escape(char))
+    return "".join(parts)
+
+
 def collect_closed_literal_findings(
     text: str, rules: tuple[_CasePatternRule, ...]
-) -> dict[Source, tuple[Finding, ...]]:
+) -> Mapping[Source, tuple[Finding, ...]]:
     """Scan ``text`` once and bucket findings by closed-literal rule source.
 
     Behavior is identical to invoking each rule's historical per-pattern
@@ -215,8 +248,10 @@ def collect_closed_literal_findings(
     if not rules:
         return {}
     lookup = _closed_literal_lookup(rules)
-    buckets: dict[Source, list[Finding]] = {rule.source: [] for rule in rules}
-    for match in _LITERAL_TOKEN_RE.finditer(text):
+    pattern = _closed_literal_pattern(rules)
+    empty_buckets = _closed_literal_empty_buckets(rules)
+    buckets: dict[Source, tuple[Finding, ...] | list[Finding]] | None = None
+    for match in pattern.finditer(text):
         observed = match.group()
         entry = lookup.get(observed.lower())
         if entry is None:
@@ -229,21 +264,34 @@ def collect_closed_literal_findings(
         candidate = matched_rule._apply_case(observed, corrected)
         if candidate == observed:
             continue
-        buckets[matched_rule.source].append(
-            Finding.create(
-                category=matched_rule._CATEGORY,
-                severity=matched_rule._severity(),
-                message=matched_rule._message(observed),
-                explanation=matched_rule._explanation(observed, candidate),
-                original=observed,
-                suggestion=candidate,
-                start=start,
-                end=end,
-                confidence=matched_rule._confidence,
-                source=matched_rule.source,
-            )
+        finding = Finding.create(
+            category=matched_rule._CATEGORY,
+            severity=matched_rule._severity(),
+            message=matched_rule._message(observed),
+            explanation=matched_rule._explanation(observed, candidate),
+            original=observed,
+            suggestion=candidate,
+            start=start,
+            end=end,
+            confidence=matched_rule._confidence,
+            source=matched_rule.source,
         )
-    return {source: tuple(items) for source, items in buckets.items()}
+        if buckets is None:
+            buckets = cast(
+                dict[Source, tuple[Finding, ...] | list[Finding]],
+                empty_buckets.copy(),
+            )
+        current = buckets[matched_rule.source]
+        if isinstance(current, tuple):
+            buckets[matched_rule.source] = [finding]
+        else:
+            current.append(finding)
+    if buckets is None:
+        return empty_buckets
+    for source, items in buckets.items():
+        if isinstance(items, list):
+            buckets[source] = tuple(items)
+    return cast(dict[Source, tuple[Finding, ...]], buckets)
 
 
 class _CasePatternRule:

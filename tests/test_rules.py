@@ -55,6 +55,19 @@ class FakeVersionedRule(FakeRule):
     behavior_version = "example-rule/1.0"
 
 
+class CountingSourceRule(FakeRule):
+    def __init__(self, source: str, findings: Iterable[Finding]) -> None:
+        self._source = Source.parse(source)
+        self._findings = tuple(findings)
+        self.calls = []
+        self.source_reads = 0
+
+    @property
+    def source(self) -> Source:
+        self.source_reads += 1
+        return self._source
+
+
 def make_finding(source: str, *, category: Category, start: int, end: int) -> Finding:
     return Finding.create(
         category=category,
@@ -205,6 +218,17 @@ def test_registry_executes_rules_in_stable_order() -> None:
         make_finding("rule:second", category=Category.SPELLING, start=1, end=2),
         make_finding("rule:first", category=Category.SPELLING, start=0, end=1),
     )
+
+
+def test_registry_precomputes_source_for_runtime_dispatch() -> None:
+    rule = CountingSourceRule("rule:counted", ())
+    registry = DeterministicRuleRegistry((RuleRegistration(rule=rule),))
+    reads_after_composition = rule.source_reads
+
+    assert registry.find("pierwszy", options=AnalysisOptions()) == ()
+    assert registry.find("drugi", options=AnalysisOptions()) == ()
+    assert rule.calls == ["pierwszy", "drugi"]
+    assert rule.source_reads == reads_after_composition
 
 
 def test_registry_rejects_duplicate_finding_ids() -> None:

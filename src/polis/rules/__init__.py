@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, Protocol
 
 from polis.core import AnalysisOptions, Category, Finding, Rule, Source, VersionedRule
 from polis.correction.policy import SourceBehavior
@@ -119,6 +119,22 @@ class RuleSourceIdentity:
     behavior_version: str
 
 
+class _RuleFind(Protocol):
+    def __call__(
+        self, text: str, *, options: AnalysisOptions
+    ) -> tuple[Finding, ...]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class _DispatchEntry:
+    """Precomputed immutable metadata for one active runtime rule."""
+
+    find: _RuleFind
+    source: Source
+    categories: frozenset[Category] | None
+    literal_rule: _CasePatternRule | None
+
+
 class RuleRegistryError(ValueError):
     """Base error for rule registration and deterministic execution failures."""
 
@@ -144,6 +160,17 @@ class DeterministicRuleRegistry:
             entry
             for entry in self._registrations
             if not _is_absent_morphology_consumer(entry.rule)
+        )
+        self._active_dispatch = tuple(
+            _DispatchEntry(
+                find=entry.rule.find,
+                source=entry.rule.source,
+                categories=entry.categories,
+                literal_rule=(
+                    entry.rule if isinstance(entry.rule, _CasePatternRule) else None
+                ),
+            )
+            for entry in self._active_registrations
         )
         self._literal_registrations = tuple(
             entry
@@ -203,22 +230,18 @@ class DeterministicRuleRegistry:
         """Execute selected rules and validate their findings."""
 
         if options.categories is None:
-            selected = self._active_registrations
-            literal_entries = self._literal_registrations
+            selected = self._active_dispatch
             literal_rules = self._literal_rules
         else:
             selected = tuple(
                 entry
-                for entry in self._active_registrations
+                for entry in self._active_dispatch
                 if _selected_by_categories(entry.categories, options.categories)
             )
-            literal_entries = tuple(
-                entry for entry in selected if isinstance(entry.rule, _CasePatternRule)
-            )
             literal_rules = tuple(
-                entry.rule
-                for entry in literal_entries
-                if isinstance(entry.rule, _CasePatternRule)
+                entry.literal_rule
+                for entry in selected
+                if entry.literal_rule is not None
             )
         findings: list[Finding] = []
         seen = set[str]()
@@ -227,17 +250,17 @@ class DeterministicRuleRegistry:
         # are selected together (Wave 0 / #338 F0.3). Non-literal rules keep
         # their independent find() paths. Emission order remains registration
         # order for exact source identity compatibility.
-        literal_buckets: dict[Source, tuple[Finding, ...]] = {}
-        if literal_entries:
+        literal_buckets: Mapping[Source, tuple[Finding, ...]] = {}
+        if literal_rules:
             literal_buckets = collect_closed_literal_findings(text, literal_rules)
 
         for entry in selected:
-            if isinstance(entry.rule, _CasePatternRule):
-                emitted = literal_buckets.get(entry.rule.source, ())
+            if entry.literal_rule is not None:
+                emitted = literal_buckets.get(entry.source, ())
             else:
-                emitted = entry.rule.find(text, options=options)
+                emitted = entry.find(text, options=options)
             for finding in emitted:
-                if finding.source != entry.rule.source:
+                if finding.source != entry.source:
                     raise IncompatibleRuleOutputError(
                         "rule returned a finding with an incompatible source"
                     )

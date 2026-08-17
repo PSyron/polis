@@ -17,8 +17,12 @@ from polis.rules.government import (
 )
 from polis.rules.spelling import (
     SpellingConajmniejRule,
+    SpellingWkoncuRule,
     SpellingWogoleRule,
+    _closed_literal_empty_buckets,
     _closed_literal_lookup,
+    _closed_literal_pattern,
+    collect_closed_literal_findings,
 )
 from polis.segmentation import is_single_sentence, segment_sentences
 
@@ -76,6 +80,40 @@ def test_closed_literal_surface_lookup_is_cached_per_rule_tuple() -> None:
     second = _closed_literal_lookup(rules)
     assert first is second
     assert _closed_literal_lookup.cache_info().hits == 1
+
+
+def test_closed_literal_pattern_is_cached_and_case_explicit() -> None:
+    rules = (SpellingWogoleRule(), SpellingWkoncuRule(), SpellingConajmniejRule())
+    _closed_literal_pattern.cache_clear()
+
+    first = _closed_literal_pattern(rules)
+    second = _closed_literal_pattern(rules)
+
+    assert first is second
+    assert first.findall("wogole WOGole wKoncu conajmniej CONAJMNIEJ") == [
+        "wogole",
+        "WOGole",
+        "wKoncu",
+        "conajmniej",
+        "CONAJMNIEJ",
+    ]
+    assert first.search("ſogole") is None
+
+
+def test_closed_literal_collector_uses_immutable_cached_empty_mapping() -> None:
+    rules = (SpellingWogoleRule(), SpellingConajmniejRule())
+    _closed_literal_empty_buckets.cache_clear()
+    template = _closed_literal_empty_buckets(rules)
+
+    empty_result = collect_closed_literal_findings("Poprawny tekst.", rules)
+    result = collect_closed_literal_findings("Wogole błąd.", rules)
+
+    assert empty_result is template
+    assert not hasattr(template, "clear")
+    assert result is not template
+    assert tuple(result) == tuple(rule.source for rule in rules)
+    assert result[rules[0].source]
+    assert result[rules[1].source] == ()
 
 
 def test_single_sentence_fast_probe_matches_segmenter_on_v3() -> None:
