@@ -1,0 +1,329 @@
+{
+  "schema_id": "polis.quality-development-manifest",
+  "schema_version": 4,
+  "dataset_id": "polis_v4_quality_development",
+  "dataset_version": 4,
+  "canonical_sha256": "fdf9261c074b945c78ea4f876d1155881449a57eeed6f9d128f529adb3709185",
+  "manifest_sha256": "43d9843795360dc281433f80c133e1a1d8afc029bab0d5e27e0a34a3154180a6",
+  "contract": {
+    "path": "docs/project/rule-coverage-contract-v1.json",
+    "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
+    "issue": 364,
+    "schema_id": "polis.rule-coverage-contract",
+    "schema_version": 1,
+    "categories": [
+      "agreement",
+      "inflection",
+      "punctuation",
+      "spelling",
+      "syntax"
+    ],
+    "shape_strata": [
+      "conflict-or-abstention",
+      "multi-sentence",
+      "quotation-or-literal",
+      "repeated-occurrence",
+      "sentence-internal",
+      "simple-local",
+      "unicode-and-case"
+    ],
+    "minimums": {
+      "positive_findings_per_category": 8,
+      "hard_negative_cases_per_category": 16,
+      "paired_examples_per_category": 4,
+      "phenomenon_or_family_count": 3
+    },
+    "provider_distinction": {
+      "provider_absent_minimum_cases": 2,
+      "provider_present_minimum_cases": 2
+    }
+  },
+  "provenance": {
+    "relationship": {
+      "prior_versions": [
+        "v1",
+        "v2",
+        "v3"
+      ],
+      "carried_forward_case_ids": [],
+      "excluded_case_rationale": "v4 is a separately authored public development set; earlier datasets remain immutable historical artifacts."
+    },
+    "author": "Paweł Cyroń",
+    "license": "CC0-1.0",
+    "source": "project-authored"
+  },
+  "profiles": {
+    "provider_absent": {
+      "capability": "morphological-analysis",
+      "behavior": "abstain",
+      "denominator_profile": "provider-absent"
+    },
+    "qualified_morphology": {
+      "capability": "morphological-analysis",
+      "behavior": "execute",
+      "denominator_profile": "qualified-provider"
+    }
+  },
+  "summary": {
+    "case_count": 124,
+    "category": {
+      "agreement": {
+        "positive_findings": 9,
+        "hard_negative_cases": 16,
+        "phenomena": [
+          "agreement"
+        ],
+        "rule_families": [
+          "rule:agreement.nominal_group_ta_nowy_ksiazka",
+          "rule:agreement.nominal_group_te_duze_okno",
+          "rule:agreement.subject_verb_oni_czyta",
+          "rule:agreement.te_neuter_noun",
+          "rule:agreement.te_zdanie"
+        ],
+        "paired_examples": 7
+      },
+      "inflection": {
+        "positive_findings": 9,
+        "hard_negative_cases": 16,
+        "phenomena": [
+          "inflection",
+          "rection"
+        ],
+        "rule_families": [
+          "rule:inflection.government_szukac_klucz",
+          "rule:inflection.negated_lubic_kawe",
+          "rule:inflection.negated_miec_czas",
+          "rule:inflection.negated_widziec",
+          "rule:inflection.przygladac_sie_nowy_budynek"
+        ],
+        "paired_examples": 7
+      },
+      "punctuation": {
+        "positive_findings": 9,
+        "hard_negative_cases": 16,
+        "phenomena": [
+          "punctuation"
+        ],
+        "rule_families": [
+          "rule:punctuation.abbreviation_dot",
+          "rule:syntax.comma_space",
+          "rule:syntax.duplicate_comma",
+          "rule:syntax.sentence_space"
+        ],
+        "paired_examples": 7
+      },
+      "spelling": {
+        "positive_findings": 9,
+        "hard_negative_cases": 16,
+        "phenomena": [
+          "spelling"
+        ],
+        "rule_families": [
+          "rule:spelling.napewno",
+          "rule:spelling.wogole_diacritic",
+          "rule:spelling.wziasc",
+          "rule:spelling.wziasc_diacritic"
+        ],
+        "paired_examples": 7
+      },
+      "syntax": {
+        "positive_findings": 9,
+        "hard_negative_cases": 16,
+        "phenomena": [
+          "syntax"
+        ],
+        "rule_families": [
+          "rule:syntax.comma_before_bo",
+          "rule:syntax.comma_before_ze_reporting",
+          "rule:syntax.comma_before_zeby_purpose",
+          "rule:syntax.initial_conditional_comma",
+          "rule:syntax.missing_destination_preposition",
+          "rule:syntax.missing_reflexive"
+        ],
+        "paired_examples": 7
+      }
+    },
+    "shape_strata": {
+      "conflict-or-abstention": {
+        "positive_cases": 5,
+        "hard_negative_cases": 10
+      },
+      "multi-sentence": {
+        "positive_cases": 5,
+        "hard_negative_cases": 15
+      },
+      "quotation-or-literal": {
+        "positive_cases": 5,
+        "hard_negative_cases": 10
+      },
+      "repeated-occurrence": {
+        "positive_cases": 5,
+        "hard_negative_cases": 15
+      },
+      "sentence-internal": {
+        "positive_cases": 5,
+        "hard_negative_cases": 10
+      },
+      "simple-local": {
+        "positive_cases": 10,
+        "hard_negative_cases": 10
+      },
+      "unicode-and-case": {
+        "positive_cases": 5,
+        "hard_negative_cases": 10
+      }
+    },
+    "kind": {
+      "error": 40,
+      "correct": 80,
+      "conflict": 1,
+      "abstain": 3
+    },
+    "phenomenon": {
+      "inflection": 22,
+      "rection": 2,
+      "agreement": 24,
+      "spelling": 24,
+      "syntax": 24,
+      "punctuation": 24
+    },
+    "provider_dependent_cases": 3
+  },
+  "v3_byte_identity": {
+    "cases_sha256": "9368376c2d53548d7a2409e6d120597b220a83443c8523ab17aa4f295507ffa8",
+    "manifest_sha256": "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17"
+  },
+  "review": {
+    "status": "maintainer-reviewed",
+    "reviewer_role": "Polis maintainer",
+    "checklist_version": "quality-development-review-v4",
+    "reviewed_case_ids": [
+      "v4_agreement_positive_01",
+      "v4_agreement_positive_02",
+      "v4_agreement_positive_03",
+      "v4_agreement_positive_04",
+      "v4_agreement_positive_05",
+      "v4_agreement_positive_06",
+      "v4_agreement_positive_07",
+      "v4_agreement_positive_08",
+      "v4_agreement_negative_01",
+      "v4_agreement_negative_02",
+      "v4_agreement_negative_03",
+      "v4_agreement_negative_04",
+      "v4_agreement_negative_05",
+      "v4_agreement_negative_06",
+      "v4_agreement_negative_07",
+      "v4_agreement_negative_08",
+      "v4_agreement_negative_09",
+      "v4_agreement_negative_10",
+      "v4_agreement_negative_11",
+      "v4_agreement_negative_12",
+      "v4_agreement_negative_13",
+      "v4_agreement_negative_14",
+      "v4_agreement_negative_15",
+      "v4_agreement_negative_16",
+      "v4_inflection_positive_01",
+      "v4_inflection_positive_02",
+      "v4_inflection_positive_03",
+      "v4_inflection_positive_04",
+      "v4_inflection_positive_05",
+      "v4_inflection_positive_06",
+      "v4_inflection_positive_07",
+      "v4_inflection_positive_08",
+      "v4_inflection_negative_01",
+      "v4_inflection_negative_02",
+      "v4_inflection_negative_03",
+      "v4_inflection_negative_04",
+      "v4_inflection_negative_05",
+      "v4_inflection_negative_06",
+      "v4_inflection_negative_07",
+      "v4_inflection_negative_08",
+      "v4_inflection_negative_09",
+      "v4_inflection_negative_10",
+      "v4_inflection_negative_11",
+      "v4_inflection_negative_12",
+      "v4_inflection_negative_13",
+      "v4_inflection_negative_14",
+      "v4_inflection_negative_15",
+      "v4_inflection_negative_16",
+      "v4_punctuation_positive_01",
+      "v4_punctuation_positive_02",
+      "v4_punctuation_positive_03",
+      "v4_punctuation_positive_04",
+      "v4_punctuation_positive_05",
+      "v4_punctuation_positive_06",
+      "v4_punctuation_positive_07",
+      "v4_punctuation_positive_08",
+      "v4_punctuation_negative_01",
+      "v4_punctuation_negative_02",
+      "v4_punctuation_negative_03",
+      "v4_punctuation_negative_04",
+      "v4_punctuation_negative_05",
+      "v4_punctuation_negative_06",
+      "v4_punctuation_negative_07",
+      "v4_punctuation_negative_08",
+      "v4_punctuation_negative_09",
+      "v4_punctuation_negative_10",
+      "v4_punctuation_negative_11",
+      "v4_punctuation_negative_12",
+      "v4_punctuation_negative_13",
+      "v4_punctuation_negative_14",
+      "v4_punctuation_negative_15",
+      "v4_punctuation_negative_16",
+      "v4_spelling_positive_01",
+      "v4_spelling_positive_02",
+      "v4_spelling_positive_03",
+      "v4_spelling_positive_04",
+      "v4_spelling_positive_05",
+      "v4_spelling_positive_06",
+      "v4_spelling_positive_07",
+      "v4_spelling_positive_08",
+      "v4_spelling_negative_01",
+      "v4_spelling_negative_02",
+      "v4_spelling_negative_03",
+      "v4_spelling_negative_04",
+      "v4_spelling_negative_05",
+      "v4_spelling_negative_06",
+      "v4_spelling_negative_07",
+      "v4_spelling_negative_08",
+      "v4_spelling_negative_09",
+      "v4_spelling_negative_10",
+      "v4_spelling_negative_11",
+      "v4_spelling_negative_12",
+      "v4_spelling_negative_13",
+      "v4_spelling_negative_14",
+      "v4_spelling_negative_15",
+      "v4_spelling_negative_16",
+      "v4_syntax_positive_01",
+      "v4_syntax_positive_02",
+      "v4_syntax_positive_03",
+      "v4_syntax_positive_04",
+      "v4_syntax_positive_05",
+      "v4_syntax_positive_06",
+      "v4_syntax_positive_07",
+      "v4_syntax_positive_08",
+      "v4_syntax_negative_01",
+      "v4_syntax_negative_02",
+      "v4_syntax_negative_03",
+      "v4_syntax_negative_04",
+      "v4_syntax_negative_05",
+      "v4_syntax_negative_06",
+      "v4_syntax_negative_07",
+      "v4_syntax_negative_08",
+      "v4_syntax_negative_09",
+      "v4_syntax_negative_10",
+      "v4_syntax_negative_11",
+      "v4_syntax_negative_12",
+      "v4_syntax_negative_13",
+      "v4_syntax_negative_14",
+      "v4_syntax_negative_15",
+      "v4_syntax_negative_16",
+      "v4_control_conflict_agreement",
+      "v4_control_abstain_01",
+      "v4_control_abstain_02",
+      "v4_control_abstain_03"
+    ],
+    "reviewed_case_ids_sha256": "f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e",
+    "canonical_sha256": "fdf9261c074b945c78ea4f876d1155881449a57eeed6f9d128f529adb3709185"
+  }
+}

@@ -12,6 +12,16 @@ from polis import Analyzer, AnalyzerConfig
 from polis.correction.policy import _ACTIVE_POLICY_ENTRIES, SOURCE_POLICY_VERSION
 from polis.evaluation._quality_types import JsonValue
 
+_AUDITED_RUNTIME_SOURCE_PATHS = (
+    "src/polis/__init__.py",
+    "src/polis/analysis",
+    "src/polis/analyzer.py",
+    "src/polis/core",
+    "src/polis/correction",
+    "src/polis/rules",
+    "src/polis/segmentation",
+)
+
 AUDIT_PATH: Final = (
     Path(__file__).resolve().parents[1] / "docs/project/rule-coverage-rjp-2026.json"
 )
@@ -361,8 +371,23 @@ def _validate_audited_source_sha(audited_sha: str) -> None:
     if commit.returncode != 0:
         raise RjpAuditError("audited_full_sha is not a resolvable commit")
     for diff_args in (
-        ["git", "diff", "--quiet", audited_sha, "--", "src"],
-        ["git", "diff", "--cached", "--quiet", audited_sha, "--", "src"],
+        [
+            "git",
+            "diff",
+            "--quiet",
+            audited_sha,
+            "--",
+            *_AUDITED_RUNTIME_SOURCE_PATHS,
+        ],
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--quiet",
+            audited_sha,
+            "--",
+            *_AUDITED_RUNTIME_SOURCE_PATHS,
+        ],
     ):
         diff = subprocess.run(
             diff_args,

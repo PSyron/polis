@@ -18,9 +18,12 @@ punctuation 5, spelling 23 i syntax 9.
 
 `audited_full_sha` oznacza dokładny, rozwiązywalny commit źródłowy, którego
 kohort opisuje macierz. Walidator sprawdza istnienie tego commita, kanoniczny
-digest snapshotu oraz brak zmian w `src/` względem audytowanego SHA. Późniejsze
-commity dokumentacyjne lub CI nie unieważniają audytu, ale zmiana runtime'u
-względem audytowanego SHA kończy walidację fail-closed.
+digest snapshotu oraz brak zmian w audytowanej części runtime'u względem SHA:
+`analysis`, `analyzer.py`, `core`, `correction`, `rules` i `segmentation`.
+Publiczne artefakty ewaluacyjne w `src/polis/evaluation/` nie zmieniają
+tożsamości źródeł reguł i są walidowane własnymi skrótami. Późniejsze commity
+dokumentacyjne lub CI nie unieważniają audytu, ale zmiana audytowanego runtime'u
+względem SHA kończy walidację fail-closed.
 
 Rada Języka Polskiego jest normą dla jawnie wskazanych przypadków pisowni i
 interpunkcji, nie dla kompletności źródeł agreement, inflection ani syntax.

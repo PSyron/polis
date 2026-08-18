@@ -29,6 +29,28 @@ from polis.evaluation._quality_types import (
 )
 from polis.evaluation._quality_v2 import V2_MANIFEST_FIELDS, validate_v2_manifest
 from polis.evaluation._quality_v3 import V3_MANIFEST_FIELDS, validate_v3_manifest
+from polis.evaluation._quality_v4 import validate_v4_dataset
+
+
+def _reject_duplicate_json_keys(
+    pairs: list[tuple[str, JsonValue]],
+) -> dict[str, JsonValue]:
+    value: dict[str, JsonValue] = {}
+    for key, item in pairs:
+        if key in value:
+            raise QualityDatasetError(f"duplicate JSON object key: {key}")
+        value[key] = item
+    return value
+
+
+def _load_json_document(path: Path, label: str) -> JsonValue:
+    try:
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
+    except json.JSONDecodeError as error:
+        raise QualityDatasetError(f"invalid {label} JSON") from error
 
 
 def load_quality_dataset(
@@ -42,14 +64,8 @@ def load_quality_dataset(
     selected_dataset_path, selected_manifest_path = quality_dataset_paths(version)
     dataset_path = dataset_path or selected_dataset_path
     manifest_path = manifest_path or selected_manifest_path
-    try:
-        dataset_raw = json.loads(dataset_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        raise QualityDatasetError("invalid quality dataset JSON") from error
-    try:
-        manifest_raw = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        raise QualityDatasetError("invalid quality manifest JSON") from error
+    dataset_raw = _load_json_document(dataset_path, "quality dataset")
+    manifest_raw = _load_json_document(manifest_path, "quality manifest")
     return validate_quality_dataset(dataset_raw, manifest_raw)
 
 
@@ -60,8 +76,10 @@ def validate_quality_dataset(
 
     dataset = require_object(dataset_raw, "quality dataset")
     manifest = require_object(manifest_raw, "quality manifest")
-    require_exact_fields(dataset, DATASET_FIELDS, "quality dataset")
     raw_schema_version = dataset.get("schema_version")
+    if raw_schema_version == 4:
+        return validate_v4_dataset(dataset, manifest)
+    require_exact_fields(dataset, DATASET_FIELDS, "quality dataset")
     if (
         isinstance(raw_schema_version, bool)
         or not isinstance(raw_schema_version, int)

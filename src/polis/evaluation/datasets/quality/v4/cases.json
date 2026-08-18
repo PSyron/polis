@@ -1,0 +1,5120 @@
+{
+  "schema_id": "polis.quality-development-dataset",
+  "schema_version": 4,
+  "id": "polis_v4_quality_development",
+  "dataset_version": 4,
+  "license": "CC0-1.0",
+  "source": "project-authored",
+  "gold_label_source": "project-authored-manual",
+  "cases": [
+    {
+      "id": "v4_agreement_positive_01",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_1",
+      "features": [],
+      "text": "Te zdanie jest jasne.",
+      "category": "agreement",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 9,
+          "original": "Te zdanie",
+          "suggestion": "To zdanie",
+          "rationale": "Exact public runtime finding for rule:agreement.te_zdanie.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_01",
+        "differentiating_feature": "The neuter singular noun 'zdanie' requires the demonstrative 'to', while 'te' is plural."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_02",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_2",
+      "features": [],
+      "text": "Widziałem te dziecko w parku.",
+      "category": "agreement",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 10,
+          "end": 12,
+          "original": "te",
+          "suggestion": "to",
+          "rationale": "Exact public runtime finding for rule:agreement.te_neuter_noun.",
+          "rule_family": "rule:agreement.te_neuter_noun",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_neuter_noun",
+        "rule_family": "rule:agreement.te_neuter_noun",
+        "audit_row": "rule:agreement.te_neuter_noun",
+        "behavior_version": "agreement-te-neuter-noun/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_02",
+        "differentiating_feature": "The neuter singular noun 'dziecko' requires 'to' in the paired sentence; the positive keeps the non-agreeing 'te'."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_03",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Te dziecko śpi. Rano odpoczywa.",
+      "category": "agreement",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "Exact public runtime finding for rule:agreement.te_neuter_noun.",
+          "rule_family": "rule:agreement.te_neuter_noun",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_neuter_noun",
+        "rule_family": "rule:agreement.te_neuter_noun",
+        "audit_row": "rule:agreement.te_neuter_noun",
+        "behavior_version": "agreement-te-neuter-noun/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_03",
+        "differentiating_feature": "The same neuter demonstrative boundary is retained across two sentences, so both occurrences must use 'to'."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_04",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_4",
+      "features": [],
+      "text": "Te zdanie jest krótkie. Te zdanie jest jasne.",
+      "category": "agreement",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 9,
+          "original": "Te zdanie",
+          "suggestion": "To zdanie",
+          "rationale": "Exact public runtime finding for rule:agreement.te_zdanie.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        },
+        {
+          "category": "agreement",
+          "start": 24,
+          "end": 33,
+          "original": "Te zdanie",
+          "suggestion": "To zdanie",
+          "rationale": "Exact public runtime finding for rule:agreement.te_zdanie.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_04",
+        "differentiating_feature": "The repeated neuter noun 'zdanie' supplies two independent agreement sites, and the corrected pair changes both 'te' tokens to 'to'."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_05",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ta nowy książka leży.",
+      "category": "agreement",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 3,
+          "end": 7,
+          "original": "nowy",
+          "suggestion": "nowa",
+          "rationale": "Exact public runtime finding for rule:agreement.nominal_group_ta_nowy_ksiazka.",
+          "rule_family": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "rule_family": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "audit_row": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_09",
+        "differentiating_feature": "The adjective agrees with the feminine noun in the corrected form `nowa` rather than the masculine form `nowy`."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_06",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_6",
+      "features": [],
+      "text": "Redaktor poprawił zdanie: „Te zdanie jest jasne”.",
+      "category": "agreement",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 27,
+          "end": 36,
+          "original": "Te zdanie",
+          "suggestion": "To zdanie",
+          "rationale": "Exact public runtime finding for rule:agreement.te_zdanie.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_11",
+        "differentiating_feature": "The quoted phrase uses the neuter demonstrative `To` before `zdanie` rather than `Te`."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_07",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_7",
+      "features": [],
+      "text": "Oni czyta książkę.",
+      "category": "agreement",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 4,
+          "end": 9,
+          "original": "czyta",
+          "suggestion": "czytają",
+          "rationale": "Exact public runtime finding for rule:agreement.subject_verb_oni_czyta.",
+          "rule_family": "rule:agreement.subject_verb_oni_czyta",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.subject_verb_oni_czyta",
+        "rule_family": "rule:agreement.subject_verb_oni_czyta",
+        "audit_row": "rule:agreement.subject_verb_oni_czyta",
+        "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_agreement_negative_13",
+        "differentiating_feature": "The plural subject `Oni` selects `czytają` rather than the singular verb form `czyta`."
+      }
+    },
+    {
+      "id": "v4_agreement_positive_08",
+      "kind": "error",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Te duże okno jest otwarte.",
+      "category": "agreement",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "Exact public runtime finding for rule:agreement.nominal_group_te_duze_okno.",
+          "rule_family": "rule:agreement.nominal_group_te_duze_okno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.nominal_group_te_duze_okno",
+        "rule_family": "rule:agreement.nominal_group_te_duze_okno",
+        "audit_row": "rule:agreement.nominal_group_te_duze_okno",
+        "behavior_version": "agreement-nominal-group-te-duze-okno/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_01",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_1",
+      "features": [],
+      "text": "To zdanie jest jasne.",
+      "category": "agreement",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The agreement in 'To zdanie jest jasne.' is licensed by the visible noun or verb context; changing it would introduce a new agreement error. Reviewed case: v4_agreement_negative_01.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_01",
+        "differentiating_feature": "The neuter singular noun 'zdanie' requires the demonstrative 'to', while 'te' is plural."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_02",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_2",
+      "features": [],
+      "text": "Widziałem to dziecko w parku.",
+      "category": "agreement",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The agreement in 'Widziałem to dziecko w parku.' is licensed by the visible noun or verb context; changing it would introduce a new agreement error. Reviewed case: v4_agreement_negative_02.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_02",
+        "differentiating_feature": "The neuter singular noun 'dziecko' requires 'to' in the paired sentence; the positive keeps the non-agreeing 'te'."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_03",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "To dziecko śpi. Rano odpoczywa.",
+      "category": "agreement",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'To dziecko śpi. Rano odpoczywa.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_agreement_negative_03.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_03",
+        "differentiating_feature": "The same neuter demonstrative boundary is retained across two sentences, so both occurrences must use 'to'."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_04",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_4",
+      "features": [],
+      "text": "To zdanie jest krótkie. To zdanie jest jasne.",
+      "category": "agreement",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'To zdanie jest krótkie. To zdanie jest jasne.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_agreement_negative_04.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_04",
+        "differentiating_feature": "The repeated neuter noun 'zdanie' supplies two independent agreement sites, and the corrected pair changes both 'te' tokens to 'to'."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_05",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Te osoby przyszły. One czekają.",
+      "category": "agreement",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Te osoby przyszły. One czekają.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_agreement_negative_05.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_06",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "To zadanie jest proste. Zaczynamy.",
+      "category": "agreement",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'To zadanie jest proste. Zaczynamy.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_agreement_negative_06.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_07",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Te książki są nowe. Te zeszyty są czyste.",
+      "category": "agreement",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Te książki są nowe. Te zeszyty są czyste.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_agreement_negative_07.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_08",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "To dziecko czyta. To ćwiczenie działa.",
+      "category": "agreement",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'To dziecko czyta. To ćwiczenie działa.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_agreement_negative_08.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_09",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Ta nowa książka leży.",
+      "category": "agreement",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "rule_family": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "audit_row": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Ta nowa książka leży.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_agreement_negative_09.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_05",
+        "differentiating_feature": "The adjective agrees with the feminine noun in the corrected form `nowa` rather than the masculine form `nowy`."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_10",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "To źródło jest ważne.",
+      "category": "agreement",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The casing and Unicode form in 'To źródło jest ważne.' are intentional for this reviewed example; normalization would create a false positive. Reviewed case: v4_agreement_negative_10.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_11",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_6",
+      "features": [],
+      "text": "Redaktor poprawił zdanie: „To zdanie jest jasne”.",
+      "category": "agreement",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Redaktor poprawił zdanie: „To zdanie jest jasne”.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_agreement_negative_11.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_06",
+        "differentiating_feature": "The quoted phrase uses the neuter demonstrative `To` before `zdanie` rather than `Te`."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_12",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Termin „te dziecko” jest omawiany.",
+      "category": "agreement",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Termin „te dziecko” jest omawiany.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_agreement_negative_12.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_13",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": "pair_agreement_7",
+      "features": [],
+      "text": "Oni czytają książkę.",
+      "category": "agreement",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.subject_verb_oni_czyta",
+        "rule_family": "rule:agreement.subject_verb_oni_czyta",
+        "audit_row": "rule:agreement.subject_verb_oni_czyta",
+        "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Oni czytają książkę.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_agreement_negative_13.",
+      "pair": {
+        "counterpart_id": "v4_agreement_positive_07",
+        "differentiating_feature": "The plural subject `Oni` selects `czytają` rather than the singular verb form `czyta`."
+      }
+    },
+    {
+      "id": "v4_agreement_negative_14",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Kontekst rozstrzyga, czy chodzi o te osoby.",
+      "category": "agreement",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The agreement in 'Kontekst rozstrzyga, czy chodzi o te osoby.' is licensed by the visible noun or verb context; changing it would introduce a new agreement error. Reviewed case: v4_agreement_negative_14.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_15",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "My czytamy raport.",
+      "category": "agreement",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The agreement in 'My czytamy raport.' is licensed by the visible noun or verb context; changing it would introduce a new agreement error. Reviewed case: v4_agreement_negative_15.",
+      "pair": null
+    },
+    {
+      "id": "v4_agreement_negative_16",
+      "kind": "correct",
+      "phenomenon": "agreement",
+      "pair_id": null,
+      "features": [],
+      "text": "Oni czytają codziennie.",
+      "category": "agreement",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The agreement in 'Oni czytają codziennie.' is licensed by the visible noun or verb context; changing it would introduce a new agreement error. Reviewed case: v4_agreement_negative_16.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_positive_01",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_1",
+      "features": [],
+      "text": "Nie widzę samochód.",
+      "category": "inflection",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 18,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_widziec.",
+          "rule_family": "rule:inflection.negated_widziec",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_01",
+        "differentiating_feature": "The verb 'widzę' governs accusative, so the pair contrasts 'nowy budynek' with the required 'nowego budynku'."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_02",
+      "kind": "error",
+      "phenomenon": "rection",
+      "pair_id": "pair_inflection_2",
+      "features": [],
+      "text": "Przyglądam się nowy budynek.",
+      "category": "inflection",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 15,
+          "end": 27,
+          "original": "nowy budynek",
+          "suggestion": "nowemu budynkowi",
+          "rationale": "Exact public runtime finding for rule:inflection.przygladac_sie_nowy_budynek.",
+          "rule_family": "rule:inflection.przygladac_sie_nowy_budynek",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.przygladac_sie_nowy_budynek",
+        "rule_family": "rule:inflection.przygladac_sie_nowy_budynek",
+        "audit_row": "rule:inflection.przygladac_sie_nowy_budynek",
+        "behavior_version": "inflection-przygladac-sie-nowy-budynek/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "abstain",
+        "qualified_morphology": "execute",
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_02",
+        "differentiating_feature": "The reflexive verb 'przyglądać się' governs dative, so the pair contrasts the uninflected phrase with 'nowemu budynkowi'."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_03",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Nie mam czas. Raport jest gotowy.",
+      "category": "inflection",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 12,
+          "original": "czas",
+          "suggestion": "czasu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_miec_czas.",
+          "rule_family": "rule:inflection.negated_miec_czas",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_miec_czas",
+        "rule_family": "rule:inflection.negated_miec_czas",
+        "audit_row": "rule:inflection.negated_miec_czas",
+        "behavior_version": "inflection-negated-miec-czas/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_03",
+        "differentiating_feature": "The negative existential construction 'nie ma' governs genitive, and the multi-sentence pair changes only that noun phrase's case."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_04",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_4",
+      "features": [],
+      "text": "Nie widzę samochód i znów Nie widzę samochód.",
+      "category": "inflection",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 18,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_widziec.",
+          "rule_family": "rule:inflection.negated_widziec",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        },
+        {
+          "category": "inflection",
+          "start": 36,
+          "end": 44,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_widziec.",
+          "rule_family": "rule:inflection.negated_widziec",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_04",
+        "differentiating_feature": "The repeated 'nie widzę' construction requires accusative in both noun phrases, so both paired occurrences are corrected together."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_05",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie lubię kawę.",
+      "category": "inflection",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 10,
+          "end": 14,
+          "original": "kawę",
+          "suggestion": "kawy",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_lubic_kawe.",
+          "rule_family": "rule:inflection.negated_lubic_kawe",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_lubic_kawe",
+        "rule_family": "rule:inflection.negated_lubic_kawe",
+        "audit_row": "rule:inflection.negated_lubic_kawe",
+        "behavior_version": "inflection-negated-lubic-kawe/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "abstain",
+        "qualified_morphology": "execute",
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_09",
+        "differentiating_feature": "The governing verb selects the genitive form `kawy` rather than the accusative form `kawę`."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_06",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_6",
+      "features": [],
+      "text": "„Cytat”. Nie widzę samochód.",
+      "category": "inflection",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 19,
+          "end": 27,
+          "original": "samochód",
+          "suggestion": "samochodu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_widziec.",
+          "rule_family": "rule:inflection.negated_widziec",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_11",
+        "differentiating_feature": "The governing verb selects `samochodu` after `widzę` rather than `samochód`."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_07",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_7",
+      "features": [],
+      "text": "Nie mam czas. Raport jest gotowy.",
+      "category": "inflection",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 8,
+          "end": 12,
+          "original": "czas",
+          "suggestion": "czasu",
+          "rationale": "Exact public runtime finding for rule:inflection.negated_miec_czas.",
+          "rule_family": "rule:inflection.negated_miec_czas",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_miec_czas",
+        "rule_family": "rule:inflection.negated_miec_czas",
+        "audit_row": "rule:inflection.negated_miec_czas",
+        "behavior_version": "inflection-negated-miec-czas/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_inflection_negative_13",
+        "differentiating_feature": "The governing verb selects `czasu` in the corrected sentence rather than `czas`."
+      }
+    },
+    {
+      "id": "v4_inflection_positive_08",
+      "kind": "error",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Szukam klucz.",
+      "category": "inflection",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "inflection",
+          "start": 7,
+          "end": 12,
+          "original": "klucz",
+          "suggestion": "klucza",
+          "rationale": "Exact public runtime finding for rule:inflection.government_szukac_klucz.",
+          "rule_family": "rule:inflection.government_szukac_klucz",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.government_szukac_klucz",
+        "rule_family": "rule:inflection.government_szukac_klucz",
+        "audit_row": "rule:inflection.government_szukac_klucz",
+        "behavior_version": "inflection-government-szukac-klucz/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "abstain",
+        "qualified_morphology": "execute",
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_01",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_1",
+      "features": [],
+      "text": "Nie widzę samochodu.",
+      "category": "inflection",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The inflection in 'Nie widzę samochodu.' is selected by the governing verb; no case-form replacement is justified. Reviewed case: v4_inflection_negative_01.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_01",
+        "differentiating_feature": "The verb 'widzę' governs accusative, so the pair contrasts 'nowy budynek' with the required 'nowego budynku'."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_02",
+      "kind": "correct",
+      "phenomenon": "rection",
+      "pair_id": "pair_inflection_2",
+      "features": [],
+      "text": "Przyglądam się nowemu budynkowi.",
+      "category": "inflection",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The inflection in 'Przyglądam się nowemu budynkowi.' is selected by the governing verb or preposition; no case-form replacement is justified. Reviewed case: v4_inflection_negative_02.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_02",
+        "differentiating_feature": "The reflexive verb 'przyglądać się' governs dative, so the pair contrasts the uninflected phrase with 'nowemu budynkowi'."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_03",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Nie mam czasu. Raport jest gotowy.",
+      "category": "inflection",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Nie mam czasu. Raport jest gotowy.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_inflection_negative_03.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_03",
+        "differentiating_feature": "The negative existential construction 'nie ma' governs genitive, and the multi-sentence pair changes only that noun phrase's case."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_04",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_4",
+      "features": [],
+      "text": "Nie widzę samochodu i znów Nie widzę samochodu.",
+      "category": "inflection",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Nie widzę samochodu i znów Nie widzę samochodu.' are already valid in their context; repeated surface form is not evidence of an error. Reviewed case: v4_inflection_negative_04.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_04",
+        "differentiating_feature": "The repeated 'nie widzę' construction requires accusative in both noun phrases, so both paired occurrences are corrected together."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_05",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Nie ma nowego wyniku. Raport gotowy.",
+      "category": "inflection",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Nie ma nowego wyniku. Raport gotowy.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_inflection_negative_05.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_06",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Szukam dobrego rozwiązania. Mam czas.",
+      "category": "inflection",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Szukam dobrego rozwiązania. Mam czas.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_inflection_negative_06.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_07",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Nie widzę nowego budynku. Nie widzę nowego domu.",
+      "category": "inflection",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Nie widzę nowego budynku. Nie widzę nowego domu.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_inflection_negative_07.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_08",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Szukam dobrego rozwiązania. Szukam dobrego wyniku.",
+      "category": "inflection",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Szukam dobrego rozwiązania. Szukam dobrego wyniku.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_inflection_negative_08.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_09",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Nie lubię kawy.",
+      "category": "inflection",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_lubic_kawe",
+        "rule_family": "rule:inflection.negated_lubic_kawe",
+        "audit_row": "rule:inflection.negated_lubic_kawe",
+        "behavior_version": "inflection-negated-lubic-kawe/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Nie lubię kawy.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_inflection_negative_09.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_05",
+        "differentiating_feature": "The governing verb selects the genitive form `kawy` rather than the accusative form `kawę`."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_10",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Przyglądam się nowemu ćwiczeniu.",
+      "category": "inflection",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The casing and Unicode form in 'Przyglądam się nowemu ćwiczeniu.' are intentional for this reviewed example; normalization would create a false positive. Reviewed case: v4_inflection_negative_10.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_11",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_6",
+      "features": [],
+      "text": "„Cytat”. Nie widzę samochodu.",
+      "category": "inflection",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart '„Cytat”. Nie widzę samochodu.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_inflection_negative_11.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_06",
+        "differentiating_feature": "The governing verb selects `samochodu` after `widzę` rather than `samochód`."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_12",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Termin „dobrego rozwiązania” pozostaje cytatem.",
+      "category": "inflection",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Termin „dobrego rozwiązania” pozostaje cytatem.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_inflection_negative_12.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_13",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": "pair_inflection_7",
+      "features": [],
+      "text": "Nie mam czasu. Raport jest gotowy.",
+      "category": "inflection",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_miec_czas",
+        "rule_family": "rule:inflection.negated_miec_czas",
+        "audit_row": "rule:inflection.negated_miec_czas",
+        "behavior_version": "inflection-negated-miec-czas/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Nie mam czasu. Raport jest gotowy.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_inflection_negative_13.",
+      "pair": {
+        "counterpart_id": "v4_inflection_positive_07",
+        "differentiating_feature": "The governing verb selects `czasu` in the corrected sentence rather than `czas`."
+      }
+    },
+    {
+      "id": "v4_inflection_negative_14",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Kontekst wybiera formę „świeżej kawy”.",
+      "category": "inflection",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Kontekst wybiera formę „świeżej kawy”.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_inflection_negative_14.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_15",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Potrzebuję nowego planu.",
+      "category": "inflection",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The inflection in 'Potrzebuję nowego planu.' is selected by the governing verb or preposition; no case-form replacement is justified. Reviewed case: v4_inflection_negative_15.",
+      "pair": null
+    },
+    {
+      "id": "v4_inflection_negative_16",
+      "kind": "correct",
+      "phenomenon": "inflection",
+      "pair_id": null,
+      "features": [],
+      "text": "Ufam dobremu przewodnikowi.",
+      "category": "inflection",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:inflection.negated_widziec",
+        "rule_family": "rule:inflection.negated_widziec",
+        "audit_row": "rule:inflection.negated_widziec",
+        "behavior_version": "inflection-negated-widziec/2.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The inflection in 'Ufam dobremu przewodnikowi.' is selected by the governing verb or preposition; no case-form replacement is justified. Reviewed case: v4_inflection_negative_16.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_positive_01",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_1",
+      "features": [],
+      "text": "Tak,nie.",
+      "category": "punctuation",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 3,
+          "end": 4,
+          "original": ",",
+          "suggestion": ", ",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_space.",
+          "rule_family": "rule:syntax.comma_space",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_01",
+        "differentiating_feature": "The sentence-initial concessive phrase 'Mimo deszczu' is followed by the required comma before the main clause."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_02",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_2",
+      "features": [],
+      "text": "Wiem,, że przyjdziesz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 5,
+          "end": 6,
+          "original": ",",
+          "suggestion": "",
+          "rationale": "Exact public runtime finding for rule:syntax.duplicate_comma.",
+          "rule_family": "rule:syntax.duplicate_comma",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.duplicate_comma",
+        "rule_family": "rule:syntax.duplicate_comma",
+        "audit_row": "rule:syntax.duplicate_comma",
+        "behavior_version": "syntax-duplicate-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_02",
+        "differentiating_feature": "The reporting clause 'Wiem' takes a comma before the subordinate clause introduced by 'że'."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_03",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "To działa.Dalej odpoczniemy.",
+      "category": "punctuation",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 9,
+          "end": 10,
+          "original": ".",
+          "suggestion": ". ",
+          "rationale": "Exact public runtime finding for rule:syntax.sentence_space.",
+          "rule_family": "rule:syntax.sentence_space",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.sentence_space",
+        "rule_family": "rule:syntax.sentence_space",
+        "audit_row": "rule:syntax.sentence_space",
+        "behavior_version": "syntax-sentence-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_03",
+        "differentiating_feature": "The initial conditional clause ends before 'zadzwoń', and the multi-sentence pair preserves the comma at that boundary."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_04",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_4",
+      "features": [],
+      "text": "Owoce, warzywa itp i wrócimy, itd i odpoczniemy.",
+      "category": "punctuation",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 18,
+          "end": 18,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Exact public runtime finding for rule:punctuation.abbreviation_dot.",
+          "rule_family": "rule:punctuation.abbreviation_dot",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        },
+        {
+          "category": "punctuation",
+          "start": 33,
+          "end": 33,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Exact public runtime finding for rule:punctuation.abbreviation_dot.",
+          "rule_family": "rule:punctuation.abbreviation_dot",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:punctuation.abbreviation_dot",
+        "rule_family": "rule:punctuation.abbreviation_dot",
+        "audit_row": "rule:punctuation.abbreviation_dot",
+        "behavior_version": "punctuation-abbreviation-dot/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_04",
+        "differentiating_feature": "Each of the two reporting clauses requires its own comma before 'że'; the repeated-occurrence pair exposes both sites."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_05",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Mówię,że ćwiczysz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 5,
+          "end": 6,
+          "original": ",",
+          "suggestion": ", ",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_space.",
+          "rule_family": "rule:syntax.comma_space",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_09",
+        "differentiating_feature": "The comma is followed by a space in the corrected Unicode sentence."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_06",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_6",
+      "features": [],
+      "text": "„Cytat”.Następne zdanie.",
+      "category": "punctuation",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 7,
+          "end": 8,
+          "original": ".",
+          "suggestion": ". ",
+          "rationale": "Exact public runtime finding for rule:syntax.sentence_space.",
+          "rule_family": "rule:syntax.sentence_space",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.sentence_space",
+        "rule_family": "rule:syntax.sentence_space",
+        "audit_row": "rule:syntax.sentence_space",
+        "behavior_version": "syntax-sentence-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_11",
+        "differentiating_feature": "The quoted sentence is followed by a space before the next sentence."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_07",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_7",
+      "features": [],
+      "text": "Napisał,że „tak”.",
+      "category": "punctuation",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 7,
+          "end": 8,
+          "original": ",",
+          "suggestion": ", ",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_space.",
+          "rule_family": "rule:syntax.comma_space",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_punctuation_negative_13",
+        "differentiating_feature": "The comma before the quoted clause is followed by a space in the corrected text."
+      }
+    },
+    {
+      "id": "v4_punctuation_positive_08",
+      "kind": "error",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Owoce, warzywa itd i wróciliśmy",
+      "category": "punctuation",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "punctuation",
+          "start": 18,
+          "end": 18,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "Exact public runtime finding for rule:punctuation.abbreviation_dot.",
+          "rule_family": "rule:punctuation.abbreviation_dot",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:punctuation.abbreviation_dot",
+        "rule_family": "rule:punctuation.abbreviation_dot",
+        "audit_row": "rule:punctuation.abbreviation_dot",
+        "behavior_version": "punctuation-abbreviation-dot/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_01",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_1",
+      "features": [],
+      "text": "Tak, nie.",
+      "category": "punctuation",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The punctuation in 'Tak, nie.' is already grammatical for this clause structure; inserting another mark would be a false positive. Reviewed case: v4_punctuation_negative_01.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_01",
+        "differentiating_feature": "The sentence-initial concessive phrase 'Mimo deszczu' is followed by the required comma before the main clause."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_02",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_2",
+      "features": [],
+      "text": "Wiem, że przyjdziesz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The punctuation boundary in 'Wiem, że przyjdziesz.' is already grammatical for this clause structure; inserting another mark would be a false positive. Reviewed case: v4_punctuation_negative_02.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_02",
+        "differentiating_feature": "The reporting clause 'Wiem' takes a comma before the subordinate clause introduced by 'że'."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_03",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "To działa. Dalej odpoczniemy.",
+      "category": "punctuation",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'To działa. Dalej odpoczniemy.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_punctuation_negative_03.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_03",
+        "differentiating_feature": "The initial conditional clause ends before 'zadzwoń', and the multi-sentence pair preserves the comma at that boundary."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_04",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_4",
+      "features": [],
+      "text": "Owoce, warzywa itp. i wrócimy, itd. i odpoczniemy.",
+      "category": "punctuation",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Owoce, warzywa itp. i wrócimy, itd. i odpoczniemy.' are already valid in their context; repeated surface form is not evidence of an error. Reviewed case: v4_punctuation_negative_04.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_04",
+        "differentiating_feature": "Each of the two reporting clauses requires its own comma before 'że'; the repeated-occurrence pair exposes both sites."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_05",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Kiedy wrócisz, napisz. Potem odpocznij.",
+      "category": "punctuation",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Kiedy wrócisz, napisz. Potem odpocznij.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_punctuation_negative_05.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_06",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Wiem, że przyjdziesz. Poczekam.",
+      "category": "punctuation",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Wiem, że przyjdziesz. Poczekam.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_punctuation_negative_06.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_07",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Jeśli przyjdziesz, zadzwoń. Jeśli wyjedziesz, napisz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Jeśli przyjdziesz, zadzwoń. Jeśli wyjedziesz, napisz.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_punctuation_negative_07.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_08",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Wiem, że przyjdziesz i wiem, że zostaniesz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Wiem, że przyjdziesz i wiem, że zostaniesz.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_punctuation_negative_08.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_09",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Mówię, że ćwiczysz.",
+      "category": "punctuation",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Mówię, że ćwiczysz.' is the reviewed boundary case; the paired positive contains the declared minimal punctuation error. Reviewed case: v4_punctuation_negative_09.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_05",
+        "differentiating_feature": "The comma is followed by a space in the corrected Unicode sentence."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_10",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Mimo że ćwiczysz, odpocznij.",
+      "category": "punctuation",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The casing and Unicode form in 'Mimo że ćwiczysz, odpocznij.' are intentional for this reviewed example; normalization would create a false positive. Reviewed case: v4_punctuation_negative_10.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_11",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_6",
+      "features": [],
+      "text": "„Cytat”. Następne zdanie.",
+      "category": "punctuation",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.sentence_space",
+        "rule_family": "rule:syntax.sentence_space",
+        "audit_row": "rule:syntax.sentence_space",
+        "behavior_version": "syntax-sentence-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart '„Cytat”. Następne zdanie.' is the reviewed boundary case; the paired positive contains the declared minimal punctuation error. Reviewed case: v4_punctuation_negative_11.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_06",
+        "differentiating_feature": "The quoted sentence is followed by a space before the next sentence."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_12",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Cytat: „Jeśli przyjdziesz, zadzwoń”.",
+      "category": "punctuation",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Cytat: „Jeśli przyjdziesz, zadzwoń”.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_punctuation_negative_12.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_13",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": "pair_punctuation_7",
+      "features": [],
+      "text": "Napisał, że „tak”.",
+      "category": "punctuation",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Napisał, że „tak”.' is the reviewed boundary case; the paired positive contains the declared minimal punctuation error. Reviewed case: v4_punctuation_negative_13.",
+      "pair": {
+        "counterpart_id": "v4_punctuation_positive_07",
+        "differentiating_feature": "The comma before the quoted clause is followed by a space in the corrected text."
+      }
+    },
+    {
+      "id": "v4_punctuation_negative_14",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Kontekst decyduje o przecinku.",
+      "category": "punctuation",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The punctuation boundary in 'Kontekst decyduje o przecinku.' is already grammatical for this clause structure; inserting another mark would be a false positive. Reviewed case: v4_punctuation_negative_14.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_15",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Chciałbym, żebyś przyszedł.",
+      "category": "punctuation",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The punctuation boundary in 'Chciałbym, żebyś przyszedł.' is already grammatical for this clause structure; inserting another mark would be a false positive. Reviewed case: v4_punctuation_negative_15.",
+      "pair": null
+    },
+    {
+      "id": "v4_punctuation_negative_16",
+      "kind": "correct",
+      "phenomenon": "punctuation",
+      "pair_id": null,
+      "features": [],
+      "text": "Zostałem, bo padało.",
+      "category": "punctuation",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_space",
+        "rule_family": "rule:syntax.comma_space",
+        "audit_row": "rule:syntax.comma_space",
+        "behavior_version": "syntax-comma-space/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The punctuation boundary in 'Zostałem, bo padało.' is already grammatical for this clause structure; inserting another mark would be a false positive. Reviewed case: v4_punctuation_negative_16.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_positive_01",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_1",
+      "features": [],
+      "text": "Napewno przyjdę.",
+      "category": "spelling",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Napewno",
+          "suggestion": "Na pewno",
+          "rationale": "Exact public runtime finding for rule:spelling.napewno.",
+          "rule_family": "rule:spelling.napewno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_01",
+        "differentiating_feature": "The lexical expression is written as two words, 'na pewno', in the corrected pair rather than the fused misspelling."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_02",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_2",
+      "features": [],
+      "text": "On wogóle nie odpisał.",
+      "category": "spelling",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 3,
+          "end": 9,
+          "original": "wogóle",
+          "suggestion": "w ogóle",
+          "rationale": "Exact public runtime finding for rule:spelling.wogole_diacritic.",
+          "rule_family": "rule:spelling.wogole_diacritic",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wogole_diacritic",
+        "rule_family": "rule:spelling.wogole_diacritic",
+        "audit_row": "rule:spelling.wogole_diacritic",
+        "behavior_version": "spelling-wogole-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_02",
+        "differentiating_feature": "The fixed expression is written 'w ogóle', with a space and the Polish diacritic, which the positive form lacks."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_03",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Muszę wziasc plecak. Potem wróciłem.",
+      "category": "spelling",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 6,
+          "end": 12,
+          "original": "wziasc",
+          "suggestion": "wziąć",
+          "rationale": "Exact public runtime finding for rule:spelling.wziasc.",
+          "rule_family": "rule:spelling.wziasc",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wziasc",
+        "rule_family": "rule:spelling.wziasc",
+        "audit_row": "rule:spelling.wziasc",
+        "behavior_version": "spelling-wziasc/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_03",
+        "differentiating_feature": "The first-person past form is 'wziąłem' with 'ą', so the pair isolates the spelling mutation in a multi-sentence context."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_04",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_4",
+      "features": [],
+      "text": "Napewno wrócę. Napewno zadzwonię.",
+      "category": "spelling",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 7,
+          "original": "Napewno",
+          "suggestion": "Na pewno",
+          "rationale": "Exact public runtime finding for rule:spelling.napewno.",
+          "rule_family": "rule:spelling.napewno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        },
+        {
+          "category": "spelling",
+          "start": 15,
+          "end": 22,
+          "original": "Napewno",
+          "suggestion": "Na pewno",
+          "rationale": "Exact public runtime finding for rule:spelling.napewno.",
+          "rule_family": "rule:spelling.napewno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_04",
+        "differentiating_feature": "Both repeated occurrences use the two-word spelling 'na pewno', so the pair tests correction of both identical tokens."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_05",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wziąść dokument jest trudno.",
+      "category": "spelling",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wziąść",
+          "suggestion": "Wziąć",
+          "rationale": "Exact public runtime finding for rule:spelling.wziasc_diacritic.",
+          "rule_family": "rule:spelling.wziasc_diacritic",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wziasc_diacritic",
+        "rule_family": "rule:spelling.wziasc_diacritic",
+        "audit_row": "rule:spelling.wziasc_diacritic",
+        "behavior_version": "spelling-wziasc-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_09",
+        "differentiating_feature": "The corrected infinitive is `Wziąć` rather than the misspelled `Wziąść`."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_06",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_6",
+      "features": [],
+      "text": "„Cytat”. Nauczyciel napewno popełnił błąd.",
+      "category": "spelling",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 20,
+          "end": 27,
+          "original": "napewno",
+          "suggestion": "na pewno",
+          "rationale": "Exact public runtime finding for rule:spelling.napewno.",
+          "rule_family": "rule:spelling.napewno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_11",
+        "differentiating_feature": "The lexical expression is written as two words, `na pewno`, rather than fused `napewno`."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_07",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_7",
+      "features": [],
+      "text": "W tym zapisie napewno potrzebna jest kwalifikacja.",
+      "category": "spelling",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 14,
+          "end": 21,
+          "original": "napewno",
+          "suggestion": "na pewno",
+          "rationale": "Exact public runtime finding for rule:spelling.napewno.",
+          "rule_family": "rule:spelling.napewno",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_spelling_negative_13",
+        "differentiating_feature": "The lexical expression remains a reviewed candidate only outside quoted content."
+      }
+    },
+    {
+      "id": "v4_spelling_positive_08",
+      "kind": "error",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wziasc dokument jest trudno.",
+      "category": "spelling",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "spelling",
+          "start": 0,
+          "end": 6,
+          "original": "Wziasc",
+          "suggestion": "Wziąć",
+          "rationale": "Exact public runtime finding for rule:spelling.wziasc.",
+          "rule_family": "rule:spelling.wziasc",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wziasc",
+        "rule_family": "rule:spelling.wziasc",
+        "audit_row": "rule:spelling.wziasc",
+        "behavior_version": "spelling-wziasc/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_01",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_1",
+      "features": [],
+      "text": "Na pewno przyjdę.",
+      "category": "spelling",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The spelling in 'Na pewno przyjdę.' is the intended standard or literal form in this context; changing it would alter reviewed text without a rule violation. Reviewed case: v4_spelling_negative_01.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_01",
+        "differentiating_feature": "The lexical expression is written as two words, 'na pewno', in the corrected pair rather than the fused misspelling."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_02",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_2",
+      "features": [],
+      "text": "On w ogóle nie odpisał.",
+      "category": "spelling",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wogole_diacritic",
+        "rule_family": "rule:spelling.wogole_diacritic",
+        "audit_row": "rule:spelling.wogole_diacritic",
+        "behavior_version": "spelling-wogole-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The spelling in 'On w ogóle nie odpisał.' is the intended standard or literal form in this context; changing it would alter reviewed text without a rule violation. Reviewed case: v4_spelling_negative_02.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_02",
+        "differentiating_feature": "The fixed expression is written 'w ogóle', with a space and the Polish diacritic, which the positive form lacks."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_03",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Muszę wziąć plecak. Potem wróciłem.",
+      "category": "spelling",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Muszę wziąć plecak. Potem wróciłem.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_spelling_negative_03.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_03",
+        "differentiating_feature": "The first-person past form is 'wziąłem' with 'ą', so the pair isolates the spelling mutation in a multi-sentence context."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_04",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_4",
+      "features": [],
+      "text": "Na pewno wrócę. Na pewno zadzwonię.",
+      "category": "spelling",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Na pewno wrócę. Na pewno zadzwonię.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_spelling_negative_04.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_04",
+        "differentiating_feature": "Both repeated occurrences use the two-word spelling 'na pewno', so the pair tests correction of both identical tokens."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_05",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Na pewno wrócę. Potem zadzwonię.",
+      "category": "spelling",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Na pewno wrócę. Potem zadzwonię.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_spelling_negative_05.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_06",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "W ogóle nie odpisał. Czekam.",
+      "category": "spelling",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wogole_diacritic",
+        "rule_family": "rule:spelling.wogole_diacritic",
+        "audit_row": "rule:spelling.wogole_diacritic",
+        "behavior_version": "spelling-wogole-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'W ogóle nie odpisał. Czekam.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_spelling_negative_06.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_07",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Na pewno wrócę. Na pewno zadzwonię.",
+      "category": "spelling",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Na pewno wrócę. Na pewno zadzwonię.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_spelling_negative_07.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_08",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "W ogóle nie odpisał. W ogóle nie dzwonił.",
+      "category": "spelling",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wogole_diacritic",
+        "rule_family": "rule:spelling.wogole_diacritic",
+        "audit_row": "rule:spelling.wogole_diacritic",
+        "behavior_version": "spelling-wogole-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'W ogóle nie odpisał. W ogóle nie dzwonił.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_spelling_negative_08.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_09",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "Wziąć dokument jest trudno.",
+      "category": "spelling",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.wziasc_diacritic",
+        "rule_family": "rule:spelling.wziasc_diacritic",
+        "audit_row": "rule:spelling.wziasc_diacritic",
+        "behavior_version": "spelling-wziasc-diacritic/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Wziąć dokument jest trudno.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_spelling_negative_09.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_05",
+        "differentiating_feature": "The corrected infinitive is `Wziąć` rather than the misspelled `Wziąść`."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_10",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Wziąłem ćwiczenie.",
+      "category": "spelling",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The casing and Unicode form in 'Wziąłem ćwiczenie.' are intentional for this reviewed example; normalization would create a false positive. Reviewed case: v4_spelling_negative_10.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_11",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_6",
+      "features": [],
+      "text": "„Cytat”. Nauczyciel na pewno popełnił błąd.",
+      "category": "spelling",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart '„Cytat”. Nauczyciel na pewno popełnił błąd.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_spelling_negative_11.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_06",
+        "differentiating_feature": "The lexical expression is written as two words, `na pewno`, rather than fused `napewno`."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_12",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Termin „wogóle” jest omawiany.",
+      "category": "spelling",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Termin „wogóle” jest omawiany.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_spelling_negative_12.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_13",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": "pair_spelling_7",
+      "features": [],
+      "text": "W tym zapisie na pewno potrzebna jest kwalifikacja.",
+      "category": "spelling",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'W tym zapisie na pewno potrzebna jest kwalifikacja.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_spelling_negative_13.",
+      "pair": {
+        "counterpart_id": "v4_spelling_positive_07",
+        "differentiating_feature": "The lexical expression remains a reviewed candidate only outside quoted content."
+      }
+    },
+    {
+      "id": "v4_spelling_negative_14",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Kontekst rozstrzyga zapis skrótu.",
+      "category": "spelling",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The spelling in 'Kontekst rozstrzyga zapis skrótu.' is the intended standard or literal form in this context; changing it would alter reviewed text without a rule violation. Reviewed case: v4_spelling_negative_14.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_15",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Wziąć dokument jest łatwo.",
+      "category": "spelling",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The spelling in 'Wziąć dokument jest łatwo.' is the intended standard or literal form in this context; changing it would alter reviewed text without a rule violation. Reviewed case: v4_spelling_negative_15.",
+      "pair": null
+    },
+    {
+      "id": "v4_spelling_negative_16",
+      "kind": "correct",
+      "phenomenon": "spelling",
+      "pair_id": null,
+      "features": [],
+      "text": "Na pewno odpocznę.",
+      "category": "spelling",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:spelling.napewno",
+        "rule_family": "rule:spelling.napewno",
+        "audit_row": "rule:spelling.napewno",
+        "behavior_version": "spelling-napewno/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The spelling in 'Na pewno odpocznę.' is the intended standard or literal form in this context; changing it would alter reviewed text without a rule violation. Reviewed case: v4_spelling_negative_16.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_positive_01",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_1",
+      "features": [],
+      "text": "Jeśli pada zostaję w domu.",
+      "category": "syntax",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 10,
+          "end": 10,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.initial_conditional_comma.",
+          "rule_family": "rule:syntax.initial_conditional_comma",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_01",
+        "differentiating_feature": "The initial 'jeśli' subordinate clause ends before the imperative, requiring a comma at that syntactic boundary."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_02",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_2",
+      "features": [],
+      "text": "Chcę żebyś wrócił.",
+      "category": "syntax",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_zeby_purpose.",
+          "rule_family": "rule:syntax.comma_before_zeby_purpose",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_zeby_purpose",
+        "rule_family": "rule:syntax.comma_before_zeby_purpose",
+        "audit_row": "rule:syntax.comma_before_zeby_purpose",
+        "behavior_version": "syntax-comma-before-zeby-purpose/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_02",
+        "differentiating_feature": "The complement clause introduced by 'żeby' is separated from 'Chciałbym' by a comma in the corrected pair."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_03",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Wiem że Ania wróciła. Potem porozmawiamy.",
+      "category": "syntax",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_ze_reporting.",
+          "rule_family": "rule:syntax.comma_before_ze_reporting",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_ze_reporting",
+        "rule_family": "rule:syntax.comma_before_ze_reporting",
+        "audit_row": "rule:syntax.comma_before_ze_reporting",
+        "behavior_version": "syntax-comma-before-ze-reporting/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_03",
+        "differentiating_feature": "The initial temporal clause introduced by 'kiedy' ends before 'napisz', and the second sentence remains unchanged."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_04",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_4",
+      "features": [],
+      "text": "Wiem że Ania wróciła. Wiem że Piotr został.",
+      "category": "syntax",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 4,
+          "end": 4,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_ze_reporting.",
+          "rule_family": "rule:syntax.comma_before_ze_reporting",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        },
+        {
+          "category": "syntax",
+          "start": 26,
+          "end": 26,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_ze_reporting.",
+          "rule_family": "rule:syntax.comma_before_ze_reporting",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_ze_reporting",
+        "rule_family": "rule:syntax.comma_before_ze_reporting",
+        "audit_row": "rule:syntax.comma_before_ze_reporting",
+        "behavior_version": "syntax-comma-before-ze-reporting/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_04",
+        "differentiating_feature": "The repeated pair contains two initial conditional clauses, and each clause boundary requires its own comma."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_05",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "MÓWIĘ że wrócisz.",
+      "category": "syntax",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 5,
+          "end": 5,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_ze_reporting.",
+          "rule_family": "rule:syntax.comma_before_ze_reporting",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_ze_reporting",
+        "rule_family": "rule:syntax.comma_before_ze_reporting",
+        "audit_row": "rule:syntax.comma_before_ze_reporting",
+        "behavior_version": "syntax-comma-before-ze-reporting/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_09",
+        "differentiating_feature": "The subordinate clause receives the comma required after the reporting verb."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_06",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_6",
+      "features": [],
+      "text": "On boi „trudności”.",
+      "category": "syntax",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 6,
+          "end": 6,
+          "original": "",
+          "suggestion": " się",
+          "rationale": "Exact public runtime finding for rule:syntax.missing_reflexive.",
+          "rule_family": "rule:syntax.missing_reflexive",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.missing_reflexive",
+        "rule_family": "rule:syntax.missing_reflexive",
+        "audit_row": "rule:syntax.missing_reflexive",
+        "behavior_version": "syntax-missing-reflexive/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_11",
+        "differentiating_feature": "The verb `boi` receives the reflexive complement `się` before the quoted object."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_07",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_7",
+      "features": [],
+      "text": "Pojechałem Warszawy.",
+      "category": "syntax",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 11,
+          "end": 11,
+          "original": "",
+          "suggestion": "do ",
+          "rationale": "Exact public runtime finding for rule:syntax.missing_destination_preposition.",
+          "rule_family": "rule:syntax.missing_destination_preposition",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.missing_destination_preposition",
+        "rule_family": "rule:syntax.missing_destination_preposition",
+        "audit_row": "rule:syntax.missing_destination_preposition",
+        "behavior_version": "syntax-missing-destination-preposition/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": {
+        "counterpart_id": "v4_syntax_negative_13",
+        "differentiating_feature": "The destination construction requires the preposition `do` before `Warszawy`."
+      }
+    },
+    {
+      "id": "v4_syntax_positive_08",
+      "kind": "error",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Zostałem bo padało.",
+      "category": "syntax",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [
+        {
+          "category": "syntax",
+          "start": 8,
+          "end": 8,
+          "original": "",
+          "suggestion": ",",
+          "rationale": "Exact public runtime finding for rule:syntax.comma_before_bo.",
+          "rule_family": "rule:syntax.comma_before_bo",
+          "ambiguity_notes": [],
+          "overlap_group": null,
+          "allow_zero_width": true
+        }
+      ],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_bo",
+        "rule_family": "rule:syntax.comma_before_bo",
+        "audit_row": "rule:syntax.comma_before_bo",
+        "behavior_version": "syntax-comma-before-bo/3.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_01",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_1",
+      "features": [],
+      "text": "Jeśli pada, zostaję w domu.",
+      "category": "syntax",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The syntax in 'Jeśli pada, zostaję w domu.' is complete in its local clause context; the nearby token pattern alone does not justify a correction. Reviewed case: v4_syntax_negative_01.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_01",
+        "differentiating_feature": "The initial 'jeśli' subordinate clause ends before the imperative, requiring a comma at that syntactic boundary."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_02",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_2",
+      "features": [],
+      "text": "Chciałbym, żebyś przyszedł.",
+      "category": "syntax",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The syntax in 'Chciałbym, żebyś przyszedł.' is complete in its local clause context; the nearby token pattern alone does not justify a correction. Reviewed case: v4_syntax_negative_02.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_02",
+        "differentiating_feature": "The complement clause introduced by 'żeby' is separated from 'Chciałbym' by a comma in the corrected pair."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_03",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_3",
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Wiem, że Ania wróciła. Potem porozmawiamy.",
+      "category": "syntax",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Wiem, że Ania wróciła. Potem porozmawiamy.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_syntax_negative_03.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_03",
+        "differentiating_feature": "The initial temporal clause introduced by 'kiedy' ends before 'napisz', and the second sentence remains unchanged."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_04",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_4",
+      "features": [],
+      "text": "Wiem, że Ania wróciła. Wiem, że Piotr został.",
+      "category": "syntax",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Wiem, że Ania wróciła. Wiem, że Piotr został.' are already valid in their context; repeated surface form is not evidence of an error. Reviewed case: v4_syntax_negative_04.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_04",
+        "differentiating_feature": "The repeated pair contains two initial conditional clauses, and each clause boundary requires its own comma."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_05",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Jeśli przyjdziesz, zadzwoń. Potem odpocznij.",
+      "category": "syntax",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Jeśli przyjdziesz, zadzwoń. Potem odpocznij.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_syntax_negative_05.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_06",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "multi_sentence"
+      ],
+      "text": "Kiedy wrócisz, napisz. Poczekam.",
+      "category": "syntax",
+      "shape_strata": [
+        "multi-sentence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The control features in 'Kiedy wrócisz, napisz. Poczekam.' make the candidate inapplicable; the validator must preserve this explicit boundary case. Reviewed case: v4_syntax_negative_06.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_07",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Jeśli przyjdziesz, zadzwoń. Jeśli wyjedziesz, napisz.",
+      "category": "syntax",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Jeśli przyjdziesz, zadzwoń. Jeśli wyjedziesz, napisz.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_syntax_negative_07.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_08",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Chciałbym, żebyś przyszedł i chciałbym, żebyś został.",
+      "category": "syntax",
+      "shape_strata": [
+        "repeated-occurrence"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "Both occurrences in 'Chciałbym, żebyś przyszedł i chciałbym, żebyś został.' are already valid in their respective contexts; repeated surface form is not evidence of an error. Reviewed case: v4_syntax_negative_08.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_09",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_5",
+      "features": [
+        "unicode"
+      ],
+      "text": "MÓWIĘ, że wrócisz.",
+      "category": "syntax",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.comma_before_ze_reporting",
+        "rule_family": "rule:syntax.comma_before_ze_reporting",
+        "audit_row": "rule:syntax.comma_before_ze_reporting",
+        "behavior_version": "syntax-comma-before-ze-reporting/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'MÓWIĘ, że wrócisz.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_syntax_negative_09.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_05",
+        "differentiating_feature": "The subordinate clause receives the comma required after the reporting verb."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_10",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [
+        "unicode"
+      ],
+      "text": "Jeśli ćwiczysz, odpocznij.",
+      "category": "syntax",
+      "shape_strata": [
+        "unicode-and-case"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The casing and Unicode form in 'Jeśli ćwiczysz, odpocznij.' are intentional for this reviewed example; normalization would create a false positive. Reviewed case: v4_syntax_negative_10.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_11",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_6",
+      "features": [],
+      "text": "On boi się „trudności”.",
+      "category": "syntax",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.missing_reflexive",
+        "rule_family": "rule:syntax.missing_reflexive",
+        "audit_row": "rule:syntax.missing_reflexive",
+        "behavior_version": "syntax-missing-reflexive/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'On boi się „trudności”.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_syntax_negative_11.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_06",
+        "differentiating_feature": "The verb `boi` receives the reflexive complement `się` before the quoted object."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_12",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Cytat: „Chciałbym, żebyś przyszedł”.",
+      "category": "syntax",
+      "shape_strata": [
+        "quotation-or-literal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The quoted or metalinguistic text 'Cytat: „Chciałbym, żebyś przyszedł”.' is being discussed as content, so its spelling and punctuation must remain literal. Reviewed case: v4_syntax_negative_12.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_13",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": "pair_syntax_7",
+      "features": [],
+      "text": "Pojechałem do Warszawy.",
+      "category": "syntax",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.missing_destination_preposition",
+        "rule_family": "rule:syntax.missing_destination_preposition",
+        "audit_row": "rule:syntax.missing_destination_preposition",
+        "behavior_version": "syntax-missing-destination-preposition/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The corrected counterpart 'Pojechałem do Warszawy.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_syntax_negative_13.",
+      "pair": {
+        "counterpart_id": "v4_syntax_positive_07",
+        "differentiating_feature": "The destination construction requires the preposition `do` before `Warszawy`."
+      }
+    },
+    {
+      "id": "v4_syntax_negative_14",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Kontekst decyduje o granicy zdania.",
+      "category": "syntax",
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The syntax in 'Kontekst decyduje o granicy zdania.' is complete in its local clause context; the nearby token pattern alone does not justify a correction. Reviewed case: v4_syntax_negative_14.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_15",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Zostałem, bo padało.",
+      "category": "syntax",
+      "shape_strata": [
+        "simple-local"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The syntax in 'Zostałem, bo padało.' is complete in its local clause context; the nearby token pattern alone does not justify a correction. Reviewed case: v4_syntax_negative_15.",
+      "pair": null
+    },
+    {
+      "id": "v4_syntax_negative_16",
+      "kind": "correct",
+      "phenomenon": "syntax",
+      "pair_id": null,
+      "features": [],
+      "text": "Wiem, że przyjdziesz.",
+      "category": "syntax",
+      "shape_strata": [
+        "sentence-internal"
+      ],
+      "expected_findings": [],
+      "rationale": null,
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:syntax.initial_conditional_comma",
+        "rule_family": "rule:syntax.initial_conditional_comma",
+        "audit_row": "rule:syntax.initial_conditional_comma",
+        "behavior_version": "syntax-initial-conditional-comma/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": "The syntax in 'Wiem, że przyjdziesz.' is complete in its local clause context; the nearby token pattern alone does not justify a correction. Reviewed case: v4_syntax_negative_16.",
+      "pair": null
+    },
+    {
+      "id": "v4_control_conflict_agreement",
+      "kind": "conflict",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "conflict"
+      ],
+      "text": "Te zdanie.",
+      "category": null,
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "To",
+          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": "controlled-conflict",
+          "allow_zero_width": false
+        },
+        {
+          "category": "agreement",
+          "start": 0,
+          "end": 2,
+          "original": "Te",
+          "suggestion": "Ten",
+          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
+          "rule_family": "rule:agreement.te_zdanie",
+          "ambiguity_notes": [],
+          "overlap_group": "controlled-conflict",
+          "allow_zero_width": false
+        }
+      ],
+      "rationale": "Two project-authored candidates intentionally overlap and require review rather than automatic selection.",
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_control_abstain_01",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention"
+      ],
+      "text": "Nie uruchamiaj bez kwalifikacji.",
+      "category": null,
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": "The public case does not justify an automatic suggestion under the conservative v1 policy.",
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_control_abstain_02",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention"
+      ],
+      "text": "Kontekst jest niepełny.",
+      "category": null,
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": "The public case does not justify an automatic suggestion under the conservative v1 policy.",
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    },
+    {
+      "id": "v4_control_abstain_03",
+      "kind": "abstain",
+      "phenomenon": null,
+      "pair_id": null,
+      "features": [
+        "abstention"
+      ],
+      "text": "Wynik wymaga ręcznej oceny.",
+      "category": null,
+      "shape_strata": [
+        "conflict-or-abstention"
+      ],
+      "expected_findings": [],
+      "rationale": "The public case does not justify an automatic suggestion under the conservative v1 policy.",
+      "provenance": {
+        "source": "project-authored",
+        "license": "CC0-1.0",
+        "reference": "RJP-2026-public-rule-coverage-audit"
+      },
+      "traceability": {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0"
+      },
+      "provider_behavior": {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": null,
+        "denominator_profile": "all-cases"
+      },
+      "boundary_rationale": null,
+      "pair": null
+    }
+  ]
+}
