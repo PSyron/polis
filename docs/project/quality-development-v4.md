@@ -51,3 +51,74 @@ Walidacja odrzuca między innymi duplikaty identyfikatorów, rozjazd skrótów,
 niezgodne zakresy, nieoznaczone nakładanie znalezisk, niekompletne pary,
 brakujące uzasadnienia hard negative, niepełną proweniencję i niespełnione
 minima kategorii lub strat.
+
+## Reprodukcja pomiaru
+
+Pomiar wykonuj wyłącznie z jednego czystego commita i jednego zbudowanego
+koła. Digest koła należy przekazać w `--artifact-sha256`, a digest commita w
+`--source-sha`; nie wolno używać zerowego digestu ani artefaktu z brudnego
+drzewa roboczego. Provider-absent i qualified-morphology są osobnymi
+środowiskami. W pierwszym środowisku `morfeusz2` musi być nieimportowalny, a w
+drugim musi odpowiadać kwalifikacji z manifestu.
+
+```bash
+uv run --locked --extra dev python scripts/validate_quality_dataset_v4.py --json
+uv run --locked --extra dev python -m build --wheel --outdir /tmp/polis-367-dist
+sha256sum /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
+
+python -m venv /tmp/polis-367-default
+/tmp/polis-367-default/bin/python -m pip install --no-deps /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
+/tmp/polis-367-default/bin/python -m polis.evaluation.quality_runner baseline \
+  --dataset-version v4 --warmup 1 --repetitions 5 \
+  --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --profile default --output /tmp/polis-367-baseline-default.json
+
+python -m venv /tmp/polis-367-morphology
+/tmp/polis-367-morphology/bin/python -m pip install --no-deps /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
+/tmp/polis-367-morphology/bin/python -m pip install morfeusz2==1.99.15
+/tmp/polis-367-morphology/bin/python -m polis.evaluation.quality_runner baseline \
+  --dataset-version v4 --warmup 1 --repetitions 5 \
+  --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --profile morphology --output /tmp/polis-367-baseline-morphology.json
+```
+
+Po zmianie wykonaj dwa polecenia `result` z tymi samymi tożsamościami i
+repetitions, używając `--artifact-sha256` digestu koła wynikowego. Następnie
+utwórz propozycję wyłącznie z obu zmierzonych baseline'ów: jej początkowy
+status to `pending_maintainer_approval`, `enforced: false`, a `decision: null`.
+Walidacja propozycji nie jest zgodą. Maintainer musi dopisać jawne metadane
+decyzji (`status: approved`, `enforced: true`, autor, czas i uzasadnienie),
+a dopiero potem można uruchomić comparison:
+
+```bash
+/tmp/polis-367-default/bin/python -m polis.evaluation.quality_runner result \
+  --dataset-version v4 --warmup 1 --repetitions 5 \
+  --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --profile default --output /tmp/polis-367-result-default.json
+/tmp/polis-367-morphology/bin/python -m polis.evaluation.quality_runner result \
+  --dataset-version v4 --warmup 1 --repetitions 5 \
+  --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --profile morphology --output /tmp/polis-367-result-morphology.json
+python -m polis.evaluation.quality_runner propose \
+  --baseline /tmp/polis-367-baseline-default.json \
+  --morphology-baseline /tmp/polis-367-baseline-morphology.json \
+  --wheel-filename polis_nlp-0.2.0-py3-none-any.whl \
+  --output /tmp/polis-367-proposal.json
+python -m polis.evaluation.quality_runner validate-proposal \
+  --baseline /tmp/polis-367-baseline-default.json \
+  --morphology-baseline /tmp/polis-367-baseline-morphology.json \
+  --proposal /tmp/polis-367-proposal.json
+python -m polis.evaluation.quality_runner compare \
+  --baseline-default /tmp/polis-367-baseline-default.json \
+  --baseline-morphology /tmp/polis-367-baseline-morphology.json \
+  --result-default /tmp/polis-367-result-default.json \
+  --result-morphology /tmp/polis-367-result-morphology.json \
+  --proposal /tmp/polis-367-proposal-approved.json \
+  --output /tmp/polis-367-comparison.json
+```
+
+Comparison ponownie sprawdza digest zbioru i manifestu, ordered-59 source
+snapshot, profil/provider, arithmetic countów, finite derived metrics,
+category/shape floors, deterministyczną remeasurement oraz performance v2.
+Wynik `pass` nie oznacza zgody na zmianę reguł. Po walidacji usuń tymczasowe
+venv i pliki; nie publikuj prywatnego tekstu ani danych środowiska.

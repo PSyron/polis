@@ -8,6 +8,7 @@ from functools import partial
 from pathlib import Path
 from typing import cast
 
+from polis import Analyzer, AnalyzerConfig
 from polis.core import Category, Confidence, Finding, Severity, Source
 from polis.evaluation.metrics import evaluate_baseline
 from polis.evaluation.quality_dataset import (
@@ -17,6 +18,7 @@ from polis.evaluation.quality_dataset import (
     quality_dataset_paths,
 )
 from polis.evaluation.quality_protocol import peak_rss_bytes
+from polis.evaluation.quality_v4_measurement import source_snapshot_sha256
 from polis.runtime_performance_protocol import run_isolated_measurement
 
 
@@ -63,12 +65,30 @@ def main() -> None:
     parser.add_argument("--protocol-overlay", action="store_true")
     parser.add_argument("--protocol-sha", required=True)
     parser.add_argument("--worker-sha", required=True)
+    parser.add_argument(
+        "--dataset-version",
+        choices=tuple(v.value for v in QualityDatasetVersion),
+        default="v3",
+    )
     args = parser.parse_args()
 
-    dataset = load_quality_dataset(version=QualityDatasetVersion.V3)
+    dataset_version = QualityDatasetVersion(args.dataset_version)
+    dataset = load_quality_dataset(version=dataset_version)
     evaluation = as_evaluation_dataset(dataset)
-    _, manifest_path = quality_dataset_paths(QualityDatasetVersion.V3)
+    _, manifest_path = quality_dataset_paths(dataset_version)
     texts = tuple(case.text for case in dataset.cases)
+    source_snapshot_hash = None
+    if dataset_version is QualityDatasetVersion.V4:
+        source_snapshot_hash = source_snapshot_sha256(
+            tuple(
+                {
+                    "source": item.source,
+                    "operation": item.operation,
+                    "behavior_version": item.behavior_version,
+                }
+                for item in Analyzer(AnalyzerConfig()).source_identity_snapshot
+            )
+        )
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     for profile, python in (
@@ -136,6 +156,7 @@ def main() -> None:
             "schema_id": "polis.runtime-performance-result",
             "schema_version": 1,
             "protocol_version": 2,
+            "dataset_version": dataset_version.value,
             "role": args.role,
             "profile": profile,
             "source": {"git_sha": args.source_sha},
@@ -155,6 +176,15 @@ def main() -> None:
                 "sha256": dataset.canonical_sha256,
                 "manifest_sha256": sha256(manifest_path),
                 "cases": len(dataset.cases),
+                "source_snapshot_sha256": source_snapshot_hash,
+            },
+            "identity": {
+                "profile": profile,
+                "provider": measurement.morphology_provider,
+                "source_git_sha": args.source_sha,
+                "wheel_sha256": sha256(args.wheel),
+                "dataset_sha256": dataset.canonical_sha256,
+                "manifest_sha256": sha256(manifest_path),
             },
             "environment": measurement.environment,
             "morphology_provider": measurement.morphology_provider,

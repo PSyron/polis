@@ -1,0 +1,476 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+
+import pytest
+
+from polis import Analyzer, AnalyzerConfig
+from polis.evaluation.quality_comparison_v4 import compare_quality_v4
+from polis.evaluation.quality_dataset import QualityDatasetVersion, load_quality_dataset
+from polis.evaluation.quality_report import (
+    QualityReportError,
+    load_quality_comparison,
+)
+from polis.evaluation.quality_report_baseline import load_quality_report
+from polis.evaluation.quality_report_models import ThresholdProposalV4
+from polis.evaluation.quality_report_proposal import load_threshold_proposal
+from polis.evaluation.quality_report_result import load_quality_result
+from polis.evaluation.quality_v4_measurement import source_snapshot_sha256
+
+ROOT = Path(__file__).resolve().parents[1]
+DATASET = load_quality_dataset(version=QualityDatasetVersion.V4)
+WHEEL_SHA = "a" * 64
+SOURCE_SHA = "1" * 40
+REPETITION_HASH = "b" * 64
+PROFILE_PROVIDER = {
+    "provider": "morfeusz2",
+    "package_version": "1.99.15",
+    "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+    "dictionary_notice_sha256": (
+        "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
+    ),
+}
+CATEGORIES = ("agreement", "inflection", "punctuation", "spelling", "syntax")
+SHAPES = (
+    "simple-local",
+    "sentence-internal",
+    "multi-sentence",
+    "repeated-occurrence",
+    "unicode-and-case",
+    "quotation-or-literal",
+    "conflict-or-abstention",
+)
+
+
+def _snapshot() -> list[dict[str, str]]:
+    return [
+        {
+            "source": item.source,
+            "operation": item.operation,
+            "behavior_version": item.behavior_version,
+        }
+        for item in Analyzer(AnalyzerConfig()).source_identity_snapshot
+    ]
+
+
+def _counts(expected: int) -> dict[str, object]:
+    return {
+        "expected_findings": expected,
+        "predicted_findings": expected,
+        "true_positives": expected,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "span_matches": expected,
+        "correction_matches": expected,
+        "correct_cases": expected,
+        "alarmed_correct_cases": 0,
+    }
+
+
+def _diag_counts(expected: int) -> dict[str, object]:
+    value = _counts(expected)
+    value.update(
+        {
+            "exact_edit_precision": 1.0 if expected else None,
+            "exact_edit_recall": 1.0 if expected else None,
+            "exact_edit_f1": 1.0 if expected else None,
+            "span_accuracy": 1.0 if expected else None,
+            "suggestion_accuracy": 1.0 if expected else None,
+            "false_discovery_proportion": 0.0 if expected else None,
+            "correct_sentence_false_alarm_rate": 0.0 if expected else None,
+        }
+    )
+    return value
+
+
+def _source_rows(
+    snapshot: list[dict[str, str]], profile: str
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for index, item in enumerate(snapshot):
+        rows.append(
+            {
+                "source": item["source"],
+                "category": "agreement",
+                "status": "measured" if index == 0 else "unmeasured",
+                "operation": item["operation"],
+                "behavior_version": item["behavior_version"],
+                "profile": profile,
+                "predicted_count": 35 if index == 0 else 0,
+                "expected_count": 35 if index == 0 else 0,
+                "exact_match_count": 35 if index == 0 else 0,
+                "false_positive_count": 0,
+                "false_negative_count": 0,
+                "case_ids": ["measured-case"] if index == 0 else [],
+            }
+        )
+    return rows
+
+
+def _diagnostics(snapshot: list[dict[str, str]], profile: str) -> dict[str, object]:
+    category: dict[str, dict[str, object]] = {}
+    strata: dict[str, dict[str, dict[str, object]]] = {}
+    category_cases: dict[str, dict[str, int]] = {}
+    stratum_cases: dict[str, dict[str, dict[str, int]]] = {}
+    for name in CATEGORIES:
+        category[name] = _diag_counts(7)
+        category_cases[name] = {"cases": 24, "eligible_cases": 24, "excluded_cases": 0}
+        strata[name] = {shape: _diag_counts(1) for shape in SHAPES}
+        stratum_cases[name] = {
+            shape: {"cases": 1, "eligible_cases": 1, "excluded_cases": 0}
+            for shape in SHAPES
+        }
+    return {
+        "aggregate": _diag_counts(35),
+        "category": category,
+        "shape_strata": strata,
+        "category_cases": category_cases,
+        "stratum_cases": stratum_cases,
+        "source": _source_rows(snapshot, profile),
+        "controls": {
+            "conflict": {
+                "case_count": 1,
+                "case_ids": ["control-conflict"],
+                "predicted_findings": 0,
+                "violations": 0,
+                "violation_case_ids": [],
+            },
+            "abstention": {
+                "case_count": 3,
+                "case_ids": [
+                    "control-abstain-1",
+                    "control-abstain-2",
+                    "control-abstain-3",
+                ],
+                "violations": 0,
+                "violation_case_ids": [],
+            },
+        },
+    }
+
+
+def _report(profile: str, *, result: bool) -> dict[str, object]:
+    snapshot = _snapshot()
+    samples = len(DATASET.cases) * 2
+    total = samples * 100
+    return {
+        "schema_id": "polis.quality-result" if result else "polis.quality-baseline",
+        "schema_version": 1 if result else 4,
+        "analyzer": "Analyzer(AnalyzerConfig())",
+        "artifact": {"sha256": WHEEL_SHA},
+        "dataset": {
+            "id": DATASET.id,
+            "schema_id": DATASET.schema_id,
+            "schema_version": 4,
+            "sha256": DATASET.canonical_sha256,
+            "cases": len(DATASET.cases),
+            "source": f"quality:{DATASET.id}@4",
+            "manifest": {
+                "schema_id": "polis.quality-development-manifest",
+                "schema_version": 4,
+                "sha256": hashlib.sha256(
+                    (
+                        ROOT / "src/polis/evaluation/datasets/quality/v4/manifest.json"
+                    ).read_bytes()
+                ).hexdigest(),
+            },
+        },
+        "quality": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "span_accuracy": 1.0,
+            "correction_accuracy": 1.0,
+            "false_alarm_rate": 0.0,
+            "counts": _counts(35),
+        },
+        "performance": {
+            "latency_ns": {
+                "sample_count": samples,
+                "min": 100,
+                "mean": 100,
+                "p50": 100,
+                "p95": 100,
+                "max": 100,
+            },
+            "throughput": {
+                "measured_cases": samples,
+                "measured_code_points": samples * 10,
+                "total_duration_ns": total,
+                "cases_per_second": samples * 1_000_000_000 / total,
+                "code_points_per_second": samples * 10 * 1_000_000_000 / total,
+            },
+            "peak_rss_bytes": 1000,
+        },
+        "environment": {
+            "package_version": "0.2.0",
+            "python_version": "3.13.12",
+            "platform_system": "Darwin",
+            "platform_release": "24.3.0",
+            "platform_machine": "arm64",
+        },
+        "reproducibility": {
+            "warmup_repetitions": 1,
+            "measured_repetitions": 2,
+            "stable_repetitions": 2,
+            "repetition_hashes": [REPETITION_HASH, REPETITION_HASH],
+        },
+        "source": {"git_sha": SOURCE_SHA},
+        "profile": {
+            "id": profile,
+            "morphology_provider": (
+                PROFILE_PROVIDER if profile == "morphology" else None
+            ),
+            "planned_morphology_source_semantics": (
+                "provider-absent-abstention"
+                if profile == "default"
+                else "qualified-provider-exercised-sources-not-implemented"
+            ),
+            "planned_non_morphology_source_semantics": "sources-not-implemented",
+        },
+        "diagnostics": _diagnostics(snapshot, profile),
+        "source_snapshot": snapshot,
+    }
+
+
+def _floors(value: float | None = 0.0) -> dict[str, object]:
+    return {
+        "minimum_precision": value,
+        "minimum_recall": value,
+        "minimum_f1": value,
+        "minimum_exact_span_accuracy": value,
+        "minimum_exact_correction_accuracy": value,
+        "maximum_false_alarm_rate": 1.0,
+    }
+
+
+def _proposal(
+    paths: dict[str, Path], digests: dict[str, str], *, approved: bool = True
+) -> dict[str, object]:
+    performance = {
+        "maximum_p95_latency_ns": 100,
+        "minimum_throughput_cases_per_second": 10_000_000.0,
+        "maximum_peak_rss_bytes": 1000,
+        "required_warmup_repetitions": 1,
+        "required_measured_repetitions": 2,
+        "require_identical_repetition_hashes": True,
+        "required_environment_match": [
+            "python_version",
+            "platform_system",
+            "platform_release",
+            "platform_machine",
+        ],
+        "allowed_regression_fraction": 0.0,
+        "missing_metric": "fail",
+        "nondeterminism": "fail",
+        "environment_mismatch": "fail",
+        "performance_regression": "fail",
+    }
+
+    def profile(name: str) -> dict[str, object]:
+        return {
+            "baseline_path": str(paths[name]),
+            "baseline_sha256": digests[name],
+            "quality_floors": _floors(),
+            "category_floors": {category: _floors() for category in CATEGORIES},
+            "stratum_floors": {
+                category: {shape: _floors() for shape in SHAPES}
+                for category in CATEGORIES
+            },
+            "performance_comparison": performance,
+        }
+
+    return {
+        "schema_id": "polis.quality-threshold-proposal",
+        "schema_version": 4,
+        "dataset_sha256": DATASET.canonical_sha256,
+        "manifest_sha256": hashlib.sha256(
+            (
+                ROOT / "src/polis/evaluation/datasets/quality/v4/manifest.json"
+            ).read_bytes()
+        ).hexdigest(),
+        "source_git_sha": SOURCE_SHA,
+        "wheel_sha256": WHEEL_SHA,
+        "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+        "source_snapshot": _snapshot(),
+        "profiles": {
+            "default": profile("default"),
+            "morphology": profile("morphology"),
+        },
+        "status": "approved" if approved else "pending_maintainer_approval",
+        "enforced": approved,
+        "decision": (
+            {
+                "status": "approved",
+                "enforced": True,
+                "approved_by": "Polis maintainer",
+                "approved_at": "2026-01-01T00:00:00Z",
+                "rationale": "test-only explicit approval",
+            }
+            if approved
+            else None
+        ),
+    }
+
+
+def _write_artifacts(tmp_path: Path, *, approved: bool = True) -> dict[str, Path]:
+    paths = {
+        "default": tmp_path / "baseline-default.json",
+        "morphology": tmp_path / "baseline-morphology.json",
+        "result-default": tmp_path / "result-default.json",
+        "result-morphology": tmp_path / "result-morphology.json",
+        "proposal": tmp_path / "proposal.json",
+        "comparison": tmp_path / "comparison.json",
+    }
+    for profile in ("default", "morphology"):
+        paths[profile].write_text(
+            json.dumps(_report(profile, result=False), sort_keys=True), encoding="utf-8"
+        )
+        paths[f"result-{profile}"].write_text(
+            json.dumps(_report(profile, result=True), sort_keys=True), encoding="utf-8"
+        )
+    digests = {
+        name: hashlib.sha256(paths[name].read_bytes()).hexdigest()
+        for name in ("default", "morphology")
+    }
+    paths["proposal"].write_text(
+        json.dumps(_proposal(paths, digests, approved=approved), sort_keys=True),
+        encoding="utf-8",
+    )
+    return paths
+
+
+def _compare(paths: dict[str, Path]) -> dict[str, object]:
+    value = compare_quality_v4(
+        baseline_default=paths["default"],
+        baseline_morphology=paths["morphology"],
+        result_default=paths["result-default"],
+        result_morphology=paths["result-morphology"],
+        proposal=paths["proposal"],
+        output=paths["comparison"],
+    )
+    assert isinstance(value, dict)
+    return value
+
+
+def test_quality_comparison_v4_valid_artifacts_round_trip(tmp_path: Path) -> None:
+    paths = _write_artifacts(tmp_path)
+    root = _compare(paths)
+    comparison = load_quality_comparison(paths["comparison"])
+    assert root["aggregate_verdict"] == "pass"
+    assert comparison.v4 is True
+    assert comparison.aggregate_verdict == "pass"
+    assert comparison.sdist_sha256 is None
+    for profile in comparison.profiles.values():
+        assert profile.verdict == "pass"
+        assert profile.performance is not None
+        assert any(gate.gate.startswith("performance.") for gate in profile.gates)
+        assert profile.source_parity is not None
+
+
+def test_quality_comparison_v4_result_and_proposal_loaders_are_explicit(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    assert (
+        load_quality_report(paths["default"]).run_identity.dataset_schema_version == 4
+    )
+    assert (
+        load_quality_result(paths["result-default"]).run_identity.dataset_schema_version
+        == 4
+    )
+    proposal = load_threshold_proposal(paths["proposal"])
+    assert isinstance(proposal, ThresholdProposalV4)
+    assert proposal.status == "approved"
+    assert proposal.enforced is True
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "dataset_sha256",
+        "manifest_sha256",
+        "profile",
+        "source_snapshot",
+        "category_count",
+        "stratum_count",
+        "precision",
+        "false_alarm_rate",
+        "stale_result",
+        "performance",
+    ),
+)
+def test_quality_comparison_v4_mutations_fail_closed(
+    tmp_path: Path, mutation: str
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    if mutation == "dataset_sha256":
+        payload = json.loads(paths["default"].read_text())
+        payload["dataset"]["sha256"] = "c" * 64
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "manifest_sha256":
+        payload = json.loads(paths["default"].read_text())
+        payload["dataset"]["manifest"]["sha256"] = "c" * 64
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "profile":
+        payload = json.loads(paths["morphology"].read_text())
+        payload["profile"]["id"] = "default"
+        paths["morphology"].write_text(json.dumps(payload))
+    elif mutation == "source_snapshot":
+        payload = json.loads(paths["default"].read_text())
+        payload["source_snapshot"][0]["source"] = "rule:syntax.changed"
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "category_count":
+        payload = json.loads(paths["default"].read_text())
+        payload["diagnostics"]["category"]["syntax"]["expected_findings"] = 8
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "stratum_count":
+        payload = json.loads(paths["default"].read_text())
+        payload["diagnostics"]["shape_strata"]["syntax"][SHAPES[0]][
+            "expected_findings"
+        ] = 2
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "precision":
+        payload = json.loads(paths["default"].read_text())
+        payload["diagnostics"]["aggregate"]["exact_edit_precision"] = 0.5
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "false_alarm_rate":
+        payload = json.loads(paths["default"].read_text())
+        payload["diagnostics"]["aggregate"]["correct_sentence_false_alarm_rate"] = 0.5
+        paths["default"].write_text(json.dumps(payload))
+    elif mutation == "stale_result":
+        payload = json.loads(paths["result-default"].read_text())
+        payload["reproducibility"]["repetition_hashes"] = ["d" * 64, "d" * 64]
+        paths["result-default"].write_text(json.dumps(payload))
+    elif mutation == "performance":
+        payload = json.loads(paths["result-default"].read_text())
+        payload["performance"]["latency_ns"]["p95"] = 101
+        payload["performance"]["throughput"]["total_duration_ns"] = 101 * 248
+        payload["performance"]["throughput"]["cases_per_second"] = (
+            248 * 1_000_000_000 / (101 * 248)
+        )
+        payload["performance"]["throughput"]["code_points_per_second"] = (
+            2480 * 1_000_000_000 / (101 * 248)
+        )
+        paths["result-default"].write_text(json.dumps(payload))
+    else:
+        raise AssertionError(mutation)
+    with pytest.raises((QualityReportError, ValueError)):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_pending_proposal_cannot_authorize_comparison(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path, approved=False)
+    with pytest.raises(QualityReportError, match="approved and enforced"):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_snapshot_hash_is_canonical() -> None:
+    snapshot = tuple(_snapshot())
+    assert source_snapshot_sha256(snapshot) == (
+        "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
+    )

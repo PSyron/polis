@@ -48,6 +48,8 @@ class QualityReport:
     latency: LatencyMetrics
     throughput: ThroughputMetrics
     resources: ResourceMetrics
+    diagnostics: JsonObject | None = None
+    source_snapshot: tuple[dict[str, str], ...] | None = None
 
     @property
     def artifact_sha256(self) -> str:
@@ -131,6 +133,31 @@ class ProfileThresholdProposalV3:
 
 
 @dataclass(frozen=True, slots=True)
+class ProfileThresholdProposalV4:
+    baseline_path: str
+    baseline_sha256: str
+    quality: QualityFloors
+    category_quality: dict[str, QualityFloors]
+    stratum_quality: dict[str, dict[str, QualityFloors]]
+    performance: PerformanceComparison
+
+
+@dataclass(frozen=True, slots=True)
+class ThresholdProposalV4:
+    dataset_sha256: str
+    manifest_sha256: str
+    source_git_sha: str
+    wheel_sha256: str
+    wheel_filename: str
+    source_snapshot: tuple[dict[str, str], ...]
+    default: ProfileThresholdProposalV4
+    morphology: ProfileThresholdProposalV4
+    status: str
+    enforced: bool
+    decision: JsonObject | None
+
+
+@dataclass(frozen=True, slots=True)
 class ThresholdProposalV3:
     dataset_sha256: str
     quality_artifact_sha256: str
@@ -144,5 +171,5 @@ class ThresholdProposalV3:
 
 
 type ThresholdProposalArtifact = (
-    ThresholdProposal | ThresholdProposalV2 | ThresholdProposalV3
+    ThresholdProposal | ThresholdProposalV2 | ThresholdProposalV3 | ThresholdProposalV4
 )
