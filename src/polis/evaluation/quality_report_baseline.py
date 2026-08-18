@@ -201,6 +201,7 @@ def load_quality_report(path: Path) -> QualityReport:
             diagnostics,
             dataset_cases=_integer(dataset, "cases", "dataset"),
             source_snapshot=source_snapshot,
+            profile=profile,
         )
     report = QualityReport(
         run_identity=RunIdentity(
@@ -408,6 +409,7 @@ def _validate_v4_diagnostics(
     *,
     dataset_cases: int,
     source_snapshot: tuple[dict[str, str], ...] | None,
+    profile: RunProfile | None,
 ) -> None:
     required = {
         "aggregate",
@@ -477,11 +479,13 @@ def _validate_v4_diagnostics(
             raise QualityReportError("quality v4 diagnostics source row is malformed")
         if row["status"] not in {"measured", "abstained", "control", "unmeasured"}:
             raise QualityReportError("quality v4 diagnostics source status is invalid")
-        if not isinstance(row["category"], str) or not row["category"]:
+        if row["category"] is not None and (
+            not isinstance(row["category"], str) or not row["category"]
+        ):
             raise QualityReportError(
                 "quality v4 diagnostics source category is invalid"
             )
-        if not isinstance(row["profile"], str) or not row["profile"]:
+        if row["profile"] not in {"default", "morphology"}:
             raise QualityReportError("quality v4 diagnostics source profile is invalid")
         if not isinstance(row["case_ids"], list) or not all(
             isinstance(case_id, str) and case_id for case_id in row["case_ids"]
@@ -504,9 +508,20 @@ def _validate_v4_diagnostics(
                 raise QualityReportError(
                     "quality v4 diagnostics source counts are invalid"
                 )
+        if (
+            row["predicted_count"]
+            != row["exact_match_count"] + row["false_positive_count"]
+        ):
+            raise QualityReportError("quality v4 source predicted arithmetic mismatch")
+        if (
+            row["expected_count"]
+            != row["exact_match_count"] + row["false_negative_count"]
+        ):
+            raise QualityReportError("quality v4 source expected arithmetic mismatch")
+        if len(row["case_ids"]) != len(set(row["case_ids"])):
+            raise QualityReportError("quality v4 source case IDs are not unique")
     controls = diagnostics["controls"]
-    if not isinstance(controls, dict) or set(controls) != {"conflict", "abstention"}:
-        raise QualityReportError("quality v4 diagnostics controls mismatch")
+    _validate_controls(controls, dataset_cases=dataset_cases, profile=profile)
     category_cases = diagnostics["category_cases"]
     stratum_cases = diagnostics["stratum_cases"]
     if not isinstance(category_cases, dict) or set(category_cases) != categories:
@@ -555,6 +570,72 @@ def _validate_v4_diagnostics(
                 raise QualityReportError("quality v4 stratum case arithmetic mismatch")
     if category_case_total != 124 - 4:
         raise QualityReportError("quality v4 diagnostics denominator mismatch")
+
+
+def _validate_controls(
+    raw: object, *, dataset_cases: int, profile: RunProfile | None
+) -> None:
+    if not isinstance(raw, dict) or set(raw) != {"conflict", "abstention"}:
+        raise QualityReportError("quality v4 diagnostics controls mismatch")
+    total_cases = 0
+    active = load_quality_dataset(version=QualityDatasetVersion.V4)
+    expected_conflicts = {
+        case.id for case in active.cases if case.kind.value == "conflict"
+    }
+    expected_abstentions = {
+        case.id for case in active.cases if case.kind.value == "abstain"
+    }
+    if profile is not None and profile.id is InstallationProfile.DEFAULT:
+        expected_abstentions.update(
+            case.id
+            for case in active.cases
+            if case.provider_requirement == "qualified_morphology"
+        )
+    elif profile is not None:
+        expected_abstentions = {
+            case.id for case in active.cases if case.kind.value == "abstain"
+        }
+    for name in ("conflict", "abstention"):
+        value = raw[name]
+        if not isinstance(value, dict) or set(value) != {
+            "case_count",
+            "case_ids",
+            "predicted_findings",
+            "violations",
+            "violation_case_ids",
+        }:
+            raise QualityReportError(f"quality v4 {name} control schema mismatch")
+        ids = value["case_ids"]
+        violation_ids = value["violation_case_ids"]
+        if (
+            not isinstance(ids, list)
+            or not all(isinstance(item, str) and item for item in ids)
+            or len(ids) != len(set(ids))
+            or not isinstance(violation_ids, list)
+            or not all(isinstance(item, str) and item in ids for item in violation_ids)
+            or len(violation_ids) != len(set(violation_ids))
+        ):
+            raise QualityReportError(f"quality v4 {name} control case IDs are invalid")
+        for field in ("case_count", "predicted_findings", "violations"):
+            number = value[field]
+            if not isinstance(number, int) or isinstance(number, bool) or number < 0:
+                raise QualityReportError(f"quality v4 {name} control count is invalid")
+        if value["case_count"] != len(ids) or value["violations"] != len(violation_ids):
+            raise QualityReportError(f"quality v4 {name} control count mismatch")
+        expected_ids = (
+            expected_conflicts if name == "conflict" else expected_abstentions
+        )
+        if set(ids) != expected_ids:
+            raise QualityReportError(f"quality v4 {name} control case IDs mismatch")
+        if name == "conflict" and (value["predicted_findings"] == 0) != (
+            value["violations"] == 0
+        ):
+            raise QualityReportError(
+                f"quality v4 {name} control violation arithmetic mismatch"
+            )
+        total_cases += value["case_count"]
+    if total_cases > dataset_cases:
+        raise QualityReportError("quality v4 control cases exceed dataset cases")
 
 
 def _profile_payload(profile: RunProfile) -> JsonObject:

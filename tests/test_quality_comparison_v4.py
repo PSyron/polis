@@ -109,7 +109,47 @@ def _source_rows(
     return rows
 
 
+def _proposal_gates(profile: str) -> list[dict[str, object]]:
+    return [
+        {
+            "scope": "aggregate",
+            "metric": "precision",
+            "measured_baseline": 1.0,
+            "proposed_threshold": 1.0,
+            "rationale": "test quality gate",
+            "allowed_variation": 0.0,
+            "regression_risk": "false alarms",
+            "maintainer_decision": {
+                "status": "approved",
+                "decided_by": "test maintainer",
+                "decided_at": "2026-01-01T00:00:00Z",
+                "rationale": "test-only approval",
+            },
+            "effective_schema_version": 4,
+        }
+    ]
+
+
 def _diagnostics(snapshot: list[dict[str, str]], profile: str) -> dict[str, object]:
+    control_abstention_ids = [
+        "v4_control_abstain_01",
+        "v4_control_abstain_02",
+        "v4_control_abstain_03",
+    ]
+    if profile == "default":
+        control_abstention_ids.extend(
+            [
+                "v4_agreement_positive_05",
+                "v4_agreement_positive_07",
+                "v4_agreement_positive_08",
+                "v4_agreement_negative_09",
+                "v4_agreement_negative_13",
+                "v4_inflection_positive_02",
+                "v4_inflection_positive_05",
+                "v4_inflection_positive_08",
+                "v4_inflection_negative_09",
+            ]
+        )
     category: dict[str, dict[str, object]] = {}
     strata: dict[str, dict[str, dict[str, object]]] = {}
     category_cases: dict[str, dict[str, int]] = {}
@@ -132,18 +172,15 @@ def _diagnostics(snapshot: list[dict[str, str]], profile: str) -> dict[str, obje
         "controls": {
             "conflict": {
                 "case_count": 1,
-                "case_ids": ["control-conflict"],
+                "case_ids": ["v4_control_conflict_agreement"],
                 "predicted_findings": 0,
                 "violations": 0,
                 "violation_case_ids": [],
             },
             "abstention": {
-                "case_count": 3,
-                "case_ids": [
-                    "control-abstain-1",
-                    "control-abstain-2",
-                    "control-abstain-3",
-                ],
+                "case_count": len(control_abstention_ids),
+                "predicted_findings": 0,
+                "case_ids": control_abstention_ids,
                 "violations": 0,
                 "violation_case_ids": [],
             },
@@ -246,6 +283,96 @@ def _floors(value: float | None = 0.0) -> dict[str, object]:
     }
 
 
+def _performance_artifact(
+    profile: str, source_sha: str = SOURCE_SHA, role: str = "reference"
+) -> dict[str, object]:
+    provider = PROFILE_PROVIDER if profile == "morphology" else None
+    return {
+        "schema_id": "polis.runtime-performance-result",
+        "schema_version": 1,
+        "protocol_version": 2,
+        "dataset_version": "v4",
+        "role": role,
+        "profile": profile,
+        "source": {"git_sha": source_sha},
+        "artifact": {
+            "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+            "wheel_sha256": WHEEL_SHA,
+        },
+        "protocol_implementation": {
+            "overlay_applied": False,
+            "runtime_performance_protocol_sha256": WHEEL_SHA,
+            "runtime_performance_worker_sha256": WHEEL_SHA,
+        },
+        "dataset": {
+            "id": DATASET.id,
+            "schema_id": "polis.quality-development-dataset",
+            "schema_version": 4,
+            "sha256": DATASET.canonical_sha256,
+            "manifest_sha256": hashlib.sha256(
+                (
+                    ROOT / "src/polis/evaluation/datasets/quality/v4/manifest.json"
+                ).read_bytes()
+            ).hexdigest(),
+            "cases": 124,
+            "source_snapshot_sha256": (
+                "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
+            ),
+        },
+        "identity": {
+            "profile": profile,
+            "provider": provider,
+            "source_git_sha": source_sha,
+            "wheel_sha256": WHEEL_SHA,
+            "dataset_sha256": DATASET.canonical_sha256,
+            "manifest_sha256": hashlib.sha256(
+                (
+                    ROOT / "src/polis/evaluation/datasets/quality/v4/manifest.json"
+                ).read_bytes()
+            ).hexdigest(),
+        },
+        "environment": {
+            "package_version": "0.2.0",
+            "platform_machine": "arm64",
+            "platform_release": "24",
+            "platform_system": "Darwin",
+            "python_version": "3.13.12",
+        },
+        "morphology_provider": provider,
+        "rss": {
+            "harness_peak_rss_bytes": 1000,
+            "worker_startup_rss_bytes": 1000,
+            "worker_measurement_start_rss_bytes": 1000,
+            "worker_peak_rss_bytes": 1000,
+            "worker_measured_incremental_peak_rss_bytes": 0,
+        },
+        "performance": {
+            "latency_ns": {
+                "sample_count": 620,
+                "min": 100,
+                "mean": 100,
+                "p50": 100,
+                "p95": 100,
+                "max": 100,
+            },
+            "throughput": {
+                "measured_cases": 620,
+                "measured_code_points": 6200,
+                "total_duration_ns": 62000,
+                "cases_per_second": 10000000.0,
+                "code_points_per_second": 100000000.0,
+            },
+        },
+        "quality": {"counts": _counts(35)},
+        "reproducibility": {
+            "warmup_repetitions": 1,
+            "measured_repetitions": 5,
+            "stable_repetitions": 5,
+            "findings_sha256": REPETITION_HASH,
+        },
+    }
+
+
 def _proposal(
     paths: dict[str, Path], digests: dict[str, str], *, approved: bool = True
 ) -> dict[str, object]:
@@ -253,6 +380,7 @@ def _proposal(
         "maximum_p95_latency_ns": 100,
         "minimum_throughput_cases_per_second": 10_000_000.0,
         "maximum_peak_rss_bytes": 1000,
+        "maximum_worker_incremental_peak_rss_bytes": 0,
         "required_warmup_repetitions": 1,
         "required_measured_repetitions": 2,
         "require_identical_repetition_hashes": True,
@@ -280,11 +408,33 @@ def _proposal(
                 for category in CATEGORIES
             },
             "performance_comparison": performance,
+            "performance_artifact": {
+                "path": str(paths[name].with_name(f"performance-{name}.json")),
+                "sha256": hashlib.sha256(
+                    paths[name].with_name(f"performance-{name}.json").read_bytes()
+                ).hexdigest(),
+                "protocol_version": 2,
+                "protocol_sha256": WHEEL_SHA,
+                "worker_sha256": WHEEL_SHA,
+            },
+            "performance_result_artifact": {
+                "path": str(paths[name].with_name(f"performance-result-{name}.json")),
+                "sha256": hashlib.sha256(
+                    paths[name]
+                    .with_name(f"performance-result-{name}.json")
+                    .read_bytes()
+                ).hexdigest(),
+                "protocol_version": 2,
+                "protocol_sha256": WHEEL_SHA,
+                "worker_sha256": WHEEL_SHA,
+            },
+            "gates": _proposal_gates(name),
         }
 
     return {
         "schema_id": "polis.quality-threshold-proposal",
         "schema_version": 4,
+        "effective_schema_version": 4,
         "dataset_sha256": DATASET.canonical_sha256,
         "manifest_sha256": hashlib.sha256(
             (
@@ -325,6 +475,15 @@ def _write_artifacts(tmp_path: Path, *, approved: bool = True) -> dict[str, Path
         "comparison": tmp_path / "comparison.json",
     }
     for profile in ("default", "morphology"):
+        performance_path = tmp_path / f"performance-{profile}.json"
+        performance_path.write_text(
+            json.dumps(_performance_artifact(profile), sort_keys=True), encoding="utf-8"
+        )
+        result_performance_path = tmp_path / f"performance-result-{profile}.json"
+        result_performance_path.write_text(
+            json.dumps(_performance_artifact(profile, role="current"), sort_keys=True),
+            encoding="utf-8",
+        )
         paths[profile].write_text(
             json.dumps(_report(profile, result=False), sort_keys=True), encoding="utf-8"
         )

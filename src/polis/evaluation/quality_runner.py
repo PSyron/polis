@@ -39,6 +39,7 @@ from polis.evaluation.quality_report import (
     write_quality_report,
     write_quality_result,
 )
+from polis.evaluation.quality_report_models import QualityReport
 from polis.evaluation.quality_v4_measurement import measure_v4
 from polis.rules._morfeusz import _load_qualified_morfeusz
 
@@ -138,6 +139,12 @@ def _build_parser() -> argparse.ArgumentParser:
     candidate.add_argument("--baseline", type=Path, required=True)
     candidate.add_argument("--morphology-baseline", type=Path, required=True)
     candidate.add_argument("--wheel-filename", required=True)
+    candidate.add_argument("--performance-default-reference", type=Path, required=True)
+    candidate.add_argument("--performance-default-current", type=Path, required=True)
+    candidate.add_argument(
+        "--performance-morphology-reference", type=Path, required=True
+    )
+    candidate.add_argument("--performance-morphology-current", type=Path, required=True)
     candidate.add_argument("--output", type=Path, required=True)
     candidate.add_argument("--replace", action="store_true")
 
@@ -188,8 +195,8 @@ def _manifest_sha256(path: Path) -> str:
 def _profile_identity(profile: InstallationProfile) -> RunProfile:
     if profile is InstallationProfile.DEFAULT:
         try:
-            importlib.metadata.version("morfeusz2")
-        except importlib.metadata.PackageNotFoundError:
+            importlib.import_module("morfeusz2")
+        except ImportError:
             return RunProfile(
                 id=profile,
                 morphology_provider=None,
@@ -391,8 +398,24 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
         raise QualityReportError("v4 proposal baselines use different source snapshots")
     if default.run_identity.artifact_sha256 != morphology.run_identity.artifact_sha256:
         raise QualityReportError("v4 proposal baselines use different wheel artifacts")
+    if args.wheel_filename != Path(args.wheel_filename).name:
+        raise QualityReportError("v4 proposal wheel_filename must be a filename")
 
-    def profile(report: object, path: Path) -> dict[str, object]:
+    def performance_binding(path: Path) -> dict[str, object]:
+        return {
+            "path": str(path),
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "protocol_version": 2,
+            "protocol_sha256": "REQUIRED_PROTOCOL_SHA256",
+            "worker_sha256": "REQUIRED_WORKER_SHA256",
+        }
+
+    def profile(
+        report: QualityReport,
+        path: Path,
+        performance_reference: Path,
+        performance_current: Path,
+    ) -> dict[str, object]:
         assert hasattr(report, "diagnostics")
         diagnostics = report.diagnostics
         assert isinstance(diagnostics, dict)
@@ -432,11 +455,27 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
                 )
             },
             "performance_comparison": _performance_payload(report),
+            "performance_artifact": performance_binding(performance_reference),
+            "performance_result_artifact": performance_binding(performance_current),
+            "gates": [
+                {
+                    "scope": "aggregate",
+                    "metric": "quality",
+                    "measured_baseline": report.quality_f1,
+                    "proposed_threshold": report.quality_f1,
+                    "rationale": "Measured v4 baseline; maintainer approval required.",
+                    "allowed_variation": 0.0,
+                    "regression_risk": "quality regression",
+                    "maintainer_decision": None,
+                    "effective_schema_version": 4,
+                }
+            ],
         }
 
     payload = {
         "schema_id": "polis.quality-threshold-proposal",
         "schema_version": 4,
+        "effective_schema_version": 4,
         "dataset_sha256": default.dataset_sha256,
         "manifest_sha256": default.run_identity.manifest_sha256,
         "source_git_sha": default.run_identity.source_sha,
@@ -444,8 +483,18 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
         "wheel_filename": args.wheel_filename,
         "source_snapshot": list(default.source_snapshot or ()),
         "profiles": {
-            "default": profile(default, args.baseline),
-            "morphology": profile(morphology, args.morphology_baseline),
+            "default": profile(
+                default,
+                args.baseline,
+                args.performance_default_reference,
+                args.performance_default_current,
+            ),
+            "morphology": profile(
+                morphology,
+                args.morphology_baseline,
+                args.performance_morphology_reference,
+                args.performance_morphology_current,
+            ),
         },
         "status": "pending_maintainer_approval",
         "enforced": False,

@@ -7,8 +7,10 @@ from typing import Final
 
 from polis.evaluation.quality_report_models import (
     JsonObject,
+    PerformanceArtifactBinding,
     PerformanceComparison,
     ProfileThresholdProposalV4,
+    ProposalGate,
     QualityFloors,
     QualityReportError,
     ThresholdProposalV4,
@@ -32,6 +34,9 @@ _PROFILE_FIELDS: Final = {
     "category_floors",
     "stratum_floors",
     "performance_comparison",
+    "performance_artifact",
+    "performance_result_artifact",
+    "gates",
 }
 _QUALITY_FIELDS: Final = {
     "minimum_precision",
@@ -45,6 +50,7 @@ _PERFORMANCE_FIELDS: Final = {
     "maximum_p95_latency_ns",
     "minimum_throughput_cases_per_second",
     "maximum_peak_rss_bytes",
+    "maximum_worker_incremental_peak_rss_bytes",
     "required_warmup_repetitions",
     "required_measured_repetitions",
     "require_identical_repetition_hashes",
@@ -83,6 +89,7 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
             "status",
             "enforced",
             "decision",
+            "effective_schema_version",
         },
         "threshold proposal",
     )
@@ -93,6 +100,10 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
         raise QualityReportError("threshold proposal schema_id mismatch")
     if _integer(root, "schema_version", "threshold proposal") != 4:
         raise QualityReportError("threshold proposal schema_version must be 4")
+    if _integer(root, "effective_schema_version", "threshold proposal") != 4:
+        raise QualityReportError(
+            "threshold proposal effective_schema_version must be 4"
+        )
     source_sha = _string(root, "source_git_sha", "threshold proposal")
     if _SOURCE_SHA.fullmatch(source_sha) is None:
         raise QualityReportError(
@@ -128,6 +139,9 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
         wheel_sha256=_sha(root, "wheel_sha256", "threshold proposal"),
         wheel_filename=_string(root, "wheel_filename", "threshold proposal"),
         source_snapshot=tuple(snapshot),
+        effective_schema_version=_integer(
+            root, "effective_schema_version", "threshold proposal"
+        ),
         default=_parse_profile(_nested(profiles, "default", _PROFILE_FIELDS)),
         morphology=_parse_profile(_nested(profiles, "morphology", _PROFILE_FIELDS)),
         status=_string(root, "status", "threshold proposal"),
@@ -169,6 +183,33 @@ def _parse_profile(root: JsonObject) -> ProfileThresholdProposalV4:
         performance=_parse_performance(
             _nested(root, "performance_comparison", _PERFORMANCE_FIELDS)
         ),
+        performance_baseline=_parse_performance_artifact(
+            _nested(
+                root,
+                "performance_artifact",
+                {
+                    "path",
+                    "sha256",
+                    "protocol_version",
+                    "protocol_sha256",
+                    "worker_sha256",
+                },
+            )
+        ),
+        performance_result=_parse_performance_artifact(
+            _nested(
+                root,
+                "performance_result_artifact",
+                {
+                    "path",
+                    "sha256",
+                    "protocol_version",
+                    "protocol_sha256",
+                    "worker_sha256",
+                },
+            )
+        ),
+        gates=_parse_gates(root["gates"]),
     )
 
 
@@ -184,6 +225,65 @@ def _parse_nested_floor_map(
     if not isinstance(raw, dict) or set(raw) != outer:
         raise QualityReportError("v4 stratum floors category coverage mismatch")
     return {name: _parse_floor_map(raw[name], inner) for name in outer}
+
+
+def _parse_performance_artifact(root: JsonObject) -> PerformanceArtifactBinding:
+    protocol_version = _integer(root, "protocol_version", "performance_artifact")
+    if protocol_version != 2:
+        raise QualityReportError("v4 performance artifact protocol_version must be 2")
+    return PerformanceArtifactBinding(
+        path=_string(root, "path", "performance_artifact"),
+        sha256=_sha(root, "sha256", "performance_artifact"),
+        protocol_version=protocol_version,
+        protocol_sha256=_sha(root, "protocol_sha256", "performance_artifact"),
+        worker_sha256=_sha(root, "worker_sha256", "performance_artifact"),
+    )
+
+
+def _parse_gates(raw: object) -> tuple[ProposalGate, ...]:
+    if not isinstance(raw, list) or not raw:
+        raise QualityReportError("v4 proposal gates must be a non-empty list")
+    gates: list[ProposalGate] = []
+    fields = {
+        "scope",
+        "metric",
+        "measured_baseline",
+        "proposed_threshold",
+        "rationale",
+        "allowed_variation",
+        "regression_risk",
+        "maintainer_decision",
+        "effective_schema_version",
+    }
+    for item in raw:
+        if not isinstance(item, dict) or set(item) != fields:
+            raise QualityReportError("v4 proposal gate is malformed")
+        variation = item["allowed_variation"]
+        if variation is not None and (
+            not isinstance(variation, int | float)
+            or isinstance(variation, bool)
+            or not 0.0 <= float(variation) <= 1.0
+        ):
+            raise QualityReportError("v4 proposal gate allowed_variation is invalid")
+        decision = item["maintainer_decision"]
+        if decision is not None and not isinstance(decision, dict):
+            raise QualityReportError("v4 proposal gate decision is malformed")
+        gates.append(
+            ProposalGate(
+                scope=_string(item, "scope", "proposal gate"),
+                metric=_string(item, "metric", "proposal gate"),
+                measured_baseline=item["measured_baseline"],
+                proposed_threshold=item["proposed_threshold"],
+                rationale=_string(item, "rationale", "proposal gate"),
+                allowed_variation=None if variation is None else float(variation),
+                regression_risk=_string(item, "regression_risk", "proposal gate"),
+                maintainer_decision=decision,
+                effective_schema_version=_integer(
+                    item, "effective_schema_version", "proposal gate"
+                ),
+            )
+        )
+    return tuple(gates)
 
 
 def _parse_floors(root: JsonObject) -> QualityFloors:
@@ -215,6 +315,9 @@ def _parse_performance(root: JsonObject) -> PerformanceComparison:
         maximum_p95_latency_ns=_integer(root, "maximum_p95_latency_ns", "performance"),
         minimum_throughput_cases_per_second=float(throughput),
         maximum_peak_rss_bytes=_integer(root, "maximum_peak_rss_bytes", "performance"),
+        maximum_worker_incremental_peak_rss_bytes=_integer(
+            root, "maximum_worker_incremental_peak_rss_bytes", "performance"
+        ),
         required_warmup_repetitions=_integer(
             root, "required_warmup_repetitions", "performance"
         ),

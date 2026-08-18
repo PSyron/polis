@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from polis.evaluation.quality_performance_artifact import load_runtime_performance_v2
 from polis.evaluation.quality_protocol import InstallationProfile
 from polis.evaluation.quality_report_baseline import (
     baseline_file_sha256,
@@ -89,6 +90,51 @@ def validate_threshold_proposal_v4(
         or morphology.artifact_sha256 != proposal.wheel_sha256
     ):
         raise QualityReportError("v4 proposal wheel identity mismatch")
+    _validate_gate_contract(proposal)
+    for profile, values in (
+        ("default", proposal.default),
+        ("morphology", proposal.morphology),
+    ):
+        for binding in (values.performance_baseline, values.performance_result):
+            load_runtime_performance_v2(
+                Path(binding.path),
+                binding=binding,
+                profile=profile,
+                expected_dataset_id=default.dataset_id,
+                expected_dataset_sha256=proposal.dataset_sha256,
+                expected_manifest_sha256=proposal.manifest_sha256,
+                expected_source_sha=proposal.source_git_sha,
+                expected_wheel_sha256=proposal.wheel_sha256,
+            )
+
+
+def _check_controls(report: Any) -> None:
+    controls = report.diagnostics["controls"]
+    if any(controls[name]["violations"] != 0 for name in ("conflict", "abstention")):
+        raise QualityReportError(
+            "v4 proposal cannot use a baseline with control violations"
+        )
+
+
+def _validate_gate_contract(proposal: ThresholdProposalV4) -> None:
+    for values in (proposal.default, proposal.morphology):
+        if not values.gates:
+            raise QualityReportError("v4 proposal gate contract is empty")
+        for gate in values.gates:
+            if gate.effective_schema_version != proposal.effective_schema_version:
+                raise QualityReportError("v4 proposal gate schema version mismatch")
+            if proposal.status == "approved" and (
+                gate.maintainer_decision is None
+                or gate.maintainer_decision.get("status") != "approved"
+                or not gate.maintainer_decision.get("decided_by")
+                or not gate.maintainer_decision.get("decided_at")
+                or not gate.maintainer_decision.get("rationale")
+            ):
+                raise QualityReportError(
+                    "approved v4 proposal gate lacks complete decision metadata"
+                )
+            if not gate.rationale or not gate.regression_risk:
+                raise QualityReportError("v4 proposal gate rationale is incomplete")
 
 
 def _bind_report(
@@ -115,6 +161,7 @@ def _bind_report(
         raise QualityReportError("v4 baseline artifact hash must not be a placeholder")
     if report.run_identity.source_snapshot != proposal.source_snapshot:
         raise QualityReportError("v4 source snapshot mismatch")
+    _check_controls(report)
     _check_floors(report.diagnostics["aggregate"], proposed.quality, "aggregate")
     category = report.diagnostics["category"]
     strata = report.diagnostics["shape_strata"]

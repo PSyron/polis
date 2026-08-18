@@ -34,9 +34,13 @@ osobnym skrótem manifestu. Wersje v1, v2 i v3 są niezmiennymi poprzednikami i
 nie są przenoszone do v4. Manifest przechowuje również skróty bajtów v3, aby
 walidacja wykrywała przypadkową zmianę wcześniejszych artefaktów.
 
-Konflikty i abstencje pozostają wynikami review-only. Zbiór nie ustanawia
-progów jakości, nie zmienia zachowania runtime'u i nie upoważnia do
-automatycznego wdrażania żadnej reguły.
+Konflikty i abstencje pozostają wynikami review-only. Każde znalezisko w takim
+kontrolnym przypadku jest naruszeniem abstencji; walidacja i comparison muszą
+wtedy zakończyć się `fail`. Aktualny pomiar morphology na bieżącym checkoutcie
+ma naruszenie `v4_control_conflict_agreement` i dlatego nie może zostać
+zatwierdzony. Issue #367 nie zmienia reguł ani złotych etykiet, więc naprawa
+tego naruszenia wymaga osobno autoryzowanej zmiany runtime'u. Zbiór nie
+ustanawia progów jakości ani nie upoważnia do automatycznego wdrażania reguł.
 
 ## Walidacja
 
@@ -117,8 +121,30 @@ python -m polis.evaluation.quality_runner compare \
   --output /tmp/polis-367-comparison.json
 ```
 
+Najpierw zbuduj wheel z czystego SHA i zapisz jego digest (macOS: `shasum -a
+256 dist/*.whl`). Dla obu ról (`reference`, `current`) uruchom izolowany
+performance-v2, nie mieszaj jego metryk z pomiarem quality runnera:
+
+```bash
+python scripts/run_runtime_performance_v2.py \
+  --role current --source-sha CLEAN_COMMIT_SHA --wheel /path/to/polis_nlp.whl \
+  --default-python /tmp/polis-367-default/bin/python \
+  --morphology-python /tmp/polis-367-morphology/bin/python \
+  --output-dir /tmp/polis-367-performance \
+  --protocol-sha PROTOCOL_SHA256 --worker-sha WORKER_SHA256 \
+  --dataset-version v4
+```
+
+Uruchom to samo polecenie dla roli `reference`. Artefakt performance zawiera
+ścieżkę i digest pliku, dataset/manifest/source/wheel/profile/provider, protokół
+i workera, środowisko, pięć repetytcji, p95, throughput oraz przyrostowy RSS
+workera. Proposal i comparison sprawdzają te pola oraz osobne artefakty
+`reference` i `current` dla obu profili. `--protocol-overlay` jest niedozwolone
+dla v4.
+
 Comparison ponownie sprawdza digest zbioru i manifestu, ordered-59 source
 snapshot, profil/provider, arithmetic countów, finite derived metrics,
-category/shape floors, deterministyczną remeasurement oraz performance v2.
+category/shape floors, deterministyczną remeasurement oraz izolowany
+performance v2 (p95, throughput i incremental RSS).
 Wynik `pass` nie oznacza zgody na zmianę reguł. Po walidacji usuń tymczasowe
 venv i pliki; nie publikuj prywatnego tekstu ani danych środowiska.

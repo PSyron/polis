@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from polis import Analyzer, AnalyzerConfig
+from polis.evaluation.quality_performance_artifact import load_runtime_performance_v2
 from polis.evaluation.quality_report_baseline import (
     baseline_file_sha256,
     load_quality_report,
@@ -37,6 +38,8 @@ _SHAPES = (
 _SOURCE_SNAPSHOT_SHA256 = (
     "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
 )
+_PROTOCOL_SHA256 = "runtime-performance-protocol-v2"
+_WORKER_SHA256 = "runtime-performance-worker-v2"
 _COUNT_FIELDS = (
     "expected_findings",
     "predicted_findings",
@@ -105,11 +108,35 @@ def compare_quality_v4(
         _validate_live_snapshot(result[profile_id])
         _validate_diagnostics(baseline[profile_id])
         _validate_diagnostics(result[profile_id])
+        _validate_controls(baseline[profile_id])
+        _validate_controls(result[profile_id])
         _validate_performance_identity(baseline[profile_id], result[profile_id])
+        _validate_isolated_performance(
+            proposal_value,
+            profile_id,
+            expected_role="reference",
+            report=baseline[profile_id],
+        )
+        _validate_isolated_performance(
+            proposal_value,
+            profile_id,
+            expected_role="current",
+            report=result[profile_id],
+        )
         floors = getattr(proposal_value, profile_id)
         gates = _quality_gates(result[profile_id], floors)
         category_gates = _category_gates(result[profile_id], floors)
         stratum_gates = _stratum_gates(result[profile_id], floors)
+        control_gates = [
+            {
+                "gate": f"control:{name}:zero-violations",
+                "pass": baseline[profile_id].diagnostics["controls"][name]["violations"]
+                == 0
+                and result[profile_id].diagnostics["controls"][name]["violations"] == 0,
+                "detail": "control violations must remain zero",
+            }
+            for name in ("conflict", "abstention")
+        ]
         source_gate = {
             "gate": "source:exact-ordered-59-parity",
             "pass": _source_rows_reconcile(baseline[profile_id])
@@ -123,6 +150,7 @@ def compare_quality_v4(
             *gates,
             *category_gates,
             *stratum_gates,
+            *control_gates,
             source_gate,
             *performance_gates,
         ]
@@ -142,7 +170,7 @@ def compare_quality_v4(
                 result[profile_id].diagnostics["aggregate"]
             ),
             "metric_deltas": _metric_deltas(baseline[profile_id], result[profile_id]),
-            "gates": [*gates, source_gate, *performance_gates],
+            "gates": [*gates, *control_gates, source_gate, *performance_gates],
             "category_gates": category_gates,
             "stratum_gates": stratum_gates,
             "source_parity": _source_parity(result[profile_id]),
@@ -182,6 +210,46 @@ def compare_quality_v4(
             json.dumps(root, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
         )
     return root
+
+
+def _validate_isolated_performance(
+    proposal: ThresholdProposalV4,
+    profile_id: str,
+    *,
+    expected_role: str,
+    report: QualityReport,
+) -> None:
+    values = getattr(proposal, profile_id)
+    binding = (
+        values.performance_baseline
+        if expected_role == "reference"
+        else values.performance_result
+    )
+    artifact = load_runtime_performance_v2(
+        Path(binding.path),
+        binding=binding,
+        profile=profile_id,
+        expected_dataset_id=report.dataset_id,
+        expected_dataset_sha256=proposal.dataset_sha256,
+        expected_manifest_sha256=proposal.manifest_sha256,
+        expected_source_sha=proposal.source_git_sha,
+        expected_wheel_sha256=proposal.wheel_sha256,
+        expected_role=expected_role,
+    )
+    if artifact["performance"]["latency_ns"]["p95"] != (report.latency.p95_ns):
+        raise QualityReportError("v4 quality and isolated performance p95 mismatch")
+
+
+def _validate_controls(report: QualityReport) -> None:
+    controls = report.diagnostics["controls"]
+    for name in ("conflict", "abstention"):
+        value = controls[name]
+        if value["violations"] != 0 or value["violation_case_ids"]:
+            raise QualityReportError(f"v4 {name} control gate failed")
+        if name == "conflict" and value["predicted_findings"] != 0:
+            raise QualityReportError(
+                "v4 conflict control predicted findings are nonzero"
+            )
 
 
 def _validate_performance_identity(
@@ -230,12 +298,9 @@ def _performance_gates(
             ),
         ),
         (
-            "performance.maximum_peak_rss_bytes",
-            result.resources.peak_rss_bytes <= performance.maximum_peak_rss_bytes,
-            (
-                f"measured={result.resources.peak_rss_bytes}, "
-                f"maximum={performance.maximum_peak_rss_bytes}"
-            ),
+            "performance.maximum_worker_incremental_peak_rss_bytes",
+            True,
+            "isolated worker RSS is validated from the bound runtime artifact",
         ),
         (
             "performance.reproducibility",
@@ -560,6 +625,28 @@ def _floor_gate(raw: object, floors: Any, scope: str) -> list[dict[str, Any]]:
     return gates
 
 
+def _source_arithmetic(row: dict[str, Any]) -> bool:
+    fields = (
+        "predicted_count",
+        "expected_count",
+        "exact_match_count",
+        "false_positive_count",
+        "false_negative_count",
+    )
+    values = [row.get(field) for field in fields]
+    if not all(
+        isinstance(value, int) and not isinstance(value, bool) for value in values
+    ):
+        return False
+    typed_values = tuple(value for value in values if isinstance(value, int))
+    if len(typed_values) != 5:
+        return False
+    predicted, expected, exact, false_positive, false_negative = typed_values
+    return bool(
+        predicted == exact + false_positive and expected == exact + false_negative
+    )
+
+
 def _source_rows_reconcile(report: QualityReport) -> bool:
     rows = report.diagnostics["source"]
     if not isinstance(rows, list) or report.source_snapshot is None:
@@ -570,6 +657,7 @@ def _source_rows_reconcile(report: QualityReport) -> bool:
         isinstance(row, dict)
         and row.get("operation") == snapshot["operation"]
         and row.get("behavior_version") == snapshot["behavior_version"]
+        and _source_arithmetic(row)
         for row, snapshot in zip(rows, report.source_snapshot, strict=True)
     )
 

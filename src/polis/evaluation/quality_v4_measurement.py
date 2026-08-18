@@ -259,7 +259,7 @@ def score_v4(
                 source_accumulator["predicted"] = (
                     cast(int, source_accumulator.get("predicted", 0)) + 1
                 )
-                if index in exact_indices:
+                if index in exact_indices and source == case.source_identity:
                     source_accumulator["exact"] = (
                         cast(int, source_accumulator.get("exact", 0)) + 1
                     )
@@ -297,6 +297,12 @@ def score_v4(
             "abstention": {
                 "case_count": len(abstention_ids),
                 "case_ids": abstention_ids,
+                "predicted_findings": sum(
+                    len(findings_by_case[index])
+                    for index, case in enumerate(dataset.cases)
+                    if case.kind is QualityCaseKind.ABSTAIN
+                    or _is_provider_abstention(case, profile_id)
+                ),
                 "violations": len(abstention_violations),
                 "violation_case_ids": abstention_violations,
             },
@@ -373,6 +379,7 @@ def _score_case(case: QualityCase, findings: tuple[Finding, ...]) -> _CaseScore:
                 and finding.end == reference.end
                 and finding.original == reference.original
                 and finding.suggestion == reference.suggestion
+                and str(finding.source) == case.source_identity
             ):
                 used[expected_index] = True
                 exact.add(index)
