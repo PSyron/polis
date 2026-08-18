@@ -101,6 +101,8 @@ _V4_MORPHOLOGY_BEHAVIOR_MARKER = "+morfeusz2-"
 _V4_CATEGORIES = frozenset(
     {"agreement", "inflection", "punctuation", "spelling", "syntax"}
 )
+_V4_CONFLICT_TRACEABILITY_SOURCE = "project-authored:ambiguity.punctuation_boundary"
+_V4_CONFLICT_TRACEABILITY_VERSION = "quality-v4-conflict-control/1.0"
 _V4_TRACEABILITY_SOURCES: dict[str, tuple[str, str]] = {
     "rule:agreement.te_zdanie": (
         "agreement",
@@ -202,9 +204,9 @@ _V3_MANIFEST_BYTES_SHA256 = (
     "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17"
 )
 _V4_CANONICAL_SHA256 = (
-    "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345"
+    "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c"
 )
-_V4_MANIFEST_SHA256 = "85531c42ffeaea03d77d7be792bf19a36adec848b9620561c74d7f3b4680e0c1"
+_V4_MANIFEST_SHA256 = "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf"
 _CONTRACT = {
     "path": "docs/project/rule-coverage-contract-v1.json",
     "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
@@ -374,6 +376,13 @@ def _validate_case_metadata(
     for field in _V4_TRACEABILITY_FIELDS:
         _require_non_blank(traceability[field], f"quality v4 traceability {field}")
     _validate_traceability(traceability, category)
+    if (
+        traceability["source_identity"] == _V4_CONFLICT_TRACEABILITY_SOURCE
+        and case.kind is not QualityCaseKind.CONFLICT
+    ):
+        raise QualityDatasetError(
+            "project-authored v4 traceability is limited to conflict controls"
+        )
     traceability_family = traceability["rule_family"]
     finding_families = {finding["rule_family"] for finding in findings}
     if case.kind is QualityCaseKind.ERROR and finding_families != {traceability_family}:
@@ -437,9 +446,14 @@ def _validate_finding(
     )
     source_metadata = _V4_TRACEABILITY_SOURCES.get(rule_family)
     if source_metadata is None:
-        raise QualityDatasetError(
-            f"quality v4 finding {index} rule_family is not an audited source"
-        )
+        if not (
+            case.kind is QualityCaseKind.CONFLICT
+            and rule_family == _V4_CONFLICT_TRACEABILITY_SOURCE
+        ):
+            raise QualityDatasetError(
+                f"quality v4 finding {index} rule_family is not an audited source"
+            )
+        source_metadata = ("punctuation", _V4_CONFLICT_TRACEABILITY_VERSION)
     if finding_category != source_metadata[0]:
         raise QualityDatasetError(
             f"quality v4 finding {index} rule_family category mismatch"
@@ -480,6 +494,16 @@ def _validate_traceability(
     if not isinstance(source, str):
         raise QualityDatasetError("quality v4 traceability source_identity is invalid")
     source_metadata = _V4_TRACEABILITY_SOURCES.get(source)
+    if source == _V4_CONFLICT_TRACEABILITY_SOURCE:
+        if category is not None:
+            raise QualityDatasetError(
+                "project-authored conflict traceability must omit case category"
+            )
+        if behavior_version != _V4_CONFLICT_TRACEABILITY_VERSION:
+            raise QualityDatasetError(
+                "quality v4 conflict traceability behavior version mismatch"
+            )
+        return
     if source_metadata is None:
         raise QualityDatasetError(
             "quality v4 traceability source_identity is not an audited source"
@@ -532,7 +556,7 @@ def _validate_cases(records: tuple[_V4Record, ...]) -> None:
     _validate_category_minimums(records)
     _validate_shape_minimums(records)
     _validate_provider_minimums(records)
-    _validate_control_cases(cases)
+    _validate_control_cases(records)
     _validate_overlap_marks(records)
     _validate_core_matrix(cases)
 
@@ -697,18 +721,66 @@ def _validate_provider_minimums(records: tuple[_V4Record, ...]) -> None:
         raise QualityDatasetError("v4 provider distinction minimum is not met")
 
 
-def _validate_control_cases(cases: tuple[QualityCase, ...]) -> None:
-    conflicts = [case for case in cases if case.kind is QualityCaseKind.CONFLICT]
-    abstentions = [case for case in cases if case.kind is QualityCaseKind.ABSTAIN]
+def _validate_control_cases(records: tuple[_V4Record, ...]) -> None:
+    conflicts = [
+        record for record in records if record.case.kind is QualityCaseKind.CONFLICT
+    ]
+    abstentions = [
+        record for record in records if record.case.kind is QualityCaseKind.ABSTAIN
+    ]
     if len(conflicts) != 1 or len(abstentions) != 3:
         raise QualityDatasetError("v4 must contain one conflict and three abstentions")
     if any(
-        case.findings
-        or case.rationale is None
-        or QualityFeature.ABSTENTION not in case.features
-        for case in abstentions
+        record.case.findings
+        or record.case.rationale is None
+        or QualityFeature.ABSTENTION not in record.case.features
+        for record in abstentions
     ):
         raise QualityDatasetError("v4 abstention controls are invalid")
+
+    conflict = conflicts[0]
+    if conflict.case.id != "v4_control_conflict_punctuation":
+        raise QualityDatasetError("v4 conflict control identity is invalid")
+    expected_candidates = (
+        (11, 11, "", ".", _V4_CONFLICT_TRACEABILITY_SOURCE),
+        (11, 11, "", ";", _V4_CONFLICT_TRACEABILITY_SOURCE),
+    )
+    actual_candidates = tuple(
+        (
+            finding.start,
+            finding.end,
+            finding.original,
+            finding.suggestion,
+            raw["rule_family"],
+        )
+        for finding, raw in zip(
+            conflict.case.findings, conflict.raw_findings, strict=True
+        )
+    )
+    candidate_texts = {
+        conflict.case.text[: finding.start]
+        + finding.suggestion
+        + conflict.case.text[finding.end :]
+        for finding in conflict.case.findings
+    }
+    if (
+        conflict.case.text != "Pada deszcz Anna wraca."
+        or actual_candidates != expected_candidates
+        or candidate_texts
+        != {
+            "Pada deszcz. Anna wraca.",
+            "Pada deszcz; Anna wraca.",
+        }
+        or any(
+            finding.start != finding.end
+            or finding.original != ""
+            or raw["allow_zero_width"] is not True
+            for finding, raw in zip(
+                conflict.case.findings, conflict.raw_findings, strict=True
+            )
+        )
+    ):
+        raise QualityDatasetError("invalid conflict correction")
 
 
 def _validate_overlap_marks(records: tuple[_V4Record, ...]) -> None:

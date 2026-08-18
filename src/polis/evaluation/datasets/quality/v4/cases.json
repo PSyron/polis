@@ -4948,55 +4948,59 @@
       "pair": null
     },
     {
-      "id": "v4_control_conflict_agreement",
+      "id": "v4_control_conflict_punctuation",
       "kind": "conflict",
       "phenomenon": null,
       "pair_id": null,
       "features": [
         "conflict"
       ],
-      "text": "Te zdanie.",
+      "text": "Pada deszcz Anna wraca.",
       "category": null,
       "shape_strata": [
         "conflict-or-abstention"
       ],
       "expected_findings": [
         {
-          "category": "agreement",
-          "start": 0,
-          "end": 2,
-          "original": "Te",
-          "suggestion": "To",
-          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
-          "rule_family": "rule:agreement.te_zdanie",
-          "ambiguity_notes": [],
+          "category": "punctuation",
+          "start": 11,
+          "end": 11,
+          "original": "",
+          "suggestion": ".",
+          "rationale": "The two independent clauses can be normatively separated with a full stop: ‘Pada deszcz. Anna wraca.’",
+          "rule_family": "project-authored:ambiguity.punctuation_boundary",
+          "ambiguity_notes": [
+            "The source provides no discourse context selecting a full stop over a semicolon."
+          ],
           "overlap_group": "controlled-conflict",
-          "allow_zero_width": false
+          "allow_zero_width": true
         },
         {
-          "category": "agreement",
-          "start": 0,
-          "end": 2,
-          "original": "Te",
-          "suggestion": "Ten",
-          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
-          "rule_family": "rule:agreement.te_zdanie",
-          "ambiguity_notes": [],
+          "category": "punctuation",
+          "start": 11,
+          "end": 11,
+          "original": "",
+          "suggestion": ";",
+          "rationale": "The two independent clauses can also be normatively separated with a semicolon: ‘Pada deszcz; Anna wraca.’",
+          "rule_family": "project-authored:ambiguity.punctuation_boundary",
+          "ambiguity_notes": [
+            "The source provides no discourse context selecting a semicolon over a full stop."
+          ],
           "overlap_group": "controlled-conflict",
-          "allow_zero_width": false
+          "allow_zero_width": true
         }
       ],
-      "rationale": "Two project-authored candidates intentionally overlap and require review rather than automatic selection.",
+      "rationale": "The project-authored sentence intentionally omits punctuation between two independent clauses. A full stop and a semicolon are both normatively valid, distinct minimal insertions at the same offset, and the local text does not justify choosing one. The quality evaluator must abstain rather than invent discourse context.",
       "provenance": {
         "source": "project-authored",
         "license": "CC0-1.0",
-        "reference": "RJP-2026-public-rule-coverage-audit"
+        "reference": "#364/#366 quality ambiguity review"
       },
       "traceability": {
-        "source_identity": "rule:agreement.te_zdanie",
-        "rule_family": "rule:agreement.te_zdanie",
-        "audit_row": "rule:agreement.te_zdanie",
-        "behavior_version": "agreement-te-zdanie/1.0"
+        "source_identity": "project-authored:ambiguity.punctuation_boundary",
+        "rule_family": "project-authored:ambiguity.punctuation_boundary",
+        "audit_row": "project-authored:ambiguity.punctuation_boundary",
+        "behavior_version": "quality-v4-conflict-control/1.0"
       },
       "provider_behavior": {
         "provider_absent": "execute",

@@ -3,8 +3,7 @@
   "schema_version": 4,
   "dataset_id": "polis_v4_quality_development",
   "dataset_version": 4,
-  "canonical_sha256": "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345",
-  "manifest_sha256": "85531c42ffeaea03d77d7be792bf19a36adec848b9620561c74d7f3b4680e0c1",
+  "canonical_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
   "contract": {
     "path": "docs/project/rule-coverage-contract-v1.json",
     "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
@@ -318,12 +317,13 @@
       "v4_syntax_negative_14",
       "v4_syntax_negative_15",
       "v4_syntax_negative_16",
-      "v4_control_conflict_agreement",
+      "v4_control_conflict_punctuation",
       "v4_control_abstain_01",
       "v4_control_abstain_02",
       "v4_control_abstain_03"
     ],
-    "reviewed_case_ids_sha256": "f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e",
-    "canonical_sha256": "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345"
-  }
+    "reviewed_case_ids_sha256": "0ca59077aa406d02128147b63a95116eec67f886c569129207a6b872d2ab7703",
+    "canonical_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c"
+  },
+  "manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf"
 }
