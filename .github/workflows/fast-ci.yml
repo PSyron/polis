@@ -62,6 +62,8 @@ jobs:
         run: uv run --locked --extra dev python scripts/validate_documentation_inventory.py
       - name: Validate rule coverage contract
         run: uv run --locked --extra dev python scripts/rule_coverage_contract.py
+      - name: Validate RJP 2026 rule audit
+        run: uv run --locked --extra dev python -m scripts.rule_coverage_rjp_2026
       - name: Validate protected release workflow
         run: uv run --locked --extra dev python scripts/validate_release_workflow.py --workflow .github/workflows/release.yml
       - name: Build distributions
