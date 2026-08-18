@@ -4955,7 +4955,7 @@
       "features": [
         "conflict"
       ],
-      "text": "Te zdanie.",
+      "text": "Te dziecko śpi.",
       "category": null,
       "shape_strata": [
         "conflict-or-abstention"
@@ -4967,8 +4967,8 @@
           "end": 2,
           "original": "Te",
           "suggestion": "To",
-          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
-          "rule_family": "rule:agreement.te_zdanie",
+          "rationale": "The demonstrative must agree with the neuter singular noun ‘dziecko’; ‘To dziecko śpi.’ is grammatically valid.",
+          "rule_family": "rule:agreement.te_neuter_noun",
           "ambiguity_notes": [],
           "overlap_group": "controlled-conflict",
           "allow_zero_width": false
@@ -4976,27 +4976,27 @@
         {
           "category": "agreement",
           "start": 0,
-          "end": 2,
-          "original": "Te",
-          "suggestion": "Ten",
-          "rationale": "The public example isolates the rule:agreement.te_zdanie rule family.",
-          "rule_family": "rule:agreement.te_zdanie",
+          "end": 10,
+          "original": "Te dziecko",
+          "suggestion": "To dziecko",
+          "rationale": "The same agreement error may be represented by correcting the complete nominal group; ‘To dziecko śpi.’ is grammatically valid.",
+          "rule_family": "rule:agreement.te_neuter_noun",
           "ambiguity_notes": [],
           "overlap_group": "controlled-conflict",
           "allow_zero_width": false
         }
       ],
-      "rationale": "Two project-authored candidates intentionally overlap and require review rather than automatic selection.",
+      "rationale": "Two independently valid, project-authored representations of one agreement correction overlap: one edits the demonstrative and the other edits the complete nominal group. The evaluator must abstain rather than choose a span.",
       "provenance": {
         "source": "project-authored",
         "license": "CC0-1.0",
         "reference": "RJP-2026-public-rule-coverage-audit"
       },
       "traceability": {
-        "source_identity": "rule:agreement.te_zdanie",
-        "rule_family": "rule:agreement.te_zdanie",
-        "audit_row": "rule:agreement.te_zdanie",
-        "behavior_version": "agreement-te-zdanie/1.0"
+        "source_identity": "rule:agreement.te_neuter_noun",
+        "rule_family": "rule:agreement.te_neuter_noun",
+        "audit_row": "rule:agreement.te_neuter_noun",
+        "behavior_version": "agreement-te-neuter-noun/2.0"
       },
       "provider_behavior": {
         "provider_absent": "execute",

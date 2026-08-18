@@ -131,6 +131,29 @@ baseline'ami v3 po korekcie datasetu. Absolutne capy wydajności z wave0
 **nie** zostały ponownie wyprowadzone; porównanie zapisuje ich wynik
 fail-closed.
 
+## Zbiór deweloperski jakości v4
+
+Issue #366 wprowadziło niezależny, projektowy zbiór CC0 `v4`:
+
+- dane: `src/polis/evaluation/datasets/quality/v4/cases.json`;
+- manifest: `src/polis/evaluation/datasets/quality/v4/manifest.json`;
+- kontrakt i przegląd: `docs/project/quality-development-v4.md`.
+
+Zbiór obejmuje 124 przypadki oraz osobne minima dla pięciu kategorii, siedmiu
+strat kształtu, profili bez providera i z kwalifikowaną morfologią. Nie jest
+źródłem prawdy wyprowadzanym z bieżącego analizatora, nie jest kalibracją ani
+holdoutem. Wersje v1–v3 pozostają niezmienne.
+
+W #376 poprawiono kontrolę `v4_control_conflict_agreement`: zamiast
+niepoprawnej propozycji `Ten zdanie` w `Te zdanie.` kontrola zawiera dwa
+nakładające się, lecz niezależnie poprawne zapisy korekty `Te dziecko śpi.`:
+`Te` → `To` oraz `Te dziecko` → `To dziecko`. Obie prowadzą do poprawnego
+`To dziecko śpi.`, więc kontrola nadal wymusza abstencję przy nierozstrzygnięciu
+zakresu. Canonical digest v4 to
+`e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4`, a digest
+manifestu to `0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b`.
+Przed użyciem wyniku do #368 należy ponownie wykonać clean-wheel baseline #367.
+
 ## Definicje pomiarów
 
 Protokół ocenia tylko niezmieniony `Analyzer(AnalyzerConfig())`. Dopasowanie

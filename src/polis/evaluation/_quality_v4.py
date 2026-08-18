@@ -202,9 +202,9 @@ _V3_MANIFEST_BYTES_SHA256 = (
     "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17"
 )
 _V4_CANONICAL_SHA256 = (
-    "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345"
+    "e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4"
 )
-_V4_MANIFEST_SHA256 = "85531c42ffeaea03d77d7be792bf19a36adec848b9620561c74d7f3b4680e0c1"
+_V4_MANIFEST_SHA256 = "0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b"
 _CONTRACT = {
     "path": "docs/project/rule-coverage-contract-v1.json",
     "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
@@ -532,7 +532,7 @@ def _validate_cases(records: tuple[_V4Record, ...]) -> None:
     _validate_category_minimums(records)
     _validate_shape_minimums(records)
     _validate_provider_minimums(records)
-    _validate_control_cases(cases)
+    _validate_control_cases(records)
     _validate_overlap_marks(records)
     _validate_core_matrix(cases)
 
@@ -697,18 +697,47 @@ def _validate_provider_minimums(records: tuple[_V4Record, ...]) -> None:
         raise QualityDatasetError("v4 provider distinction minimum is not met")
 
 
-def _validate_control_cases(cases: tuple[QualityCase, ...]) -> None:
-    conflicts = [case for case in cases if case.kind is QualityCaseKind.CONFLICT]
-    abstentions = [case for case in cases if case.kind is QualityCaseKind.ABSTAIN]
+def _validate_control_cases(records: tuple[_V4Record, ...]) -> None:
+    conflicts = [
+        record for record in records if record.case.kind is QualityCaseKind.CONFLICT
+    ]
+    abstentions = [
+        record for record in records if record.case.kind is QualityCaseKind.ABSTAIN
+    ]
     if len(conflicts) != 1 or len(abstentions) != 3:
         raise QualityDatasetError("v4 must contain one conflict and three abstentions")
     if any(
-        case.findings
-        or case.rationale is None
-        or QualityFeature.ABSTENTION not in case.features
-        for case in abstentions
+        record.case.findings
+        or record.case.rationale is None
+        or QualityFeature.ABSTENTION not in record.case.features
+        for record in abstentions
     ):
         raise QualityDatasetError("v4 abstention controls are invalid")
+
+    conflict = conflicts[0]
+    if conflict.case.id != "v4_control_conflict_agreement":
+        raise QualityDatasetError("v4 conflict control identity is invalid")
+    expected_candidates = (
+        (0, 2, "Te", "To", "rule:agreement.te_neuter_noun"),
+        (0, 10, "Te dziecko", "To dziecko", "rule:agreement.te_neuter_noun"),
+    )
+    actual_candidates = tuple(
+        (
+            finding.start,
+            finding.end,
+            finding.original,
+            finding.suggestion,
+            raw["rule_family"],
+        )
+        for finding, raw in zip(
+            conflict.case.findings, conflict.raw_findings, strict=True
+        )
+    )
+    if (
+        conflict.case.text != "Te dziecko śpi."
+        or actual_candidates != expected_candidates
+    ):
+        raise QualityDatasetError("invalid conflict correction")
 
 
 def _validate_overlap_marks(records: tuple[_V4Record, ...]) -> None:

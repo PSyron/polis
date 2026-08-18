@@ -78,12 +78,27 @@ def test_v4_loads_the_reviewed_public_dataset() -> None:
     dataset = quality_dataset.load_quality_dataset(
         version=quality_dataset.QualityDatasetVersion.V4
     )
+    _, manifest = _documents()
 
     assert dataset.schema_version == 4
     assert dataset.id == "polis_v4_quality_development"
     assert len(dataset.cases) == 124
     assert dataset.review.reviewed_case_ids == tuple(case.id for case in dataset.cases)
     assert dataset.review.canonical_sha256 == dataset.canonical_sha256
+    assert (
+        dataset.canonical_sha256
+        == "e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4"
+    )
+    assert manifest["canonical_sha256"] == dataset.canonical_sha256
+    assert manifest["review"]["canonical_sha256"] == dataset.canonical_sha256
+    assert (
+        manifest["review"]["reviewed_case_ids_sha256"]
+        == "f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e"
+    )
+    assert (
+        manifest["manifest_sha256"]
+        == "0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b"
+    )
 
 
 def test_v4_meets_the_category_and_shape_contract() -> None:
@@ -116,6 +131,84 @@ def test_v4_meets_the_category_and_shape_contract() -> None:
     for summary in manifest["summary"]["shape_strata"].values():
         assert summary["positive_cases"] >= 1
         assert summary["hard_negative_cases"] >= 1
+
+
+def test_v4_conflict_uses_only_valid_competing_corrections() -> None:
+    raw, manifest = _documents()
+    conflict = next(case for case in raw["cases"] if case["kind"] == "conflict")
+
+    assert conflict["id"] == "v4_control_conflict_agreement"
+    assert conflict["text"] == "Te dziecko śpi."
+    candidates = {
+        conflict["text"][: finding["start"]]
+        + finding["suggestion"]
+        + conflict["text"][finding["end"] :]
+        for finding in conflict["expected_findings"]
+    }
+    assert candidates == {"To dziecko śpi."}
+    assert all("Ten zdanie" not in candidate for candidate in candidates)
+    assert all(
+        finding["overlap_group"] == "controlled-conflict"
+        for finding in conflict["expected_findings"]
+    )
+    assert all(
+        finding["rule_family"] == "rule:agreement.te_neuter_noun"
+        for finding in conflict["expected_findings"]
+    )
+    assert conflict["provider_behavior"] == {
+        "provider_absent": "execute",
+        "qualified_morphology": "execute",
+        "provider_requirement": "none",
+        "capability": None,
+        "denominator_profile": "all-cases",
+    }
+
+    all_replacements = {
+        case["text"][: finding["start"]]
+        + finding["suggestion"]
+        + case["text"][finding["end"] :]
+        for case in raw["cases"]
+        for finding in case["expected_findings"]
+    }
+    assert "Ten zdanie." not in all_replacements
+    _validate_mutation(raw, manifest)
+
+
+def test_v4_rejects_the_old_invalid_conflict_candidate() -> None:
+    raw, manifest = _documents()
+    conflict = next(case for case in raw["cases"] if case["kind"] == "conflict")
+    conflict["text"] = "Te zdanie."
+    conflict["traceability"] = {
+        "source_identity": "rule:agreement.te_zdanie",
+        "rule_family": "rule:agreement.te_zdanie",
+        "audit_row": "rule:agreement.te_zdanie",
+        "behavior_version": "agreement-te-zdanie/1.0",
+    }
+    conflict["expected_findings"] = [
+        {
+            **conflict["expected_findings"][0],
+            "category": "agreement",
+            "start": 0,
+            "end": 2,
+            "original": "Te",
+            "suggestion": "To",
+            "rule_family": "rule:agreement.te_zdanie",
+            "overlap_group": "controlled-conflict",
+        },
+        {
+            **conflict["expected_findings"][1],
+            "category": "agreement",
+            "start": 0,
+            "end": 2,
+            "original": "Te",
+            "suggestion": "Ten",
+            "rule_family": "rule:agreement.te_zdanie",
+            "overlap_group": "controlled-conflict",
+        },
+    ]
+    _rebind(raw, manifest)
+    with pytest.raises(ValueError, match="invalid conflict correction"):
+        _validate_mutation(raw, manifest)
 
 
 def test_v4_preserves_exact_half_open_spans_and_minimal_suggestions() -> None:

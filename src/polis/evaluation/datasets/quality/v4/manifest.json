@@ -3,8 +3,7 @@
   "schema_version": 4,
   "dataset_id": "polis_v4_quality_development",
   "dataset_version": 4,
-  "canonical_sha256": "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345",
-  "manifest_sha256": "85531c42ffeaea03d77d7be792bf19a36adec848b9620561c74d7f3b4680e0c1",
+  "canonical_sha256": "e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4",
   "contract": {
     "path": "docs/project/rule-coverage-contract-v1.json",
     "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
@@ -324,6 +323,7 @@
       "v4_control_abstain_03"
     ],
     "reviewed_case_ids_sha256": "f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e",
-    "canonical_sha256": "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345"
-  }
+    "canonical_sha256": "e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4"
+  },
+  "manifest_sha256": "0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b"
 }
