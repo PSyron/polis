@@ -155,7 +155,18 @@ python scripts/run_runtime_performance_v2.py \
   --dataset-version v4
 ```
 
-Uruchom to samo polecenie dla roli `reference`. Artefakt performance zawiera
+Uruchom to samo polecenie dla roli `reference`. Każdy artefakt można
+zweryfikować niezależnie po pomiarze:
+
+```bash
+python scripts/validate_runtime_performance_v2.py \
+  --artifact /tmp/polis-367-performance/runtime-performance-v2-current-default.json \
+  --profile default --role current \
+  --source-sha CLEAN_COMMIT_SHA --wheel-sha256 WHEEL_SHA256 \
+  --protocol-sha256 PROTOCOL_FILE_SHA256 --worker-sha256 WORKER_FILE_SHA256
+```
+
+Artefakt performance zawiera
 ścieżkę i digest pliku, dataset/manifest/source/wheel/profile/provider, protokół
 i workera, środowisko, pięć repetytcji, p95, throughput oraz przyrostowy RSS
 workera. Proposal i comparison sprawdzają te pola oraz osobne artefakty
