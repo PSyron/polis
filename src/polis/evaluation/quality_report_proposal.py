@@ -16,6 +16,7 @@ from polis.evaluation.quality_report_models import (
     ThresholdProposalArtifact,
     ThresholdProposalV2,
     ThresholdProposalV3,
+    ThresholdProposalV4,
 )
 from polis.evaluation.quality_report_proposal_v2 import parse_threshold_proposal_v2
 from polis.evaluation.quality_report_proposal_v2_validation import (
@@ -24,6 +25,10 @@ from polis.evaluation.quality_report_proposal_v2_validation import (
 from polis.evaluation.quality_report_proposal_v3 import parse_threshold_proposal_v3
 from polis.evaluation.quality_report_proposal_v3_validation import (
     validate_threshold_proposal_v3,
+)
+from polis.evaluation.quality_report_proposal_v4 import parse_threshold_proposal_v4
+from polis.evaluation.quality_report_proposal_v4_validation import (
+    validate_threshold_proposal_v4,
 )
 from polis.evaluation.quality_report_validation import (
     _boolean,
@@ -57,9 +62,13 @@ def load_threshold_proposal(path: Path) -> ThresholdProposalArtifact:
             if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
                 raise QualityReportError("threshold proposal schema_id mismatch")
             return parse_threshold_proposal_v3(root)
+        case 4:
+            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+                raise QualityReportError("threshold proposal schema_id mismatch")
+            return parse_threshold_proposal_v4(root)
         case _:
             raise QualityReportError(
-                "threshold proposal schema_version must be 1, 2, or 3"
+                "threshold proposal schema_version must be 1, 2, 3, or 4"
             )
 
 
@@ -125,6 +134,10 @@ def validate_threshold_proposal(
             )
         case ThresholdProposalV3():
             validate_threshold_proposal_v3(
+                proposal, baseline_path, morphology_baseline_path
+            )
+        case ThresholdProposalV4():
+            validate_threshold_proposal_v4(
                 proposal, baseline_path, morphology_baseline_path
             )
         case unreachable:

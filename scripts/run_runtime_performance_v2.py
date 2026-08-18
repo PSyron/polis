@@ -8,7 +8,9 @@ from functools import partial
 from pathlib import Path
 from typing import cast
 
+from polis import Analyzer, AnalyzerConfig
 from polis.core import Category, Confidence, Finding, Severity, Source
+from polis.evaluation.distribution_binding import validate_interpreter_wheel
 from polis.evaluation.metrics import evaluate_baseline
 from polis.evaluation.quality_dataset import (
     QualityDatasetVersion,
@@ -17,6 +19,11 @@ from polis.evaluation.quality_dataset import (
     quality_dataset_paths,
 )
 from polis.evaluation.quality_protocol import peak_rss_bytes
+from polis.evaluation.quality_v4_measurement import source_snapshot_sha256
+from polis.evaluation.source_binding import (
+    validate_source_repository,
+    validate_wheel_source_binding,
+)
 from polis.runtime_performance_protocol import run_isolated_measurement
 
 
@@ -56,19 +63,55 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--role", choices=("reference", "current"), required=True)
     parser.add_argument("--source-sha", required=True)
+    parser.add_argument(
+        "--source-repository",
+        type=Path,
+        default=Path.cwd(),
+        help="clean Git repository/worktree used for the exact source binding",
+    )
     parser.add_argument("--wheel", type=Path, required=True)
     parser.add_argument("--default-python", required=True)
     parser.add_argument("--morphology-python", required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--protocol-overlay", action="store_true")
+    parser.add_argument(
+        "--protocol-overlay",
+        action="store_true",
+        help="legacy overlay mode; v4 validation rejects non-clean protocol bytes",
+    )
     parser.add_argument("--protocol-sha", required=True)
     parser.add_argument("--worker-sha", required=True)
+    parser.add_argument(
+        "--dataset-version",
+        choices=tuple(v.value for v in QualityDatasetVersion),
+        default="v3",
+    )
     args = parser.parse_args()
 
-    dataset = load_quality_dataset(version=QualityDatasetVersion.V3)
+    validate_source_repository(args.source_sha, args.source_repository)
+    wheel_sha256 = sha256(args.wheel)
+    validate_wheel_source_binding(args.wheel, args.source_repository)
+    for interpreter in (args.default_python, args.morphology_python):
+        validate_interpreter_wheel(interpreter, args.wheel, wheel_sha256)
+
+    dataset_version = QualityDatasetVersion(args.dataset_version)
+    if dataset_version is not QualityDatasetVersion.V4:
+        raise ValueError("runtime-performance-v2 requires dataset version v4")
+    dataset = load_quality_dataset(version=dataset_version)
     evaluation = as_evaluation_dataset(dataset)
-    _, manifest_path = quality_dataset_paths(QualityDatasetVersion.V3)
+    _, manifest_path = quality_dataset_paths(dataset_version)
     texts = tuple(case.text for case in dataset.cases)
+    source_snapshot_hash = None
+    if dataset_version is QualityDatasetVersion.V4:
+        source_snapshot_hash = source_snapshot_sha256(
+            tuple(
+                {
+                    "source": item.source,
+                    "operation": item.operation,
+                    "behavior_version": item.behavior_version,
+                }
+                for item in Analyzer(AnalyzerConfig()).source_identity_snapshot
+            )
+        )
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     for profile, python in (
@@ -136,12 +179,13 @@ def main() -> None:
             "schema_id": "polis.runtime-performance-result",
             "schema_version": 1,
             "protocol_version": 2,
+            "dataset_version": dataset_version.value,
             "role": args.role,
             "profile": profile,
             "source": {"git_sha": args.source_sha},
             "artifact": {
                 "wheel_filename": args.wheel.name,
-                "wheel_sha256": sha256(args.wheel),
+                "wheel_sha256": wheel_sha256,
             },
             "protocol_implementation": {
                 "overlay_applied": args.protocol_overlay,
@@ -155,6 +199,15 @@ def main() -> None:
                 "sha256": dataset.canonical_sha256,
                 "manifest_sha256": sha256(manifest_path),
                 "cases": len(dataset.cases),
+                "source_snapshot_sha256": source_snapshot_hash,
+            },
+            "identity": {
+                "profile": profile,
+                "provider": measurement.morphology_provider,
+                "source_git_sha": args.source_sha,
+                "wheel_sha256": wheel_sha256,
+                "dataset_sha256": dataset.canonical_sha256,
+                "manifest_sha256": sha256(manifest_path),
             },
             "environment": measurement.environment,
             "morphology_provider": measurement.morphology_provider,

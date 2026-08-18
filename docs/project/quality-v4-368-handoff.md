@@ -1,7 +1,9 @@
-# Przekazanie jakości v4 do #367 i #368
+# Przekazanie jakości v4 do #368
 
-Ten dokument wiąże korektę publicznego gold control z dalszym pomiarem #367.
-Nie jest baseline'em, propozycją progu ani zgodą na implementację reguły.
+Ten dokument jest maszynowo używalnym handoffem z #367 do #368. Nie jest
+kanonicznym dowodem jakości: nie zawiera wyników clean-SHA, zatwierdzonej
+propozycji ani comparison. Nie wolno traktować go jako zgody na implementację
+reguły.
 
 ## Stan po #376
 
@@ -48,8 +50,21 @@ chronieni i niezmienieni.
    zweryfikowane luki do #368. Ten dokument nie wybiera progów i nie otwiera
    żadnej pracy nad regułą.
 
+Proposal pozostaje `pending_maintainer_approval`, `enforced: false`, z
+`decision: null`, do czasu niezależnej decyzji maintenera dla każdego gate'u.
+Comparison musi pozostać fail-closed przy jakimkolwiek naruszeniu kontroli,
+rozjeździe tożsamości, brakującej metryce lub niedeterministycznych
+powtórzeniach. Nie publikuj ani nie twórz zastępczych canonical JSON przed
+clean-SHA runs.
+
 Walidacja publicznego zbioru, bez sieci, modelu, Javy, kalibracji i holdoutu:
 
 ```bash
 uv run --locked --extra dev python scripts/validate_quality_dataset_v4.py --json
 ```
+
+Po wykonaniu pomiarów zweryfikuj artefakty skryptem
+`scripts/validate_runtime_performance_v2.py`, podając rzeczywiste wartości
+identyfikatorów źródła, wheel, datasetu, manifestu, protokołu i workera. Każdy
+placeholder w dokumentacji jest wartością wejściową do zastąpienia; żaden nie
+może trafić do artefaktu.

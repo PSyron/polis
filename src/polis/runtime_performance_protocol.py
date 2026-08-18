@@ -180,8 +180,8 @@ def _validate_profile(profile: str) -> dict[str, object] | None:
         raise RuntimePerformanceProtocolError("unsupported runtime profile")
     if profile == "default":
         try:
-            importlib.metadata.version("morfeusz2")
-        except importlib.metadata.PackageNotFoundError:
+            importlib.import_module("morfeusz2")
+        except ImportError:
             return None
         raise RuntimePerformanceProtocolError(
             "default worker requires morfeusz2 absent"

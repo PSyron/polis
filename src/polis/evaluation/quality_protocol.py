@@ -34,6 +34,7 @@ class RunIdentity:
     manifest_sha256: str
     source_sha: str | None = None
     profile: RunProfile | None = None
+    source_snapshot: tuple[dict[str, str], ...] | None = None
 
 
 class InstallationProfile(StrEnum):
@@ -101,6 +102,7 @@ class QualityProtocolResult:
     latency: LatencyMetrics
     throughput: ThroughputMetrics
     resources: ResourceMetrics
+    v4_diagnostics: dict[str, object] | None = None
 
 
 @dataclass(frozen=True, slots=True)

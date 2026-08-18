@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from polis.evaluation._quality_parsing import (
     DATASET_FIELDS,
@@ -329,6 +329,16 @@ def _parse_record(raw: JsonValue, seen_ids: set[str]) -> _V4Record:
     core_case["expected_findings"] = core_findings
     parsed = parse_case(core_case, seen_ids)
     _validate_case_metadata(case, parsed, findings)
+    traceability = require_object(case["traceability"], "quality v4 traceability")
+    provider = require_object(case["provider_behavior"], "quality v4 provider_behavior")
+    parsed = replace(
+        parsed,
+        category=case["category"] if isinstance(case["category"], str) else None,
+        shape_strata=tuple(case["shape_strata"]),
+        source_identity=str(traceability["source_identity"]),
+        behavior_version=str(traceability["behavior_version"]),
+        provider_requirement=str(provider["provider_requirement"]),
+    )
     return _V4Record(parsed, case, findings)
 
 
