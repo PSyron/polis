@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -665,6 +666,53 @@ def test_quality_comparison_v4_pending_proposal_cannot_authorize_comparison(
         _compare(paths)
 
 
+def test_quality_runner_generated_proposal_loads_and_validates(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from polis.evaluation import quality_runner
+
+    paths = _write_artifacts(tmp_path)
+    args = SimpleNamespace(
+        baseline=paths["default"],
+        morphology_baseline=paths["morphology"],
+        wheel_filename="polis_nlp-0.2.0-py3-none-any.whl",
+        wheel_path=tmp_path / "polis_nlp-0.2.0-py3-none-any.whl",
+        protocol_sha256=WHEEL_SHA,
+        worker_sha256=WHEEL_SHA,
+        performance_default_reference=tmp_path / "performance-default.json",
+        performance_default_reference_sha256=hashlib.sha256(
+            (tmp_path / "performance-default.json").read_bytes()
+        ).hexdigest(),
+        performance_default_current=tmp_path / "performance-result-default.json",
+        performance_default_current_sha256=hashlib.sha256(
+            (tmp_path / "performance-result-default.json").read_bytes()
+        ).hexdigest(),
+        performance_morphology_reference=tmp_path / "performance-morphology.json",
+        performance_morphology_reference_sha256=hashlib.sha256(
+            (tmp_path / "performance-morphology.json").read_bytes()
+        ).hexdigest(),
+        performance_morphology_current=tmp_path / "performance-result-morphology.json",
+        performance_morphology_current_sha256=hashlib.sha256(
+            (tmp_path / "performance-result-morphology.json").read_bytes()
+        ).hexdigest(),
+        default_maximum_p95_latency_ns=100,
+        default_minimum_throughput_cases_per_second=10_000_000.0,
+        default_maximum_worker_incremental_peak_rss_bytes=0,
+        morphology_maximum_p95_latency_ns=100,
+        morphology_minimum_throughput_cases_per_second=10_000_000.0,
+        morphology_maximum_worker_incremental_peak_rss_bytes=0,
+        output=tmp_path / "generated-proposal.json",
+        replace=False,
+    )
+    monkeypatch.setattr(quality_runner, "_validate_wheel_file", lambda *_: None)
+    quality_runner._pending_v4_proposal(args)
+    generated = load_threshold_proposal(args.output)
+    assert isinstance(generated, ThresholdProposalV4)
+    assert generated.status == "pending_maintainer_approval"
+    assert generated.default.performance.maximum_worker_incremental_peak_rss_bytes == 0
+    assert generated.default.performance_baseline.protocol_sha256 == WHEEL_SHA
+
+
 def test_quality_comparison_v4_isolated_rss_over_cap_fails(
     tmp_path: Path,
 ) -> None:
@@ -678,6 +726,67 @@ def test_quality_comparison_v4_isolated_rss_over_cap_fails(
     binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
     paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
     with pytest.raises(QualityReportError):
+        _compare(paths)
+
+
+@pytest.mark.parametrize(
+    ("metric", "mutate"),
+    [
+        (
+            "p95",
+            lambda payload: payload["performance"]["latency_ns"].update(p95=101),
+        ),
+        (
+            "throughput",
+            lambda payload: payload["performance"]["throughput"].update(
+                cases_per_second=1.0
+            ),
+        ),
+    ],
+)
+def test_quality_comparison_v4_isolated_performance_caps_fail(
+    tmp_path: Path, metric: str, mutate: object
+) -> None:
+    del metric
+    paths = _write_artifacts(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text())
+    assert callable(mutate)
+    mutate(payload)
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    binding = proposal["profiles"]["morphology"]["performance_result_artifact"]
+    binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises((QualityReportError, ValueError)):
+        _compare(paths)
+
+
+@pytest.mark.parametrize(
+    "field", ["protocol_implementation", "profile", "dataset", "source", "artifact"]
+)
+def test_quality_comparison_v4_isolated_identity_mismatch_fails(
+    tmp_path: Path, field: str
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text())
+    if field == "protocol_implementation":
+        payload[field]["runtime_performance_protocol_sha256"] = "c" * 64
+    elif field == "profile":
+        payload[field] = "default"
+    elif field == "dataset":
+        payload[field]["sha256"] = "c" * 64
+    elif field == "source":
+        payload[field]["git_sha"] = "2" * 40
+    else:
+        payload[field]["wheel_sha256"] = "c" * 64
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    binding = proposal["profiles"]["morphology"]["performance_result_artifact"]
+    binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises((QualityReportError, ValueError)):
         _compare(paths)
 
 

@@ -218,6 +218,13 @@ def _validate_performance(value: object, rss_value: object) -> None:
         raise QualityReportError("v4 performance throughput metrics are malformed")
     if throughput["measured_cases"] != 620 or throughput["total_duration_ns"] <= 0:
         raise QualityReportError("v4 performance throughput identity mismatch")
+    expected_cases_per_second = (
+        throughput["measured_cases"] * 1_000_000_000 / throughput["total_duration_ns"]
+    )
+    if not math.isclose(
+        float(throughput["cases_per_second"]), expected_cases_per_second, rel_tol=1e-9
+    ):
+        raise QualityReportError("v4 performance throughput arithmetic mismatch")
     if set(rss) != {
         "harness_peak_rss_bytes",
         "worker_startup_rss_bytes",
