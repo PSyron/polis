@@ -144,14 +144,16 @@ strat kształtu, profili bez providera i z kwalifikowaną morfologią. Nie jest
 źródłem prawdy wyprowadzanym z bieżącego analizatora, nie jest kalibracją ani
 holdoutem. Wersje v1–v3 pozostają niezmienne.
 
-W #376 poprawiono kontrolę `v4_control_conflict_agreement`: zamiast
-niepoprawnej propozycji `Ten zdanie` w `Te zdanie.` kontrola zawiera dwa
-nakładające się, lecz niezależnie poprawne zapisy korekty `Te dziecko śpi.`:
-`Te` → `To` oraz `Te dziecko` → `To dziecko`. Obie prowadzą do poprawnego
-`To dziecko śpi.`, więc kontrola nadal wymusza abstencję przy nierozstrzygnięciu
-zakresu. Canonical digest v4 to
-`e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4`, a digest
-manifestu to `0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b`.
+W #376 poprawiono kontrolę `v4_control_conflict_punctuation`: zamiast
+niepoprawnej propozycji `Ten zdanie` oraz nieminimalnej kontroli `Te dziecko`,
+zbiór używa projektu `Pada deszcz Anna wraca.`. Dwie normatywnie dopuszczalne,
+minimalne insercje w tym samym offsecie `[11, 11)` dają różne teksty:
+`Pada deszcz. Anna wraca.` oraz `Pada deszcz; Anna wraca.`. Brak kontekstu
+dyskursowego uzasadniającego wybór znaku oznacza, że aktualny Analyzer
+abstenuje w obu profilach. Traceability jest jawnie projektowa i nie podszywa
+kandydatów pod istniejące źródło runtime. Canonical digest v4 to
+`0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c`, a digest
+manifestu to `120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`.
 Przed użyciem wyniku do #368 należy ponownie wykonać clean-wheel baseline #367.
 
 ## Definicje pomiarów

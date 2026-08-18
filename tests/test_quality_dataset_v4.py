@@ -7,6 +7,9 @@ from pathlib import Path
 
 import pytest
 
+from polis import Analyzer, AnalyzerConfig, Confidence
+from polis.core import Category, Finding, Severity, Source
+from polis.correction import findings_conflict
 from polis.evaluation import quality_dataset
 from polis.evaluation._quality_parsing import canonical_hash
 from polis.evaluation._quality_types import JsonValue
@@ -87,17 +90,17 @@ def test_v4_loads_the_reviewed_public_dataset() -> None:
     assert dataset.review.canonical_sha256 == dataset.canonical_sha256
     assert (
         dataset.canonical_sha256
-        == "e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4"
+        == "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c"
     )
     assert manifest["canonical_sha256"] == dataset.canonical_sha256
     assert manifest["review"]["canonical_sha256"] == dataset.canonical_sha256
     assert (
         manifest["review"]["reviewed_case_ids_sha256"]
-        == "f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e"
+        == "0ca59077aa406d02128147b63a95116eec67f886c569129207a6b872d2ab7703"
     )
     assert (
         manifest["manifest_sha256"]
-        == "0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b"
+        == "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf"
     )
 
 
@@ -133,28 +136,56 @@ def test_v4_meets_the_category_and_shape_contract() -> None:
         assert summary["hard_negative_cases"] >= 1
 
 
-def test_v4_conflict_uses_only_valid_competing_corrections() -> None:
+def _conflict_candidates(raw: dict[str, JsonValue]) -> tuple[Finding, ...]:
+    conflict = next(case for case in raw["cases"] if case["kind"] == "conflict")
+    return tuple(
+        Finding.create(
+            category=Category.PUNCTUATION,
+            severity=Severity.SUGGESTION,
+            message="conflict candidate",
+            explanation="project-authored ambiguity",
+            original=finding["original"],
+            suggestion=finding["suggestion"],
+            start=finding["start"],
+            end=finding["end"],
+            confidence=Confidence(0.9),
+            source=Source.parse("rule:quality-v4-conflict-control"),
+        )
+        for finding in conflict["expected_findings"]
+    )
+
+
+def test_v4_conflict_uses_distinct_minimal_competing_corrections() -> None:
     raw, manifest = _documents()
     conflict = next(case for case in raw["cases"] if case["kind"] == "conflict")
 
-    assert conflict["id"] == "v4_control_conflict_agreement"
-    assert conflict["text"] == "Te dziecko śpi."
+    assert conflict["id"] == "v4_control_conflict_punctuation"
+    assert conflict["text"] == "Pada deszcz Anna wraca."
     candidates = {
         conflict["text"][: finding["start"]]
         + finding["suggestion"]
         + conflict["text"][finding["end"] :]
         for finding in conflict["expected_findings"]
     }
-    assert candidates == {"To dziecko śpi."}
+    assert candidates == {
+        "Pada deszcz. Anna wraca.",
+        "Pada deszcz; Anna wraca.",
+    }
+    for finding in conflict["expected_findings"]:
+        assert finding["start"] == finding["end"] == 11
+        assert finding["original"] == ""
+        assert finding["allow_zero_width"] is True
+        assert finding["suggestion"] in {".", ";"}
+        assert finding["overlap_group"] == "controlled-conflict"
+        assert finding["rule_family"] == (
+            "project-authored:ambiguity.punctuation_boundary"
+        )
+
+    first, second = _conflict_candidates(raw)
+    assert findings_conflict(first, second)
+    assert first.start == first.end == second.start == second.end == 11
+    assert first.suggestion != second.suggestion
     assert all("Ten zdanie" not in candidate for candidate in candidates)
-    assert all(
-        finding["overlap_group"] == "controlled-conflict"
-        for finding in conflict["expected_findings"]
-    )
-    assert all(
-        finding["rule_family"] == "rule:agreement.te_neuter_noun"
-        for finding in conflict["expected_findings"]
-    )
     assert conflict["provider_behavior"] == {
         "provider_absent": "execute",
         "qualified_morphology": "execute",
@@ -162,16 +193,25 @@ def test_v4_conflict_uses_only_valid_competing_corrections() -> None:
         "capability": None,
         "denominator_profile": "all-cases",
     }
-
-    all_replacements = {
-        case["text"][: finding["start"]]
-        + finding["suggestion"]
-        + case["text"][finding["end"] :]
-        for case in raw["cases"]
-        for finding in case["expected_findings"]
-    }
-    assert "Ten zdanie." not in all_replacements
     _validate_mutation(raw, manifest)
+
+
+def test_v4_conflict_analyzer_abstains_in_both_profiles(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import polis.analyzer as analyzer_module
+
+    text = "Pada deszcz Anna wraca."
+    qualified_loader = analyzer_module._load_qualified_morfeusz
+    monkeypatch.setattr(analyzer_module, "_load_qualified_morfeusz", lambda: None)
+    assert Analyzer(AnalyzerConfig()).analyze(text).issues == ()
+
+    monkeypatch.setattr(analyzer_module, "_load_qualified_morfeusz", qualified_loader)
+    qualified_provider = analyzer_module._load_qualified_morfeusz()
+    assert qualified_provider is not None
+    assert qualified_provider.identity.package_version == "1.99.15"
+    assert qualified_provider.identity.dictionary_id == "pl.sgjp.sgjp-2026.06.01"
+    assert Analyzer(AnalyzerConfig()).analyze(text).issues == ()
 
 
 def test_v4_rejects_the_old_invalid_conflict_candidate() -> None:
@@ -194,6 +234,7 @@ def test_v4_rejects_the_old_invalid_conflict_candidate() -> None:
             "suggestion": "To",
             "rule_family": "rule:agreement.te_zdanie",
             "overlap_group": "controlled-conflict",
+            "allow_zero_width": False,
         },
         {
             **conflict["expected_findings"][1],
@@ -204,8 +245,36 @@ def test_v4_rejects_the_old_invalid_conflict_candidate() -> None:
             "suggestion": "Ten",
             "rule_family": "rule:agreement.te_zdanie",
             "overlap_group": "controlled-conflict",
+            "allow_zero_width": False,
         },
     ]
+    _rebind(raw, manifest)
+    with pytest.raises(ValueError, match="invalid conflict correction"):
+        _validate_mutation(raw, manifest)
+
+
+def test_v4_rejects_the_prior_te_dziecko_replacement() -> None:
+    raw, manifest = _documents()
+    conflict = next(case for case in raw["cases"] if case["kind"] == "conflict")
+    conflict["text"] = "Te dziecko śpi."
+    conflict["expected_findings"][0]["start"] = 0
+    conflict["expected_findings"][0]["end"] = 2
+    conflict["expected_findings"][0]["original"] = "Te"
+    conflict["expected_findings"][0]["suggestion"] = "To"
+    conflict["expected_findings"][1]["start"] = 0
+    conflict["expected_findings"][1]["end"] = 10
+    conflict["expected_findings"][1]["original"] = "Te dziecko"
+    conflict["expected_findings"][1]["suggestion"] = "To dziecko"
+    conflict["expected_findings"][0]["category"] = "agreement"
+    conflict["expected_findings"][1]["category"] = "agreement"
+    conflict["expected_findings"][0]["rule_family"] = "rule:agreement.te_neuter_noun"
+    conflict["expected_findings"][1]["rule_family"] = "rule:agreement.te_neuter_noun"
+    conflict["traceability"] = {
+        "source_identity": "rule:agreement.te_neuter_noun",
+        "rule_family": "rule:agreement.te_neuter_noun",
+        "audit_row": "rule:agreement.te_neuter_noun",
+        "behavior_version": "agreement-te-neuter-noun/2.0",
+    }
     _rebind(raw, manifest)
     with pytest.raises(ValueError, match="invalid conflict correction"):
         _validate_mutation(raw, manifest)

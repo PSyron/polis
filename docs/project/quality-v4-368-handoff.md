@@ -5,17 +5,17 @@ Nie jest baseline'em, propozycją progu ani zgodą na implementację reguły.
 
 ## Stan po #376
 
-- `v4_control_conflict_agreement` używa `Te dziecko śpi.`.
-- Jego dwie konkurencyjne reprezentacje są językowo poprawne:
-  `Te` → `To` oraz `Te dziecko` → `To dziecko`.
-- Obie edycje prowadzą do `To dziecko śpi.` i nakładają się na zakresach
-  `[0, 2)` oraz `[0, 10)`, dlatego przypadek nadal wymaga abstencji zamiast
-  arbitralnego wyboru zakresu.
-- Nie występuje już goldowa sugestia `Ten zdanie`; `Ten` nie zgadza się z
-  nijakim rzeczownikiem `zdanie`.
-- Provider-absent i qualified-morphology zachowują odpowiednio wykonanie tej
-  niezależnej od providera kontrolki; oczekiwaniem obu profili pozostaje
-  zero sugestii dla konfliktu.
+- `v4_control_conflict_punctuation` używa `Pada deszcz Anna wraca.`.
+- Jego dwie konkurencyjne i minimalne insercje w `[11, 11)` to kropka oraz
+  średnik: `Pada deszcz. Anna wraca.` i `Pada deszcz; Anna wraca.`.
+- Insercje mają różne teksty końcowe i konfliktują według produkcyjnego
+  `findings_conflict`, więc przypadek wymaga abstencji zamiast arbitralnego
+  wyboru znaku.
+- Traceability używa jawnej projektowej tożsamości niejednoznaczności, a nie
+  niepasującej aktualnej reguły runtime.
+- Provider-absent i qualified-morphology zwracają zero sugestii dla dokładnego
+  tekstu, ponieważ runtime nie rozstrzyga wyboru interpunkcji bez kontekstu
+  dyskursowego.
 - Minima kategorii, kształtu i profili z kontraktu #364/#366 oraz wszystkie
   wiązania v3 pozostają niezmienione.
 
@@ -23,15 +23,15 @@ Nie jest baseline'em, propozycją progu ani zgodą na implementację reguły.
 
 Canonical digest datasetu v4:
 
-`e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4`
+`0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c`
 
 Digest manifestu:
 
-`0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b`
+`120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`
 
 Digest kompletnej listy przejrzanych identyfikatorów:
 
-`f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e`
+`0ca59077aa406d02128147b63a95116eec67f886c569129207a6b872d2ab7703`
 
 Review nadal obejmuje wszystkie 124 przypadki. Poprzednicy v1–v3 pozostają
 chronieni i niezmienieni.

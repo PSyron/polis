@@ -36,25 +36,35 @@ walidacja wykrywała przypadkową zmianę wcześniejszych artefaktów.
 
 ### Korekta kontroli konfliktu (#376)
 
-Kontrolka `v4_control_conflict_agreement` używa tekstu `Te dziecko śpi.`.
-Obie konkurencyjne, nakładające się reprezentacje edycji są językowo poprawne
-i prowadzą do tego samego poprawnego zdania `To dziecko śpi.`:
+Kontrolka `v4_control_conflict_punctuation` używa projektu `Pada deszcz Anna
+wraca.`. To celowo nieinterpunkcyjna granica dwóch niezależnych zdań. Bez
+kontekstu dyskursowego obie następujące, normatywnie dopuszczalne interpunkcje
+są uzasadnione:
 
-- `Te` → `To`, zakres `[0, 2)`;
-- `Te dziecko` → `To dziecko`, zakres `[0, 10)`.
+- wstawienie kropki w offset `[11, 11)`: `Pada deszcz. Anna wraca.`;
+- wstawienie średnika w offset `[11, 11)`: `Pada deszcz; Anna wraca.`.
 
-Pierwotna wersja kontrolki błędnie dopuszczała `Te` → `Ten` w `Te zdanie.`.
-Forma `zdanie` ma rodzaj nijaki, więc wynik `Ten zdanie` jest niepoprawny i
-nie może być złotą konkurencyjną sugestią. Korekta zachowuje rolę konfliktu,
-abstencję runtime'u oraz minima kontraktu #364/#366; zmienia wyłącznie publiczny
-v4 gold control, nie regułę `rule:agreement.te_zdanie` ani politykę korekt.
-Walidator wiąże tę semantykę z kontrolką i odrzuca powrót starego przypadku.
+Są to dwie minimalne insercje (pusty oryginał, brak niezmienionego kontekstu),
+mają różne teksty końcowe i pozostają konfliktem według produkcyjnego
+`findings_conflict`, ponieważ dzielą ten sam offset insercji. Żaden aktualny
+runtime source nie rozstrzyga tej niejednoznaczności; traceability jawnie używa
+projektowej tożsamości `project-authored:ambiguity.punctuation_boundary`, a nie
+podszywa kandydatów pod niepasującą regułę. Walidator dopuszcza tę jedną
+projektową tożsamość wyłącznie w kontrolce konfliktu, jako najmniejszą korektę
+schematu zgodną z #364/#366.
+
+Poprzednia wersja błędnie używała `Te dziecko śpi.`: druga sugestia była
+nieminimalnym zakresem prowadzącym do tego samego tekstu, a analizator emitował
+`rule:agreement.te_neuter_noun`. Zastąpienie kontrolki nie zmienia runtime'u
+ani polityki korekt. Dla dokładnego nowego tekstu aktualny Analyzer zasadnie
+abstenuje w profilu bez providera i z kwalifikowaną morfologią: wybór kropki lub
+średnika wymaga niedostępnego kontekstu dyskursowego, którego v1 nie wnioskuje.
 
 Po korekcie canonical digest zbioru to
-`e87ad62b54d5d77c00b32c43cc5ee74d7347cdaa5501bc72080eddd79e12fba4`, a digest
-manifestu to `0561200bd16319737e4c484ba220ff588ae964dddd680f0285d88e35140cc07b`.
-Digest listy przejrzanych identyfikatorów pozostaje
-`f8a36263a0d42e9b3eb68688752416ab51bf073b4cb19125ddfaca1530750c0e`;
+`0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c`, a digest
+manifestu to `120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`.
+Digest listy przejrzanych identyfikatorów to
+`0ca59077aa406d02128147b63a95116eec67f886c569129207a6b872d2ab7703`;
 review obejmuje nadal wszystkie 124 przypadki. Wiązania bajtów v3 pozostają
 bez zmian.
 
