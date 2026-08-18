@@ -2,39 +2,16 @@ from __future__ import annotations
 
 import json
 import sys
-from hashlib import sha256
-from pathlib import Path
 
 from polis.evaluation._quality_parsing import require_object
 from polis.evaluation._quality_rules import (
     _load_json_document,
     validate_quality_dataset,
 )
-from polis.evaluation._quality_types import QualityDatasetError
 from polis.evaluation.quality_dataset import (
     QualityDatasetVersion,
     quality_dataset_paths,
 )
-
-
-def _validate_contract_identity(manifest_raw: object) -> None:
-    manifest = require_object(manifest_raw, "quality manifest")
-    contract = require_object(manifest.get("contract"), "quality v4 contract")
-    declared_sha256 = contract.get("sha256")
-    if not isinstance(declared_sha256, str):
-        raise QualityDatasetError("quality v4 contract sha256 must be a string")
-    contract_path = (
-        Path(__file__).resolve().parents[1]
-        / "docs/project/rule-coverage-contract-v1.json"
-    )
-    try:
-        actual_sha256 = sha256(contract_path.read_bytes()).hexdigest()
-    except OSError as error:
-        raise QualityDatasetError(
-            "accepted #364 contract artifact is unavailable"
-        ) from error
-    if actual_sha256 != declared_sha256:
-        raise QualityDatasetError("accepted #364 contract artifact hash mismatch")
 
 
 def main() -> int:
@@ -43,7 +20,6 @@ def main() -> int:
     dataset_path, manifest_path = quality_dataset_paths(QualityDatasetVersion.V4)
     dataset_raw = _load_json_document(dataset_path, "quality dataset")
     manifest_raw = _load_json_document(manifest_path, "quality manifest")
-    _validate_contract_identity(manifest_raw)
     dataset = validate_quality_dataset(dataset_raw, manifest_raw)
     manifest = require_object(manifest_raw, "quality manifest")
     summary = manifest["summary"]

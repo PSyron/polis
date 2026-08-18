@@ -4,12 +4,12 @@ import hashlib
 import json
 import subprocess
 from pathlib import Path
-from typing import Any
 
 import pytest
 
 from polis.evaluation import quality_dataset
 from polis.evaluation._quality_parsing import canonical_hash
+from polis.evaluation._quality_types import JsonValue
 from polis.evaluation._quality_v4 import (
     _V4_TRACEABILITY_SOURCES,
     validate_v4_dataset,
@@ -43,7 +43,7 @@ _PREVIOUS_DATASET_BYTE_HASHES = {
 }
 
 
-def _documents() -> tuple[dict[str, Any], dict[str, Any]]:
+def _documents() -> tuple[dict[str, JsonValue], dict[str, JsonValue]]:
     cases_path, manifest_path = quality_dataset.quality_dataset_paths(
         quality_dataset.QualityDatasetVersion.V4
     )
@@ -53,7 +53,7 @@ def _documents() -> tuple[dict[str, Any], dict[str, Any]]:
     )
 
 
-def _rebind(raw: dict[str, Any], manifest: dict[str, Any]) -> None:
+def _rebind(raw: dict[str, JsonValue], manifest: dict[str, JsonValue]) -> None:
     digest = canonical_hash(raw)
     manifest["canonical_sha256"] = digest
     manifest["review"]["canonical_sha256"] = digest
@@ -63,7 +63,9 @@ def _rebind(raw: dict[str, Any], manifest: dict[str, Any]) -> None:
     )
 
 
-def _validate_mutation(raw: dict[str, Any], manifest: dict[str, Any]) -> None:
+def _validate_mutation(
+    raw: dict[str, JsonValue], manifest: dict[str, JsonValue]
+) -> None:
     validate_v4_dataset(
         raw,
         manifest,
@@ -174,7 +176,7 @@ def test_v4_public_validator_cli_reports_machine_readable_summary() -> None:
     }
 
 
-def test_quality_dataset_loader_rejects_duplicate_json_keys(tmp_path: Any) -> None:
+def test_quality_dataset_loader_rejects_duplicate_json_keys(tmp_path: Path) -> None:
     dataset_path = tmp_path / "cases.json"
     manifest_path = tmp_path / "manifest.json"
     dataset_path.write_text(
