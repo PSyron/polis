@@ -261,11 +261,11 @@
         "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": null,
       "pair": {
@@ -361,11 +361,11 @@
         "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": null,
       "pair": {
@@ -411,11 +411,11 @@
         "behavior_version": "agreement-nominal-group-te-duze-okno/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": null,
       "pair": null
@@ -737,11 +737,11 @@
         "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": "The corrected counterpart 'Ta nowa książka leży.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_agreement_negative_09.",
       "pair": {
@@ -881,11 +881,11 @@
         "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": "The corrected counterpart 'Oni czytają książkę.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_agreement_negative_13.",
       "pair": {
@@ -1725,11 +1725,11 @@
         "behavior_version": "inflection-negated-lubic-kawe/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
       },
       "provider_behavior": {
-        "provider_absent": "execute",
+        "provider_absent": "abstain",
         "qualified_morphology": "execute",
-        "provider_requirement": "none",
-        "capability": null,
-        "denominator_profile": "all-cases"
+        "provider_requirement": "qualified_morphology",
+        "capability": "morphological-analysis",
+        "denominator_profile": "qualified-provider"
       },
       "boundary_rationale": "The corrected counterpart 'Nie lubię kawy.' is the reviewed boundary case; the paired positive contains the declared minimal error. Reviewed case: v4_inflection_negative_09.",
       "pair": {

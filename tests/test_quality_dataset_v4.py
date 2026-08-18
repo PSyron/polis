@@ -426,6 +426,23 @@ def test_v4_rejects_provider_dependent_case_without_profile() -> None:
         _validate_mutation(raw, manifest)
 
 
+def test_v4_rejects_morphology_behavior_without_provider_profile() -> None:
+    raw, manifest = _documents()
+    case = next(
+        case
+        for case in raw["cases"]
+        if case["traceability"]["source_identity"]
+        == "rule:agreement.nominal_group_ta_nowy_ksiazka"
+    )
+    case["provider_behavior"]["provider_requirement"] = "none"
+    case["provider_behavior"]["capability"] = None
+    case["provider_behavior"]["denominator_profile"] = "all-cases"
+    _rebind(raw, manifest)
+
+    with pytest.raises(ValueError, match="provider profile does not match"):
+        _validate_mutation(raw, manifest)
+
+
 def test_v4_rejects_category_below_hard_negative_minimum() -> None:
     raw, manifest = _documents()
     case = raw["cases"][12]

@@ -97,6 +97,7 @@ _V4_SHAPES = frozenset(
         "conflict-or-abstention",
     }
 )
+_V4_MORPHOLOGY_BEHAVIOR_MARKER = "+morfeusz2-"
 _V4_CATEGORIES = frozenset(
     {"agreement", "inflection", "punctuation", "spelling", "syntax"}
 )
@@ -201,9 +202,9 @@ _V3_MANIFEST_BYTES_SHA256 = (
     "956479298747d3be9c9c73e6f7df3a5b72c1e67f8f0fe3b4c62b4139fa451b17"
 )
 _V4_CANONICAL_SHA256 = (
-    "fdf9261c074b945c78ea4f876d1155881449a57eeed6f9d128f529adb3709185"
+    "a9ccdbb33c49b144e2ffd95cb604c0d52de2f1f569ffd6e6ee4c44868658c345"
 )
-_V4_MANIFEST_SHA256 = "43d9843795360dc281433f80c133e1a1d8afc029bab0d5e27e0a34a3154180a6"
+_V4_MANIFEST_SHA256 = "85531c42ffeaea03d77d7be792bf19a36adec848b9620561c74d7f3b4680e0c1"
 _CONTRACT = {
     "path": "docs/project/rule-coverage-contract-v1.json",
     "sha256": "c98068a895919b22a916f9ecd2fafb1cb15ee698cb891e66c8d55ffb9194e629",
@@ -382,6 +383,14 @@ def _validate_case_metadata(
     provider = require_object(raw["provider_behavior"], "quality v4 provider_behavior")
     require_exact_fields(provider, _V4_PROVIDER_FIELDS, "quality v4 provider_behavior")
     _validate_provider(provider)
+    morphology_bound = (
+        _V4_MORPHOLOGY_BEHAVIOR_MARKER in traceability["behavior_version"]
+    )
+    provider_bound = provider["provider_requirement"] == "qualified_morphology"
+    if morphology_bound != provider_bound:
+        raise QualityDatasetError(
+            "quality v4 provider profile does not match behavior identity"
+        )
     boundary_rationale = raw["boundary_rationale"]
     if case.kind is QualityCaseKind.CORRECT:
         _require_non_blank(
