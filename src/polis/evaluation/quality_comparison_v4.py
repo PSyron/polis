@@ -124,6 +124,13 @@ def compare_quality_v4(
             report=result[profile_id],
         )
         floors = getattr(proposal_value, profile_id)
+        _validate_performance_environment_binding(
+            isolated_reference,
+            isolated_current,
+            baseline[profile_id],
+            result[profile_id],
+            tuple(floors.performance.required_environment_match) + ("package_version",),
+        )
         gates = _quality_gates(result[profile_id], floors)
         category_gates = _category_gates(result[profile_id], floors)
         stratum_gates = _stratum_gates(result[profile_id], floors)
@@ -212,6 +219,57 @@ def compare_quality_v4(
     return root
 
 
+def _validate_performance_environment_binding(
+    reference: dict[str, Any],
+    current: dict[str, Any],
+    baseline: QualityReport,
+    result: QualityReport,
+    fields: tuple[str, ...],
+) -> None:
+    reference_environment = reference.get("environment")
+    current_environment = current.get("environment")
+    if not isinstance(reference_environment, dict) or not isinstance(
+        current_environment, dict
+    ):
+        raise QualityReportError("v4 performance environment identity mismatch")
+    report_environments = (
+        _environment(baseline),
+        _environment(result),
+    )
+    for field in fields:
+        if field not in reference_environment or field not in current_environment:
+            raise QualityReportError(
+                f"v4 performance required environment field is missing: {field}"
+            )
+        values = (reference_environment[field], current_environment[field])
+        if len(set(values)) != 1:
+            raise QualityReportError(f"v4 performance environment mismatch: {field}")
+    quality_fields = {
+        "package_version",
+        "python_version",
+        "platform_system",
+        "platform_release",
+        "platform_machine",
+    }
+    for field in quality_fields.intersection(fields):
+        reference_quality = report_environments[0].get(field)
+        current_quality = report_environments[1].get(field)
+        if (
+            reference_quality is not None
+            and reference_environment[field] != reference_quality
+        ):
+            raise QualityReportError(
+                f"v4 quality/performance environment mismatch: {field}"
+            )
+        if (
+            current_quality is not None
+            and current_environment[field] != current_quality
+        ):
+            raise QualityReportError(
+                f"v4 quality/performance environment mismatch: {field}"
+            )
+
+
 def _validate_isolated_performance(
     proposal: ThresholdProposalV4,
     profile_id: str,
@@ -234,6 +292,7 @@ def _validate_isolated_performance(
         expected_manifest_sha256=proposal.manifest_sha256,
         expected_source_sha=proposal.source_git_sha,
         expected_wheel_sha256=proposal.wheel_sha256,
+        expected_wheel_filename=proposal.wheel_filename,
         expected_role=expected_role,
     )
     return dict(artifact)

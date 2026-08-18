@@ -371,7 +371,7 @@ def _performance_artifact(
         "environment": {
             "package_version": "0.2.0",
             "platform_machine": "arm64",
-            "platform_release": "24",
+            "platform_release": "24.3.0",
             "platform_system": "Darwin",
             "python_version": "3.13.12",
         },
@@ -400,7 +400,15 @@ def _performance_artifact(
                 "code_points_per_second": 100000000.0,
             },
         },
-        "quality": {"counts": _counts(35)},
+        "quality": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "span_accuracy": 1.0,
+            "correction_accuracy": 1.0,
+            "false_alarm_rate": 0.0,
+            "counts": _counts(35),
+        },
         "reproducibility": {
             "warmup_repetitions": 1,
             "measured_repetitions": 5,
@@ -658,6 +666,70 @@ def test_quality_comparison_v4_mutations_fail_closed(
         _compare(paths)
 
 
+def test_quality_comparison_v4_rejects_malformed_nested_performance_payload(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text())
+    payload["artifact"].pop("wheel_filename")
+    payload["artifact"]["unexpected"] = True
+    payload["performance"]["throughput"].update(
+        measured_code_points="nonsense",
+        code_points_per_second=123.0,
+    )
+    payload["reproducibility"]["findings_sha256"] = "Z" * 64
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["morphology"]["performance_result_artifact"]["sha256"] = (
+        hashlib.sha256(performance.read_bytes()).hexdigest()
+    )
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError, match="artifact fields mismatch"):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_rejects_performance_environment_drift(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text())
+    payload["environment"]["python_version"] = "9.9.9"
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["morphology"]["performance_result_artifact"]["sha256"] = (
+        hashlib.sha256(performance.read_bytes()).hexdigest()
+    )
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError, match="environment mismatch"):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_approval_decision_rejects_extra_field(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["decision"]["unexpected"] = True
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError, match="decision"):
+        load_threshold_proposal(paths["proposal"])
+
+
+def test_quality_comparison_v4_gate_decision_rejects_extra_field(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["default"]["gates"][0]["maintainer_decision"]["unexpected"] = (
+        True
+    )
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError, match="decision"):
+        load_threshold_proposal(paths["proposal"])
+
+
 def test_quality_comparison_v4_pending_proposal_cannot_authorize_comparison(
     tmp_path: Path,
 ) -> None:
@@ -719,14 +791,31 @@ def test_quality_comparison_v4_isolated_rss_over_cap_fails(
     paths = _write_artifacts(tmp_path)
     performance = paths["morphology"].with_name("performance-result-morphology.json")
     payload = json.loads(performance.read_text())
+    payload["rss"]["worker_peak_rss_bytes"] = 1999
     payload["rss"]["worker_measured_incremental_peak_rss_bytes"] = 999
     performance.write_text(json.dumps(payload, sort_keys=True))
     proposal = json.loads(paths["proposal"].read_text())
     binding = proposal["profiles"]["morphology"]["performance_result_artifact"]
     binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
     paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
-    with pytest.raises(QualityReportError):
-        _compare(paths)
+    comparison = _compare(paths)
+    profiles = comparison["profiles"]
+    assert isinstance(profiles, dict)
+    morphology = profiles["morphology"]
+    assert isinstance(morphology, dict)
+    gates = morphology["gates"]
+    assert isinstance(gates, list)
+    rss_gate = next(
+        gate
+        for gate in gates
+        if gate["gate"] == "performance.maximum_worker_incremental_peak_rss_bytes"
+    )
+    assert rss_gate == {
+        "gate": "performance.maximum_worker_incremental_peak_rss_bytes",
+        "pass": False,
+        "detail": "measured=999, maximum=0",
+    }
+    assert comparison["aggregate_verdict"] == "fail"
 
 
 @pytest.mark.parametrize(
@@ -734,12 +823,16 @@ def test_quality_comparison_v4_isolated_rss_over_cap_fails(
     [
         (
             "p95",
-            lambda payload: payload["performance"]["latency_ns"].update(p95=101),
+            lambda payload: payload["performance"]["latency_ns"].update(
+                p95=101, max=101
+            ),
         ),
         (
             "throughput",
             lambda payload: payload["performance"]["throughput"].update(
-                cases_per_second=1.0
+                total_duration_ns=124000,
+                cases_per_second=5_000_000.0,
+                code_points_per_second=50_000_000.0,
             ),
         ),
     ],
@@ -747,7 +840,6 @@ def test_quality_comparison_v4_isolated_rss_over_cap_fails(
 def test_quality_comparison_v4_isolated_performance_caps_fail(
     tmp_path: Path, metric: str, mutate: object
 ) -> None:
-    del metric
     paths = _write_artifacts(tmp_path)
     performance = paths["morphology"].with_name("performance-result-morphology.json")
     payload = json.loads(performance.read_text())
@@ -758,8 +850,21 @@ def test_quality_comparison_v4_isolated_performance_caps_fail(
     binding = proposal["profiles"]["morphology"]["performance_result_artifact"]
     binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
     paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
-    with pytest.raises((QualityReportError, ValueError)):
-        _compare(paths)
+    comparison = _compare(paths)
+    gate_name = (
+        "performance.maximum_p95_latency_ns"
+        if metric == "p95"
+        else "performance.minimum_throughput_cases_per_second"
+    )
+    profiles = comparison["profiles"]
+    assert isinstance(profiles, dict)
+    morphology = profiles["morphology"]
+    assert isinstance(morphology, dict)
+    gates = morphology["gates"]
+    assert isinstance(gates, list)
+    gate = next(gate for gate in gates if gate["gate"] == gate_name)
+    assert gate["pass"] is False
+    assert comparison["aggregate_verdict"] == "fail"
 
 
 @pytest.mark.parametrize(
@@ -798,7 +903,12 @@ def test_quality_comparison_v4_source_total_drift_fails(
     payload["diagnostics"]["source"][0]["exact_match_count"] += 1
     payload["diagnostics"]["source"][0]["predicted_count"] += 1
     paths["default"].write_text(json.dumps(payload, sort_keys=True))
-    with pytest.raises(QualityReportError):
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["default"]["baseline_sha256"] = hashlib.sha256(
+        paths["default"].read_bytes()
+    ).hexdigest()
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError, match="source"):
         _compare(paths)
 
 

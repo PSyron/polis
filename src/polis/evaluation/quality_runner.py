@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib
 import importlib.metadata
 import json
 import math
 import platform
 import re
-import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +14,7 @@ from typing import Final
 
 from polis import Analyzer, AnalyzerConfig
 from polis.core import Category, PolisError, SourceKind
+from polis.evaluation.distribution_binding import validate_interpreter_wheel
 from polis.evaluation.metrics import BaselineResult, QualityCounts
 from polis.evaluation.quality_dataset import (
     QualityDataset,
@@ -44,6 +43,10 @@ from polis.evaluation.quality_report import (
 )
 from polis.evaluation.quality_report_models import QualityReport
 from polis.evaluation.quality_v4_measurement import measure_v4
+from polis.evaluation.source_binding import (
+    validate_source_repository,
+    validate_wheel_source_binding,
+)
 from polis.rules._morfeusz import _load_qualified_morfeusz
 
 _ANALYZER_IDENTITY: Final = "Analyzer(AnalyzerConfig())"
@@ -135,6 +138,12 @@ def _build_parser() -> argparse.ArgumentParser:
             "--artifact-sha256", type=_artifact_sha256, required=True
         )
         measurement.add_argument("--source-sha", type=_source_sha)
+        measurement.add_argument(
+            "--source-repository",
+            type=Path,
+            default=Path.cwd(),
+            help="clean Git repository/worktree used for the exact source binding",
+        )
         measurement.add_argument("--wheel-path", type=Path)
         measurement.add_argument(
             "--profile", type=InstallationProfile, choices=tuple(InstallationProfile)
@@ -246,30 +255,10 @@ def _file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _validate_source_repository(source_sha: str) -> None:
-    """Bind a measured source SHA to the repository available to the runner."""
-
-    try:
-        root = subprocess.run(
-            ["git", "-C", str(Path.cwd()), "rev-parse", "--show-toplevel"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-        resolved = subprocess.run(
-            ["git", "-C", root, "rev-parse", "--verify", f"{source_sha}^{{commit}}"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as error:
-        raise QualityReportError(
-            "v4 source SHA cannot be bound to the current repository"
-        ) from error
-    if resolved != source_sha:
-        raise QualityReportError(
-            "v4 source SHA must identify a commit in the current repository"
-        )
+def _validate_source_repository(
+    source_sha: str, repository: Path | None = None
+) -> None:
+    validate_source_repository(source_sha, repository)
 
 
 def _validate_wheel_file(path: Path, artifact_sha256: str) -> None:
@@ -280,23 +269,10 @@ def _validate_wheel_file(path: Path, artifact_sha256: str) -> None:
 
 
 def _validate_installed_wheel(path: Path, artifact_sha256: str) -> None:
-    """Verify the wheel and the distribution executing this runner.
-
-    This deliberately verifies an existing wheel file; it never attempts to
-    reconstruct a wheel from an installed package when that file is absent.
-    """
+    """Prove that the running distribution contains the supplied wheel bytes."""
 
     _validate_wheel_file(path, artifact_sha256)
-    distribution = importlib.metadata.distribution("polis-nlp")
-    if distribution.metadata.get("Name") != "polis-nlp":
-        raise QualityReportError("v4 installed distribution identity mismatch")
-    module = importlib.import_module("polis")
-    installed_init = Path(str(distribution.locate_file("polis/__init__.py"))).resolve()
-    module_path = Path(module.__file__ or "").resolve()
-    if module_path != installed_init:
-        raise QualityReportError(
-            "v4 runner is not executing the installed distribution"
-        )
+    validate_interpreter_wheel(sys.executable, path, artifact_sha256)
 
 
 def _validate_v4_runtime_inputs(args: argparse.Namespace) -> None:
@@ -304,8 +280,9 @@ def _validate_v4_runtime_inputs(args: argparse.Namespace) -> None:
         raise QualityReportError(
             "v4 measurement requires source SHA and an existing wheel path"
         )
-    _validate_source_repository(args.source_sha)
+    _validate_source_repository(args.source_sha, args.source_repository)
     _validate_installed_wheel(args.wheel_path, args.artifact_sha256)
+    validate_wheel_source_binding(args.wheel_path, args.source_repository)
 
 
 def _profile_identity(profile: InstallationProfile) -> RunProfile:
@@ -485,6 +462,7 @@ def _performance_payload(report: object) -> dict[str, object]:
         "required_measured_repetitions": report.measured_repetitions,
         "require_identical_repetition_hashes": True,
         "required_environment_match": [
+            "package_version",
             "python_version",
             "platform_system",
             "platform_release",
@@ -855,7 +833,7 @@ def run(argv: list[str] | None = None) -> int:
         else:
             from polis.evaluation.quality_comparison_v4 import compare_quality_v4
 
-            compare_quality_v4(
+            comparison = compare_quality_v4(
                 baseline_default=args.baseline_default,
                 baseline_morphology=args.baseline_morphology,
                 result_default=args.result_default,
@@ -864,6 +842,7 @@ def run(argv: list[str] | None = None) -> int:
                 output=args.output,
                 replace=args.replace,
             )
+            return 0 if comparison.get("aggregate_verdict") == "pass" else 1
     except FileExistsError:
         print(f"error: output already exists: {args.output}", file=sys.stderr)
         return 2

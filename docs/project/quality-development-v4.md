@@ -60,7 +60,9 @@ minima kategorii lub strat.
 
 Pomiar wykonuj wyłącznie z jednego czystego commita i jednego zbudowanego
 koła. Digest koła należy przekazać w `--artifact-sha256`, a digest commita w
-`--source-sha`; nie wolno używać zerowego digestu ani artefaktu z brudnego
+`--source-sha` oraz `--source-repository`; `--source-sha` musi być dokładnym
+HEAD-em czystego tracked tree wskazanego repozytorium/worktree (untracked
+`.omo/` jest ignorowany). Nie wolno używać zerowego digestu ani artefaktu z brudnego
 drzewa roboczego. Provider-absent i qualified-morphology są osobnymi
 środowiskami. W pierwszym środowisku `morfeusz2` musi być nieimportowalny, a w
 drugim musi odpowiadać kwalifikacji z manifestu.
@@ -68,13 +70,14 @@ drugim musi odpowiadać kwalifikacji z manifestu.
 ```bash
 uv run --locked --extra dev python scripts/validate_quality_dataset_v4.py --json
 uv run --locked --extra dev python -m build --wheel --outdir /tmp/polis-367-dist
-sha256sum /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
+shasum -a 256 /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
 
 python -m venv /tmp/polis-367-default
 /tmp/polis-367-default/bin/python -m pip install --no-deps /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl
 /tmp/polis-367-default/bin/python -m polis.evaluation.quality_runner baseline \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --source-repository /path/to/clean/polis-worktree \
   --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile default --output /tmp/polis-367-baseline-default.json
 
@@ -84,6 +87,7 @@ python -m venv /tmp/polis-367-morphology
 /tmp/polis-367-morphology/bin/python -m polis.evaluation.quality_runner baseline \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --source-repository /path/to/clean/polis-worktree \
   --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile morphology --output /tmp/polis-367-baseline-morphology.json
 ```
@@ -147,7 +151,9 @@ performance-v2, nie mieszaj jego metryk z pomiarem quality runnera:
 
 ```bash
 python scripts/run_runtime_performance_v2.py \
-  --role current --source-sha CLEAN_COMMIT_SHA --wheel /path/to/polis_nlp.whl \
+  --role current --source-sha CLEAN_COMMIT_SHA \
+  --source-repository /path/to/clean/polis-worktree \
+  --wheel /path/to/polis_nlp.whl \
   --default-python /tmp/polis-367-default/bin/python \
   --morphology-python /tmp/polis-367-morphology/bin/python \
   --output-dir /tmp/polis-367-performance \

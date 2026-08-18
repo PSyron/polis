@@ -51,7 +51,16 @@ def validate_threshold_proposal_v4(
             raise QualityReportError(
                 "approved v4 threshold proposal requires enforced decision metadata"
             )
-        if decision.get("status") != "approved" or decision.get("enforced") is not True:
+        if (
+            set(decision)
+            != {"status", "enforced", "approved_by", "approved_at", "rationale"}
+            or decision.get("status") != "approved"
+            or decision.get("enforced") is not True
+            or not all(
+                isinstance(decision.get(key), str) and decision[key]
+                for key in ("approved_by", "approved_at", "rationale")
+            )
+        ):
             raise QualityReportError("v4 approval decision is inconsistent")
     else:
         raise QualityReportError(
@@ -114,6 +123,7 @@ def validate_threshold_proposal_v4(
                 expected_manifest_sha256=proposal.manifest_sha256,
                 expected_source_sha=proposal.source_git_sha,
                 expected_wheel_sha256=proposal.wheel_sha256,
+                expected_wheel_filename=proposal.wheel_filename,
                 expected_role=role,
             )
     _validate_gate_contract(proposal, default, morphology, performance_artifacts)
@@ -163,6 +173,8 @@ def _validate_gate_contract(
                 )
             if proposal.status == "approved" and (
                 gate.maintainer_decision is None
+                or set(gate.maintainer_decision)
+                != {"status", "decided_by", "decided_at", "rationale"}
                 or gate.maintainer_decision.get("status") != "approved"
                 or not gate.maintainer_decision.get("decided_by")
                 or not gate.maintainer_decision.get("decided_at")

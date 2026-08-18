@@ -211,9 +211,9 @@ def _parse_decision(raw: object) -> JsonObject | None:
         raise QualityReportError("threshold proposal decision is malformed")
     if not isinstance(raw["status"], str) or not isinstance(raw["enforced"], bool):
         raise QualityReportError("threshold proposal decision values are malformed")
-    if not all(
+    if raw["status"] not in {"approved", "pending"} or not all(
         isinstance(raw[key], str) and raw[key]
-        for key in {"status", "approved_by", "approved_at", "rationale"}
+        for key in {"approved_by", "approved_at", "rationale"}
     ):
         raise QualityReportError("threshold proposal decision values are malformed")
     return {key: raw[key] for key in raw}
@@ -314,8 +314,24 @@ def _parse_gates(raw: object) -> tuple[ProposalGate, ...]:
         ):
             raise QualityReportError("v4 proposal gate allowed_variation is invalid")
         decision = item["maintainer_decision"]
-        if decision is not None and not isinstance(decision, dict):
-            raise QualityReportError("v4 proposal gate decision is malformed")
+        if decision is not None:
+            if not isinstance(decision, dict) or set(decision) != {
+                "status",
+                "decided_by",
+                "decided_at",
+                "rationale",
+            }:
+                raise QualityReportError("v4 proposal gate decision fields mismatch")
+            if (
+                decision.get("status") != "approved"
+                or not isinstance(decision.get("decided_by"), str)
+                or not decision["decided_by"]
+                or not isinstance(decision.get("decided_at"), str)
+                or not decision["decided_at"]
+                or not isinstance(decision.get("rationale"), str)
+                or not decision["rationale"]
+            ):
+                raise QualityReportError("v4 proposal gate decision is malformed")
         gates.append(
             ProposalGate(
                 scope=_string(item, "scope", "proposal gate"),
