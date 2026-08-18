@@ -131,6 +131,31 @@ baseline'ami v3 po korekcie datasetu. Absolutne capy wydajności z wave0
 **nie** zostały ponownie wyprowadzone; porównanie zapisuje ich wynik
 fail-closed.
 
+## Zbiór deweloperski jakości v4
+
+Issue #366 wprowadziło niezależny, projektowy zbiór CC0 `v4`:
+
+- dane: `src/polis/evaluation/datasets/quality/v4/cases.json`;
+- manifest: `src/polis/evaluation/datasets/quality/v4/manifest.json`;
+- kontrakt i przegląd: `docs/project/quality-development-v4.md`.
+
+Zbiór obejmuje 124 przypadki oraz osobne minima dla pięciu kategorii, siedmiu
+strat kształtu, profili bez providera i z kwalifikowaną morfologią. Nie jest
+źródłem prawdy wyprowadzanym z bieżącego analizatora, nie jest kalibracją ani
+holdoutem. Wersje v1–v3 pozostają niezmienne.
+
+W #376 poprawiono kontrolę `v4_control_conflict_punctuation`: zamiast
+niepoprawnej propozycji `Ten zdanie` oraz nieminimalnej kontroli `Te dziecko`,
+zbiór używa projektu `Pada deszcz Anna wraca.`. Dwie normatywnie dopuszczalne,
+minimalne insercje w tym samym offsecie `[11, 11)` dają różne teksty:
+`Pada deszcz. Anna wraca.` oraz `Pada deszcz; Anna wraca.`. Brak kontekstu
+dyskursowego uzasadniającego wybór znaku oznacza, że aktualny Analyzer
+abstenuje w obu profilach. Traceability jest jawnie projektowa i nie podszywa
+kandydatów pod istniejące źródło runtime. Canonical digest v4 to
+`0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c`, a digest
+manifestu to `120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`.
+Przed użyciem wyniku do #368 należy ponownie wykonać clean-wheel baseline #367.
+
 ## Definicje pomiarów
 
 Protokół ocenia tylko niezmieniony `Analyzer(AnalyzerConfig())`. Dopasowanie
