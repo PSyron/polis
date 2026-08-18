@@ -30,7 +30,7 @@ class ArchitecturePolicyTests(unittest.TestCase):
         }
         linked = re.findall(r"\(decisions/([^)]+\.md)\)", index)
 
-        self.assertEqual(len(accepted), 27)
+        self.assertEqual(len(accepted), 30)
         self.assertEqual(set(linked), accepted)
         self.assertEqual(len(linked), len(set(linked)))
         self.assertNotIn("<!--", index)

@@ -1,0 +1,22 @@
+{
+  "schema_id": "polis.rule-coverage-quality-artifact-provenance",
+  "schema_version": 1,
+  "repository": "PSyron/polis",
+  "verification": "The recorded GitHub commit URLs, object IDs, tree IDs, parent IDs, and messages are an immutable provenance record for historical public v3 artifacts. Runtime validation remains offline and never fetches the network.",
+  "sources": [
+    {
+      "source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5",
+      "authoritative_url": "https://github.com/PSyron/polis/commit/87765eae902f610ab948796f19e258c9f1dbc0a5",
+      "tree_sha": "6460dae8ce0eb42a5a47cb8c32c3a8dd79089656",
+      "parent_shas": ["1aaefd8a20dfc51b39762d5c1c878942c214e14d"],
+      "message": "Reclassify two defective v3 all-uppercase case-lowering cases (#353 F6.1)\n\nReplace all-uppercase unicode_casing_offset texts for month_weekday and\nproper_adjective with mixed-case Unicode-prefixed variants so the expected\nlowercase correction is meaningful. Runtime already abstained on the old\nall-caps forms; do not teach rules to fire inside all-uppercase text."
+    },
+    {
+      "source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
+      "authoritative_url": "https://github.com/PSyron/polis/commit/f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
+      "tree_sha": "80705f73da70197721a3b230d6299eb402a3666e",
+      "parent_shas": ["5d3c0e861611533a6137e9561e669189807966fc"],
+      "message": "Speed closed government and sentence probes without semantic change (#355)\n\nPattern-first Wave 4 government find, process-local morphology form\ncache keyed by provider identity/backend, and LRU cache for repeated\nsentence segmentation in syntax rules. No source semantics, policy, or\nv3 performance-cap edits."
+    }
+  ]
+}

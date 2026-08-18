@@ -1,0 +1,250 @@
+{
+  "schema_id": "polis.rule-coverage-contract",
+  "schema_version": 1,
+  "contract_id": "polis-conservative-v1-rule-coverage",
+  "status": "accepted",
+  "effective_date": "2026-08-18",
+  "issue": 364,
+  "parent_issue": 363,
+  "decision_owner": "Paweł Cyroń",
+  "scope": {
+    "product": "conservative deterministic Polis v1",
+    "categories": ["agreement", "inflection", "punctuation", "spelling", "syntax"],
+    "claim_boundary": "A coverage claim describes only the mapped, reviewed, public evidence units and never follows from source count or aggregate score alone.",
+    "runtime_behavior_change": "This contract adds no runtime source, rule behavior, correction policy entry, provider, dependency, or v4 case.",
+    "numeric_v4_thresholds": "No v4 quality threshold is selected here; thresholds require a measured reviewed baseline and a later approval."
+  },
+  "source_precedence": [
+    "issue-and-accepted-maintainer-clarifications",
+    "accepted-architecture-decisions",
+    "PROMPT.md",
+    "docs/project/ROADMAP.md",
+    "docs/rules.md",
+    "public-v3-quality-and-isolated-performance-artifacts"
+  ],
+  "coverage_units": [
+    {
+      "id": "source-identity",
+      "definition": "Exact public Analyzer source key, including its rule: prefix.",
+      "evidence_role": "Identifies the composed deterministic source without claiming linguistic completeness."
+    },
+    {
+      "id": "behavior-version",
+      "definition": "Exact observable implementation version paired with a source identity.",
+      "evidence_role": "Binds quality and policy evidence to the behavior that produced it."
+    },
+    {
+      "id": "rule-family",
+      "definition": "A bounded implementation family sharing one deterministic boundary and one primary operation pattern.",
+      "evidence_role": "Groups related source identities without merging their evidence or policy keys."
+    },
+    {
+      "id": "linguistic-phenomenon",
+      "definition": "The observable Polish orthographic, punctuation, agreement, inflection, or syntactic phenomenon named by evidence.",
+      "evidence_role": "Links a source or candidate to a phenomenon without treating a corpus label as normative authority."
+    },
+    {
+      "id": "public-evaluation-case",
+      "definition": "One project-authored, licensed, publicly reviewable input with a declared case kind, text, features, and expected outcome.",
+      "evidence_role": "Provides the auditable observation used by quality and sampling reports."
+    },
+    {
+      "id": "expected-finding",
+      "definition": "One exact expected minimal edit with category, half-open span, original text, suggestion, and rationale.",
+      "evidence_role": "Defines the gold contract for exact-edit, span, and suggestion metrics."
+    },
+    {
+      "id": "positive-hard-negative-pair",
+      "definition": "Two related public cases that differ in one controlled condition: one requires the qualified edit and one must remain unchanged.",
+      "evidence_role": "Demonstrates a boundary instead of merely demonstrating a positive template."
+    },
+    {
+      "id": "category-capability-claim",
+      "definition": "A bounded statement about one supported category under one profile, based on required evidence strata and not on aggregate results.",
+      "evidence_role": "Prevents source counts and aggregate recall from being reported as category completeness."
+    }
+  ],
+  "relationships": [
+    {"from": "source-identity", "to": "behavior-version", "rule": "Every source row names exactly one current behavior version."},
+    {"from": "rule-family", "to": "source-identity", "rule": "A family maps to one or more exact sources; family evidence never replaces source evidence."},
+    {"from": "linguistic-phenomenon", "to": "rule-family", "rule": "A phenomenon may map to multiple families, but each mapping records its deterministic boundary."},
+    {"from": "public-evaluation-case", "to": "expected-finding", "rule": "Only incorrect cases with deterministic gold edits carry expected findings."},
+    {"from": "positive-hard-negative-pair", "to": "public-evaluation-case", "rule": "Each pair links two cases with one declared controlled distinction."},
+    {"from": "category-capability-claim", "to": "public-evaluation-case", "rule": "A category claim is valid only when its required category and shape strata are represented."},
+    {"from": "behavior-version", "to": "expected-finding", "rule": "Quality artifacts record the source and behavior identity that emitted or was expected to emit the finding."}
+  ],
+  "profiles": [
+    {
+      "id": "provider-absent",
+      "claim": "The installed default runtime executes provider-independent deterministic sources and never treats an absent optional morphology provider as a product failure.",
+      "provider_identity": null,
+      "expected_source_families": {
+        "execute": ["provider-independent deterministic sources"],
+        "abstain": ["source identities whose qualified behavior requires the exact morphology provider"],
+        "failure": "Provider absence is not a runtime failure; a provider-dependent family must abstain without a suggestion."
+      },
+      "provider_absence_or_drift": "Missing or drifted optional provider identity is an abstention boundary. It must not be replaced by a default, a guessed tag, or a lower confidence threshold.",
+      "comparability": ["exact-edit counts and rates within the provider-absent profile", "half-open spans and exact suggestions", "correct-sentence false-alarm rate", "category and input-shape strata", "identity and behavior parity"]
+    },
+    {
+      "id": "qualified-morphology",
+      "claim": "The qualified profile executes provider-independent sources plus provider-dependent sources only with the exact approved morphology provider identity.",
+      "provider_identity": {
+        "provider": "morfeusz2",
+        "package_version": "1.99.15",
+        "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+        "dictionary_notice_sha256": "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "identity_rule": "The package, dictionary, and notice identity are checked before provider-dependent findings are emitted."
+      },
+      "expected_source_families": {
+        "execute": ["provider-independent deterministic sources", "provider-dependent sources with the exact qualified identity"],
+        "abstain": ["provider-dependent sources when the provider is missing, ambiguous, incomplete, or identity-drifted"],
+        "failure": "Provider identity drift is a fail-closed abstention for the affected source family, not permission to use an unqualified provider."
+      },
+      "provider_absence_or_drift": "The exact provider identity is part of reproducible behavior evidence. Any mismatch invalidates the provider-dependent result and is recorded as abstention or unavailable evidence.",
+      "comparability": ["all provider-absent metrics for the common source subset", "qualified-profile exact-edit counts and rates", "half-open spans and exact suggestions", "correct-sentence false-alarm rate", "category and input-shape strata", "identity and behavior parity", "isolated protocol-v2 performance only with matching environment and provider identity"]
+    }
+  ],
+  "metrics": [
+    {"id": "exact-edit-true-positives", "scope": "determinate incorrect cases", "formula": "Count predicted findings whose category, start, end, original, and suggestion exactly equal one unused expected finding.", "numerator": "exactly matched expected edits", "denominator": "count", "zero_denominator": "zero", "conflict_handling": "Exclude conflict cases from this metric.", "abstention_handling": "Exclude abstention and unsupported cases; score their violations separately."},
+    {"id": "exact-edit-false-positives", "scope": "determinate incorrect cases", "formula": "Count predicted findings not matched by any expected finding in the same case.", "numerator": "unmatched predictions", "denominator": "count", "zero_denominator": "zero", "conflict_handling": "Do not convert a conflict case into an ordinary false positive.", "abstention_handling": "A prediction in an abstention case is an abstention violation, not an exact-edit false positive."},
+    {"id": "exact-edit-false-negatives", "scope": "determinate incorrect cases", "formula": "Count expected findings left unmatched by a prediction.", "numerator": "unmatched expected edits", "denominator": "count", "zero_denominator": "zero", "conflict_handling": "Conflict cases have no determinate edit denominator.", "abstention_handling": "Expected findings are absent from abstention cases by contract."},
+    {"id": "exact-edit-precision", "scope": "determinate incorrect cases", "formula": "TP / (TP + FP).", "numerator": "exact-edit true positives", "denominator": "exact-edit true positives plus exact-edit false positives", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Use only determinate cases.", "abstention_handling": "Report abstention violations separately."},
+    {"id": "exact-edit-recall", "scope": "determinate incorrect cases", "formula": "TP / (TP + FN).", "numerator": "exact-edit true positives", "denominator": "exact-edit true positives plus exact-edit false negatives", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Use only determinate cases.", "abstention_handling": "Report unavailable and abstention strata separately."},
+    {"id": "exact-edit-f1", "scope": "determinate incorrect cases", "formula": "2 * TP / (2 * TP + FP + FN).", "numerator": "2 times exact-edit true positives", "denominator": "2 times TP plus FP plus FN", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Use only determinate cases.", "abstention_handling": "Report abstention violations separately."},
+    {"id": "exact-half-open-span-accuracy", "scope": "determinate incorrect cases", "formula": "Predictions whose [start, end) span exactly equals an unused expected finding / expected findings in determinate incorrect cases.", "numerator": "predictions with exact [start, end) span matches", "denominator": "expected findings in determinate incorrect cases", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Overlapping conflict findings are checked by the conflict policy, not this rate.", "abstention_handling": "Abstention cases have no span denominator."},
+    {"id": "exact-suggestion-accuracy", "scope": "matched spans", "formula": "Predictions whose suggestion exactly equals the expected suggestion / matched spans.", "numerator": "exact suggestion matches", "denominator": "matched expected spans", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Multiple valid corrections require an explicit canonical expected suggestion or are ambiguous.", "abstention_handling": "Any suggestion in an abstention case is a violation."},
+    {"id": "correct-sentence-false-alarm-rate", "scope": "correct cases", "formula": "Correct cases with at least one finding / correct cases.", "numerator": "alarmed correct cases", "denominator": "correct cases", "zero_denominator": "null and gate-unavailable", "conflict_handling": "A correct case is never silently reclassified as conflict.", "abstention_handling": "Unsupported or ambiguous cases are not correct cases unless explicitly declared correct."},
+    {"id": "category-counts-and-rates", "scope": "one supported category and profile", "formula": "Apply the exact-edit counts and rates after restricting both expected and predicted findings to the category.", "numerator": "category-restricted count", "denominator": "category-restricted denominator for the named metric", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Conflicts remain separate in the category report.", "abstention_handling": "Category abstention violations are reported separately."},
+    {"id": "shape-stratum-counts-and-rates", "scope": "one required input-shape stratum and profile", "formula": "Apply the exact-edit counts and rates after restricting cases to the declared stratum.", "numerator": "stratum-restricted count", "denominator": "stratum-restricted denominator for the named metric", "zero_denominator": "null and gate-unavailable", "conflict_handling": "Conflict-or-abstention is a required explicit stratum.", "abstention_handling": "Missing applicability is documented; silent omission is invalid."},
+    {"id": "source-identity-and-behavior-consistency", "scope": "runtime, inventory, policy, and quality artifacts", "formula": "Exact ordered parity of source, category where present, operation, behavior version, policy status, and artifact references.", "numerator": "matching required identity fields", "denominator": "required identity fields", "zero_denominator": "never applicable; missing fields fail", "conflict_handling": "Duplicate, missing, extra, or conflicting identities fail closed.", "abstention_handling": "Unknown identity or version is unavailable evidence, never a pass."},
+    {"id": "isolated-runtime-performance", "scope": "one qualified runtime profile and accepted protocol-v2 environment", "formula": "Use protocol-v2 latency, throughput, RSS, quality, environment, and findings-hash fields without mixing harness cost into runtime RSS.", "numerator": "protocol-defined measurement", "denominator": "protocol-defined repetitions and code points", "zero_denominator": "invalid protocol run", "conflict_handling": "A performance pass cannot waive a quality or parity failure.", "abstention_handling": "Missing, drifted, or incomparable environment is unavailable evidence and fails the gate."}
+  ],
+  "gates": {
+    "precision": {"rule": "Any precision regression against an approved measured baseline fails closed.", "failure_mode": "Aggregate recall cannot waive false positives."},
+    "correct_sentence_false_alarm": {"rule": "Any correct-sentence false-alarm regression fails closed.", "failure_mode": "Zero-tolerance false alarms remain a separate gate."},
+    "category": {"rule": "Every supported category and applicable profile must meet its evidence minima and report its own metrics.", "failure_mode": "Aggregate metrics cannot hide an under-sampled or failing category."},
+    "aggregate_recall": {"rule": "Aggregate recall is contextual and cannot establish category completeness.", "failure_mode": "A high aggregate score cannot waive a failing category or stratum."},
+    "thresholds": {"rule": "A numeric threshold is proposed only after a reviewed baseline records its value, denominator, rationale, approver, and change procedure.", "failure_mode": "This contract does not invent v4 numeric thresholds."},
+    "evidence": {"rule": "Every required claim has complete public provenance and exact identity bindings.", "failure_mode": "Unavailable, ambiguous, protected, or incomplete evidence is not a pass."},
+    "runtime_performance": {"rule": "Accepted isolated protocol-v2 performance gates are evaluated separately for each applicable profile and matching environment.", "failure_mode": "Performance cannot waive precision, false-alarm, category, or parity failure."}
+  },
+  "sampling": {
+    "global_pair_requirement": "Every supported category must contain at least one controlled positive/hard-negative pair in every applicable required shape stratum; a pair must differ by a declared condition and preserve exact provenance.",
+    "shape_strata": [
+      {"id": "simple-local", "definition": "The smallest local construction exercising one deterministic boundary.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "sentence-internal", "definition": "The construction appears inside surrounding words or punctuation in one sentence.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "multi-sentence", "definition": "The target is preceded or followed by another sentence and offsets remain document-relative.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "repeated-occurrence", "definition": "The same qualified phenomenon occurs at least twice and findings preserve order and independent spans.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "unicode-and-case", "definition": "The case exercises Polish Unicode text, casing or combining-mark boundaries and exact original offsets.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "quotation-or-literal", "definition": "Quoted, literal, code-like, or mention-shaped text tests the abstention boundary.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1},
+      {"id": "conflict-or-abstention", "definition": "An overlap, ambiguity, unsupported input, or provider-unavailable case proves fail-closed behavior.", "minimum_positive_cases": 1, "minimum_hard_negative_cases": 1}
+    ],
+    "categories": [
+      {"id": "agreement", "capability_claim": "Only the reviewed deterministic agreement phenomena mapped to exact source identities are claimed; this is not agreement completeness.", "claim_boundary": "Report separately by profile, source identity, phenomenon, and applicable shape stratum; aggregate score cannot extend the claim.", "minimum_positive_expected_findings": 8, "minimum_correct_hard_negative_cases": 16, "minimum_phenomenon_or_family_count": 3, "minimum_paired_positive_negative_examples": 4, "required_shape_strata": ["simple-local", "sentence-internal", "multi-sentence", "repeated-occurrence", "unicode-and-case", "quotation-or-literal", "conflict-or-abstention"]},
+      {"id": "inflection", "capability_claim": "Only the reviewed deterministic inflection phenomena mapped to exact source identities are claimed; this is not inflection completeness.", "claim_boundary": "Report separately by profile, source identity, phenomenon, and applicable shape stratum; aggregate score cannot extend the claim.", "minimum_positive_expected_findings": 8, "minimum_correct_hard_negative_cases": 16, "minimum_phenomenon_or_family_count": 3, "minimum_paired_positive_negative_examples": 4, "required_shape_strata": ["simple-local", "sentence-internal", "multi-sentence", "repeated-occurrence", "unicode-and-case", "quotation-or-literal", "conflict-or-abstention"]},
+      {"id": "punctuation", "capability_claim": "Only the reviewed deterministic punctuation phenomena mapped to exact source identities are claimed; this is not punctuation completeness.", "claim_boundary": "Report separately by profile, source identity, phenomenon, and applicable shape stratum; aggregate score cannot extend the claim.", "minimum_positive_expected_findings": 8, "minimum_correct_hard_negative_cases": 16, "minimum_phenomenon_or_family_count": 3, "minimum_paired_positive_negative_examples": 4, "required_shape_strata": ["simple-local", "sentence-internal", "multi-sentence", "repeated-occurrence", "unicode-and-case", "quotation-or-literal", "conflict-or-abstention"]},
+      {"id": "spelling", "capability_claim": "Only the reviewed deterministic spelling phenomena mapped to exact source identities are claimed; this is not spelling completeness.", "claim_boundary": "Report separately by profile, source identity, phenomenon, and applicable shape stratum; aggregate score cannot extend the claim.", "minimum_positive_expected_findings": 8, "minimum_correct_hard_negative_cases": 16, "minimum_phenomenon_or_family_count": 3, "minimum_paired_positive_negative_examples": 4, "required_shape_strata": ["simple-local", "sentence-internal", "multi-sentence", "repeated-occurrence", "unicode-and-case", "quotation-or-literal", "conflict-or-abstention"]},
+      {"id": "syntax", "capability_claim": "Only the reviewed deterministic syntax phenomena mapped to exact source identities are claimed; this is not syntax completeness.", "claim_boundary": "Report separately by profile, source identity, phenomenon, and applicable shape stratum; aggregate score cannot extend the claim.", "minimum_positive_expected_findings": 8, "minimum_correct_hard_negative_cases": 16, "minimum_phenomenon_or_family_count": 3, "minimum_paired_positive_negative_examples": 4, "required_shape_strata": ["simple-local", "sentence-internal", "multi-sentence", "repeated-occurrence", "unicode-and-case", "quotation-or-literal", "conflict-or-abstention"]}
+    ],
+    "category_applicability": {
+      "agreement": {"simple-local": "required", "sentence-internal": "required", "multi-sentence": "required", "repeated-occurrence": "required", "unicode-and-case": "required", "quotation-or-literal": "required", "conflict-or-abstention": "required", "not_applicable_reasons": {}},
+      "inflection": {"simple-local": "required", "sentence-internal": "required", "multi-sentence": "required", "repeated-occurrence": "required", "unicode-and-case": "required", "quotation-or-literal": "required", "conflict-or-abstention": "required", "not_applicable_reasons": {}},
+      "punctuation": {"simple-local": "required", "sentence-internal": "required", "multi-sentence": "required", "repeated-occurrence": "required", "unicode-and-case": "required", "quotation-or-literal": "required", "conflict-or-abstention": "required", "not_applicable_reasons": {}},
+      "spelling": {"simple-local": "required", "sentence-internal": "required", "multi-sentence": "required", "repeated-occurrence": "required", "unicode-and-case": "required", "quotation-or-literal": "required", "conflict-or-abstention": "required", "not_applicable_reasons": {}},
+      "syntax": {"simple-local": "required", "sentence-internal": "required", "multi-sentence": "required", "repeated-occurrence": "required", "unicode-and-case": "required", "quotation-or-literal": "required", "conflict-or-abstention": "required", "not_applicable_reasons": {}}
+    },
+    "provider_distinction": {
+      "when_applicable": "Required for every source family whose deterministic boundary depends on morphology; not applicable sources record a reason rather than omitting the distinction.",
+      "provider_absent_minimum_cases": 2,
+      "provider_present_minimum_cases": 2
+    }
+  },
+  "ambiguity_policy": {
+    "overlapping_expected_findings": "Represent the overlap as an explicit conflict case with all expected findings and require the runtime to abstain unless a later policy explicitly resolves it.",
+    "multiple_valid_corrections": "Choose one canonical correction only when a normative and deterministic authority selects it; otherwise classify the case as ambiguous and require abstention.",
+    "conflicting_rule_families": "Do not rank conflicting families by aggregate score; record the conflict and require an explicit deterministic resolution or abstention.",
+    "repeated_occurrences": "Score each occurrence independently with exact document-relative half-open [start, end) offsets and preserve deterministic output order.",
+    "same_span_different_sources": "Keep source identities distinct; a duplicate span is not permission to merge or silently drop evidence.",
+    "ambiguous_morphology": "Missing, ambiguous, incomplete, or drifted morphology produces abstention and no finding for the dependent family.",
+    "correct_text_resembling_template": "A hard negative remains correct unless an exact local boundary and normative rationale justify a finding.",
+    "malformed_or_unsupported_input": "Fail closed with no suggestion and a documented applicability reason; do not coerce the input into a supported shape."
+  },
+  "correction_governance": {
+    "new_family_default": "review-only",
+    "automatic_promotion": "Separate policy decision; never an implicit completion condition for coverage or qualification.",
+    "automatic_identity_key": ["source", "category", "operation", "behavior_version", "source_policy_version"],
+    "automatic_requirements": ["exact source and behavior key", "conflict safety", "correction idempotence evidence", "separate maintainer approval"]
+  },
+  "source_governance": {
+    "runtime_snapshot": {
+      "derivation": "Analyzer(AnalyzerConfig()).source_identity_snapshot from the public composition root.",
+      "fields": ["source", "operation", "behavior_version"],
+      "order": "Exact deterministic registration order; sets and manually duplicated counts are invalid.",
+      "digest": {"algorithm": "sha256", "canonicalization": "UTF-8 JSON array of ordered identity objects, sorted object keys, compact separators, ensure_ascii=false."},
+      "planning_baseline": {"full_sha": "59d5a62f12d529f64b3355412d6d316a5d6eb4ae", "source_count": 59, "snapshot_sha256": "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"}
+    },
+    "maintained_rule_inventory": {
+      "path": "docs/rules.md",
+      "parity_rule": "Every runtime source identity appears exactly once in the maintained table; missing, extra, duplicate, category, or scope identities fail.",
+      "rows_sha256": "289a8f720c7b7ecad2c5936121da3c6fe86534792ef89aae4034c992b94a844f",
+      "row_canonicalization": "UTF-8 JSON array of ordered source, category, and scope objects, sorted object keys, compact separators, ensure_ascii=false."
+    },
+    "behavior_versions": {"path": "Analyzer.source_identity_snapshot and the registered VersionedRule metadata", "parity_rule": "Every quality and policy artifact records the exact operation and behavior_version; drift is an error."},
+    "correction_policy": {
+      "path": "src/polis/correction/policy.py",
+      "parity_rule": "Automatic status is derived from the complete exact policy key and policy version; unknown status is not review-only by implication and fails validation.",
+      "policy_version": "1.2",
+      "active_automatic_entries": [
+        {"source": "rule:agreement.copula", "category": "agreement", "operation": "replace.copula_form", "behavior_version": "agreement-copula/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:spelling.jestes", "category": "spelling", "operation": "replace.common_typo", "behavior_version": "spelling-jestes/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:spelling.wlasnie", "category": "spelling", "operation": "replace.common_typo", "behavior_version": "spelling-wlasnie/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:spelling.zeby", "category": "spelling", "operation": "replace.common_typo", "behavior_version": "spelling-zeby/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:syntax.comma_space", "category": "punctuation", "operation": "normalize.comma_spacing", "behavior_version": "syntax-comma-space/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:syntax.list_space", "category": "syntax", "operation": "normalize.list_marker_spacing", "behavior_version": "syntax-list-space/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:syntax.quote_space", "category": "punctuation", "operation": "normalize.quote_spacing", "behavior_version": "syntax-quote-space/1.0", "source_policy_version": "1.2"},
+        {"source": "rule:syntax.sentence_space", "category": "punctuation", "operation": "normalize.sentence_spacing", "behavior_version": "syntax-sentence-space/1.0", "source_policy_version": "1.2"}
+      ]
+    },
+    "quality_artifacts": {
+      "path": "docs/quality-comparison-v3.json and versioned public quality manifests",
+      "parity_rule": "Artifacts bind their published source SHA, dataset identity, profile, and provider identity where applicable; historical source SHAs are paired with the durable offline provenance manifest, while the runtime snapshot and behavior versions are checked independently because the historical v3 artifacts do not publish those fields.",
+      "comparison_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
+      "comparison_source_snapshot_sha256": null,
+      "comparison_sha256": "b16ce0a44d46d06ed0b61a49a7153797338c93a616fff5c634c7c676ebe87c16",
+      "baseline_source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5",
+      "result_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
+      "provenance_manifest_path": "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
+      "provenance_manifest_sha256": "c93286096d2d376a4f1502f544a1d3c99eccbd8f222ba3df5ac76bfcfe7506c0"
+    },
+    "normative_candidate_inventory": {
+      "path": "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
+      "parity_rule": "The inventory separates normative authorities from candidate sources, maps every supported category, and fails closed on missing, extra, duplicate, reordered, or unmapped source identities.",
+      "schema_id": "polis.rule-normative-candidate-inventory",
+      "schema_version": 1,
+      "sha256": "79e24a783d0aae59e73225dcd5c2ef5e874a010eeb6dffbfd9c7ce0e5fecfe3e"
+    },
+    "parity_failure": "Missing, extra, duplicate, reordered, or mismatched source, operation, behavior, policy, normative/candidate inventory, or artifact identity drift fails closed."
+  },
+  "exclusions": [
+    "runtime rule registration or behavior changes",
+    "authoring v4 cases or selecting v4 numeric thresholds",
+    "qualifying exact new rule families",
+    "automatic-correction promotion",
+    "changing correction-policy eligibility",
+    "optional research or research-only implementation",
+    "calibration, holdout, sealed, private, or consumed research evidence",
+    "models, network, Java, broad LanguageTool, or a new production dependency",
+    "style, semantic, entity, world-knowledge, OCR, or unrestricted rewriting",
+    "release and packaging work",
+    "normative authority claims from corpora, frequency, dictionaries, or LanguageTool alone"
+  ],
+  "maintainer_approval": {
+    "status": "approved",
+    "approver": "Paweł Cyroń",
+    "approved_date": "2026-08-18",
+    "issue": 364,
+    "scope": ["sampling requirements", "gate policy"],
+    "record": "Maintainer approval is recorded for this contract decision and its sampling/gate policy; later threshold values and runtime families require their own evidence and approval."
+  }
+}

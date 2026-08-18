@@ -34,6 +34,9 @@ późniejszy ADR.
 | [ADR-0025](decisions/0025-runtime-source-cohort-evolution.md) | Zaakceptowany | Niezmienna kohorta kwalifikacji i historyczny cel runtime 28 (cel runtime supersedowany przez ADR-0026) |
 | [ADR-0026](decisions/0026-runtime-source-cohort-umbrella-f.md) | Zaakceptowany | Docelowa kohorta runtime'u Umbrella F (`exact-ordered-59`) |
 | [ADR-0027](decisions/0027-isolated-runtime-performance-protocol.md) | Zaakceptowany | Izolowany runtime-only protokół pomiaru wydajności v2 |
+| [ADR-0028](decisions/0028-conservative-v1-rule-coverage-contract.md) | Zaakceptowany | Kontrakt pokrycia reguł konserwatywnego runtime'u v1 |
+| [ADR-0029](decisions/0029-rule-coverage-contract-validator-hardening.md) | Zaakceptowany | Utwardzenie validatora kontraktu pokrycia reguł |
+| [ADR-0030](decisions/0030-rule-coverage-authority-and-applicability-clarification.md) | Zaakceptowany | Podstawy normatywne, kandydackie i aplikowalność stratum pokrycia reguł |
 
 [Granica protokołów runtime'u v1](protocols.md) opisuje punkty rozdziału
 implementacji zgodne z zaakceptowanym kontraktem publicznego API.
@@ -44,3 +47,6 @@ Bieżące źródła runtime'u v1 opisuje [wykaz reguł](../rules.md), a ich
 konserwatywny zakres określają ADR-0022, ADR-0025 (kwalifikacja 20),
 ADR-0026 (docelowy composition root Umbrella F) oraz ADR-0027 (izolowany
 pomiar wydajności runtime'u).
+Kontrakt pokrycia kategorii i dowodów opisuje ADR-0028.
+Wykonywanie i fail-closed validatora tego kontraktu doprecyzowuje ADR-0029.
+Podstawy normatywne i kandydackie oraz maszynową aplikowalność stratum doprecyzowuje ADR-0030.
