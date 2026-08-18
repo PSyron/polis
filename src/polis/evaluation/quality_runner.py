@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import importlib.metadata
 import json
+import math
 import platform
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -92,6 +95,13 @@ def _artifact_sha256(value: str) -> str:
     return value
 
 
+def _nonnegative_float(value: str) -> float:
+    parsed = float(value)
+    if not math.isfinite(parsed) or parsed < 0:
+        raise argparse.ArgumentTypeError("must be a finite number greater than 0")
+    return parsed
+
+
 def _source_sha(value: str) -> str:
     if _SOURCE_SHA_PATTERN.fullmatch(value) is None:
         raise argparse.ArgumentTypeError(
@@ -125,6 +135,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "--artifact-sha256", type=_artifact_sha256, required=True
         )
         measurement.add_argument("--source-sha", type=_source_sha)
+        measurement.add_argument("--wheel-path", type=Path)
         measurement.add_argument(
             "--profile", type=InstallationProfile, choices=tuple(InstallationProfile)
         )
@@ -139,12 +150,51 @@ def _build_parser() -> argparse.ArgumentParser:
     candidate.add_argument("--baseline", type=Path, required=True)
     candidate.add_argument("--morphology-baseline", type=Path, required=True)
     candidate.add_argument("--wheel-filename", required=True)
+    candidate.add_argument("--wheel-path", type=Path, required=True)
+    candidate.add_argument("--protocol-sha256", type=_artifact_sha256, required=True)
+    candidate.add_argument("--worker-sha256", type=_artifact_sha256, required=True)
     candidate.add_argument("--performance-default-reference", type=Path, required=True)
+    candidate.add_argument(
+        "--performance-default-reference-sha256",
+        type=_artifact_sha256,
+        required=True,
+    )
     candidate.add_argument("--performance-default-current", type=Path, required=True)
+    candidate.add_argument(
+        "--performance-default-current-sha256",
+        type=_artifact_sha256,
+        required=True,
+    )
     candidate.add_argument(
         "--performance-morphology-reference", type=Path, required=True
     )
+    candidate.add_argument(
+        "--performance-morphology-reference-sha256",
+        type=_artifact_sha256,
+        required=True,
+    )
     candidate.add_argument("--performance-morphology-current", type=Path, required=True)
+    candidate.add_argument(
+        "--performance-morphology-current-sha256",
+        type=_artifact_sha256,
+        required=True,
+    )
+    for profile in ("default", "morphology"):
+        candidate.add_argument(
+            f"--{profile}-maximum-p95-latency-ns",
+            type=_nonnegative_integer,
+            required=True,
+        )
+        candidate.add_argument(
+            f"--{profile}-minimum-throughput-cases-per-second",
+            type=_nonnegative_float,
+            required=True,
+        )
+        candidate.add_argument(
+            f"--{profile}-maximum-worker-incremental-peak-rss-bytes",
+            type=_nonnegative_integer,
+            required=True,
+        )
     candidate.add_argument("--output", type=Path, required=True)
     candidate.add_argument("--replace", action="store_true")
 
@@ -192,6 +242,72 @@ def _manifest_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _validate_source_repository(source_sha: str) -> None:
+    """Bind a measured source SHA to the repository available to the runner."""
+
+    try:
+        root = subprocess.run(
+            ["git", "-C", str(Path.cwd()), "rev-parse", "--show-toplevel"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        resolved = subprocess.run(
+            ["git", "-C", root, "rev-parse", "--verify", f"{source_sha}^{{commit}}"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise QualityReportError(
+            "v4 source SHA cannot be bound to the current repository"
+        ) from error
+    if resolved != source_sha:
+        raise QualityReportError(
+            "v4 source SHA must identify a commit in the current repository"
+        )
+
+
+def _validate_wheel_file(path: Path, artifact_sha256: str) -> None:
+    if not path.is_file() or path.suffix != ".whl":
+        raise QualityReportError("v4 wheel path must point to an existing wheel")
+    if _file_sha256(path) != artifact_sha256:
+        raise QualityReportError("v4 wheel digest does not match declared artifact")
+
+
+def _validate_installed_wheel(path: Path, artifact_sha256: str) -> None:
+    """Verify the wheel and the distribution executing this runner.
+
+    This deliberately verifies an existing wheel file; it never attempts to
+    reconstruct a wheel from an installed package when that file is absent.
+    """
+
+    _validate_wheel_file(path, artifact_sha256)
+    distribution = importlib.metadata.distribution("polis-nlp")
+    if distribution.metadata.get("Name") != "polis-nlp":
+        raise QualityReportError("v4 installed distribution identity mismatch")
+    module = importlib.import_module("polis")
+    installed_init = Path(str(distribution.locate_file("polis/__init__.py"))).resolve()
+    module_path = Path(module.__file__ or "").resolve()
+    if module_path != installed_init:
+        raise QualityReportError(
+            "v4 runner is not executing the installed distribution"
+        )
+
+
+def _validate_v4_runtime_inputs(args: argparse.Namespace) -> None:
+    if args.source_sha is None or args.wheel_path is None:
+        raise QualityReportError(
+            "v4 measurement requires source SHA and an existing wheel path"
+        )
+    _validate_source_repository(args.source_sha)
+    _validate_installed_wheel(args.wheel_path, args.artifact_sha256)
+
+
 def _profile_identity(profile: InstallationProfile) -> RunProfile:
     if profile is InstallationProfile.DEFAULT:
         try:
@@ -235,6 +351,8 @@ def _run_baseline(args: argparse.Namespace, *, result_schema: bool = False) -> N
         version=version,
     )
     _require_complete_review(dataset)
+    if version is QualityDatasetVersion.V4:
+        _validate_v4_runtime_inputs(args)
     analyzer = Analyzer(AnalyzerConfig())
     identity = RunIdentity(
         analyzer=_ANALYZER_IDENTITY,
@@ -362,6 +480,7 @@ def _performance_payload(report: object) -> dict[str, object]:
         "maximum_p95_latency_ns": report.latency.p95_ns,
         "minimum_throughput_cases_per_second": report.throughput.cases_per_second,
         "maximum_peak_rss_bytes": report.resources.peak_rss_bytes,
+        "maximum_worker_incremental_peak_rss_bytes": 0,
         "required_warmup_repetitions": report.warmup_repetitions,
         "required_measured_repetitions": report.measured_repetitions,
         "require_identical_repetition_hashes": True,
@@ -377,6 +496,91 @@ def _performance_payload(report: object) -> dict[str, object]:
         "environment_mismatch": "fail",
         "performance_regression": "fail",
     }
+
+
+def _proposal_gates(
+    report: QualityReport,
+    performance_reference: dict[str, object],
+    thresholds: dict[str, object],
+) -> list[dict[str, object]]:
+    diagnostics = report.diagnostics
+    assert isinstance(diagnostics, dict)
+    gates: list[dict[str, object]] = []
+
+    def add(scope: str, metric: str, baseline: object, threshold: object) -> None:
+        gates.append(
+            {
+                "scope": scope,
+                "metric": metric,
+                "measured_baseline": baseline,
+                "proposed_threshold": threshold,
+                "rationale": "Measured v4 baseline; maintainer approval required.",
+                "allowed_variation": 0.0,
+                "regression_risk": "quality or performance regression",
+                "maintainer_decision": None,
+                "effective_schema_version": 4,
+            }
+        )
+
+    quality_keys = (
+        ("precision", "exact_edit_precision", "minimum_precision"),
+        ("recall", "exact_edit_recall", "minimum_recall"),
+        ("f1", "exact_edit_f1", "minimum_f1"),
+        ("span_accuracy", "span_accuracy", "minimum_exact_span_accuracy"),
+        (
+            "suggestion_accuracy",
+            "suggestion_accuracy",
+            "minimum_exact_correction_accuracy",
+        ),
+        (
+            "false_alarm_rate",
+            "correct_sentence_false_alarm_rate",
+            "maximum_false_alarm_rate",
+        ),
+    )
+    for scope, raw in [("aggregate", diagnostics["aggregate"])]:
+        for metric, field, _ in quality_keys:
+            add(scope, metric, raw[field], raw[field])
+    for category in sorted(diagnostics["category"]):
+        raw = diagnostics["category"][category]
+        for metric, field, _ in quality_keys:
+            add(f"category:{category}", metric, raw[field], raw[field])
+    for category in sorted(diagnostics["shape_strata"]):
+        for shape in sorted(diagnostics["shape_strata"][category]):
+            raw = diagnostics["shape_strata"][category][shape]
+            for metric, field, _ in quality_keys:
+                add(f"stratum:{category}:{shape}", metric, raw[field], raw[field])
+    add("source", "exact-ordered-59-parity", True, True)
+    for name in ("conflict", "abstention"):
+        add(f"control:{name}", "zero-violations", 0, 0)
+    performance = performance_reference["performance"]
+    rss = performance_reference["rss"]
+    if not isinstance(performance, dict) or not isinstance(rss, dict):
+        raise QualityReportError("v4 performance artifact metrics are malformed")
+    latency = performance["latency_ns"]
+    throughput = performance["throughput"]
+    if not isinstance(latency, dict) or not isinstance(throughput, dict):
+        raise QualityReportError("v4 performance artifact metrics are malformed")
+    add(
+        "performance",
+        "maximum_p95_latency_ns",
+        latency["p95"],
+        thresholds["maximum_p95_latency_ns"],
+    )
+    add(
+        "performance",
+        "minimum_throughput_cases_per_second",
+        throughput["cases_per_second"],
+        thresholds["minimum_throughput_cases_per_second"],
+    )
+    add(
+        "performance",
+        "maximum_worker_incremental_peak_rss_bytes",
+        rss["worker_measured_incremental_peak_rss_bytes"],
+        thresholds["maximum_worker_incremental_peak_rss_bytes"],
+    )
+    add("performance", "reproducibility", True, True)
+    return gates
 
 
 def _pending_v4_proposal(args: argparse.Namespace) -> None:
@@ -401,20 +605,64 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
     if args.wheel_filename != Path(args.wheel_filename).name:
         raise QualityReportError("v4 proposal wheel_filename must be a filename")
 
-    def performance_binding(path: Path) -> dict[str, object]:
+    _validate_wheel_file(args.wheel_path, default.artifact_sha256)
+    if Path(args.wheel_path).name != args.wheel_filename:
+        raise QualityReportError("v4 proposal wheel filename does not match wheel path")
+
+    def performance_binding(path: Path, expected_sha256: str) -> dict[str, object]:
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+        if _file_sha256(path) != expected_sha256:
+            raise QualityReportError("v4 performance artifact digest mismatch")
+        if not isinstance(artifact, dict):
+            raise QualityReportError("v4 performance artifact is malformed")
+        implementation = artifact.get("protocol_implementation")
+        identity = artifact.get("identity")
+        artifact_identity = artifact.get("artifact")
+        source_identity = artifact.get("source")
+        if not isinstance(implementation, dict) or not isinstance(identity, dict):
+            raise QualityReportError("v4 performance artifact identity is missing")
+        if not isinstance(artifact_identity, dict) or not isinstance(
+            source_identity, dict
+        ):
+            raise QualityReportError("v4 performance artifact binding is malformed")
+        if artifact.get("protocol_version") != 2:
+            raise QualityReportError(
+                "v4 performance artifact protocol version mismatch"
+            )
+        if (
+            implementation.get("runtime_performance_protocol_sha256")
+            != args.protocol_sha256
+            or implementation.get("runtime_performance_worker_sha256")
+            != args.worker_sha256
+        ):
+            raise QualityReportError(
+                "v4 performance artifact protocol or worker digest mismatch"
+            )
+        if artifact_identity.get("wheel_sha256") != default.artifact_sha256:
+            raise QualityReportError("v4 performance artifact wheel identity mismatch")
+        if source_identity.get("git_sha") != default.run_identity.source_sha:
+            raise QualityReportError("v4 performance artifact source identity mismatch")
+        if (
+            identity.get("source_git_sha") != default.run_identity.source_sha
+            or identity.get("wheel_sha256") != default.artifact_sha256
+        ):
+            raise QualityReportError("v4 performance artifact identity mismatch")
         return {
             "path": str(path),
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "sha256": expected_sha256,
             "protocol_version": 2,
-            "protocol_sha256": "REQUIRED_PROTOCOL_SHA256",
-            "worker_sha256": "REQUIRED_WORKER_SHA256",
+            "protocol_sha256": args.protocol_sha256,
+            "worker_sha256": args.worker_sha256,
         }
 
     def profile(
         report: QualityReport,
         path: Path,
         performance_reference: Path,
+        performance_reference_sha256: str,
         performance_current: Path,
+        performance_current_sha256: str,
+        thresholds: dict[str, object],
     ) -> dict[str, object]:
         assert hasattr(report, "diagnostics")
         diagnostics = report.diagnostics
@@ -454,22 +702,21 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
                     "syntax",
                 )
             },
-            "performance_comparison": _performance_payload(report),
-            "performance_artifact": performance_binding(performance_reference),
-            "performance_result_artifact": performance_binding(performance_current),
-            "gates": [
-                {
-                    "scope": "aggregate",
-                    "metric": "quality",
-                    "measured_baseline": report.quality_f1,
-                    "proposed_threshold": report.quality_f1,
-                    "rationale": "Measured v4 baseline; maintainer approval required.",
-                    "allowed_variation": 0.0,
-                    "regression_risk": "quality regression",
-                    "maintainer_decision": None,
-                    "effective_schema_version": 4,
-                }
-            ],
+            "performance_comparison": {
+                **_performance_payload(report),
+                **thresholds,
+            },
+            "performance_artifact": performance_binding(
+                performance_reference, performance_reference_sha256
+            ),
+            "performance_result_artifact": performance_binding(
+                performance_current, performance_current_sha256
+            ),
+            "gates": _proposal_gates(
+                report,
+                json.loads(performance_reference.read_text(encoding="utf-8")),
+                thresholds,
+            ),
         }
 
     payload = {
@@ -481,19 +728,42 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
         "source_git_sha": default.run_identity.source_sha,
         "wheel_sha256": default.run_identity.artifact_sha256,
         "wheel_filename": args.wheel_filename,
+        "wheel_path": str(args.wheel_path),
         "source_snapshot": list(default.source_snapshot or ()),
         "profiles": {
             "default": profile(
                 default,
                 args.baseline,
                 args.performance_default_reference,
+                args.performance_default_reference_sha256,
                 args.performance_default_current,
+                args.performance_default_current_sha256,
+                {
+                    "maximum_p95_latency_ns": args.default_maximum_p95_latency_ns,
+                    "minimum_throughput_cases_per_second": (
+                        args.default_minimum_throughput_cases_per_second
+                    ),
+                    "maximum_worker_incremental_peak_rss_bytes": (
+                        args.default_maximum_worker_incremental_peak_rss_bytes
+                    ),
+                },
             ),
             "morphology": profile(
                 morphology,
                 args.morphology_baseline,
                 args.performance_morphology_reference,
+                args.performance_morphology_reference_sha256,
                 args.performance_morphology_current,
+                args.performance_morphology_current_sha256,
+                {
+                    "maximum_p95_latency_ns": args.morphology_maximum_p95_latency_ns,
+                    "minimum_throughput_cases_per_second": (
+                        args.morphology_minimum_throughput_cases_per_second
+                    ),
+                    "maximum_worker_incremental_peak_rss_bytes": (
+                        args.morphology_maximum_worker_incremental_peak_rss_bytes
+                    ),
+                },
             ),
         },
         "status": "pending_maintainer_approval",
@@ -504,6 +774,19 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
     with args.output.open(mode, encoding="utf-8", newline="\n") as stream:
         json.dump(payload, stream, ensure_ascii=False, sort_keys=True, indent=2)
         stream.write("\n")
+    # Exercise the writer -> parser -> validator boundary before returning a
+    # generated proposal to a maintainer.
+    from polis.evaluation.quality_report_proposal import (
+        load_threshold_proposal,
+        validate_threshold_proposal,
+    )
+
+    generated = load_threshold_proposal(args.output)
+    validate_threshold_proposal(
+        generated,
+        baseline_path=args.baseline,
+        morphology_baseline_path=args.morphology_baseline,
+    )
 
 
 def _validate_proposal(args: argparse.Namespace) -> None:
@@ -532,6 +815,12 @@ def run(argv: list[str] | None = None) -> int:
             for flag, value in (
                 ("--source-sha", args.source_sha),
                 ("--profile", args.profile),
+                (
+                    "--wheel-path",
+                    args.wheel_path
+                    if args.dataset_version is QualityDatasetVersion.V4
+                    else True,
+                ),
             )
             if value is None
         )
@@ -541,8 +830,21 @@ def run(argv: list[str] | None = None) -> int:
     if args.command == "result" and args.dataset_version is QualityDatasetVersion.V1:
         parser.error("result requires dataset version v2, v3, or v4")
     if args.command == "baseline" and args.dataset_version is QualityDatasetVersion.V1:
-        if args.source_sha is not None or args.profile is not None:
-            parser.error("source SHA and profile are reserved for v2/v3 baselines")
+        if (
+            args.source_sha is not None
+            or args.profile is not None
+            or args.wheel_path is not None
+        ):
+            parser.error(
+                "source SHA, profile, and wheel path are reserved for "
+                "v2/v3/v4 baselines"
+            )
+    if (
+        args.command in {"baseline", "result"}
+        and args.dataset_version is not QualityDatasetVersion.V4
+        and args.wheel_path is not None
+    ):
+        parser.error("wheel path is reserved for v4 measurements")
     try:
         if args.command in {"baseline", "result"}:
             _run_baseline(args, result_schema=args.command == "result")

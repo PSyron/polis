@@ -111,13 +111,13 @@ def compare_quality_v4(
         _validate_controls(baseline[profile_id])
         _validate_controls(result[profile_id])
         _validate_performance_identity(baseline[profile_id], result[profile_id])
-        _validate_isolated_performance(
+        isolated_reference = _validate_isolated_performance(
             proposal_value,
             profile_id,
             expected_role="reference",
             report=baseline[profile_id],
         )
-        _validate_isolated_performance(
+        isolated_current = _validate_isolated_performance(
             proposal_value,
             profile_id,
             expected_role="current",
@@ -144,7 +144,7 @@ def compare_quality_v4(
             "detail": "source diagnostics reconcile with the live snapshot",
         }
         performance_gates = _performance_gates(
-            baseline[profile_id], result[profile_id], floors.performance
+            isolated_reference, isolated_current, floors.performance
         )
         all_gates = [
             *gates,
@@ -218,7 +218,7 @@ def _validate_isolated_performance(
     *,
     expected_role: str,
     report: QualityReport,
-) -> None:
+) -> dict[str, Any]:
     values = getattr(proposal, profile_id)
     binding = (
         values.performance_baseline
@@ -236,8 +236,7 @@ def _validate_isolated_performance(
         expected_wheel_sha256=proposal.wheel_sha256,
         expected_role=expected_role,
     )
-    if artifact["performance"]["latency_ns"]["p95"] != (report.latency.p95_ns):
-        raise QualityReportError("v4 quality and isolated performance p95 mismatch")
+    return dict(artifact)
 
 
 def _validate_controls(report: QualityReport) -> None:
@@ -275,38 +274,47 @@ def _validate_performance_identity(
 
 
 def _performance_gates(
-    baseline: QualityReport,
-    result: QualityReport,
+    baseline: dict[str, Any],
+    result: dict[str, Any],
     performance: Any,
 ) -> list[dict[str, Any]]:
     checks = (
         (
             "performance.maximum_p95_latency_ns",
-            result.latency.p95_ns <= performance.maximum_p95_latency_ns,
+            result["performance"]["latency_ns"]["p95"]
+            <= performance.maximum_p95_latency_ns,
             (
-                f"measured={result.latency.p95_ns}, "
+                f"measured={result['performance']['latency_ns']['p95']}, "
                 f"maximum={performance.maximum_p95_latency_ns}"
             ),
         ),
         (
             "performance.minimum_throughput_cases_per_second",
-            result.throughput.cases_per_second
+            result["performance"]["throughput"]["cases_per_second"]
             >= performance.minimum_throughput_cases_per_second,
             (
-                f"measured={result.throughput.cases_per_second}, "
+                f"measured={result['performance']['throughput']['cases_per_second']}, "
                 f"minimum={performance.minimum_throughput_cases_per_second}"
             ),
         ),
         (
             "performance.maximum_worker_incremental_peak_rss_bytes",
-            True,
-            "isolated worker RSS is validated from the bound runtime artifact",
+            result["rss"]["worker_measured_incremental_peak_rss_bytes"]
+            <= performance.maximum_worker_incremental_peak_rss_bytes,
+            (
+                "measured="
+                f"{result['rss']['worker_measured_incremental_peak_rss_bytes']}, "
+                f"maximum={performance.maximum_worker_incremental_peak_rss_bytes}"
+            ),
         ),
         (
             "performance.reproducibility",
-            baseline.repetition_hashes == result.repetition_hashes
-            and result.measured_repetitions == performance.required_measured_repetitions
-            and result.warmup_repetitions == performance.required_warmup_repetitions,
+            baseline["reproducibility"]["findings_sha256"]
+            == result["reproducibility"]["findings_sha256"]
+            and result["reproducibility"]["measured_repetitions"]
+            == performance.required_measured_repetitions
+            and result["reproducibility"]["warmup_repetitions"]
+            == performance.required_warmup_repetitions,
             "repetition, warmup, and measured counts match the approved protocol",
         ),
     )
@@ -648,18 +656,64 @@ def _source_arithmetic(row: dict[str, Any]) -> bool:
 
 
 def _source_rows_reconcile(report: QualityReport) -> bool:
-    rows = report.diagnostics["source"]
-    if not isinstance(rows, list) or report.source_snapshot is None:
+    diagnostics = report.diagnostics
+    rows = diagnostics["source"]
+    aggregate = diagnostics["aggregate"]
+    categories = diagnostics["category"]
+    if (
+        not isinstance(rows, list)
+        or not isinstance(aggregate, dict)
+        or not isinstance(categories, dict)
+        or report.source_snapshot is None
+        or len(rows) != 59
+    ):
         return False
-    return [row.get("source") for row in rows if isinstance(row, dict)] == [
+    if [row.get("source") for row in rows if isinstance(row, dict)] != [
         item["source"] for item in report.source_snapshot
-    ] and all(
-        isinstance(row, dict)
-        and row.get("operation") == snapshot["operation"]
-        and row.get("behavior_version") == snapshot["behavior_version"]
-        and _source_arithmetic(row)
-        for row, snapshot in zip(rows, report.source_snapshot, strict=True)
+    ]:
+        return False
+    fields = (
+        ("predicted_count", "predicted_findings"),
+        ("expected_count", "expected_findings"),
+        ("exact_match_count", "true_positives"),
+        ("false_positive_count", "false_positives"),
+        ("false_negative_count", "false_negatives"),
     )
+    for row, snapshot in zip(rows, report.source_snapshot, strict=True):
+        if not isinstance(row, dict):
+            return False
+        if (
+            row.get("operation") != snapshot["operation"]
+            or row.get("behavior_version") != snapshot["behavior_version"]
+            or not _source_arithmetic(row)
+        ):
+            return False
+        status = row["status"]
+        counters = tuple(int(row[field]) for field, _ in fields)
+        if status in {"abstained", "control", "unmeasured"} and any(counters):
+            return False
+        if status == "unmeasured" and row["case_ids"]:
+            return False
+        if status in {"measured", "abstained", "control"} and not row["case_ids"]:
+            return False
+        if status == "measured" and row["category"] is None:
+            return False
+    for source_field, aggregate_field in fields:
+        if sum(
+            int(row[source_field]) for row in rows if row["status"] == "measured"
+        ) != int(aggregate[aggregate_field]):
+            return False
+    for category, values in categories.items():
+        if not isinstance(values, dict):
+            return False
+        for source_field, aggregate_field in fields:
+            if sum(
+                int(row[source_field])
+                for row in rows
+                if row["status"] == "measured" and row["category"] == category
+            ) != int(values[aggregate_field]):
+                return False
+    return True
 
 
 def _source_parity(report: QualityReport) -> dict[str, Any]:

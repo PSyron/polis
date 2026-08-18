@@ -175,6 +175,7 @@ class ThresholdProposalV4:
     source_git_sha: str
     wheel_sha256: str
     wheel_filename: str
+    wheel_path: str
     source_snapshot: tuple[dict[str, str], ...]
     effective_schema_version: int
     default: ProfileThresholdProposalV4

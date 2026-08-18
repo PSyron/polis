@@ -71,6 +71,52 @@ _SHAPES = {
     "quotation-or-literal",
     "conflict-or-abstention",
 }
+_QUALITY_GATE_METRICS = (
+    ("precision", "exact_edit_precision", "minimum_precision"),
+    ("recall", "exact_edit_recall", "minimum_recall"),
+    ("f1", "exact_edit_f1", "minimum_f1"),
+    ("span_accuracy", "span_accuracy", "minimum_exact_span_accuracy"),
+    (
+        "suggestion_accuracy",
+        "suggestion_accuracy",
+        "minimum_exact_correction_accuracy",
+    ),
+    (
+        "false_alarm_rate",
+        "correct_sentence_false_alarm_rate",
+        "maximum_false_alarm_rate",
+    ),
+)
+_PERFORMANCE_GATE_METRICS = (
+    "maximum_p95_latency_ns",
+    "minimum_throughput_cases_per_second",
+    "maximum_worker_incremental_peak_rss_bytes",
+    "reproducibility",
+)
+
+
+def expected_v4_gate_ids() -> tuple[str, ...]:
+    """Return the complete, versioned proposal gate coverage contract."""
+
+    result: list[str] = []
+    for scope in ("aggregate",):
+        result.extend(f"{scope}:{metric[0]}" for metric in _QUALITY_GATE_METRICS)
+    for category in sorted(_CATEGORIES):
+        result.extend(
+            f"category:{category}:{metric[0]}" for metric in _QUALITY_GATE_METRICS
+        )
+    for category in sorted(_CATEGORIES):
+        for shape in sorted(_SHAPES):
+            result.extend(
+                f"stratum:{category}:{shape}:{metric[0]}"
+                for metric in _QUALITY_GATE_METRICS
+            )
+    result.append("source:exact-ordered-59-parity")
+    result.extend(
+        ("control:conflict:zero-violations", "control:abstention:zero-violations")
+    )
+    result.extend(f"performance:{metric}" for metric in _PERFORMANCE_GATE_METRICS)
+    return tuple(result)
 
 
 def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
@@ -84,6 +130,7 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
             "source_git_sha",
             "wheel_sha256",
             "wheel_filename",
+            "wheel_path",
             "source_snapshot",
             "profiles",
             "status",
@@ -138,6 +185,7 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
         source_git_sha=source_sha,
         wheel_sha256=_sha(root, "wheel_sha256", "threshold proposal"),
         wheel_filename=_string(root, "wheel_filename", "threshold proposal"),
+        wheel_path=_string(root, "wheel_path", "threshold proposal"),
         source_snapshot=tuple(snapshot),
         effective_schema_version=_integer(
             root, "effective_schema_version", "threshold proposal"

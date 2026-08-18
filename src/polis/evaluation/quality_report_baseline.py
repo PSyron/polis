@@ -520,6 +520,36 @@ def _validate_v4_diagnostics(
             raise QualityReportError("quality v4 source expected arithmetic mismatch")
         if len(row["case_ids"]) != len(set(row["case_ids"])):
             raise QualityReportError("quality v4 source case IDs are not unique")
+        counters = tuple(
+            int(row[field])
+            for field in (
+                "predicted_count",
+                "expected_count",
+                "exact_match_count",
+                "false_positive_count",
+                "false_negative_count",
+            )
+        )
+        if row["status"] == "unmeasured" and row["case_ids"]:
+            raise QualityReportError(
+                "quality v4 unmeasured source row must not list cases"
+            )
+        if row["status"] in {"abstained", "control", "unmeasured"} and any(counters):
+            raise QualityReportError(
+                "quality v4 non-measured source row has disallowed counters"
+            )
+        if row["status"] == "measured" and not any(counters):
+            raise QualityReportError(
+                "quality v4 measured source row has no measured counters"
+            )
+        if (
+            row["status"] in {"measured", "abstained", "control"}
+            and not row["case_ids"]
+        ):
+            raise QualityReportError(
+                "quality v4 measured source row must list represented cases"
+            )
+    _validate_v4_source_totals(diagnostics)
     controls = diagnostics["controls"]
     _validate_controls(controls, dataset_cases=dataset_cases, profile=profile)
     category_cases = diagnostics["category_cases"]
@@ -570,6 +600,74 @@ def _validate_v4_diagnostics(
                 raise QualityReportError("quality v4 stratum case arithmetic mismatch")
     if category_case_total != 124 - 4:
         raise QualityReportError("quality v4 diagnostics denominator mismatch")
+
+
+def _validate_v4_source_totals(diagnostics: dict[str, object]) -> None:
+    source = diagnostics["source"]
+    aggregate = diagnostics["aggregate"]
+    categories = diagnostics["category"]
+    assert isinstance(source, list)
+    assert isinstance(aggregate, dict)
+    assert isinstance(categories, dict)
+    source_fields = (
+        "predicted_count",
+        "expected_count",
+        "exact_match_count",
+        "false_positive_count",
+        "false_negative_count",
+    )
+    aggregate_fields = (
+        "predicted_findings",
+        "expected_findings",
+        "true_positives",
+        "false_positives",
+        "false_negatives",
+    )
+    if any(
+        not isinstance(row, dict)
+        or row["status"] not in {"measured", "abstained", "control", "unmeasured"}
+        for row in source
+    ):
+        raise QualityReportError("quality v4 source status is invalid")
+    source_totals = {
+        field: sum(
+            int(row[field])
+            for row in source
+            if isinstance(row, dict) and row["status"] == "measured"
+        )
+        for field in source_fields
+    }
+    aggregate_totals = {
+        source_field: int(aggregate[aggregate_field])
+        for source_field, aggregate_field in zip(
+            source_fields, aggregate_fields, strict=True
+        )
+    }
+    if source_totals != aggregate_totals:
+        raise QualityReportError("quality v4 source/aggregate arithmetic mismatch")
+    for category, category_value in categories.items():
+        if not isinstance(category_value, dict):
+            raise QualityReportError("quality v4 category diagnostics are malformed")
+        category_totals = {
+            field: sum(
+                int(row[field])
+                for row in source
+                if isinstance(row, dict)
+                and row["status"] == "measured"
+                and row["category"] == category
+            )
+            for field in source_fields
+        }
+        expected = {
+            source_field: int(category_value[aggregate_field])
+            for source_field, aggregate_field in zip(
+                source_fields, aggregate_fields, strict=True
+            )
+        }
+        if category_totals != expected:
+            raise QualityReportError(
+                f"quality v4 source/category arithmetic mismatch: {category}"
+            )
 
 
 def _validate_controls(

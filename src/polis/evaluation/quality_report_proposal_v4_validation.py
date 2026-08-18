@@ -16,6 +16,10 @@ from polis.evaluation.quality_report_models import (
     QualityReportError,
     ThresholdProposalV4,
 )
+from polis.evaluation.quality_report_proposal_v4 import (
+    _QUALITY_GATE_METRICS,
+    expected_v4_gate_ids,
+)
 
 _CATEGORIES = ("agreement", "inflection", "punctuation", "spelling", "syntax")
 _SHAPES = (
@@ -90,13 +94,18 @@ def validate_threshold_proposal_v4(
         or morphology.artifact_sha256 != proposal.wheel_sha256
     ):
         raise QualityReportError("v4 proposal wheel identity mismatch")
-    _validate_gate_contract(proposal)
+    if proposal.wheel_filename != Path(proposal.wheel_path).name:
+        raise QualityReportError("v4 proposal wheel filename/path mismatch")
+    performance_artifacts: dict[str, dict[str, object]] = {}
     for profile, values in (
         ("default", proposal.default),
         ("morphology", proposal.morphology),
     ):
-        for binding in (values.performance_baseline, values.performance_result):
-            load_runtime_performance_v2(
+        for role, binding in (
+            ("reference", values.performance_baseline),
+            ("current", values.performance_result),
+        ):
+            performance_artifacts[f"{profile}:{role}"] = load_runtime_performance_v2(
                 Path(binding.path),
                 binding=binding,
                 profile=profile,
@@ -105,24 +114,53 @@ def validate_threshold_proposal_v4(
                 expected_manifest_sha256=proposal.manifest_sha256,
                 expected_source_sha=proposal.source_git_sha,
                 expected_wheel_sha256=proposal.wheel_sha256,
+                expected_role=role,
             )
+    _validate_gate_contract(proposal, default, morphology, performance_artifacts)
 
 
 def _check_controls(report: Any) -> None:
     controls = report.diagnostics["controls"]
-    if any(controls[name]["violations"] != 0 for name in ("conflict", "abstention")):
+    if any(
+        controls[name]["violations"] != 0 or controls[name]["predicted_findings"] != 0
+        for name in ("conflict", "abstention")
+    ):
         raise QualityReportError(
             "v4 proposal cannot use a baseline with control violations"
         )
 
 
-def _validate_gate_contract(proposal: ThresholdProposalV4) -> None:
-    for values in (proposal.default, proposal.morphology):
+def _validate_gate_contract(
+    proposal: ThresholdProposalV4,
+    default: Any,
+    morphology: Any,
+    performance_artifacts: dict[str, dict[str, object]],
+) -> None:
+    expected = set(expected_v4_gate_ids())
+    for report, values in (
+        (default, proposal.default),
+        (morphology, proposal.morphology),
+    ):
+        actual = [f"{gate.scope}:{gate.metric}" for gate in values.gates]
+        if set(actual) != expected or len(actual) != len(set(actual)):
+            raise QualityReportError("v4 proposal gate coverage mismatch")
+        _validate_gate_values(
+            report,
+            values,
+            performance_artifacts[f"{report.run_identity.profile.id.value}:reference"],
+        )
         if not values.gates:
             raise QualityReportError("v4 proposal gate contract is empty")
         for gate in values.gates:
             if gate.effective_schema_version != proposal.effective_schema_version:
                 raise QualityReportError("v4 proposal gate schema version mismatch")
+            if proposal.status == "pending_maintainer_approval" and (
+                gate.maintainer_decision is not None
+            ):
+                raise QualityReportError(
+                    "v4 comparison requires an explicitly approved and enforced "
+                    "proposal; pending proposal gate must remain undecided"
+                )
             if proposal.status == "approved" and (
                 gate.maintainer_decision is None
                 or gate.maintainer_decision.get("status") != "approved"
@@ -135,6 +173,107 @@ def _validate_gate_contract(proposal: ThresholdProposalV4) -> None:
                 )
             if not gate.rationale or not gate.regression_risk:
                 raise QualityReportError("v4 proposal gate rationale is incomplete")
+
+
+def _validate_gate_values(
+    report: Any,
+    values: ProfileThresholdProposalV4,
+    performance_artifact: dict[str, object],
+) -> None:
+    diagnostics = report.diagnostics
+    for gate in values.gates:
+        baseline: object
+        threshold: object
+        if gate.scope.startswith("control:"):
+            name = gate.scope.split(":")[1]
+            baseline = diagnostics["controls"][name]["violations"]
+            threshold = 0
+        elif gate.scope in {"source", "source:exact-ordered-59-parity"}:
+            baseline = _source_gate_baseline(report)
+            threshold = True
+        elif gate.scope in {"performance", "performance:performance"}:
+            baseline, threshold = _performance_gate_values(
+                values, gate.metric, performance_artifact
+            )
+        elif gate.scope.startswith("performance:"):
+            baseline, threshold = _performance_gate_values(
+                values, gate.metric, performance_artifact
+            )
+        else:
+            raw: Any = diagnostics["aggregate"]
+            if gate.scope.startswith("category:"):
+                raw = diagnostics["category"][gate.scope.split(":")[1]]
+            elif gate.scope.startswith("stratum:"):
+                _, category, shape = gate.scope.split(":")
+                raw = diagnostics["shape_strata"][category][shape]
+            metric = next(
+                (item for item in _QUALITY_GATE_METRICS if item[0] == gate.metric), None
+            )
+            if metric is None:
+                raise QualityReportError("v4 proposal gate metric is unknown")
+            baseline = raw[metric[1]]
+            threshold = getattr(values.quality, metric[2])
+            if gate.scope.startswith("category:"):
+                threshold = getattr(
+                    values.category_quality[gate.scope.split(":")[1]], metric[2]
+                )
+            elif gate.scope.startswith("stratum:"):
+                _, category, shape = gate.scope.split(":")
+                threshold = getattr(values.stratum_quality[category][shape], metric[2])
+        if gate.measured_baseline != baseline or gate.proposed_threshold != threshold:
+            raise QualityReportError(
+                "v4 proposal gate values do not bind to measurements: "
+                f"{gate.scope}:{gate.metric} "
+                f"{gate.measured_baseline!r}/{baseline!r} "
+                f"{gate.proposed_threshold!r}/{threshold!r}"
+            )
+
+
+def _source_gate_baseline(report: Any) -> bool:
+    rows = report.diagnostics["source"]
+    return isinstance(rows, list) and bool(rows)
+
+
+def _performance_gate_values(
+    values: ProfileThresholdProposalV4,
+    metric: str,
+    artifact: dict[str, object],
+) -> tuple[object, object]:
+    performance = values.performance
+    raw_performance = artifact.get("performance")
+    raw_rss = artifact.get("rss")
+    if not isinstance(raw_performance, dict) or not isinstance(raw_rss, dict):
+        raise QualityReportError("v4 performance artifact metrics are malformed")
+    latency = raw_performance.get("latency_ns")
+    throughput = raw_performance.get("throughput")
+    if not isinstance(latency, dict) or not isinstance(throughput, dict):
+        raise QualityReportError("v4 performance artifact metrics are malformed")
+    if metric == "maximum_p95_latency_ns":
+        return latency["p95"], performance.maximum_p95_latency_ns
+    if metric == "minimum_throughput_cases_per_second":
+        return throughput[
+            "cases_per_second"
+        ], performance.minimum_throughput_cases_per_second
+    if metric == "maximum_worker_incremental_peak_rss_bytes":
+        return (
+            raw_rss["worker_measured_incremental_peak_rss_bytes"],
+            performance.maximum_worker_incremental_peak_rss_bytes,
+        )
+    if metric == "reproducibility":
+        reproducibility = artifact.get("reproducibility")
+        if not isinstance(reproducibility, dict):
+            raise QualityReportError("v4 performance reproducibility is malformed")
+        hashes = reproducibility.get("repetition_hashes")
+        if isinstance(hashes, list):
+            if not hashes:
+                raise QualityReportError(
+                    "v4 performance repetition hashes are malformed"
+                )
+            return len(set(hashes)) == 1, True
+        stable = reproducibility.get("stable_repetitions")
+        measured = reproducibility.get("measured_repetitions")
+        return stable == measured, True
+    raise QualityReportError("v4 proposal performance gate metric is unknown")
 
 
 def _bind_report(

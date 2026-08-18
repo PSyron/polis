@@ -90,44 +90,80 @@ def _source_rows(
 ) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for index, item in enumerate(snapshot):
+        measured = index < len(CATEGORIES)
         rows.append(
             {
                 "source": item["source"],
-                "category": "agreement",
-                "status": "measured" if index == 0 else "unmeasured",
+                "category": CATEGORIES[index] if measured else "agreement",
+                "status": "measured" if measured else "unmeasured",
                 "operation": item["operation"],
                 "behavior_version": item["behavior_version"],
                 "profile": profile,
-                "predicted_count": 35 if index == 0 else 0,
-                "expected_count": 35 if index == 0 else 0,
-                "exact_match_count": 35 if index == 0 else 0,
+                "predicted_count": 7 if measured else 0,
+                "expected_count": 7 if measured else 0,
+                "exact_match_count": 7 if measured else 0,
                 "false_positive_count": 0,
                 "false_negative_count": 0,
-                "case_ids": ["measured-case"] if index == 0 else [],
+                "case_ids": [f"measured-case-{index}"] if measured else [],
             }
         )
     return rows
 
 
 def _proposal_gates(profile: str) -> list[dict[str, object]]:
-    return [
-        {
-            "scope": "aggregate",
-            "metric": "precision",
-            "measured_baseline": 1.0,
-            "proposed_threshold": 1.0,
-            "rationale": "test quality gate",
-            "allowed_variation": 0.0,
-            "regression_risk": "false alarms",
-            "maintainer_decision": {
-                "status": "approved",
-                "decided_by": "test maintainer",
-                "decided_at": "2026-01-01T00:00:00Z",
-                "rationale": "test-only approval",
-            },
-            "effective_schema_version": 4,
-        }
-    ]
+    decision = {
+        "status": "approved",
+        "decided_by": "test maintainer",
+        "decided_at": "2026-01-01T00:00:00Z",
+        "rationale": "test-only approval",
+    }
+    gates: list[dict[str, object]] = []
+
+    def add(scope: str, metric: str, baseline: object, threshold: object) -> None:
+        gates.append(
+            {
+                "scope": scope,
+                "metric": metric,
+                "measured_baseline": baseline,
+                "proposed_threshold": threshold,
+                "rationale": "test quality gate",
+                "allowed_variation": 0.0,
+                "regression_risk": "test regression",
+                "maintainer_decision": decision,
+                "effective_schema_version": 4,
+            }
+        )
+
+    metrics = (
+        ("precision", "exact_edit_precision"),
+        ("recall", "exact_edit_recall"),
+        ("f1", "exact_edit_f1"),
+        ("span_accuracy", "span_accuracy"),
+        ("suggestion_accuracy", "suggestion_accuracy"),
+        ("false_alarm_rate", "correct_sentence_false_alarm_rate"),
+    )
+    for metric, field in metrics:
+        value = 0.0 if field == "correct_sentence_false_alarm_rate" else 1.0
+        add("aggregate", metric, value, 1.0)
+    for category in CATEGORIES:
+        for metric, field in metrics:
+            value = 0.0 if field == "correct_sentence_false_alarm_rate" else 1.0
+            add(f"category:{category}", metric, value, 1.0)
+    for category in CATEGORIES:
+        for shape in SHAPES:
+            for metric, field in metrics:
+                value = 0.0 if field == "correct_sentence_false_alarm_rate" else 1.0
+                add(f"stratum:{category}:{shape}", metric, value, 1.0)
+    add("source", "exact-ordered-59-parity", True, True)
+    add("control:conflict", "zero-violations", 0, 0)
+    add("control:abstention", "zero-violations", 0, 0)
+    add("performance", "maximum_p95_latency_ns", 100, 100)
+    add(
+        "performance", "minimum_throughput_cases_per_second", 10_000_000.0, 10_000_000.0
+    )
+    add("performance", "maximum_worker_incremental_peak_rss_bytes", 0, 0)
+    add("performance", "reproducibility", True, True)
+    return gates
 
 
 def _diagnostics(snapshot: list[dict[str, str]], profile: str) -> dict[str, object]:
@@ -382,7 +418,7 @@ def _proposal(
         "maximum_peak_rss_bytes": 1000,
         "maximum_worker_incremental_peak_rss_bytes": 0,
         "required_warmup_repetitions": 1,
-        "required_measured_repetitions": 2,
+        "required_measured_repetitions": 5,
         "require_identical_repetition_hashes": True,
         "required_environment_match": [
             "python_version",
@@ -401,10 +437,10 @@ def _proposal(
         return {
             "baseline_path": str(paths[name]),
             "baseline_sha256": digests[name],
-            "quality_floors": _floors(),
-            "category_floors": {category: _floors() for category in CATEGORIES},
+            "quality_floors": _floors(1.0),
+            "category_floors": {category: _floors(1.0) for category in CATEGORIES},
             "stratum_floors": {
-                category: {shape: _floors() for shape in SHAPES}
+                category: {shape: _floors(1.0) for shape in SHAPES}
                 for category in CATEGORIES
             },
             "performance_comparison": performance,
@@ -444,6 +480,7 @@ def _proposal(
         "source_git_sha": SOURCE_SHA,
         "wheel_sha256": WHEEL_SHA,
         "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+        "wheel_path": "/tmp/polis_nlp-0.2.0-py3-none-any.whl",
         "source_snapshot": _snapshot(),
         "profiles": {
             "default": profile("default"),
@@ -625,6 +662,45 @@ def test_quality_comparison_v4_pending_proposal_cannot_authorize_comparison(
 ) -> None:
     paths = _write_artifacts(tmp_path, approved=False)
     with pytest.raises(QualityReportError, match="approved and enforced"):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_isolated_rss_over_cap_fails(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text())
+    payload["rss"]["worker_measured_incremental_peak_rss_bytes"] = 999
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    binding = proposal["profiles"]["morphology"]["performance_result_artifact"]
+    binding["sha256"] = hashlib.sha256(performance.read_bytes()).hexdigest()
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_source_total_drift_fails(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    payload = json.loads(paths["default"].read_text())
+    payload["diagnostics"]["source"][0]["exact_match_count"] += 1
+    payload["diagnostics"]["source"][0]["predicted_count"] += 1
+    paths["default"].write_text(json.dumps(payload, sort_keys=True))
+    with pytest.raises(QualityReportError):
+        _compare(paths)
+
+
+def test_quality_comparison_v4_incomplete_gate_coverage_fails(
+    tmp_path: Path,
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["default"]["gates"].pop()
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+    with pytest.raises(QualityReportError):
         _compare(paths)
 
 

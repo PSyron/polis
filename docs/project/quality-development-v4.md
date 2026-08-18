@@ -75,6 +75,7 @@ python -m venv /tmp/polis-367-default
 /tmp/polis-367-default/bin/python -m polis.evaluation.quality_runner baseline \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile default --output /tmp/polis-367-baseline-default.json
 
 python -m venv /tmp/polis-367-morphology
@@ -83,6 +84,7 @@ python -m venv /tmp/polis-367-morphology
 /tmp/polis-367-morphology/bin/python -m polis.evaluation.quality_runner baseline \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile morphology --output /tmp/polis-367-baseline-morphology.json
 ```
 
@@ -98,15 +100,33 @@ a dopiero potem można uruchomić comparison:
 /tmp/polis-367-default/bin/python -m polis.evaluation.quality_runner result \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile default --output /tmp/polis-367-result-default.json
 /tmp/polis-367-morphology/bin/python -m polis.evaluation.quality_runner result \
   --dataset-version v4 --warmup 1 --repetitions 5 \
   --artifact-sha256 WHEEL_SHA256 --source-sha CLEAN_COMMIT_SHA \
+  --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
   --profile morphology --output /tmp/polis-367-result-morphology.json
 python -m polis.evaluation.quality_runner propose \
   --baseline /tmp/polis-367-baseline-default.json \
   --morphology-baseline /tmp/polis-367-baseline-morphology.json \
   --wheel-filename polis_nlp-0.2.0-py3-none-any.whl \
+  --wheel-path /tmp/polis-367-dist/polis_nlp-0.2.0-py3-none-any.whl \
+  --protocol-sha256 PROTOCOL_FILE_SHA256 --worker-sha256 WORKER_FILE_SHA256 \
+  --performance-default-reference /tmp/polis-367-performance/runtime-performance-v2-reference-default.json \
+  --performance-default-reference-sha256 DEFAULT_REFERENCE_SHA256 \
+  --performance-default-current /tmp/polis-367-performance/runtime-performance-v2-current-default.json \
+  --performance-default-current-sha256 DEFAULT_CURRENT_SHA256 \
+  --performance-morphology-reference /tmp/polis-367-performance/runtime-performance-v2-reference-morphology.json \
+  --performance-morphology-reference-sha256 MORPH_REFERENCE_SHA256 \
+  --performance-morphology-current /tmp/polis-367-performance/runtime-performance-v2-current-morphology.json \
+  --performance-morphology-current-sha256 MORPH_CURRENT_SHA256 \
+  --default-maximum-p95-latency-ns DEFAULT_P95_CAP \
+  --default-minimum-throughput-cases-per-second DEFAULT_THROUGHPUT_FLOOR \
+  --default-maximum-worker-incremental-peak-rss-bytes DEFAULT_RSS_CAP \
+  --morphology-maximum-p95-latency-ns MORPH_P95_CAP \
+  --morphology-minimum-throughput-cases-per-second MORPH_THROUGHPUT_FLOOR \
+  --morphology-maximum-worker-incremental-peak-rss-bytes MORPH_RSS_CAP \
   --output /tmp/polis-367-proposal.json
 python -m polis.evaluation.quality_runner validate-proposal \
   --baseline /tmp/polis-367-baseline-default.json \
