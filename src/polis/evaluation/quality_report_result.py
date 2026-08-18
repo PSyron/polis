@@ -34,11 +34,14 @@ def load_quality_result(path: Path) -> QualityReport:
     if not isinstance(dataset, dict):
         raise QualityReportError("quality result dataset must be an object")
     dataset_schema_version = _integer(dataset, "schema_version", "dataset")
-    if dataset_schema_version not in {2, 3}:
-        raise QualityReportError("quality result dataset schema_version must be 2 or 3")
+    if dataset_schema_version not in {2, 3, 4}:
+        raise QualityReportError(
+            "quality result dataset schema_version must be 2, 3, or 4"
+        )
 
     # Result reports share the measured field contract with baselines of the
-    # same dataset schema generation (v2 or v3).
+    # same dataset schema generation (v2, v3, or v4). A result must retain its
+    # explicit result identity and cannot be silently accepted as a baseline.
     rewritten = dict(root)
     rewritten["schema_id"] = "polis.quality-baseline"
     rewritten["schema_version"] = dataset_schema_version

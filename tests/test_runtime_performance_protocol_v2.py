@@ -113,6 +113,21 @@ def test_worker_rejects_unknown_operation_fail_closed() -> None:
         run_worker(stdin, io.StringIO())
 
 
+def test_default_worker_rejects_importable_provider_without_distribution_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import polis.runtime_performance_protocol as protocol
+
+    real_import = protocol.importlib.import_module
+    monkeypatch.setattr(
+        protocol.importlib,
+        "import_module",
+        lambda name: object() if name == "morfeusz2" else real_import(name),
+    )
+    with pytest.raises(RuntimePerformanceProtocolError, match="morfeusz2 absent"):
+        protocol._validate_profile("default")
+
+
 @pytest.mark.parametrize("sequences", ((7,), (0, 0), (0, 2)))
 def test_worker_rejects_non_monotonic_sequences(sequences: tuple[int, ...]) -> None:
     requests = _line(

@@ -8,6 +8,12 @@ import pytest
 from tests.quality_runner_helpers import _ARTIFACT_SHA256
 
 
+def _write_compare_inputs(tmp_path: Path) -> dict[str, Path]:
+    from tests.test_quality_comparison_v4 import _write_artifacts
+
+    return _write_artifacts(tmp_path)
+
+
 def _module_command(*arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-m", "polis.evaluation.quality_runner", *arguments],
@@ -15,6 +21,60 @@ def _module_command(*arguments: str) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
     )
+
+
+@pytest.mark.parametrize("metric", ("p95", "throughput", "rss"))
+def test_compare_returns_nonzero_for_each_failed_performance_gate(
+    tmp_path: Path, metric: str
+) -> None:
+    import hashlib
+    import json
+
+    paths = _write_compare_inputs(tmp_path)
+    performance = paths["morphology"].with_name("performance-result-morphology.json")
+    payload = json.loads(performance.read_text(encoding="utf-8"))
+    if metric == "p95":
+        payload["performance"]["latency_ns"].update(p95=101, max=101)
+    elif metric == "throughput":
+        payload["performance"]["throughput"].update(
+            total_duration_ns=124000,
+            cases_per_second=5_000_000.0,
+            code_points_per_second=50_000_000.0,
+        )
+        payload["performance"]["latency_ns"].update(
+            mean=200, min=100, p50=200, p95=200, max=200
+        )
+    else:
+        payload["rss"].update(
+            worker_peak_rss_bytes=1999,
+            worker_measured_incremental_peak_rss_bytes=999,
+        )
+    performance.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+    proposal = json.loads(paths["proposal"].read_text(encoding="utf-8"))
+    proposal["profiles"]["morphology"]["performance_result_artifact"]["sha256"] = (
+        hashlib.sha256(performance.read_bytes()).hexdigest()
+    )
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True), encoding="utf-8")
+
+    result = _module_command(
+        "compare",
+        "--baseline-default",
+        str(paths["default"]),
+        "--baseline-morphology",
+        str(paths["morphology"]),
+        "--result-default",
+        str(paths["result-default"]),
+        "--result-morphology",
+        str(paths["result-morphology"]),
+        "--proposal",
+        str(paths["proposal"]),
+        "--output",
+        str(paths["comparison"]),
+    )
+
+    assert result.returncode == 1
+    comparison = json.loads(paths["comparison"].read_text(encoding="utf-8"))
+    assert comparison["aggregate_verdict"] == "fail"
 
 
 def test_module_help_lists_only_supported_commands() -> None:
