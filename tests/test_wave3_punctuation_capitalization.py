@@ -204,7 +204,7 @@ def test_wave3_sources_remain_review_only(source: str) -> None:
         "syntax.comma_before_bo": (
             Category.SYNTAX,
             "insert.causal_clause_comma",
-            "syntax-comma-before-bo/2.0",
+            "syntax-comma-before-bo/3.0",
         ),
         "spelling.month_weekday_lowercase": (
             Category.SPELLING,
