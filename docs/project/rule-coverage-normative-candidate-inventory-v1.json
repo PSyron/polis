@@ -1,0 +1,85 @@
+{
+  "schema_id": "polis.rule-normative-candidate-inventory",
+  "schema_version": 1,
+  "issue": 364,
+  "purpose": "A conservative offline inventory that separates normative authority from candidate evidence and binds every runtime category to an explicit claim boundary.",
+  "verification": {
+    "network": "The validator checks this committed identity record locally and never fetches the authority URLs.",
+    "normative_rule": "Only an explicitly listed authority may support a normative claim; candidate sources may suggest examples but cannot establish correctness.",
+    "missing_or_extra": "Missing, extra, duplicate, reordered, or category-unmapped source identities fail closed."
+  },
+  "normative_authorities": [
+    {
+      "id": "rjp-2026-orthography-interpunkcja",
+      "title": "Zasady pisowni i interpunkcji polskiej",
+      "publisher": "Rada Języka Polskiego przy Prezydium Polskiej Akademii Nauk",
+      "landing_page": "https://rjp.pan.pl/zasady-pisowni-i-interpunkcji-polskiej-2/",
+      "document_url": "https://rjp.pan.pl/app/uploads/2026/03/Zalacznik-do-komunikatu-11-25-wersja-ostateczna-jednolita.pdf",
+      "effective_from": "2026-01-01",
+      "categories": ["punctuation", "spelling"],
+      "authority_boundary": "Normative for orthography and punctuation only; it does not establish completeness for Polis rule families or normative claims about agreement, inflection, or syntax."
+    }
+  ],
+  "candidate_sources": [
+    {
+      "id": "maintained-rule-inventory",
+      "path": "docs/rules.md",
+      "role": "candidate-mapping",
+      "boundary": "The maintained table records closed runtime patterns and scopes; it is not evidence that a category or language phenomenon is complete."
+    },
+    {
+      "id": "public-v3-quality-artifacts",
+      "path": "docs/quality-comparison-v3.json and versioned public quality manifests",
+      "role": "candidate-evidence",
+      "boundary": "Public v3 artifacts measure the recorded cases and identities; they do not create a normative rule or broaden a capability claim."
+    }
+  ],
+  "category_mappings": [
+    {
+      "id": "agreement",
+      "category": "agreement",
+      "normative_authority_ids": [],
+      "candidate_source_ids": ["maintained-rule-inventory", "public-v3-quality-artifacts"],
+      "normative_claim": "not-claimed",
+      "claim_boundary": "No normative completeness claim is made for agreement; each closed pattern requires its own authority and evidence decision."
+    },
+    {
+      "id": "inflection",
+      "category": "inflection",
+      "normative_authority_ids": [],
+      "candidate_source_ids": ["maintained-rule-inventory", "public-v3-quality-artifacts"],
+      "normative_claim": "not-claimed",
+      "claim_boundary": "No normative completeness claim is made for inflection; morphology and candidate evidence remain bounded and provider-aware."
+    },
+    {
+      "id": "punctuation",
+      "category": "punctuation",
+      "normative_authority_ids": ["rjp-2026-orthography-interpunkcja"],
+      "candidate_source_ids": ["maintained-rule-inventory", "public-v3-quality-artifacts"],
+      "normative_claim": "bounded-rjp-backed",
+      "claim_boundary": "RJP may establish the correctness of an explicitly mapped punctuation case, not completeness of punctuation coverage."
+    },
+    {
+      "id": "spelling",
+      "category": "spelling",
+      "normative_authority_ids": ["rjp-2026-orthography-interpunkcja"],
+      "candidate_source_ids": ["maintained-rule-inventory", "public-v3-quality-artifacts"],
+      "normative_claim": "bounded-rjp-backed",
+      "claim_boundary": "RJP may establish the correctness of an explicitly mapped spelling case, not completeness of spelling coverage."
+    },
+    {
+      "id": "syntax",
+      "category": "syntax",
+      "normative_authority_ids": [],
+      "candidate_source_ids": ["maintained-rule-inventory", "public-v3-quality-artifacts"],
+      "normative_claim": "not-claimed",
+      "claim_boundary": "No normative completeness claim is made for syntax; punctuation authority is not silently extended to sentence-structure rules."
+    }
+  ],
+  "source_parity": {
+    "runtime_source_fields": ["source", "category", "scope"],
+    "maintained_inventory_path": "docs/rules.md",
+    "mapping_rule": "Every ordered runtime source identity must appear exactly once in the maintained inventory and inherit exactly one category mapping; every category mapping must be used by at least one runtime source.",
+    "digest_rule": "The validator compares the ordered runtime source set and maintained inventory rows independently, then validates the category mapping for every source."
+  }
+}

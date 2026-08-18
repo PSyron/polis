@@ -47,6 +47,7 @@ EXPECTED_RUN_COMMANDS: Final[tuple[str, ...]] = (
     "uv run --locked --extra dev ruff format --check .",
     "uv run --locked --extra dev mypy .",
     "uv run --locked --extra dev python scripts/validate_documentation_inventory.py",
+    "uv run --locked --extra dev python scripts/rule_coverage_contract.py",
     "uv run --locked --extra dev python scripts/validate_release_workflow.py "
     "--workflow .github/workflows/release.yml",
     "uv run --locked --extra dev python -m build --no-isolation",
@@ -252,7 +253,7 @@ def validate_quality_graph(path: Path) -> QualityGraphResult:
     ):
         errors.append("unexpected quality job key")
     steps_value = quality.get("steps")
-    if not isinstance(steps_value, list) or len(steps_value) != 15:
+    if not isinstance(steps_value, list) or len(steps_value) != 16:
         return QualityGraphResult((), tuple(errors + ["unexpected quality step"]))
     commands: list[str] = []
     for index, action_spec in enumerate(EXPECTED_ACTIONS):

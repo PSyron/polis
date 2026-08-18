@@ -245,7 +245,10 @@
         "docs/architecture/decisions/0024-automatic-review-abstention-quality-contract.md",
         "docs/architecture/decisions/0025-runtime-source-cohort-evolution.md",
         "docs/architecture/decisions/0026-runtime-source-cohort-umbrella-f.md",
-        "docs/architecture/decisions/0027-isolated-runtime-performance-protocol.md"
+        "docs/architecture/decisions/0027-isolated-runtime-performance-protocol.md",
+        "docs/architecture/decisions/0028-conservative-v1-rule-coverage-contract.md",
+        "docs/architecture/decisions/0029-rule-coverage-contract-validator-hardening.md",
+        "docs/architecture/decisions/0030-rule-coverage-authority-and-applicability-clarification.md"
       ],
       "prefixes": []
     },

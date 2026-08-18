@@ -1,5 +1,11 @@
 # Reguły deterministyczne v1
 
+Definicję tego, co wolno twierdzić o pokryciu kategorii, profilach i dowodach,
+opisują [kontrakt pokrycia reguł v1](project/rule-coverage.md) oraz
+[ADR-0028](architecture/decisions/0028-conservative-v1-rule-coverage-contract.md).
+Liczba źródeł w poniższej tabeli jest snapshotem composition root, a nie miarą
+kompletności języka.
+
 `Analyzer` rejestruje dokładnie następujące źródła w stałej kolejności:
 
 | Źródło | Kategoria | Zakres |

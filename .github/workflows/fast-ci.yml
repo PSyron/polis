@@ -60,6 +60,8 @@ jobs:
         run: uv run --locked --extra dev mypy .
       - name: Validate documentation inventory
         run: uv run --locked --extra dev python scripts/validate_documentation_inventory.py
+      - name: Validate rule coverage contract
+        run: uv run --locked --extra dev python scripts/rule_coverage_contract.py
       - name: Validate protected release workflow
         run: uv run --locked --extra dev python scripts/validate_release_workflow.py --workflow .github/workflows/release.yml
       - name: Build distributions
