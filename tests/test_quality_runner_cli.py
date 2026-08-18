@@ -41,6 +41,9 @@ def test_compare_returns_nonzero_for_each_failed_performance_gate(
             cases_per_second=5_000_000.0,
             code_points_per_second=50_000_000.0,
         )
+        payload["performance"]["latency_ns"].update(
+            mean=200, min=100, p50=200, p95=200, max=200
+        )
     else:
         payload["rss"].update(
             worker_peak_rss_bytes=1999,

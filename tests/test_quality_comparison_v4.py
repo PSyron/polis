@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,7 +11,11 @@ import pytest
 
 from polis import Analyzer, AnalyzerConfig
 from polis.evaluation.quality_comparison_v4 import compare_quality_v4
-from polis.evaluation.quality_dataset import QualityDatasetVersion, load_quality_dataset
+from polis.evaluation.quality_dataset import (
+    QualityDatasetVersion,
+    load_quality_dataset,
+    quality_dataset_paths,
+)
 from polis.evaluation.quality_report import (
     QualityReportError,
     load_quality_comparison,
@@ -689,6 +695,103 @@ def test_quality_comparison_v4_rejects_malformed_nested_performance_payload(
         _compare(paths)
 
 
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("mean", "latency arithmetic mismatch"),
+        ("precision", "quality metric arithmetic mismatch"),
+    ),
+)
+def test_quality_comparison_v4_rejects_rebound_arithmetic_mutations(
+    tmp_path: Path, mutation: str, message: str
+) -> None:
+    paths = _write_artifacts(tmp_path)
+    performance = paths["default"].with_name("performance-result-default.json")
+    payload = json.loads(performance.read_text())
+    if mutation == "mean":
+        payload["performance"]["latency_ns"]["mean"] = 0
+    else:
+        payload["quality"]["precision"] = 0.123
+    performance.write_text(json.dumps(payload, sort_keys=True))
+    proposal = json.loads(paths["proposal"].read_text())
+    proposal["profiles"]["default"]["performance_result_artifact"]["sha256"] = (
+        hashlib.sha256(performance.read_bytes()).hexdigest()
+    )
+    paths["proposal"].write_text(json.dumps(proposal, sort_keys=True))
+
+    with pytest.raises(QualityReportError, match=message):
+        _compare(paths)
+
+
+def test_runtime_performance_validator_cli_uses_v4_manifest_by_default(
+    tmp_path: Path,
+) -> None:
+    artifact = tmp_path / "runtime-performance-v2-current-default.json"
+    artifact.write_text(
+        json.dumps(_performance_artifact("default", role="current"), sort_keys=True),
+        encoding="utf-8",
+    )
+    command = [
+        sys.executable,
+        str(ROOT / "scripts/validate_runtime_performance_v2.py"),
+        "--artifact",
+        str(artifact),
+        "--profile",
+        "default",
+        "--role",
+        "current",
+        "--source-sha",
+        SOURCE_SHA,
+        "--wheel-sha256",
+        WHEEL_SHA,
+        "--protocol-sha256",
+        WHEEL_SHA,
+        "--worker-sha256",
+        WHEEL_SHA,
+    ]
+    result = subprocess.run(
+        command, cwd=ROOT, check=False, capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert str(artifact) in result.stdout
+
+
+def test_runtime_performance_validator_cli_rejects_wrong_manifest(
+    tmp_path: Path,
+) -> None:
+    artifact = tmp_path / "runtime-performance-v2-current-default.json"
+    artifact.write_text(
+        json.dumps(_performance_artifact("default", role="current"), sort_keys=True),
+        encoding="utf-8",
+    )
+    _, v1_manifest = quality_dataset_paths(QualityDatasetVersion.V1)
+    command = [
+        sys.executable,
+        str(ROOT / "scripts/validate_runtime_performance_v2.py"),
+        "--artifact",
+        str(artifact),
+        "--profile",
+        "default",
+        "--role",
+        "current",
+        "--manifest-sha256",
+        hashlib.sha256(v1_manifest.read_bytes()).hexdigest(),
+        "--source-sha",
+        SOURCE_SHA,
+        "--wheel-sha256",
+        WHEEL_SHA,
+        "--protocol-sha256",
+        WHEEL_SHA,
+        "--worker-sha256",
+        WHEEL_SHA,
+    ]
+    result = subprocess.run(
+        command, cwd=ROOT, check=False, capture_output=True, text=True
+    )
+    assert result.returncode != 0
+    assert "identity mismatch" in result.stderr
+
+
 def test_quality_comparison_v4_rejects_performance_environment_drift(
     tmp_path: Path,
 ) -> None:
@@ -829,10 +932,15 @@ def test_quality_comparison_v4_isolated_rss_over_cap_fails(
         ),
         (
             "throughput",
-            lambda payload: payload["performance"]["throughput"].update(
-                total_duration_ns=124000,
-                cases_per_second=5_000_000.0,
-                code_points_per_second=50_000_000.0,
+            lambda payload: (
+                payload["performance"]["throughput"].update(
+                    total_duration_ns=124000,
+                    cases_per_second=5_000_000.0,
+                    code_points_per_second=50_000_000.0,
+                )
+                or payload["performance"]["latency_ns"].update(
+                    mean=200, min=100, p50=200, p95=200, max=200
+                )
             ),
         ),
     ],

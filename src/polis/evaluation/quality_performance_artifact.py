@@ -248,9 +248,7 @@ def _validate_performance(value: object, rss_value: object) -> None:
     required_latency = {"sample_count", "min", "mean", "p50", "p95", "max"}
     if not all(_nonnegative_int(latency[k]) for k in required_latency):
         raise QualityReportError("v4 performance latency metrics are malformed")
-    if latency["sample_count"] != 620 or not (
-        latency["min"] <= latency["p50"] <= latency["p95"] <= latency["max"]
-    ):
+    if latency["sample_count"] != 620:
         raise QualityReportError("v4 performance latency identity mismatch")
     if (
         not _nonnegative_int(throughput["measured_cases"])
@@ -268,6 +266,13 @@ def _validate_performance(value: object, rss_value: object) -> None:
         or throughput["code_points_per_second"] <= 0
     ):
         raise QualityReportError("v4 performance throughput identity mismatch")
+    if latency["mean"] != throughput["total_duration_ns"] // latency["sample_count"]:
+        raise QualityReportError("v4 performance latency arithmetic mismatch")
+    if not (
+        latency["min"] <= latency["mean"] <= latency["max"]
+        and latency["min"] <= latency["p50"] <= latency["p95"] <= latency["max"]
+    ):
+        raise QualityReportError("v4 performance latency identity mismatch")
     expected_cases_per_second = (
         throughput["measured_cases"] * 1_000_000_000 / throughput["total_duration_ns"]
     )
@@ -344,9 +349,38 @@ def _validate_quality(value: object) -> None:
         or counts["correction_matches"] != counts["true_positives"]
         or counts["span_matches"]
         > min(counts["expected_findings"], counts["predicted_findings"])
+        or counts["correction_matches"] > counts["span_matches"]
         or counts["alarmed_correct_cases"] > counts["correct_cases"]
     ):
         raise QualityReportError("v4 performance quality arithmetic mismatch")
+    expected_metrics = {
+        "precision": _ratio(
+            counts["true_positives"],
+            counts["true_positives"] + counts["false_positives"],
+        ),
+        "recall": _ratio(
+            counts["true_positives"],
+            counts["true_positives"] + counts["false_negatives"],
+        ),
+        "f1": _ratio(
+            2 * counts["true_positives"],
+            2 * counts["true_positives"]
+            + counts["false_positives"]
+            + counts["false_negatives"],
+        ),
+        "span_accuracy": _ratio(counts["span_matches"], counts["expected_findings"]),
+        "correction_accuracy": _ratio(
+            counts["correction_matches"], counts["span_matches"]
+        ),
+        "false_alarm_rate": _ratio(
+            counts["alarmed_correct_cases"], counts["correct_cases"]
+        ),
+    }
+    if any(
+        not math.isclose(float(quality[name]), expected, rel_tol=1e-9, abs_tol=1e-12)
+        for name, expected in expected_metrics.items()
+    ):
+        raise QualityReportError("v4 performance quality metric arithmetic mismatch")
 
 
 def _exact_object(value: object, fields: set[str], name: str) -> dict[str, Any]:
@@ -360,17 +394,21 @@ def _is_sha256(value: object) -> bool:
     return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
 
 
+def _ratio(numerator: int, denominator: int) -> float:
+    return 0.0 if denominator == 0 else numerator / denominator
+
+
 def _nonnegative_int(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value >= 0
 
 
 def _nonnegative_number(value: object) -> bool:
-    return (
-        isinstance(value, (int, float))
-        and not isinstance(value, bool)
-        and math.isfinite(float(value))
-        and value >= 0
-    )
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    try:
+        return math.isfinite(float(value)) and value >= 0
+    except (OverflowError, ValueError):
+        return False
 
 
 __all__ = ["file_sha256", "load_runtime_performance_v2"]

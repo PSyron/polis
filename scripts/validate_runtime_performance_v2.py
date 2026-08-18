@@ -4,9 +4,9 @@ import argparse
 from pathlib import Path
 
 from polis.evaluation.quality_dataset import (
-    QUALITY_MANIFEST_PATH,
     QualityDatasetVersion,
     load_quality_dataset,
+    quality_dataset_paths,
 )
 from polis.evaluation.quality_performance_artifact import (
     file_sha256,
@@ -34,7 +34,8 @@ def main() -> None:
     dataset = load_quality_dataset(version=QualityDatasetVersion.V4)
     dataset_id = args.dataset_id or dataset.id
     dataset_sha256 = args.dataset_sha256 or dataset.canonical_sha256
-    manifest_sha256 = args.manifest_sha256 or file_sha256(QUALITY_MANIFEST_PATH)
+    _, manifest_path = quality_dataset_paths(QualityDatasetVersion.V4)
+    manifest_sha256 = args.manifest_sha256 or file_sha256(manifest_path)
     digest = file_sha256(args.artifact)
     binding = PerformanceArtifactBinding(
         path=str(args.artifact),
