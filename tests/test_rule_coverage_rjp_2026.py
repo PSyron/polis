@@ -46,6 +46,10 @@ def test_valid_rjp_audit_has_full_snapshot_and_change_matrix() -> None:
     assert len(changes) == len(CHANGE_NUMBERS)
 
 
+def test_evaluation_artifacts_do_not_invalidate_rjp_source_audit() -> None:
+    validate_rjp_2026_audit()
+
+
 def test_source_rows_keep_live_order_and_category_counts() -> None:
     audit = validate_rjp_2026_audit()
     rows = audit["source_rows"]
