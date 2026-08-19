@@ -46,14 +46,23 @@
     <input>Jutro,powiem o tym zespołowi.</input>
     <expected_output>Jutro, powiem o tym zespołowi.</expected_output>
     <expected_findings>
-      <finding category="punctuation" start="6" end="6" original="" suggestion=" " />
+      <finding category="punctuation" start="5" end="6" original="," suggestion=", " />
     </expected_findings>
   </case>
   <case id="punctuation_sentence_spacing" verification="rules" tags="punctuation,spacing,sentence_boundary">
     <input>To działa.Następne zdanie też działa.</input>
     <expected_output>To działa. Następne zdanie też działa.</expected_output>
     <expected_findings>
-      <finding category="punctuation" start="10" end="10" original="" suggestion=" " />
+      <finding category="punctuation" start="9" end="10" original="." suggestion=". " />
+    </expected_findings>
+  </case>
+  <case id="spelling_repeated_across_sentences" verification="rules" tags="spelling,orthography,repeated,multiple_findings,sentence_boundary">
+    <input>Zeby zeby. Wlasnie.</input>
+    <expected_output>Żeby żeby. Właśnie.</expected_output>
+    <expected_findings>
+      <finding category="spelling" start="0" end="4" original="Zeby" suggestion="Żeby" />
+      <finding category="spelling" start="5" end="9" original="zeby" suggestion="żeby" />
+      <finding category="spelling" start="11" end="18" original="Wlasnie" suggestion="Właśnie" />
     </expected_findings>
   </case>
   <case id="inflection_male_surname_instrumental" verification="llm_planned" tags="inflection,case,name,surname" tracking_issue="42">

@@ -34,6 +34,61 @@ class E2ECase:
     expected_findings: tuple[E2EExpectedFinding, ...]
 
 
+FindingProjection = tuple[str, int, int, str, str]
+
+
+def _assert_exact_findings(
+    case_id: str,
+    actual_findings: tuple[FindingProjection, ...],
+    expected_findings: tuple[FindingProjection, ...],
+) -> None:
+    assert len(actual_findings) == len(expected_findings), f"{case_id}.count"
+    for index, (actual, expected) in enumerate(
+        zip(actual_findings, expected_findings, strict=True)
+    ):
+        assert actual[0] == expected[0], f"{case_id}[{index}].category"
+        assert actual[1] == expected[1], f"{case_id}[{index}].start"
+        assert actual[2] == expected[2], f"{case_id}[{index}].end"
+        assert actual[3] == expected[3], f"{case_id}[{index}].original"
+        assert actual[4] == expected[4], f"{case_id}[{index}].suggestion"
+
+
+def _mutate_actual_findings(
+    actual_findings: tuple[FindingProjection, ...], mutation: str
+) -> tuple[FindingProjection, ...]:
+    assert actual_findings
+    first = actual_findings[0]
+    if mutation == "category":
+        mutated_first: FindingProjection = (
+            "mutated-category",
+            first[1],
+            first[2],
+            first[3],
+            first[4],
+        )
+        return (mutated_first, *actual_findings[1:])
+    if mutation == "start":
+        mutated_first = (first[0], first[1] + 1, first[2], first[3], first[4])
+        return (mutated_first, *actual_findings[1:])
+    if mutation == "end":
+        mutated_first = (first[0], first[1], first[2] + 1, first[3], first[4])
+        return (mutated_first, *actual_findings[1:])
+    if mutation == "original":
+        mutated_first = (first[0], first[1], first[2], first[3] + "!", first[4])
+        return (mutated_first, *actual_findings[1:])
+    if mutation == "suggestion":
+        mutated_first = (first[0], first[1], first[2], first[3], first[4] + "!")
+        return (mutated_first, *actual_findings[1:])
+    if mutation == "drop":
+        return actual_findings[:-1]
+    if mutation == "duplicate":
+        return (*actual_findings, actual_findings[-1])
+    if mutation == "reorder":
+        assert len(actual_findings) >= 2
+        return (actual_findings[1], actual_findings[0], *actual_findings[2:])
+    raise AssertionError(f"unknown finding mutation: {mutation}")
+
+
 def _load_json_cases() -> dict[str, E2ECase]:
     raw = json.loads(JSON_FIXTURE.read_text(encoding="utf-8"))
     return {
@@ -149,6 +204,74 @@ def test_end_to_end_polish_correction_corpus_fixtures(
     result = analyzer.analyze(case.source)
     corrected = result.apply(tuple(item.id for item in result.issues))
 
+    actual_findings = tuple(
+        (
+            item.category.value,
+            item.start,
+            item.end,
+            item.original,
+            item.suggestion,
+        )
+        for item in result.issues
+    )
+    expected_findings = tuple(
+        (
+            finding.category,
+            finding.start,
+            finding.end,
+            finding.original,
+            finding.suggestion,
+        )
+        for finding in case.expected_findings
+    )
+
+    _assert_exact_findings(case.case_id, actual_findings, expected_findings)
+    assert corrected == case.expected
+
+
+@pytest.mark.parametrize(
+    ("case_id", "mutation", "expected_field"),
+    [
+        ("spelling_zeby", "category", "category"),
+        ("spelling_zeby", "start", "start"),
+        ("spelling_zeby", "end", "end"),
+        ("spelling_zeby", "original", "original"),
+        ("spelling_zeby", "suggestion", "suggestion"),
+        ("spelling_repeated_across_sentences", "drop", "count"),
+        ("spelling_repeated_across_sentences", "duplicate", "count"),
+        ("spelling_repeated_across_sentences", "reorder", "start"),
+    ],
+)
+def test_exact_finding_assertion_rejects_controlled_mutations(
+    case_id: str, mutation: str, expected_field: str
+) -> None:
+    case = _load_json_cases()[case_id]
+    result = Analyzer(AnalyzerConfig()).analyze(case.source)
+    actual_findings = tuple(
+        (
+            item.category.value,
+            item.start,
+            item.end,
+            item.original,
+            item.suggestion,
+        )
+        for item in result.issues
+    )
+    expected_findings = tuple(
+        (
+            finding.category,
+            finding.start,
+            finding.end,
+            finding.original,
+            finding.suggestion,
+        )
+        for finding in case.expected_findings
+    )
+    corrected = result.apply(tuple(item.id for item in result.issues))
+    mutated_findings = _mutate_actual_findings(actual_findings, mutation)
+
+    with pytest.raises(AssertionError, match=expected_field):
+        _assert_exact_findings(case.case_id, mutated_findings, expected_findings)
     assert corrected == case.expected
 
 
@@ -190,3 +313,25 @@ def test_corpus_preserves_name_inflection_and_valid_word_order_negatives() -> No
         "negative_male_name_dative",
         "negative_marked_word_order",
     }
+
+
+def test_review_only_finding_requires_explicit_apply() -> None:
+    source = "On boi hałasu."
+    analyzer = Analyzer(AnalyzerConfig())
+
+    result = analyzer.analyze(source)
+
+    assert tuple(
+        (
+            item.category.value,
+            item.start,
+            item.end,
+            item.original,
+            item.suggestion,
+        )
+        for item in result.issues
+    ) == (("syntax", 6, 6, "", " się"),)
+    assert analyzer.correct(source).corrected_text == source
+    assert (
+        result.apply(tuple(item.id for item in result.issues)) == "On boi się hałasu."
+    )

@@ -75,7 +75,7 @@
       "description": "Brak spacji po przecinku.",
       "tags": ["punctuation", "spacing"],
       "expected_findings": [
-        {"category": "punctuation", "start": 6, "end": 6, "original": "", "suggestion": " "}
+        {"category": "punctuation", "start": 5, "end": 6, "original": ",", "suggestion": ", "}
       ],
       "verification": "rules"
     },
@@ -86,7 +86,20 @@
       "description": "Brak spacji między zdaniami po kropce.",
       "tags": ["punctuation", "spacing", "sentence_boundary"],
       "expected_findings": [
-        {"category": "punctuation", "start": 10, "end": 10, "original": "", "suggestion": " "}
+        {"category": "punctuation", "start": 9, "end": 10, "original": ".", "suggestion": ". "}
+      ],
+      "verification": "rules"
+    },
+    {
+      "id": "spelling_repeated_across_sentences",
+      "input": "Zeby zeby. Wlasnie.",
+      "expected_output": "Żeby żeby. Właśnie.",
+      "description": "Powtórzony błąd ortograficzny i druga poprawka w kolejnym zdaniu.",
+      "tags": ["spelling", "orthography", "repeated", "multiple_findings", "sentence_boundary"],
+      "expected_findings": [
+        {"category": "spelling", "start": 0, "end": 4, "original": "Zeby", "suggestion": "Żeby"},
+        {"category": "spelling", "start": 5, "end": 9, "original": "zeby", "suggestion": "żeby"},
+        {"category": "spelling", "start": 11, "end": 18, "original": "Wlasnie", "suggestion": "Właśnie"}
       ],
       "verification": "rules"
     },
