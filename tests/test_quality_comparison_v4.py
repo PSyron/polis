@@ -1053,5 +1053,5 @@ def test_quality_comparison_v4_incomplete_gate_coverage_fails(
 def test_quality_comparison_v4_snapshot_hash_is_canonical() -> None:
     snapshot = tuple(_snapshot())
     assert source_snapshot_sha256(snapshot) == (
-        "1eb1ea4ad357101374c19bf6d03c4ed2cdcc26923c6c5157e5407dd34d927500"
+        "448fd8630f1f9003e6b7bb1786f1020d7a57d7bbfa87670eb8279d1dc4f6310d"
     )

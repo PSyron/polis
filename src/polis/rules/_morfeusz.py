@@ -74,10 +74,25 @@ _PRZYGLADAC_NOUN_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc:m3"})
 _PRZYGLADAC_ADJECTIVE_TARGET_TAG: Final = "adj:sg:dat:m1.m2.m3.n:pos"
 _PRZYGLADAC_NOUN_TARGET_TAG: Final = "subst:sg:dat:m3"
 _NON_ADJECTIVE_LEMMAS: Final = frozenset(
-    {"jaki", "który", "mój", "nasz", "taki", "twój", "wasz", "żaden"}
+    {"jaki", "który", "mój", "nasz", "taki", "ten", "twój", "wasz", "żaden"}
 )
 _VERB_TAG_PREFIXES: Final = frozenset(
     {"fin", "ger", "impt", "imps", "inf", "pant", "pcon", "praet"}
+)
+_COMPETING_NOMINAL_TAG_PREFIXES: Final = frozenset(
+    {
+        "adj",
+        "adja",
+        "adjc",
+        "adjp",
+        "depr",
+        "num",
+        "numcol",
+        "ppas",
+        "ppron12",
+        "ppron3",
+        "winien",
+    }
 )
 _KNOWN_TAG_PREFIXES: Final = frozenset(
     {
@@ -115,6 +130,7 @@ _KNOWN_TAG_PREFIXES: Final = frozenset(
     }
 )
 _KNOWN_NOUN_TAG_SUFFIXES: Final = frozenset({"col", "ncol"})
+_GOVERNMENT_CASES: Final = frozenset({"gen", "dat", "inst"})
 
 type _AgreementFeature = tuple[str, str, str]
 
@@ -123,6 +139,28 @@ class _QualifiedMorfeuszBackend(Protocol):
     def analyse(self, text: str) -> Sequence[_AnalysisRow]: ...
 
     def generate(self, lemma: str) -> Sequence[_GenerationRow]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class _CanonicalMorfeuszBackend:
+    backend: _QualifiedMorfeuszBackend
+    normalize_exact_duplicates: bool = False
+
+    def analyse(self, text: str) -> Sequence[_AnalysisRow]:
+        rows = self.backend.analyse(text)
+        return (
+            _deduplicate_provider_rows(rows)
+            if self.normalize_exact_duplicates
+            else rows
+        )
+
+    def generate(self, lemma: str) -> Sequence[_GenerationRow]:
+        rows = self.backend.generate(lemma)
+        return (
+            _deduplicate_provider_rows(rows)
+            if self.normalize_exact_duplicates
+            else rows
+        )
 
 
 @runtime_checkable
@@ -176,7 +214,7 @@ class _QualifiedMorfeusz:
                 lemma=_NEGATED_NOUN_LEMMA,
                 target_tag=_NEGATED_NOUN_TARGET_TAG,
             )
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
         if (
             not _has_one_supported_lemma(
@@ -208,7 +246,7 @@ class _QualifiedMorfeusz:
                 lemma=_DEMONSTRATIVE_LEMMA,
                 target_tag=_DEMONSTRATIVE_TARGET_TAG,
             )
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
         if (
             not _has_one_supported_lemma(
@@ -252,7 +290,7 @@ class _QualifiedMorfeusz:
                 lemma=_TA_ADJECTIVE_LEMMA,
                 target_tag=_TA_ADJECTIVE_TARGET_TAG,
             )
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
         if (
             not _has_one_supported_lemma(
@@ -308,7 +346,7 @@ class _QualifiedMorfeusz:
                 if demonstrative_input is not None
                 else None
             )
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
 
         adjective_selection = _select_agreement_analyses(
@@ -342,7 +380,7 @@ class _QualifiedMorfeusz:
 
         try:
             generated_rows = _generation_rows(self.backend.generate(adjective_lemma))
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
         if generated_rows is None:
             return None
@@ -364,6 +402,126 @@ class _QualifiedMorfeusz:
             return None
         return next(iter(forms))
 
+    def government_nominal_group_replacement(
+        self,
+        governor: str,
+        adjective: str | None,
+        noun: str,
+        *,
+        governor_lemma: str,
+        governor_tags: frozenset[str],
+        target_case: str,
+    ) -> tuple[str | None, str] | None:
+        if (
+            self.identity != _qualified_identity()
+            or target_case not in _GOVERNMENT_CASES
+        ):
+            return None
+        governor_input = governor.casefold() if governor.isupper() else governor
+        adjective_input = (
+            adjective.casefold()
+            if adjective is not None and adjective.isupper()
+            else adjective
+        )
+        noun_input = noun.casefold() if noun.isupper() else noun
+        try:
+            governor_analyses = _analyses_with_metadata(
+                self.backend.analyse(governor_input), governor_input
+            )
+            noun_analyses = _analyses_with_metadata(
+                self.backend.analyse(noun_input), noun_input
+            )
+            adjective_analyses = (
+                _analyses_with_metadata(
+                    self.backend.analyse(adjective_input), adjective_input
+                )
+                if adjective_input is not None
+                else None
+            )
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
+            return None
+
+        if governor_analyses is None or len(governor_analyses) != len(
+            set(governor_analyses)
+        ):
+            return None
+        governor_analysis_set = {(item.lemma, item.tag) for item in governor_analyses}
+        if (
+            not _has_one_supported_lemma(
+                governor_analysis_set,
+                lemma=governor_lemma,
+                source_tags=governor_tags,
+            )
+            or _tags_for_lemma(governor_analysis_set, governor_lemma) != governor_tags
+        ):
+            return None
+        noun_selection = _select_government_noun_analyses(noun_analyses)
+        if noun_selection is None:
+            return None
+        noun_lemma, noun_features = noun_selection
+        noun_shapes = {(number, gender) for number, _case, gender in noun_features}
+        if len(noun_shapes) != 1:
+            return None
+        number, gender = next(iter(noun_shapes))
+        target_feature = (number, target_case, gender)
+
+        adjective_lemma: str | None = None
+        if adjective_input is not None:
+            adjective_selection = _select_agreement_analyses(
+                adjective_analyses, prefix="adj"
+            )
+            if adjective_selection is None:
+                return None
+            adjective_lemma, adjective_features = adjective_selection
+            adjective_shapes = {
+                (number, gender) for number, _case, gender in adjective_features
+            }
+            compatible_shapes = noun_shapes & adjective_shapes
+            if len(compatible_shapes) != 1:
+                return None
+            if adjective_lemma in _NON_ADJECTIVE_LEMMAS:
+                return None
+
+        try:
+            noun_rows = _government_generation_rows(self.backend.generate(noun_lemma))
+            adjective_rows = (
+                _government_generation_rows(self.backend.generate(adjective_lemma))
+                if adjective_lemma is not None
+                else None
+            )
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
+            return None
+        if noun_rows is None or (
+            adjective_lemma is not None and adjective_rows is None
+        ):
+            return None
+        if len(noun_rows) != len(set(noun_rows)) or (
+            adjective_rows is not None
+            and len(adjective_rows) != len(set(adjective_rows))
+        ):
+            return None
+
+        noun_forms = _government_forms_for_feature(
+            noun_rows,
+            lemma=noun_lemma,
+            prefix="subst",
+            feature=target_feature,
+        )
+        if len(noun_forms) != 1:
+            return None
+        if adjective_lemma is None:
+            return None, next(iter(noun_forms))
+
+        adjective_forms = _government_forms_for_feature(
+            adjective_rows or (),
+            lemma=adjective_lemma,
+            prefix="adj",
+            feature=target_feature,
+        )
+        if len(adjective_forms) != 1:
+            return None
+        return next(iter(adjective_forms)), next(iter(noun_forms))
+
     @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def przygladac_sie_nowy_budynek_replacement(self) -> str | None:
         if self.identity != _qualified_identity():
@@ -384,7 +542,7 @@ class _QualifiedMorfeusz:
                 lemma=_PRZYGLADAC_NOUN_LEMMA,
                 target_tag=_PRZYGLADAC_NOUN_TARGET_TAG,
             )
-        except (KeyError, RuntimeError, TypeError, ValueError):
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
             return None
         if (
             not _has_one_supported_lemma(
@@ -424,7 +582,7 @@ def _analyses_with_metadata(
 ) -> tuple[_ParsedAnalysis, ...] | None:
     if isinstance(rows, (str, bytes)):
         return None
-    parsed: set[_ParsedAnalysis] = set()
+    parsed: list[_ParsedAnalysis] = []
     for row in rows:
         if not isinstance(row, tuple) or len(row) != 3:
             return None
@@ -452,7 +610,7 @@ def _analyses_with_metadata(
             or not all(isinstance(value, str) for value in qualifiers)
         ):
             return None
-        parsed.add(
+        parsed.append(
             _ParsedAnalysis(
                 lemma=lemma,
                 tag=tag,
@@ -515,6 +673,8 @@ def _select_agreement_analyses(
         item.tag.rsplit(":", 1)[-1] != "pos" for item in selected
     ):
         return None
+    if len(selected) != len(set(selected)):
+        return None
     if require_common_noun and any(
         item.labels != ("nazwa_pospolita",) for item in selected
     ):
@@ -533,6 +693,114 @@ def _select_agreement_analyses(
             return None
         features.update(parsed)
     return next(iter(lemmas)), frozenset(features)
+
+
+def _select_government_noun_analyses(
+    analyses: tuple[_ParsedAnalysis, ...] | None,
+) -> tuple[str, frozenset[_AgreementFeature]] | None:
+    if analyses is None or any(item.tag == "ign" for item in analyses):
+        return None
+    selected = tuple(item for item in analyses if item.tag.startswith("subst:"))
+    if (
+        not selected
+        or len(selected) != 1
+        or any(item.labels != ("nazwa_pospolita",) for item in selected)
+        or any(
+            item.tag.partition(":")[0] in _COMPETING_NOMINAL_TAG_PREFIXES
+            for item in analyses
+        )
+    ):
+        return None
+    lemmas = {item.lemma for item in selected}
+    if len(lemmas) != 1:
+        return None
+    features: set[_AgreementFeature] = set()
+    for item in selected:
+        parsed = _tag_features(item.tag, prefix="subst")
+        if parsed is None:
+            return None
+        if any(case == "voc" for _number, case, _gender in parsed):
+            return None
+        features.update(parsed)
+    return next(iter(lemmas)), frozenset(features)
+
+
+def _government_generation_rows(
+    rows: Sequence[_GenerationRow],
+) -> tuple[tuple[str, str, str], ...] | None:
+    if isinstance(rows, (str, bytes)):
+        return None
+    parsed: list[tuple[str, str, str]] = []
+    for row in rows:
+        if (
+            not isinstance(row, tuple)
+            or len(row) != 5
+            or not isinstance(row[0], str)
+            or not row[0]
+            or not isinstance(row[1], str)
+            or not row[1]
+            or not isinstance(row[2], str)
+            or not isinstance(row[3], list)
+            or not isinstance(row[4], list)
+            or not all(isinstance(value, str) for value in row[3])
+            or not all(isinstance(value, str) for value in row[4])
+        ):
+            return None
+        prefix = row[2].partition(":")[0]
+        if prefix not in _KNOWN_TAG_PREFIXES:
+            return None
+        if prefix in {"adj", "subst"} and _tag_features(row[2], prefix=prefix) is None:
+            return None
+        parsed.append((row[0], row[1], row[2]))
+    return tuple(parsed)
+
+
+def _deduplicate_provider_rows(
+    rows: Sequence[_AnalysisRow] | Sequence[_GenerationRow],
+) -> Sequence[_AnalysisRow] | Sequence[_GenerationRow]:
+    if isinstance(rows, (str, bytes)):
+        return rows
+    unique: list[tuple[object, ...]] = []
+    for row in rows:
+        if not any(_provider_rows_equal(row, candidate) for candidate in unique):
+            unique.append(row)
+    return tuple(unique)
+
+
+def _provider_rows_equal(left: tuple[object, ...], right: tuple[object, ...]) -> bool:
+    if len(left) != len(right):
+        return False
+    for left_value, right_value in zip(left, right, strict=True):
+        if type(left_value) is not type(right_value):
+            return False
+        if isinstance(left_value, (list, tuple)) and isinstance(
+            right_value, (list, tuple)
+        ):
+            if len(left_value) != len(right_value):
+                return False
+            if not _provider_rows_equal(tuple(left_value), tuple(right_value)):
+                return False
+        elif left_value != right_value:
+            return False
+    return True
+
+
+def _government_forms_for_feature(
+    rows: tuple[tuple[str, str, str], ...],
+    *,
+    lemma: str,
+    prefix: str,
+    feature: _AgreementFeature,
+) -> set[str]:
+    return {
+        form
+        for form, row_lemma, tag in rows
+        if row_lemma == lemma
+        and tag.startswith(f"{prefix}:")
+        and (prefix != "adj" or tag.rsplit(":", 1)[-1] == "pos")
+        and (tag_features := _tag_features(tag, prefix=prefix)) is not None
+        and feature in tag_features
+    }
 
 
 def _tag_features(tag: str, *, prefix: str) -> frozenset[_AgreementFeature] | None:
@@ -684,11 +952,19 @@ def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
                 backend.dict_copyright().encode("utf-8")
             ).hexdigest(),
         )
-    except (ImportError, AttributeError, RuntimeError, TypeError, ValueError):
+    except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError):
         return None
     if identity != _qualified_identity():
         return None
-    return _QualifiedMorfeusz(backend=backend, identity=identity)
+    if type(backend).__module__ != "morfeusz2" or type(backend).__name__ != "Morfeusz":
+        return None
+    return _QualifiedMorfeusz(
+        backend=_CanonicalMorfeuszBackend(
+            backend,
+            normalize_exact_duplicates=True,
+        ),
+        identity=identity,
+    )
 
 
 __all__: list[str] = []

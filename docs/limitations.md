@@ -9,9 +9,14 @@
   można wybrać jawnie przez `CorrectionResult.apply_suggestions()`.
 - Runtime działa offline i nie wymaga sieci, modelu, procesu Java ani
   instalacji dodatkowych usług.
-- Opcjonalne extra `morphology` rozszerza cztery wąsko ograniczone rodziny
-  review-only, w tym lokalną zgodę przymiotnika z rzeczownikiem; nie stanowi
-  ogólnej obsługi polskiej fleksji, zgody ani rekcji. Morfeusz2 1.99.15 nie ma
+- Opcjonalne extra `morphology` rozszerza wąsko ograniczone rodziny review-only,
+  w tym lokalną zgodę przymiotnika z rzeczownikiem oraz zamkniętą tabelę rekcji
+  `szukać`, `używać`, `ufać`, `interesować się` i `do`; nie stanowi ogólnej
+  obsługi polskiej fleksji, zgody ani rekcji. Rekcja przyjmuje tylko jednoznaczny
+  rzeczownik pospolity albo grupę `przymiotnik + rzeczownik` i abstainuje dla
+  nazw własnych, zaimków, wołacza, koordynacji, elipsy (`...` i `…`),
+  niezgodnej liczby lub rodzaju w grupie przymiotnik–rzeczownik, niepełnych danych
+  oraz dryftu providera. Morfeusz2 1.99.15 nie ma
   opublikowanego sdistu ani kół Linux arm64/musl; jego koła obejmują macOS
   universal2, manylinux 2.28 x86_64 oraz Windows amd64.
 - Wspierane są zwykłe napisy Pythona oraz indeksy Unicode `[start, end)`; Polis

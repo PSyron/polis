@@ -30,15 +30,6 @@ _POTRZEBOWAC_BEHAVIOR_VERSION: Final = (
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
-_SZUKAC_PATTERN: Final = re.compile(
-    r"(?<!\w)(?P<phrase>(?P<governor>Szukam) (?P<governed>klucz))(?!\w)",
-    re.IGNORECASE,
-)
-_SZUKAC_BEHAVIOR_VERSION: Final = (
-    "inflection-government-szukac-klucz/1.0+"
-    "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
-    "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
-)
 _MENTION_WRAPPERS: Final = frozenset(
     {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
 )
@@ -66,16 +57,6 @@ _POTRZEBOWAC_FORM: Final = _GovernedFormProp(
     governed_tags=frozenset({"subst:sg:nom:f", "subst:sg:acc:f"}),
     target_tag="subst:sg:gen:f",
     target_form="pomocy",
-)
-_SZUKAC_FORM: Final = _GovernedFormProp(
-    governor_surface="szukam",
-    governor_lemma="szukać",
-    governor_tags=frozenset({"fin:sg:pri:imperf"}),
-    governed_surface="klucz",
-    governed_lemma="klucz",
-    governed_tags=frozenset({"subst:sg:nom.acc:m3"}),
-    target_tag="subst:sg:gen:m3",
-    target_form="klucza",
 )
 _GOVERNED_FORMS: Final = (_POTRZEBOWAC_FORM,)
 
@@ -159,47 +140,12 @@ class InflectionGovernmentSzukacKluczRule:
 
     @property
     def behavior_version(self) -> str:
-        return _SZUKAC_BEHAVIOR_VERSION
+        return _wave4_behavior("inflection-government-szukac-klucz", 2)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
-        if options.categories is not None and self._CATEGORY not in options.categories:
-            return ()
-        matches = tuple(
-            match
-            for match in _SZUKAC_PATTERN.finditer(text)
-            if not _is_wrapped_mention(text, match.start("phrase"), match.end("phrase"))
+        return _GeneralizedGovernmentRule(self._provider, _GENERALIZED_SPECS[0]).find(
+            text, options=options
         )
-        if (
-            not matches
-            or self._provider is None
-            or _governed_form_replacement(self._provider, _SZUKAC_FORM) != "klucza"
-        ):
-            return ()
-
-        findings: list[Finding] = []
-        for match in matches:
-            original = match.group("governed")
-            suggestion = _match_case(original, "klucza")
-            if suggestion == original:
-                continue
-            findings.append(
-                Finding.create(
-                    category=self._CATEGORY,
-                    severity=Severity.SUGGESTION,
-                    message="Niepoprawna forma dopełnienia po czasowniku „szukać”.",
-                    explanation=(
-                        "W tej zamkniętej konstrukcji czasownik „Szukam” wymaga formy "
-                        "dopełniacza „klucza”."
-                    ),
-                    original=original,
-                    suggestion=suggestion,
-                    start=match.start("governed"),
-                    end=match.end("governed"),
-                    confidence=self._confidence,
-                    source=self.source,
-                )
-            )
-        return tuple(findings)
 
 
 @dataclass(frozen=True, slots=True)
@@ -391,6 +337,218 @@ _WAVE4_SPECS: Final = (
     ),
 )
 
+_GOVERNMENT_WORD: Final = r"[^\W\d_]+"
+_GOVERNMENT_TARGET: Final = (
+    r"(?P<terminator>\.(?![.\u2026\w])|[!?](?![.!?\u2026\w])|"
+    r",(?=[ \t]+)|(?=[ \t]+(?:i|oraz|albo|lub|ani)\b)|\Z)"
+)
+_GOVERNMENT_GOVERNOR_TAGS: Final = frozenset({"fin:sg:pri:imperf"})
+_NOMINAL_COORDINATION_PREFIXES: Final = frozenset(
+    {
+        "adj",
+        "adja",
+        "adjc",
+        "adjp",
+        "depr",
+        "num",
+        "numcol",
+        "ppas",
+        "ppron12",
+        "ppron3",
+        "subst",
+        "winien",
+    }
+)
+
+
+@dataclass(frozen=True, slots=True)
+class _GeneralizedGovernmentSpec:
+    source_name: str
+    behavior_stem: str
+    pattern: re.Pattern[str]
+    governor_lemma: str
+    governor_tags: frozenset[str]
+    governor_label: str
+    target_case: str
+    target_case_label: str
+
+
+def _generalized_pattern(prefix: str, suffix: str = "") -> re.Pattern[str]:
+    return re.compile(
+        rf"(?<!\w)(?P<governor>{prefix}){suffix}[ \t]+"
+        rf"(?P<complement>(?:(?P<adjective>{_GOVERNMENT_WORD})[ \t]+)?"
+        rf"(?P<noun>{_GOVERNMENT_WORD}))"
+        rf"{_GOVERNMENT_TARGET}",
+        re.IGNORECASE,
+    )
+
+
+_GENERALIZED_SPECS: Final = (
+    _GeneralizedGovernmentSpec(
+        source_name="inflection.government_szukac_klucz",
+        behavior_stem="inflection-government-szukac-klucz",
+        pattern=_generalized_pattern("szukam"),
+        governor_lemma="szukać",
+        governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
+        governor_label="„szukać”",
+        target_case="gen",
+        target_case_label="dopełniacza",
+    ),
+    _GeneralizedGovernmentSpec(
+        source_name="inflection.government_uzywac_telefon",
+        behavior_stem="inflection-government-uzywac-telefon",
+        pattern=_generalized_pattern("używam"),
+        governor_lemma="używać",
+        governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
+        governor_label="„używać”",
+        target_case="gen",
+        target_case_label="dopełniacza",
+    ),
+    _GeneralizedGovernmentSpec(
+        source_name="inflection.government_ufac_lekarz",
+        behavior_stem="inflection-government-ufac-lekarz",
+        pattern=_generalized_pattern("ufam"),
+        governor_lemma="ufać",
+        governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
+        governor_label="„ufać”",
+        target_case="dat",
+        target_case_label="celownika",
+    ),
+    _GeneralizedGovernmentSpec(
+        source_name="inflection.government_interesowac_sie_historia",
+        behavior_stem="inflection-government-interesowac-sie-historia",
+        pattern=_generalized_pattern("interesuję", r"[ \t]+się"),
+        governor_lemma="interesować",
+        governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
+        governor_label="„interesować się”",
+        target_case="inst",
+        target_case_label="narzędnika",
+    ),
+    _GeneralizedGovernmentSpec(
+        source_name="inflection.government_do_sklep",
+        behavior_stem="inflection-government-do-sklep",
+        pattern=_generalized_pattern("do"),
+        governor_lemma="do:P",
+        governor_tags=frozenset({"prep:gen"}),
+        governor_label="przyimku „do”",
+        target_case="gen",
+        target_case_label="dopełniacza",
+    ),
+)
+
+
+class _GeneralizedGovernmentRule:
+    _CATEGORY = Category.INFLECTION
+
+    def __init__(
+        self, provider: _QualifiedMorfeusz | None, spec: _GeneralizedGovernmentSpec
+    ) -> None:
+        self.source = Source(SourceKind.RULE, spec.source_name)
+        self._provider = provider
+        self._spec = spec
+        self._confidence = Confidence(0.9)
+
+    @property
+    def operation(self) -> str:
+        return "replace.governed_form"
+
+    @property
+    def behavior_version(self) -> str:
+        return _wave4_behavior(self._spec.behavior_stem, 2)
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        if self._provider is None:
+            return ()
+        findings: list[Finding] = []
+        for match in self._spec.pattern.finditer(text):
+            adjective = match.group("adjective")
+            noun = match.group("noun")
+            legacy_szukac_klucz = (
+                self._spec.source_name == "inflection.government_szukac_klucz"
+                and adjective is None
+                and noun.casefold() == "klucz"
+                and not _is_comma_followed_by_nominal_group(
+                    text, match.end("noun"), self._provider
+                )
+            )
+            if match.group("terminator") == "," and not legacy_szukac_klucz:
+                continue
+            if not legacy_szukac_klucz and (
+                _is_quoted_position(text, match.start("governor"))
+                or _is_wrapped_mention(text, match.start(0), match.end(0))
+                or _is_after_coordinator(text, match.start("governor"))
+                or _is_before_coordinator(text, match.end("noun"))
+                or (
+                    self._spec.source_name == "inflection.government_do_sklep"
+                    and _is_initial_do_case_boundary(text, match)
+                )
+            ):
+                continue
+            if _is_title_case(noun):
+                continue
+            replacement = self._provider.government_nominal_group_replacement(
+                match.group("governor"),
+                adjective,
+                noun,
+                governor_lemma=self._spec.governor_lemma,
+                governor_tags=self._spec.governor_tags,
+                target_case=self._spec.target_case,
+            )
+            if replacement is None:
+                continue
+            replacement_adjective, replacement_noun = replacement
+            target_adjective = (
+                _match_case(adjective, replacement_adjective)
+                if adjective is not None and replacement_adjective is not None
+                else None
+            )
+            target_noun = _match_case(noun, replacement_noun)
+            adjective_changed = adjective is not None and target_adjective != adjective
+            noun_changed = target_noun != noun
+            if not adjective_changed and not noun_changed:
+                continue
+            if adjective_changed and noun_changed:
+                assert target_adjective is not None
+                start = match.start("complement")
+                end = match.end("complement")
+                original = match.group("complement")
+                suggestion = f"{target_adjective} {target_noun}"
+            elif adjective_changed:
+                assert target_adjective is not None
+                start = match.start("adjective")
+                end = match.end("adjective")
+                original = adjective
+                suggestion = target_adjective
+            else:
+                start = match.start("noun")
+                end = match.end("noun")
+                original = noun
+                suggestion = target_noun
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message=(
+                        "Niepoprawna forma grupy nominalnej po "
+                        f"{self._spec.governor_label}."
+                    ),
+                    explanation=(
+                        "W tej zamkniętej konstrukcji wymagany jest "
+                        f"{self._spec.target_case_label} dla jednoznacznego "
+                        "dopełnienia."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=start,
+                    end=end,
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
+
 
 class _Wave4MorphologyGovernmentRule:
     """Shared closed morphology-backed government consumer for Wave 4."""
@@ -471,14 +629,14 @@ class InflectionGovernmentSluchacRadioRule(_Wave4MorphologyGovernmentRule):
         super().__init__(provider, _WAVE4_SPECS[0])
 
 
-class InflectionGovernmentUzywacTelefonRule(_Wave4MorphologyGovernmentRule):
+class InflectionGovernmentUzywacTelefonRule(_GeneralizedGovernmentRule):
     def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
-        super().__init__(provider, _WAVE4_SPECS[1])
+        super().__init__(provider, _GENERALIZED_SPECS[1])
 
 
-class InflectionGovernmentInteresowacSieHistoriaRule(_Wave4MorphologyGovernmentRule):
+class InflectionGovernmentInteresowacSieHistoriaRule(_GeneralizedGovernmentRule):
     def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
-        super().__init__(provider, _WAVE4_SPECS[2])
+        super().__init__(provider, _GENERALIZED_SPECS[3])
 
 
 class InflectionGovernmentBycNauczycielRule(_Wave4MorphologyGovernmentRule):
@@ -486,14 +644,14 @@ class InflectionGovernmentBycNauczycielRule(_Wave4MorphologyGovernmentRule):
         super().__init__(provider, _WAVE4_SPECS[3])
 
 
-class InflectionGovernmentDoSklepRule(_Wave4MorphologyGovernmentRule):
+class InflectionGovernmentDoSklepRule(_GeneralizedGovernmentRule):
     def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
-        super().__init__(provider, _WAVE4_SPECS[4])
+        super().__init__(provider, _GENERALIZED_SPECS[4])
 
 
-class InflectionGovernmentUfacLekarzRule(_Wave4MorphologyGovernmentRule):
+class InflectionGovernmentUfacLekarzRule(_GeneralizedGovernmentRule):
     def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
-        super().__init__(provider, _WAVE4_SPECS[5])
+        super().__init__(provider, _GENERALIZED_SPECS[2])
 
 
 class InflectionNegatedLubicKaweRule(_Wave4MorphologyGovernmentRule):
@@ -562,7 +720,7 @@ def _governed_form_replacement(
             lemma=row.governed_lemma,
             target_tag=row.target_tag,
         )
-    except (KeyError, RuntimeError, TypeError, ValueError):
+    except (KeyError, OSError, RuntimeError, TypeError, ValueError):
         _GOVERNED_FORM_CACHE[cache_key] = None
         return None
     if (
@@ -609,6 +767,84 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
         if right in _CLOSING_QUOTES:
             return True
     return False
+
+
+def _is_quoted_position(text: str, position: int) -> bool:
+    for opening, closing in (
+        ('"', '"'),
+        ("'", "'"),
+        ("`", "`"),
+        ("„", "”"),
+        ("“", "”"),
+        ("«", "»"),
+    ):
+        before = text[:position]
+        if opening == closing:
+            if before.count(opening) % 2 == 1:
+                return True
+        elif before.rfind(opening) > before.rfind(closing):
+            return True
+    return False
+
+
+def _is_after_coordinator(text: str, position: int) -> bool:
+    sentence = re.split(r"[.!?]", text[:position])[-1]
+    return (
+        re.search(
+            r"(?:^|[ \t])(?:i|oraz|albo|lub|ani)"
+            r"(?:[ \t]+(?:znów|znowu))?[ \t]+$",
+            sentence,
+            re.IGNORECASE,
+        )
+        is not None
+    )
+
+
+def _is_before_coordinator(text: str, position: int) -> bool:
+    suffix = text[position:]
+    match = re.match(
+        r"[ \t]+(?:i|oraz|albo|lub|ani)\b[ \t]+(?P<next>[^\W\d_]+)",
+        suffix,
+        re.IGNORECASE,
+    )
+    if match is None:
+        return False
+    return True
+
+
+def _is_comma_followed_by_nominal_group(
+    text: str,
+    position: int,
+    provider: _QualifiedMorfeusz,
+) -> bool:
+    match = re.match(
+        r",[ \t]+(?P<next>[^\W\d_]+)",
+        text[position:],
+        re.IGNORECASE,
+    )
+    if match is None:
+        return False
+    next_token = match.group("next")
+    if next_token.casefold() in {"i", "oraz", "albo", "lub", "ani"}:
+        return True
+    try:
+        analyses = _analyses(
+            provider.backend.analyse(next_token),
+            next_token,
+        )
+    except (KeyError, OSError, RuntimeError, TypeError, ValueError):
+        return True
+    if not analyses:
+        return True
+    return any(
+        tag.partition(":")[0] in _NOMINAL_COORDINATION_PREFIXES
+        for _lemma, tag in analyses
+    )
+
+
+def _is_initial_do_case_boundary(text: str, match: re.Match[str]) -> bool:
+    sentence = re.split(r"[.!?]", text[: match.start("governor")])[-1].strip()
+    return sentence.casefold() == "idę" and match.group("governor") != "do"
 
 
 __all__ = [

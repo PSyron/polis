@@ -178,7 +178,7 @@ def _oni_subject_verb_replacement(provider: _QualifiedMorfeusz) -> str | None:
             lemma=_VERB_LEMMA,
             target_tag=_ONI_VERB_TARGET_TAG,
         )
-    except (KeyError, RuntimeError, TypeError, ValueError):
+    except (KeyError, OSError, RuntimeError, TypeError, ValueError):
         return None
     if (
         not _has_one_supported_lemma(
@@ -211,7 +211,7 @@ def _my_subject_verb_replacement(provider: _QualifiedMorfeusz) -> str | None:
             lemma=_VERB_LEMMA,
             target_tag=_MY_VERB_TARGET_TAG,
         )
-    except (KeyError, RuntimeError, TypeError, ValueError):
+    except (KeyError, OSError, RuntimeError, TypeError, ValueError):
         return None
     if (
         not _has_one_supported_lemma(
