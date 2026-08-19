@@ -21,7 +21,18 @@ _PROVIDER_SUFFIX = "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-" + _NOTICE
 
 
 def _behavior_version(source: str, stem: str) -> str:
-    major = 2 if source == "rule:inflection.government_do_sklep" else 1
+    major = (
+        2
+        if source
+        in {
+            "rule:inflection.government_szukac_klucz",
+            "rule:inflection.government_uzywac_telefon",
+            "rule:inflection.government_interesowac_sie_historia",
+            "rule:inflection.government_do_sklep",
+            "rule:inflection.government_ufac_lekarz",
+        }
+        else 1
+    )
     return f"{stem}/{major}.0+{_PROVIDER_SUFFIX}"
 
 
