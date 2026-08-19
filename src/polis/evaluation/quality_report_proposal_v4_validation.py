@@ -20,6 +20,7 @@ from polis.evaluation.quality_report_proposal_v4 import (
     _QUALITY_GATE_METRICS,
     expected_v4_gate_ids,
 )
+from polis.evaluation.quality_v4_measurement import source_snapshot_sha256
 
 _CATEGORIES = ("agreement", "inflection", "punctuation", "spelling", "syntax")
 _SHAPES = (
@@ -122,6 +123,9 @@ def validate_threshold_proposal_v4(
                 expected_dataset_sha256=proposal.dataset_sha256,
                 expected_manifest_sha256=proposal.manifest_sha256,
                 expected_source_sha=proposal.source_git_sha,
+                expected_source_snapshot_sha256=source_snapshot_sha256(
+                    default.source_snapshot or ()
+                ),
                 expected_wheel_sha256=proposal.wheel_sha256,
                 expected_wheel_filename=proposal.wheel_filename,
                 expected_role=role,

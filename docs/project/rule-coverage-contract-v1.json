@@ -182,12 +182,12 @@
       "fields": ["source", "operation", "behavior_version"],
       "order": "Exact deterministic registration order; sets and manually duplicated counts are invalid.",
       "digest": {"algorithm": "sha256", "canonicalization": "UTF-8 JSON array of ordered identity objects, sorted object keys, compact separators, ensure_ascii=false."},
-      "planning_baseline": {"full_sha": "59d5a62f12d529f64b3355412d6d316a5d6eb4ae", "source_count": 59, "snapshot_sha256": "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"}
+      "planning_baseline": {"full_sha": "d1696bef2d48301e3752dd1acfad59759cc6c32e", "source_count": 59, "snapshot_sha256": "1eb1ea4ad357101374c19bf6d03c4ed2cdcc26923c6c5157e5407dd34d927500"}
     },
     "maintained_rule_inventory": {
       "path": "docs/rules.md",
       "parity_rule": "Every runtime source identity appears exactly once in the maintained table; missing, extra, duplicate, category, or scope identities fail.",
-      "rows_sha256": "289a8f720c7b7ecad2c5936121da3c6fe86534792ef89aae4034c992b94a844f",
+      "rows_sha256": "604e86ffe0351e029baaf38e20b51ed29c26a108e1c5019e6983bae4bbd712e3",
       "row_canonicalization": "UTF-8 JSON array of ordered source, category, and scope objects, sorted object keys, compact separators, ensure_ascii=false."
     },
     "behavior_versions": {"path": "Analyzer.source_identity_snapshot and the registered VersionedRule metadata", "parity_rule": "Every quality and policy artifact records the exact operation and behavior_version; drift is an error."},

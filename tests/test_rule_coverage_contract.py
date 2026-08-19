@@ -15,6 +15,7 @@ from scripts.rule_coverage_contract import (
     REQUIRED_SHAPE_STRATA,
     RuleCoverageContractError,
     _read_documented_rule_inventory,
+    _validate_runtime_source_sha,
     load_rule_coverage_contract,
     validate_live_parity,
     validate_rule_coverage_contract,
@@ -305,6 +306,14 @@ def test_rule_coverage_contract_binds_ordered_runtime_snapshot_to_inventory() ->
     baseline = runtime_snapshot["planning_baseline"]
     assert isinstance(baseline, dict)
     assert hashlib.sha256(encoded).hexdigest() == baseline["snapshot_sha256"]
+
+
+def test_rule_coverage_contract_rejects_stale_planning_baseline_source() -> None:
+    with pytest.raises(
+        RuleCoverageContractError,
+        match="live runtime differs from the planning baseline source SHA",
+    ):
+        _validate_runtime_source_sha(ROOT, "59d5a62f12d529f64b3355412d6d316a5d6eb4ae")
 
 
 def test_rule_coverage_contract_rejects_missing_active_policy_entry(

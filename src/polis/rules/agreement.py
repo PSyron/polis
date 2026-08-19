@@ -24,12 +24,29 @@ _NOMINAL_GROUP_TE_DUZE_OKNO_BEHAVIOR_VERSION: Final = (
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
-_NOMINAL_GROUP_TA_NOWY_KSIAZKA_PATTERN: Final = re.compile(
-    r"(?<!\w)(?P<phrase>Ta (?P<adjective>nowy) książka)(?!\w)",
+_NOMINAL_GROUP_ADJECTIVE_NOUN_PATTERN: Final = re.compile(
+    r"(?<!\w)(?!(?:ta|to|ten|te)(?!\w))"
+    r"(?P<adjective>[^\W\d_]+)[ \t]+(?P<noun>[^\W\d_]+)(?!\w)",
+    re.IGNORECASE,
+)
+_NOMINAL_GROUP_DEMONSTRATIVES: Final = frozenset({"ta", "to", "ten", "te"})
+_NOMINAL_GROUP_COORDINATOR_PATTERN: Final = re.compile(
+    r"(?<!\w)(?:i|oraz|albo|lub|ani)[ \t]+$", re.IGNORECASE
+)
+_NOMINAL_GROUP_COORDINATOR_AFTER_PATTERN: Final = re.compile(
+    r"^[ \t]+(?:i|oraz|albo|lub|ani)(?!\w)", re.IGNORECASE
+)
+_NOMINAL_GROUP_PREPOSITION_PATTERN: Final = re.compile(
+    r"(?<!\w)(?:bez|dla|do|ku|nad|na|o|od|pod|po|przy|przed|przez|w|we|z|za|ze)[ \t]+$",
+    re.IGNORECASE,
+)
+_NOMINAL_GROUP_VOCATIVE_PATTERN: Final = re.compile(r"^[ \t]*,")
+_NOMINAL_GROUP_INTERRUPTED_DEMONSTRATIVE_PATTERN: Final = re.compile(
+    r"(?<!\w)(?:ta|to|ten|te)(?=[\W]*[^\w\s][\W]*$)[\W]+$",
     re.IGNORECASE,
 )
 _NOMINAL_GROUP_TA_NOWY_KSIAZKA_BEHAVIOR_VERSION: Final = (
-    "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+    "agreement-nominal-group-ta-nowy-ksiazka/2.1+"
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
@@ -331,8 +348,6 @@ class AgreementNominalGroupTeDuzeOknoRule:
 
 
 class AgreementNominalGroupTaNowyKsiazkaRule:
-    """Review one exact adjective gender error using qualified morphology."""
-
     _CATEGORY = Category.AGREEMENT
 
     def __init__(self, provider: _QualifiedMorfeusz | None) -> None:
@@ -352,42 +367,96 @@ class AgreementNominalGroupTaNowyKsiazkaRule:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
 
-        matches = tuple(
-            match
-            for match in _NOMINAL_GROUP_TA_NOWY_KSIAZKA_PATTERN.finditer(text)
-            if not _is_wrapped_mention(text, match.start("phrase"), match.end("phrase"))
-        )
-        if (
-            not matches
-            or self._provider is None
-            or self._provider.nominal_group_ta_nowy_ksiazka_replacement() != "nowa"
-        ):
-            return ()
-
         findings: list[Finding] = []
-        for match in matches:
+        for match in _NOMINAL_GROUP_ADJECTIVE_NOUN_PATTERN.finditer(text):
+            adjective_start = match.start("adjective")
+            noun_end = match.end("noun")
+            preceding_demonstrative = _preceding_demonstrative(text, adjective_start)
+            demonstrative = (
+                preceding_demonstrative[0]
+                if preceding_demonstrative is not None
+                else None
+            )
+            phrase_start = (
+                preceding_demonstrative[1]
+                if preceding_demonstrative is not None
+                else adjective_start
+            )
+            if (
+                _is_wrapped_mention(text, phrase_start, noun_end)
+                or _is_quoted_position(text, phrase_start)
+                or _NOMINAL_GROUP_INTERRUPTED_DEMONSTRATIVE_PATTERN.search(
+                    text[:adjective_start]
+                )
+                or _NOMINAL_GROUP_COORDINATOR_PATTERN.search(text[:phrase_start])
+                or _NOMINAL_GROUP_COORDINATOR_AFTER_PATTERN.match(text[noun_end:])
+                or _NOMINAL_GROUP_PREPOSITION_PATTERN.search(text[:phrase_start])
+                or _NOMINAL_GROUP_VOCATIVE_PATTERN.match(text[noun_end:])
+            ):
+                continue
             adjective = match.group("adjective")
-            suggestion = _match_case(adjective, "nowa")
+            noun = match.group("noun")
+            if not _has_simple_casing(adjective):
+                continue
+            replacement: str | None
+            legacy_pattern = (
+                demonstrative is not None
+                and demonstrative.casefold() == "ta"
+                and adjective.casefold() == "nowy"
+                and noun.casefold() == "książka"
+            )
+            if legacy_pattern:
+                replacement = (
+                    self._provider.nominal_group_ta_nowy_ksiazka_replacement()
+                    if self._provider is not None
+                    else None
+                )
+            elif self._provider is None:
+                replacement = None
+            else:
+                replacement = self._provider.nominal_group_agreement_replacement(
+                    adjective, noun, demonstrative
+                )
+            if replacement is None:
+                continue
+            suggestion = _match_case(adjective, replacement)
             if suggestion == adjective:
                 continue
+            explanation = (
+                "W tej zamkniętej konstrukcji forma „nowy” nie zgadza się "
+                "z rzeczownikiem „książka”; oczekiwana jest forma „nowa”."
+                if legacy_pattern
+                else (
+                    f"Forma „{adjective}” nie zgadza się z rzeczownikiem „{noun}”; "
+                    f"jednoznaczna forma to „{suggestion}”."
+                )
+            )
             findings.append(
                 Finding.create(
                     category=self._CATEGORY,
                     severity=Severity.SUGGESTION,
                     message="Niezgodność form w grupie nominalnej.",
-                    explanation=(
-                        "W tej zamkniętej konstrukcji forma „nowy” nie zgadza się "
-                        "z rzeczownikiem „książka”; oczekiwana jest forma „nowa”."
-                    ),
+                    explanation=explanation,
                     original=adjective,
                     suggestion=suggestion,
-                    start=match.start("adjective"),
+                    start=adjective_start,
                     end=match.end("adjective"),
                     confidence=self._confidence,
                     source=self.source,
                 )
             )
         return tuple(findings)
+
+
+def _preceding_demonstrative(text: str, position: int) -> tuple[str, int] | None:
+    prefix = text[:position]
+    match = re.search(r"(?<!\w)(?P<word>[^\W\d_]+)[ \t]+$", prefix)
+    if match is None:
+        return None
+    word = match.group("word")
+    if word.casefold() not in _NOMINAL_GROUP_DEMONSTRATIVES:
+        return None
+    return word, match.start("word")
 
 
 def _match_case(reference: str, replacement: str) -> str:
@@ -398,13 +467,26 @@ def _match_case(reference: str, replacement: str) -> str:
     return replacement
 
 
+def _has_simple_casing(value: str) -> bool:
+    return value.islower() or value.isupper() or value.istitle()
+
+
 _MENTION_WRAPPERS: Final = frozenset(
-    {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
+    {
+        ('"', '"'),
+        ("'", "'"),
+        ("`", "`"),
+        ("„", "”"),
+        ("“", "”"),
+        ("‘", "’"),
+        ("«", "»"),
+        ("‹", "›"),
+    }
 )
 
 
 def _is_quoted_position(text: str, position: int) -> bool:
-    for opening, closing in (('"', '"'), ("„", "”"), ("“", "”"), ("«", "»")):
+    for opening, closing in _MENTION_WRAPPERS:
         before = text[:position]
         if opening == closing:
             if before.count(opening) % 2 == 1:

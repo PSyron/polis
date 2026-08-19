@@ -20,7 +20,9 @@ stratach kształtu wejścia: `simple-local`, `sentence-internal`,
 Każde znalezisko ma półotwarty zakres `[start, end)`, zgodny z oryginalnym
 tekstem, minimalną sugestię, uzasadnienie i dokładną rodzinę reguły `rule:*`.
 Traceability każdego przypadku wiąże identyczne `source_identity`, `rule_family`
-i `audit_row` z aktualnym `behavior_version` z publicznego audytu źródeł.
+i `audit_row` z `behavior_version` zapisanym w snapshotcie tego pomiaru.
+Snapshot pomiaru jest wersjonowaną tożsamością artefaktu; bieżący audyt źródeł
+runtime'u jest utrzymywany osobno i nie przepisuje historycznych wyników v4.
 Nieznane, podstawione albo niespójne identyfikatory są odrzucane. Hard negative
 musi wyjaśniać granicę językową, a para wskazuje oba identyfikatory oraz cechę,
 która rozróżnia przypadki. Przypadki zależne od morfologii opisują osobno

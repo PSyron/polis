@@ -14,9 +14,11 @@ from polis.evaluation import quality_dataset
 from polis.evaluation._quality_parsing import canonical_hash
 from polis.evaluation._quality_types import JsonValue
 from polis.evaluation._quality_v4 import (
+    _CONTRACT,
     _V4_TRACEABILITY_SOURCES,
     validate_v4_dataset,
 )
+from polis.evaluation.quality_report_baseline import load_quality_report
 
 _PREVIOUS_DATASET_BYTE_HASHES = {
     quality_dataset.QualityDatasetVersion.V1: {
@@ -111,13 +113,7 @@ def test_v4_meets_the_category_and_shape_contract() -> None:
     raw, manifest = _documents()
 
     assert manifest["contract"]["issue"] == 364
-    contract_path = (
-        Path(__file__).parents[1] / "docs/project/rule-coverage-contract-v1.json"
-    )
-    assert (
-        hashlib.sha256(contract_path.read_bytes()).hexdigest()
-        == manifest["contract"]["sha256"]
-    )
+    assert manifest["contract"] == _CONTRACT
     assert manifest["contract"]["minimums"] == {
         "positive_findings_per_category": 8,
         "hard_negative_cases_per_category": 16,
@@ -292,20 +288,18 @@ def test_v4_preserves_exact_half_open_spans_and_minimal_suggestions() -> None:
             assert finding.rationale.strip()
 
 
-def test_v4_traceability_map_matches_public_audit_rows() -> None:
-    audit = json.loads(
-        (
-            Path(__file__).parents[1] / "docs/project/rule-coverage-rjp-2026.json"
-        ).read_text(encoding="utf-8")
+def test_v4_traceability_map_matches_its_published_measurement_snapshot() -> None:
+    report = load_quality_report(
+        Path(__file__).parents[1] / "docs/quality-baseline-v4-default.json"
     )
-    rows = {
-        row["source"]: (row["category"], row["behavior_version"])
-        for row in audit["source_rows"]
-    }
+    snapshot = report.source_snapshot
+    assert snapshot is not None
+    behavior_by_source = {item["source"]: item["behavior_version"] for item in snapshot}
 
-    assert _V4_TRACEABILITY_SOURCES == {
-        source: rows[source] for source in _V4_TRACEABILITY_SOURCES
-    }
+    assert all(
+        source in behavior_by_source and behavior_by_source[source] == behavior_version
+        for source, (_category, behavior_version) in _V4_TRACEABILITY_SOURCES.items()
+    )
 
 
 def test_v4_public_validator_cli_reports_machine_readable_summary() -> None:

@@ -13,7 +13,7 @@ from polis.rules.agreement import AgreementNominalGroupTaNowyKsiazkaRule
 
 _NOTICE_SHA256 = "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 _BEHAVIOR_VERSION = (
-    "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+    "agreement-nominal-group-ta-nowy-ksiazka/2.1+"
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     f"{_NOTICE_SHA256}"
 )
