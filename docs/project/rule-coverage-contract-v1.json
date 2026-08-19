@@ -11,7 +11,7 @@
     "product": "conservative deterministic Polis v1",
     "categories": ["agreement", "inflection", "punctuation", "spelling", "syntax"],
     "claim_boundary": "A coverage claim describes only the mapped, reviewed, public evidence units and never follows from source count or aggregate score alone.",
-    "runtime_behavior_change": "This contract adds no runtime source, rule behavior, correction policy entry, provider, dependency, or v4 case.",
+    "runtime_behavior_change": "Issue #386 adds one review-only runtime source and its public evidence; it adds no correction policy entry, provider, dependency, or v4 case.",
     "numeric_v4_thresholds": "No v4 quality threshold is selected here; thresholds require a measured reviewed baseline and a later approval."
   },
   "source_precedence": [
@@ -182,12 +182,12 @@
       "fields": ["source", "operation", "behavior_version"],
       "order": "Exact deterministic registration order; sets and manually duplicated counts are invalid.",
       "digest": {"algorithm": "sha256", "canonicalization": "UTF-8 JSON array of ordered identity objects, sorted object keys, compact separators, ensure_ascii=false."},
-      "planning_baseline": {"full_sha": "952b0bd10d082091438e20ca1dab02d8e0cf6c1c", "source_count": 59, "snapshot_sha256": "448fd8630f1f9003e6b7bb1786f1020d7a57d7bbfa87670eb8279d1dc4f6310d"}
+      "planning_baseline": {"full_sha": "165434e243360bb534d5eda8782ff089c087632c", "source_count": 60, "snapshot_sha256": "503f04cac68dc8d5aec782ac2a3bdbe26ad09bbf0c6cfde4f5562019d5b3e22d"}
     },
     "maintained_rule_inventory": {
       "path": "docs/rules.md",
       "parity_rule": "Every runtime source identity appears exactly once in the maintained table; missing, extra, duplicate, category, or scope identities fail.",
-      "rows_sha256": "62d16c1b70c3ddb6be962cd99a3fe8d3c5a7a3d68362e9b36670f861cba74cdf",
+      "rows_sha256": "733c98e9ce9cd2d0040c7657f5a4c263ef9f1fbcd7ff8d7e98cf45e76a03dd74",
       "row_canonicalization": "UTF-8 JSON array of ordered source, category, and scope objects, sorted object keys, compact separators, ensure_ascii=false."
     },
     "behavior_versions": {"path": "Analyzer.source_identity_snapshot and the registered VersionedRule metadata", "parity_rule": "Every quality and policy artifact records the exact operation and behavior_version; drift is an error."},

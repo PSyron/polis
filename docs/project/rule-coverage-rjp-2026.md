@@ -9,11 +9,11 @@ obserwowalną, bezpieczną granicę dla v1.
 
 ## Zakres i źródła normy
 
-Audyt wiąże dokładnie 59 tożsamości zwróconych przez
+Audyt wiąże dokładnie 60 tożsamości zwróconych przez
 `Analyzer(AnalyzerConfig()).source_identity_snapshot`. Wykaz zachowuje
 kolejność runtime'u, operację, wersję zachowania, provider, politykę korekty,
 status konformancji, publiczne pozytywy, hard negatives, notatkę abstencji i
-następną czynność. Bieżący podział to: agreement 8, inflection 14,
+następną czynność. Bieżący podział to: agreement 9, inflection 14,
 punctuation 5, spelling 23 i syntax 9.
 
 `audited_full_sha` oznacza dokładny, rozwiązywalny commit źródłowy, którego

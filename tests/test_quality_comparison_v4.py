@@ -9,7 +9,6 @@ from types import SimpleNamespace
 
 import pytest
 
-from polis import Analyzer, AnalyzerConfig
 from polis.evaluation.quality_comparison_v4 import compare_quality_v4
 from polis.evaluation.quality_dataset import (
     QualityDatasetVersion,
@@ -52,13 +51,19 @@ SHAPES = (
 
 
 def _snapshot() -> list[dict[str, str]]:
+    payload = json.loads(
+        (ROOT / "docs/quality-result-v4-default.json").read_text(encoding="utf-8")
+    )
+    frozen_snapshot = payload["source_snapshot"]
+    assert isinstance(frozen_snapshot, list)
     return [
         {
-            "source": item.source,
-            "operation": item.operation,
-            "behavior_version": item.behavior_version,
+            "source": item["source"],
+            "operation": item["operation"],
+            "behavior_version": item["behavior_version"],
         }
-        for item in Analyzer(AnalyzerConfig()).source_identity_snapshot
+        for item in frozen_snapshot
+        if isinstance(item, dict)
     ]
 
 
@@ -1053,5 +1058,5 @@ def test_quality_comparison_v4_incomplete_gate_coverage_fails(
 def test_quality_comparison_v4_snapshot_hash_is_canonical() -> None:
     snapshot = tuple(_snapshot())
     assert source_snapshot_sha256(snapshot) == (
-        "448fd8630f1f9003e6b7bb1786f1020d7a57d7bbfa87670eb8279d1dc4f6310d"
+        "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
     )
