@@ -9,7 +9,7 @@ from polis.rules._morfeusz import _ProviderIdentity, _QualifiedMorfeusz
 from polis.rules.agreement import AgreementNominalGroupTaNowyKsiazkaRule
 
 _NOTICE_SHA256 = "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
-_TEXT = "Ta czerwony książka. To duży okno. Ten nowa samochód."
+_TEXT = "Ta czerwony książka. Ta duży książka. Czerwony książka."
 
 type _AnalysisRow = tuple[int, int, tuple[str, str, str, list[str], list[str]]]
 type _GenerationRow = tuple[str, str, str, list[str], list[str]]
@@ -72,6 +72,7 @@ _FORMS: dict[str, tuple[_GenerationRow, ...]] = {
     "duży": (
         _generation("duże", "duży", "adj:sg:acc:n:pos"),
         _generation("duże", "duży", "adj:sg:nom.voc:n:pos"),
+        _generation("duża", "duży", "adj:sg:nom.voc:f:pos"),
     ),
     "nowy:A": (
         _generation("nowy", "nowy:A", "adj:sg:acc:m3:pos"),
@@ -125,7 +126,7 @@ def _provider(
     )
 
 
-def test_generalized_nominal_group_emits_three_new_lemma_findings() -> None:
+def test_generalized_nominal_group_emits_three_unambiguous_lemma_findings() -> None:
     rule = AgreementNominalGroupTaNowyKsiazkaRule(_provider(_QualifiedBackend()))
 
     findings = rule.find(_TEXT, options=AnalysisOptions())
@@ -135,8 +136,8 @@ def test_generalized_nominal_group_emits_three_new_lemma_findings() -> None:
         for finding in findings
     ] == [
         ("czerwony", "czerwona", 3, 11),
-        ("duży", "duże", 24, 28),
-        ("nowa", "nowy", 39, 43),
+        ("duży", "duża", 24, 28),
+        ("Czerwony", "Czerwona", 38, 46),
     ]
     assert all(finding.category is Category.AGREEMENT for finding in findings)
     assert all(
@@ -147,7 +148,7 @@ def test_generalized_nominal_group_emits_three_new_lemma_findings() -> None:
 def test_generalized_nominal_group_preserves_case_repetition_and_sentence_offsets() -> (
     None
 ):
-    text = "TA CZERWONY KSIĄŻKA. To DUŻY OKNO. Ta nowa książka."
+    text = "TA CZERWONY KSIĄŻKA. Ta DUŻY KSIĄŻKA. Ta nowa książka."
     rule = AgreementNominalGroupTaNowyKsiazkaRule(_provider(_QualifiedBackend()))
 
     findings = rule.find(text, options=AnalysisOptions())
@@ -157,7 +158,7 @@ def test_generalized_nominal_group_preserves_case_repetition_and_sentence_offset
         for finding in findings
     ] == [
         ("CZERWONY", "CZERWONA", 3, 11),
-        ("DUŻY", "DUŻE", 24, 28),
+        ("DUŻY", "DUŻA", 24, 28),
     ]
     assert all(
         text[finding.start : finding.end] == finding.original for finding in findings
@@ -332,6 +333,14 @@ def test_generalized_nominal_group_abstains_on_ambiguous_case_without_context() 
     findings = AgreementNominalGroupTaNowyKsiazkaRule(
         _provider(_QualifiedBackend(analyses=analyses))
     ).find("Czerwony książka.", options=AnalysisOptions())
+
+    assert findings == ()
+
+
+def test_generalized_nominal_group_abstains_on_ambiguous_case_with_demonstrative() -> None:
+    findings = AgreementNominalGroupTaNowyKsiazkaRule(
+        _provider(_QualifiedBackend())
+    ).find("To duży okno.", options=AnalysisOptions())
 
     assert findings == ()
 

@@ -6,19 +6,17 @@ _SOURCE = "rule:agreement.nominal_group_ta_nowy_ksiazka"
 
 _POSITIVES = (
     ("Ta czerwony książka.", ("czerwony", "czerwona", 3, 11)),
-    ("To duży okno.", ("duży", "duże", 3, 7)),
-    ("Ten nowa samochód.", ("nowa", "nowy", 4, 8)),
     ("Ta stary książka.", ("stary", "stara", 3, 8)),
     ("Czerwony książka.", ("Czerwony", "Czerwona", 0, 8)),
-    ("Te czerwony książki.", ("czerwony", "czerwone", 3, 11)),
     ("Ta czerwonego książka.", ("czerwonego", "czerwona", 3, 13)),
     ("Ta mały książka.", ("mały", "mała", 3, 7)),
+    ("Ta duży książka.", ("duży", "duża", 3, 7)),
+    ("Ta wysoki książka.", ("wysoki", "wysoka", 3, 9)),
+    ("Stary książka.", ("Stary", "Stara", 0, 5)),
 )
 
 _HARD_NEGATIVES = (
     "Ta czerwona książka.",
-    "To duże okno.",
-    "Ten nowy samochód.",
     "Ta stara książka.",
     "Czerwona książka.",
     "Duże okno.",
@@ -32,6 +30,8 @@ _HARD_NEGATIVES = (
     "Ta czerwony książka i Ten nowy samochód.",
     "Ta czerwony i książka.",
     "Ta czerwony książki.",
+    "To duży okno.",
+    "Ten nowa samochód.",
 )
 
 

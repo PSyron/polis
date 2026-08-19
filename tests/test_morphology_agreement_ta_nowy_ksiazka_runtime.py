@@ -74,7 +74,7 @@ def test_default_analyzer_preserves_finding_through_json_and_explicit_apply() ->
 
 
 def test_generalized_finding_remains_review_only_until_explicit_apply() -> None:
-    text = "To duży okno."
+    text = "Ta duży książka."
     analyzer = Analyzer(AnalyzerConfig())
     finding = analyzer.analyze(text).issues[0]
 
@@ -83,7 +83,7 @@ def test_generalized_finding_remains_review_only_until_explicit_apply() -> None:
     assert correction.corrected_text == text
     assert correction.applied_findings == ()
     assert correction.skipped_findings == (finding,)
-    assert correction.apply_suggestions((finding.id,)) == "To duże okno."
+    assert correction.apply_suggestions((finding.id,)) == "Ta duża książka."
 
 
 def test_default_analyzer_runs_offline() -> None:
@@ -201,8 +201,7 @@ def test_rule_abstains_outside_the_approved_exact_phrase(text: str) -> None:
     ("text", "original", "suggestion", "start", "end"),
     (
         ("Ta czerwony książka.", "czerwony", "czerwona", 3, 11),
-        ("To duży okno.", "duży", "duże", 3, 7),
-        ("Ten nowa samochód.", "nowa", "nowy", 4, 8),
+        ("Ta duży książka.", "duży", "duża", 3, 7),
         ("Ta stary książka.", "stary", "stara", 3, 8),
         ("Ta nowe książka.", "nowe", "nowa", 3, 7),
     ),

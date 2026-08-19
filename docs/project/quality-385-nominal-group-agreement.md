@@ -29,12 +29,13 @@ oczekiwanych findingów oraz szesnaście hard negatives. Wynik bieżącego runti
 | --- | ---: | ---: | ---: | ---: |
 | qualified-morphology | 8 | 8 | 16 | 0 |
 
-Przykłady obejmują zgodność rodzaju, liczby i przypadku, trzy różne leksemy
-przymiotnikowe oraz demonstratywy `Ta`, `To` i `Ten`. Każdy pozytyw sprawdza
+Przykłady obejmują zgodność rodzaju, liczby i przypadku, wiele leksemów
+przymiotnikowych oraz jednoznaczny demonstratyw `Ta`. Każdy pozytyw sprawdza
 `original`, `suggestion` i półotwarty span `[start, end)` względem wejścia.
 Kontrolowane pary obejmują poprawioną formę, zgodność bez demonstratywu,
-niejednoznaczność nazwy własnej, granicę cytatu/literału oraz abstencję przy
-przerwanym demonstratywie przed interpunkcją. Nie jest to claim
+niejednoznaczność nazwy własnej, wieloznaczny pakiet cech w `To duży okno`,
+granicę cytatu/literału oraz abstencję przy przerwanym demonstratywie przed
+interpunkcją. Nie jest to claim
 pełnego pokrycia kategorii; minima kategorii z #364 pozostają wiązane przez
 istniejący publiczny kontrakt v4.
 

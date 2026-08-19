@@ -335,15 +335,7 @@ class _QualifiedMorfeusz:
             target_features &= demonstrative_features
         if not target_features:
             return None
-        if (
-            len({feature[0] for feature in target_features}) != 1
-            or len({feature[2] for feature in target_features}) != 1
-        ):
-            return None
-        if (
-            demonstrative is None
-            and len({feature[1] for feature in target_features}) != 1
-        ):
+        if len(target_features) != 1:
             return None
         if adjective_features & target_features:
             return None
