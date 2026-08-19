@@ -248,7 +248,7 @@ def test_nominal_group_ta_nowy_ksiazka_full_policy_key_remains_review_only() -> 
         source,
         "replace.adjective_gender",
         (
-            "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+            "agreement-nominal-group-ta-nowy-ksiazka/2.1+"
             "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
             "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
         ),

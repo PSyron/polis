@@ -17,8 +17,9 @@ następną czynność. Bieżący podział to: agreement 8, inflection 14,
 punctuation 5, spelling 23 i syntax 9.
 
 `audited_full_sha` oznacza dokładny, rozwiązywalny commit źródłowy, którego
-kohort opisuje macierz. Walidator sprawdza istnienie tego commita, kanoniczny
-digest snapshotu oraz brak zmian w audytowanej części runtime'u względem SHA:
+kohort opisuje macierz. Audytowane ścieżki tego commita muszą być identyczne z
+bieżącym runtime'em. Walidator sprawdza istnienie commita, kanoniczny digest
+snapshotu oraz brak zmian w audytowanej części runtime'u względem SHA:
 `analysis`, `analyzer.py`, `core`, `correction`, `rules` i `segmentation`.
 Publiczne artefakty ewaluacyjne w `src/polis/evaluation/` nie zmieniają
 tożsamości źródeł reguł i są walidowane własnymi skrótami. Późniejsze commity

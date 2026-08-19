@@ -65,6 +65,11 @@ zachowania, polityka korekty i artefakty jakości muszą zachować parity z tym
 snapshotem. Nowa rodzina zaczyna jako `review-only`; automatic correction wymaga
 osobnego, dokładnego klucza polityki i osobnej akceptacji.
 
+`planning_baseline` jest parą dokładnego, rozwiązywalnego SHA źródła oraz digestu
+snapshotu. Validator odrzuca baseline, którego audytowane ścieżki runtime'u nie
+są identyczne z bieżącymi, dlatego stary SHA nie może pozostać cichym źródłem
+prawdy po zmianie zachowania.
+
 Validator wiąże również kanoniczny digest uporządkowanych wierszy wykazu
 (`source`, `category`, `scope`) oraz kompletną listę aktywnych kluczy polityki
 automatycznej. Historyczne artefakty v3 publikują SHA źródła, dataset, profil i

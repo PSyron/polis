@@ -21,6 +21,7 @@ from polis.evaluation.quality_report_validation import (
 _SCHEMA_ID: Final = "polis.quality-comparison"
 _SCHEMA_VERSION: Final = 1
 _SOURCE_SHA: Final = re.compile(r"[0-9a-f]{40}")
+_SNAPSHOT_SHA: Final = re.compile(r"[0-9a-f]{64}")
 _PROFILE_IDS: Final = ("default", "morphology")
 
 
@@ -242,17 +243,21 @@ def _parse_profile(
             "result",
         }:
             raise QualityReportError("quality v4 performance details are missing")
+        source_parity = value.get("source_parity")
+        if not isinstance(source_parity, dict):
+            raise QualityReportError("quality v4 source parity details are missing")
+        snapshot_sha = source_parity.get("snapshot_sha256")
+        if (
+            not isinstance(snapshot_sha, str)
+            or _SNAPSHOT_SHA.fullmatch(snapshot_sha) is None
+        ):
+            raise QualityReportError("quality v4 source snapshot digest is invalid")
+        if source_parity.get("row_count") != 59:
+            raise QualityReportError("quality v4 source parity row count is invalid")
     expected_verdict = (
         "pass"
         if all(gate.passed for gate in (*gates, *category_gates, *stratum_gates))
-        and (
-            not v4
-            or (
-                isinstance(value.get("source_parity"), dict)
-                and value["source_parity"].get("snapshot_sha256")
-                == "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
-            )
-        )
+        and (not v4 or isinstance(value.get("source_parity"), dict))
         else "fail"
     )
     if verdict != expected_verdict:

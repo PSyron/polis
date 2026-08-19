@@ -60,7 +60,7 @@ CHANGE_NUMBERS: Final = (
     "10",
     "11",
 )
-AUDIT_DATE: Final = "2026-08-18"
+AUDIT_DATE: Final = "2026-08-19"
 RJP_DOC_URL: Final = "https://rjp.pan.pl/app/uploads/2026/03/Zalacznik-do-komunikatu-11-25-wersja-ostateczna-jednolita.pdf"
 RJP_LANDING_URL: Final = "https://rjp.pan.pl/zasady-pisowni-i-interpunkcji-polskiej-2/"
 WITHDRAWAL_URL: Final = "https://rjp.pan.pl/komunikat-rady-jezyka-polskiego-przy-prezydium-pan-z-dnia-7-listopada-2025-r/"
@@ -362,14 +362,16 @@ def _canonical_snapshot() -> tuple[list[dict[str, str]], str]:
 
 def _validate_audited_source_sha(audited_sha: str) -> None:
     commit = subprocess.run(
-        ["git", "cat-file", "-e", f"{audited_sha}^{{commit}}"],
+        ["git", "rev-list", "--all"],
         cwd=AUDIT_PATH.parents[2],
         capture_output=True,
         text=True,
         check=False,
     )
-    if commit.returncode != 0:
-        raise RjpAuditError("audited_full_sha is not a resolvable commit")
+    if commit.returncode != 0 or audited_sha not in commit.stdout.splitlines():
+        raise RjpAuditError(
+            "audited_full_sha is not a resolvable commit from an advertised ref"
+        )
     for diff_args in (
         [
             "git",

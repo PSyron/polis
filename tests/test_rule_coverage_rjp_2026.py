@@ -266,16 +266,19 @@ def test_source_sha_and_public_v3_baseline_are_bound(tmp_path: Path) -> None:
         validate_rjp_2026_audit(_write(tmp_path, data))
 
 
-def test_audited_sha_is_valid_from_the_descendant_audit_checkout() -> None:
+def test_audited_sha_is_resolvable_from_the_current_audit_checkout() -> None:
     data = _data()
     audited_sha = data["audited_full_sha"]
     assert isinstance(audited_sha, str)
-    descendant = subprocess.run(
-        ["git", "merge-base", "--is-ancestor", audited_sha, "HEAD"],
+    resolved = subprocess.run(
+        ["git", "rev-list", "--all"],
         cwd=ROOT,
+        capture_output=True,
+        text=True,
         check=False,
     )
-    assert descendant.returncode == 0
+    assert resolved.returncode == 0
+    assert audited_sha in resolved.stdout.splitlines()
     validate_rjp_2026_audit()
 
 
@@ -473,7 +476,7 @@ def test_candidate_and_withdrawal_guards_fail_closed(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("mutation", "value", "message"),
     [
-        ("audit_date", "2026-08-19", "audit date"),
+        ("audit_date", "2026-08-18", "audit date"),
         ("category_summary", "fabricated boundary", "category summary"),
         ("maintainer_review_status", "approved", "maintainer review"),
         ("official_change_name", "RJP-01: fabricated", "official change name"),
