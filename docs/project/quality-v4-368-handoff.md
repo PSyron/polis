@@ -1,7 +1,8 @@
-# Przekazanie jakości v4 do #367 i #368
+# Przekazanie jakości v4 do #368
 
-Ten dokument wiąże korektę publicznego gold control z dalszym pomiarem #367.
-Nie jest baseline'em, propozycją progu ani zgodą na implementację reguły.
+Ten dokument jest maszynowo używalnym handoffem z #367 do #368. Kanoniczne
+dowody jakości pozostają w wersjonowanych artefaktach `docs/quality-*-v4*.json`;
+ten skrót nie zastępuje ich walidacji i nie jest zgodą na implementację reguły.
 
 ## Stan po #376
 
@@ -36,20 +37,43 @@ Digest kompletnej listy przejrzanych identyfikatorów:
 Review nadal obejmuje wszystkie 124 przypadki. Poprzednicy v1–v3 pozostają
 chronieni i niezmienieni.
 
+## Zatwierdzony pomiar #367
+
+- source SHA: `07cd485d9778c56d195f93da899917035a808a39`;
+- wheel SHA-256:
+  `7b8df55e83df14cfadf1cff974131a3030912346672e33bf3f4e0b0e6662e091`;
+- proposal: `docs/quality-threshold-proposal-v4.json`, status `approved`,
+  `enforced: true`, SHA-256
+  `24e83bb6013934184c87f3e27ad90f2f3e773b8ad5f2a6eb54dc15f0279166e7`;
+- comparison: `docs/quality-comparison-v4.json`, `aggregate_verdict: pass`,
+  SHA-256
+  `b59a4fe78d5fa69fc18e00301809e52036f3f6ed343352eda5005fdefaaeb190`;
+- default: TP 39 / FP 0 / FN 0;
+- morphology: TP 45 / FP 0 / FN 0;
+- conflict violations: 0; abstention violations: 0 w obu profilach;
+- pięć deterministycznych powtórzeń w każdym baseline i result.
+
+Comparison pozostaje fail-closed przy naruszeniu kontroli, rozjeździe
+tożsamości, brakującej metryce, regresji kategorii/straty lub
+niedeterministycznych powtórzeniach.
+
 ## Następne dozwolone czynności
 
-1. Uruchomić publiczny validator v4 z finalnych bajtów.
-2. Wykonać świeży clean-wheel baseline i powtórny pomiar #367 dla obu profili,
-   wiążąc wynik z nowym digestem datasetu, manifestu, pełnym SHA źródeł oraz
-   digestem koła.
-3. Sprawdzić osobno zero naruszeń konfliktu i abstencji oraz pełną tożsamość
-   źródeł, profilu i providera.
-4. Dopiero po niezależnym przeglądzie i akceptacji wyników #367 przekazać
-   zweryfikowane luki do #368. Ten dokument nie wybiera progów i nie otwiera
-   żadnej pracy nad regułą.
+1. W #368 odczytać publiczne luki i case IDs z kanonicznych baseline'ów v4.
+2. Zachować kolejność i pełną tożsamość 59 źródeł.
+3. Nie zmieniać goldów v4 ani zatwierdzonych gate'ów, aby dopasować przyszłą
+   implementację.
+4. Każde poszerzenie reguły utrzymać review-only do osobnej kwalifikacji i
+   ponownie sprawdzić comparison v4.
 
 Walidacja publicznego zbioru, bez sieci, modelu, Javy, kalibracji i holdoutu:
 
 ```bash
 uv run --locked --extra dev python scripts/validate_quality_dataset_v4.py --json
 ```
+
+Po wykonaniu pomiarów zweryfikuj artefakty skryptem
+`scripts/validate_runtime_performance_v2.py`, podając rzeczywiste wartości
+identyfikatorów źródła, wheel, datasetu, manifestu, protokołu i workera. Każdy
+placeholder w dokumentacji jest wartością wejściową do zastąpienia; żaden nie
+może trafić do artefaktu.

@@ -78,7 +78,12 @@ class QualityExpectedFinding:
 
 @dataclass(frozen=True, slots=True)
 class QualityCase:
-    """One project-authored input in the active quality matrix."""
+    """One project-authored input in the active quality matrix.
+
+    The optional fields are v4-only review metadata.  Keeping them on the
+    validated value type avoids reparsing protected case bytes in measurement
+    code while leaving the v1-v3 public shape unchanged.
+    """
 
     id: str
     kind: QualityCaseKind
@@ -88,6 +93,11 @@ class QualityCase:
     text: str
     findings: tuple[QualityExpectedFinding, ...]
     rationale: str | None
+    category: str | None = None
+    shape_strata: tuple[str, ...] = ()
+    source_identity: str | None = None
+    behavior_version: str | None = None
+    provider_requirement: str = "none"
 
 
 @dataclass(frozen=True, slots=True)

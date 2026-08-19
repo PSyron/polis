@@ -1,0 +1,1907 @@
+{
+  "aggregate_verdict": "pass",
+  "artifacts": {
+    "sdist_filename": null,
+    "sdist_sha256": null,
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "7b8df55e83df14cfadf1cff974131a3030912346672e33bf3f4e0b0e6662e091"
+  },
+  "dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+  "environment_baseline": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "environment_result": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "manifest_sha256": "c7080b7609e83533d81bef97526536078ccf566178808c394338e339bc042422",
+  "notes": [
+    "v4 comparison is fail-closed and category/shape aware."
+  ],
+  "profiles": {
+    "default": {
+      "baseline_path": "docs/quality-baseline-v4-default.json",
+      "baseline_sha256": "b197f841dcbb9929e0b518475ddd19289393a3cba66e3d7f05c5def70e2f1aa8",
+      "category_gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:agreement:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:inflection:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:punctuation:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:spelling:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:syntax:false_alarm_rate",
+          "pass": true
+        }
+      ],
+      "gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "aggregate:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "control violations must remain zero",
+          "gate": "control:conflict:zero-violations",
+          "pass": true
+        },
+        {
+          "detail": "control violations must remain zero",
+          "gate": "control:abstention:zero-violations",
+          "pass": true
+        },
+        {
+          "detail": "source diagnostics reconcile with the live snapshot",
+          "gate": "source:exact-ordered-59-parity",
+          "pass": true
+        },
+        {
+          "detail": "measured=30042, maximum=30042",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": true
+        },
+        {
+          "detail": "measured=52610.38294758326, minimum=52610.38294758326",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": true
+        },
+        {
+          "detail": "measured=147456, maximum=147456",
+          "gate": "performance.maximum_worker_incremental_peak_rss_bytes",
+          "pass": true
+        },
+        {
+          "detail": "repetition, warmup, and measured counts match the approved protocol",
+          "gate": "performance.reproducibility",
+          "pass": true
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 1.0
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        }
+      ],
+      "performance": {
+        "baseline": {
+          "measured_repetitions": 5,
+          "p95_latency_ns": 25209,
+          "peak_rss_bytes": 35848192,
+          "repetition_hashes": [
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f"
+          ],
+          "throughput_cases_per_second": 62019.995246467464,
+          "warmup_repetitions": 1
+        },
+        "result": {
+          "measured_repetitions": 5,
+          "p95_latency_ns": 24875,
+          "peak_rss_bytes": 33357824,
+          "repetition_hashes": [
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f",
+            "b95bd7c869f4edd43ff47810ab3aa572c88977e9b40b939f06f1ae2564b4134f"
+          ],
+          "throughput_cases_per_second": 62348.31509712158,
+          "warmup_repetitions": 1
+        }
+      },
+      "profile_id": "default",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 77,
+        "correction_matches": 39,
+        "expected_findings": 39,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 39,
+        "span_matches": 39,
+        "true_positives": 39
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 77,
+        "correction_matches": 39,
+        "expected_findings": 39,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 39,
+        "span_matches": 39,
+        "true_positives": 39
+      },
+      "result_path": "docs/quality-result-v4-default.json",
+      "result_sha256": "0741f4b47652a31d60f963d639222ae66c1ca4f870113915f568319e826653d9",
+      "source_parity": {
+        "profile": "default",
+        "row_count": 59,
+        "snapshot_sha256": "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c",
+        "source_sha": "07cd485d9778c56d195f93da899917035a808a39"
+      },
+      "stratum_gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        }
+      ],
+      "verdict": "pass"
+    },
+    "morphology": {
+      "baseline_path": "docs/quality-baseline-v4-morphology.json",
+      "baseline_sha256": "0172aed6caa6e2772f18db2b01106a93d5c520fed1f9a2f39e3d15bfab24b1ea",
+      "category_gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:agreement:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:agreement:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:inflection:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:inflection:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:punctuation:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:punctuation:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:spelling:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:spelling:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "category:syntax:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "category:syntax:false_alarm_rate",
+          "pass": true
+        }
+      ],
+      "gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "aggregate:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "aggregate:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "control violations must remain zero",
+          "gate": "control:conflict:zero-violations",
+          "pass": true
+        },
+        {
+          "detail": "control violations must remain zero",
+          "gate": "control:abstention:zero-violations",
+          "pass": true
+        },
+        {
+          "detail": "source diagnostics reconcile with the live snapshot",
+          "gate": "source:exact-ordered-59-parity",
+          "pass": true
+        },
+        {
+          "detail": "measured=37500, maximum=37500",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": true
+        },
+        {
+          "detail": "measured=39533.141652857696, minimum=39030.16339159529",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": true
+        },
+        {
+          "detail": "measured=114688, maximum=114688",
+          "gate": "performance.maximum_worker_incremental_peak_rss_bytes",
+          "pass": true
+        },
+        {
+          "detail": "repetition, warmup, and measured counts match the approved protocol",
+          "gate": "performance.reproducibility",
+          "pass": true
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 1.0
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        }
+      ],
+      "performance": {
+        "baseline": {
+          "measured_repetitions": 5,
+          "p95_latency_ns": 32125,
+          "peak_rss_bytes": 79642624,
+          "repetition_hashes": [
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848"
+          ],
+          "throughput_cases_per_second": 45376.4473988903,
+          "warmup_repetitions": 1
+        },
+        "result": {
+          "measured_repetitions": 5,
+          "p95_latency_ns": 31875,
+          "peak_rss_bytes": 77512704,
+          "repetition_hashes": [
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+            "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848"
+          ],
+          "throughput_cases_per_second": 45953.579769040276,
+          "warmup_repetitions": 1
+        }
+      },
+      "profile_id": "morphology",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 80,
+        "correction_matches": 45,
+        "expected_findings": 45,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 45,
+        "span_matches": 45,
+        "true_positives": 45
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 80,
+        "correction_matches": 45,
+        "expected_findings": 45,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 45,
+        "span_matches": 45,
+        "true_positives": 45
+      },
+      "result_path": "docs/quality-result-v4-morphology.json",
+      "result_sha256": "4d388ba3b8ed0c9727b20a1dceb107319f6d002cd8609a4012c6ad75dd42d182",
+      "source_parity": {
+        "profile": "morphology",
+        "row_count": 59,
+        "snapshot_sha256": "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c",
+        "source_sha": "07cd485d9778c56d195f93da899917035a808a39"
+      },
+      "stratum_gates": [
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:agreement:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:agreement:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:inflection:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:inflection:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:punctuation:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:spelling:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:spelling:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:simple-local:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:simple-local:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:sentence-internal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:sentence-internal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:multi-sentence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:multi-sentence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:repeated-occurrence:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:repeated-occurrence:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:unicode-and-case:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:unicode-and-case:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:quotation-or-literal:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:quotation-or-literal:false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:precision",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:recall",
+          "pass": true
+        },
+        {
+          "detail": "measured=1.0, threshold=1.0",
+          "gate": "stratum:syntax:conflict-or-abstention:f1",
+          "pass": true
+        },
+        {
+          "detail": "measured=0.0, threshold=0.0",
+          "gate": "stratum:syntax:conflict-or-abstention:false_alarm_rate",
+          "pass": true
+        }
+      ],
+      "verdict": "pass"
+    }
+  },
+  "proposal_path": "docs/quality-threshold-proposal-v4.json",
+  "proposal_sha256": "24e83bb6013934184c87f3e27ad90f2f3e773b8ad5f2a6eb54dc15f0279166e7",
+  "schema_id": "polis.quality-comparison",
+  "schema_version": 4,
+  "source_git_sha": "07cd485d9778c56d195f93da899917035a808a39"
+}

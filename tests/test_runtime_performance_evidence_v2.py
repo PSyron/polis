@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 PROFILES = ("default", "morphology")
 ROLES = ("reference", "current")
+V3_PROTOCOL_SHA256 = "510e9f8799f52768ff9535c0d7657be1f761f39e58f06dd2db99edb0b7beb225"
+V3_WORKER_SHA256 = "08c0311953255ebc136ecb7a49bb1d2776e5e6bd74cf99d90d298e001f750752"
 PROTECTED = {
     "quality-threshold-proposal-v3.json": (
         "c747365bec66b2f3642d617ba53cd234da4098e6405b9ba5cbf79ff3ead28b6a"
@@ -51,8 +53,6 @@ def test_protocol_v2_evidence_is_additive_to_protected_history() -> None:
 
 
 def test_protocol_v2_results_share_dataset_environment_and_protocol_identity() -> None:
-    protocol_sha = _sha(ROOT / "src/polis/runtime_performance_protocol.py")
-    worker_sha = _sha(ROOT / "src/polis/runtime_performance_worker.py")
     environments = []
     for role in ROLES:
         for profile in PROFILES:
@@ -69,8 +69,8 @@ def test_protocol_v2_results_share_dataset_environment_and_protocol_identity() -
             )
             assert result["protocol_implementation"] == {
                 "overlay_applied": role == "reference",
-                "runtime_performance_protocol_sha256": protocol_sha,
-                "runtime_performance_worker_sha256": worker_sha,
+                "runtime_performance_protocol_sha256": V3_PROTOCOL_SHA256,
+                "runtime_performance_worker_sha256": V3_WORKER_SHA256,
             }
             assert result["reproducibility"]["warmup_repetitions"] == 1
             assert result["reproducibility"]["measured_repetitions"] == 5

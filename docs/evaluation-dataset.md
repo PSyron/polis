@@ -154,7 +154,13 @@ abstenuje w obu profilach. Traceability jest jawnie projektowa i nie podszywa
 kandydatów pod istniejące źródło runtime. Canonical digest v4 to
 `0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c`, a digest
 manifestu to `120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`.
-Przed użyciem wyniku do #368 należy ponownie wykonać clean-wheel baseline #367.
+
+#367 opublikowało dualne baseline'y i wyniki v4, cztery izolowane artefakty
+wydajności, zatwierdzoną propozycję `docs/quality-threshold-proposal-v4.json`
+oraz `docs/quality-comparison-v4.json`. Comparison ma `aggregate_verdict: pass`;
+oba profile zachowują precision/recall/F1 `1.0`, zero false alarmów i zero
+naruszeń kontroli. Te artefakty są wejściem do kwalifikacji luk w #368, ale nie
+stanowią zgody na automatyczną korektę ani zmianę goldów.
 
 ## Definicje pomiarów
 
