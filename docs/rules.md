@@ -15,7 +15,7 @@ kompletności języka.
 | `rule:agreement.te_zdanie` | `agreement` | zamknięty wzorzec `Te zdanie` → `To zdanie`, z zachowaniem wielkości liter |
 | `rule:agreement.te_neuter_noun` | `agreement` | zamknięty wzorzec `Te` + rzeczownik nijaki (bez `zdanie`/`miasto`) → `To`, z abstencją przed przecinkiem wołacza, wyłącznie do przeglądu |
 | `rule:agreement.nominal_group_te_duze_okno` | `agreement` | opcjonalna zamknięta konstrukcja `Te duże okno jest otwarte.` → `To duże okno jest otwarte.`, wyłącznie do przeglądu |
-| `rule:agreement.nominal_group_ta_nowy_ksiazka` | `agreement` | opcjonalna zamknięta konstrukcja `Ta nowy książka.` → `Ta nowa książka.`, wyłącznie do przeglądu |
+| `rule:agreement.nominal_group_ta_nowy_ksiazka` | `agreement` | opcjonalne lokalne grupy `przymiotnik + rzeczownik`, a przy jednoznacznym demonstratywie także `demonstratyw + przymiotnik + rzeczownik`; minimalna korekta przymiotnika, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_my_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `My czyta książkę.` → `My czytamy książkę.`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
@@ -83,7 +83,11 @@ Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:syntax.missing_correlative`,
 `rule:syntax.missing_destination_preposition` i
 `rule:syntax.missing_reflexive` działają tylko dla pojedynczego zdania i
-pozostają do przeglądu. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
+pozostają do przeglądu. Reguła `rule:agreement.nominal_group_ta_nowy_ksiazka`
+korzysta z Morfeusza również dla lokalnych grup przymiotnik–rzeczownik; zachowuje
+minimalny span przymiotnika i abstenuje przy niejednoznaczności, wołaczu,
+koordynacji, cytacie, przerwanym demonstratywie przed interpunkcją, nazwie
+własnej albo niepełnych danych. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
 oraz druga i trzecia z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo

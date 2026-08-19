@@ -73,6 +73,50 @@ _PRZYGLADAC_NOUN_LEMMA: Final = "budynek"
 _PRZYGLADAC_NOUN_SOURCE_TAGS: Final = frozenset({"subst:sg:nom.acc:m3"})
 _PRZYGLADAC_ADJECTIVE_TARGET_TAG: Final = "adj:sg:dat:m1.m2.m3.n:pos"
 _PRZYGLADAC_NOUN_TARGET_TAG: Final = "subst:sg:dat:m3"
+_NON_ADJECTIVE_LEMMAS: Final = frozenset(
+    {"jaki", "który", "mój", "nasz", "taki", "twój", "wasz", "żaden"}
+)
+_VERB_TAG_PREFIXES: Final = frozenset(
+    {"fin", "ger", "impt", "imps", "inf", "pant", "pcon", "praet"}
+)
+_KNOWN_TAG_PREFIXES: Final = frozenset(
+    {
+        "adj",
+        "adja",
+        "adjc",
+        "adjp",
+        "adv",
+        "brev",
+        "burk",
+        "comp",
+        "conj",
+        "depr",
+        "fin",
+        "ger",
+        "ign",
+        "imps",
+        "impt",
+        "inf",
+        "interj",
+        "num",
+        "numcol",
+        "pant",
+        "part",
+        "pcon",
+        "ppron12",
+        "ppron3",
+        "ppas",
+        "praet",
+        "pred",
+        "prep",
+        "qub",
+        "subst",
+        "winien",
+    }
+)
+_KNOWN_NOUN_TAG_SUFFIXES: Final = frozenset({"col", "ncol"})
+
+type _AgreementFeature = tuple[str, str, str]
 
 
 class _QualifiedMorfeuszBackend(Protocol):
@@ -98,6 +142,14 @@ class _ProviderIdentity:
     package_version: str
     dictionary_id: str
     dictionary_notice_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class _ParsedAnalysis:
+    lemma: str
+    tag: str
+    labels: tuple[str, ...]
+    qualifiers: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -229,6 +281,97 @@ class _QualifiedMorfeusz:
             return None
         return "nowa"
 
+    @lru_cache(maxsize=64)  # noqa: B019 - bounded provider lifecycle cache
+    def nominal_group_agreement_replacement(
+        self, adjective: str, noun: str, demonstrative: str | None = None
+    ) -> str | None:
+        if self.identity != _qualified_identity():
+            return None
+        adjective_input = adjective.casefold() if adjective.isupper() else adjective
+        noun_input = noun.casefold() if noun.isupper() else noun
+        demonstrative_input = (
+            demonstrative.casefold()
+            if demonstrative is not None and demonstrative.isupper()
+            else demonstrative
+        )
+        try:
+            adjective_analyses = _analyses_with_metadata(
+                self.backend.analyse(adjective_input), adjective_input
+            )
+            noun_analyses = _analyses_with_metadata(
+                self.backend.analyse(noun_input), noun_input
+            )
+            demonstrative_analyses = (
+                _analyses_with_metadata(
+                    self.backend.analyse(demonstrative_input), demonstrative_input
+                )
+                if demonstrative_input is not None
+                else None
+            )
+        except (KeyError, RuntimeError, TypeError, ValueError):
+            return None
+
+        adjective_selection = _select_agreement_analyses(
+            adjective_analyses, prefix="adj"
+        )
+        noun_selection = _select_agreement_analyses(
+            noun_analyses, prefix="subst", require_common_noun=True
+        )
+        if adjective_selection is None or noun_selection is None:
+            return None
+        adjective_lemma, adjective_features = adjective_selection
+        if adjective_lemma in _NON_ADJECTIVE_LEMMAS:
+            return None
+        _, target_features = noun_selection
+        if demonstrative is not None:
+            demonstrative_selection = _select_agreement_analyses(
+                demonstrative_analyses, prefix="adj"
+            )
+            if demonstrative_selection is None:
+                return None
+            demonstrative_lemma, demonstrative_features = demonstrative_selection
+            if demonstrative_lemma != _DEMONSTRATIVE_LEMMA:
+                return None
+            target_features &= demonstrative_features
+        if not target_features:
+            return None
+        if (
+            len({feature[0] for feature in target_features}) != 1
+            or len({feature[2] for feature in target_features}) != 1
+        ):
+            return None
+        if (
+            demonstrative is None
+            and len({feature[1] for feature in target_features}) != 1
+        ):
+            return None
+        if adjective_features & target_features:
+            return None
+
+        try:
+            generated_rows = _generation_rows(self.backend.generate(adjective_lemma))
+        except (KeyError, RuntimeError, TypeError, ValueError):
+            return None
+        if generated_rows is None:
+            return None
+        forms: set[str] = set()
+        for feature in target_features:
+            feature_forms = {
+                form
+                for form, lemma, tag in generated_rows
+                if lemma == adjective_lemma
+                and tag.startswith("adj:")
+                and tag.rsplit(":", 1)[-1] == "pos"
+                and (tag_features := _tag_features(tag, prefix="adj")) is not None
+                and feature in tag_features
+            }
+            if not feature_forms:
+                return None
+            forms.update(feature_forms)
+        if len(forms) != 1:
+            return None
+        return next(iter(forms))
+
     @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def przygladac_sie_nowy_budynek_replacement(self) -> str | None:
         if self.identity != _qualified_identity():
@@ -282,6 +425,165 @@ class _QualifiedMorfeusz:
 
 def _qualified_identity() -> _ProviderIdentity:
     return _ProviderIdentity(_PACKAGE_VERSION, _DICTIONARY_ID, _NOTICE_SHA256)
+
+
+def _analyses_with_metadata(
+    rows: Sequence[_AnalysisRow], input_form: str
+) -> tuple[_ParsedAnalysis, ...] | None:
+    if isinstance(rows, (str, bytes)):
+        return None
+    parsed: set[_ParsedAnalysis] = set()
+    for row in rows:
+        if not isinstance(row, tuple) or len(row) != 3:
+            return None
+        start, end, interpretation = row
+        if (
+            type(start) is not int
+            or type(end) is not int
+            or (start, end) != (0, 1)
+            or not isinstance(interpretation, tuple)
+            or len(interpretation) != 5
+        ):
+            return None
+        surface, lemma, tag, labels, qualifiers = interpretation
+        if (
+            not isinstance(surface, str)
+            or surface != input_form
+            or not isinstance(lemma, str)
+            or not lemma
+            or not isinstance(tag, str)
+            or not tag
+            or tag.partition(":")[0] not in _KNOWN_TAG_PREFIXES
+            or not isinstance(labels, list)
+            or not isinstance(qualifiers, list)
+            or not all(isinstance(value, str) for value in labels)
+            or not all(isinstance(value, str) for value in qualifiers)
+        ):
+            return None
+        parsed.add(
+            _ParsedAnalysis(
+                lemma=lemma,
+                tag=tag,
+                labels=tuple(labels),
+                qualifiers=tuple(qualifiers),
+            )
+        )
+    return tuple(
+        sorted(
+            parsed,
+            key=lambda item: (item.lemma, item.tag, item.labels, item.qualifiers),
+        )
+    )
+
+
+def _generation_rows(
+    rows: Sequence[_GenerationRow],
+) -> tuple[tuple[str, str, str], ...] | None:
+    if isinstance(rows, (str, bytes)):
+        return None
+    parsed: set[tuple[str, str, str]] = set()
+    for row in rows:
+        if (
+            not isinstance(row, tuple)
+            or len(row) != 5
+            or not isinstance(row[0], str)
+            or not row[0]
+            or not isinstance(row[1], str)
+            or not row[1]
+            or not isinstance(row[2], str)
+            or not isinstance(row[3], list)
+            or not isinstance(row[4], list)
+            or not all(isinstance(value, str) for value in row[3])
+            or not all(isinstance(value, str) for value in row[4])
+        ):
+            return None
+        tag_prefix = row[2].partition(":")[0]
+        if tag_prefix not in _KNOWN_TAG_PREFIXES:
+            return None
+        if tag_prefix != "adj":
+            continue
+        if _tag_features(row[2], prefix="adj") is None:
+            return None
+        parsed.add((row[0], row[1], row[2]))
+    return tuple(sorted(parsed))
+
+
+def _select_agreement_analyses(
+    analyses: tuple[_ParsedAnalysis, ...] | None,
+    *,
+    prefix: str,
+    require_common_noun: bool = False,
+) -> tuple[str, frozenset[_AgreementFeature]] | None:
+    if analyses is None or any(item.tag == "ign" for item in analyses):
+        return None
+    selected = tuple(item for item in analyses if item.tag.startswith(f"{prefix}:"))
+    if not selected:
+        return None
+    if prefix == "adj" and any(
+        item.tag.rsplit(":", 1)[-1] != "pos" for item in selected
+    ):
+        return None
+    if require_common_noun and any(
+        item.labels != ("nazwa_pospolita",) for item in selected
+    ):
+        return None
+    lemmas = {item.lemma for item in selected}
+    if len(lemmas) != 1:
+        return None
+    if prefix == "subst" and any(
+        item.tag.partition(":")[0] in _VERB_TAG_PREFIXES for item in analyses
+    ):
+        return None
+    features: set[_AgreementFeature] = set()
+    for item in selected:
+        parsed = _tag_features(item.tag, prefix=prefix)
+        if parsed is None:
+            return None
+        features.update(parsed)
+    return next(iter(lemmas)), frozenset(features)
+
+
+def _tag_features(tag: str, *, prefix: str) -> frozenset[_AgreementFeature] | None:
+    parts = tag.split(":")
+    if prefix == "adj":
+        if (
+            len(parts) != 5
+            or parts[0] != "adj"
+            or parts[4] not in {"pos", "com", "sup"}
+        ):
+            return None
+        number_part, case_part, gender_part = parts[1:4]
+    elif prefix == "subst":
+        if (
+            len(parts) not in {4, 5}
+            or parts[0] != "subst"
+            or (len(parts) == 5 and parts[4] not in _KNOWN_NOUN_TAG_SUFFIXES)
+        ):
+            return None
+        number_part, case_part, gender_part = parts[1:4]
+    else:
+        return None
+    numbers = _tag_values(number_part, frozenset({"sg", "pl"}))
+    cases = _tag_values(
+        case_part,
+        frozenset({"nom", "acc", "gen", "dat", "inst", "loc", "voc"}),
+    )
+    genders = _tag_values(gender_part, frozenset({"m1", "m2", "m3", "f", "n"}))
+    if numbers is None or cases is None or genders is None:
+        return None
+    return frozenset(
+        (number, case, gender)
+        for number in numbers
+        for case in cases
+        for gender in genders
+    )
+
+
+def _tag_values(value: str, allowed: frozenset[str]) -> frozenset[str] | None:
+    values = frozenset(value.split("."))
+    if not values or "" in values or not values <= allowed:
+        return None
+    return values
 
 
 def _analyses(

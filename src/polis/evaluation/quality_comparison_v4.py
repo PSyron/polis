@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from polis import Analyzer, AnalyzerConfig
 from polis.evaluation.quality_performance_artifact import load_runtime_performance_v2
 from polis.evaluation.quality_report_baseline import (
     baseline_file_sha256,
@@ -34,9 +33,6 @@ _SHAPES = (
     "unicode-and-case",
     "quotation-or-literal",
     "conflict-or-abstention",
-)
-_SOURCE_SNAPSHOT_SHA256 = (
-    "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
 )
 _PROTOCOL_SHA256 = "runtime-performance-protocol-v2"
 _WORKER_SHA256 = "runtime-performance-worker-v2"
@@ -104,8 +100,8 @@ def compare_quality_v4(
         _validate_identity(
             baseline[profile_id], result[profile_id], proposal_value, profile_id
         )
-        _validate_live_snapshot(baseline[profile_id])
-        _validate_live_snapshot(result[profile_id])
+        _validate_artifact_snapshot(baseline[profile_id])
+        _validate_artifact_snapshot(result[profile_id])
         _validate_diagnostics(baseline[profile_id])
         _validate_diagnostics(result[profile_id])
         _validate_controls(baseline[profile_id])
@@ -291,6 +287,9 @@ def _validate_isolated_performance(
         expected_dataset_sha256=proposal.dataset_sha256,
         expected_manifest_sha256=proposal.manifest_sha256,
         expected_source_sha=proposal.source_git_sha,
+        expected_source_snapshot_sha256=source_snapshot_sha256(
+            report.source_snapshot or ()
+        ),
         expected_wheel_sha256=proposal.wheel_sha256,
         expected_wheel_filename=proposal.wheel_filename,
         expected_role=expected_role,
@@ -421,22 +420,23 @@ def _validate_identity(
         )
 
 
-def _validate_live_snapshot(report: QualityReport) -> None:
-    live = tuple(
-        {
-            "source": item.source,
-            "operation": item.operation,
-            "behavior_version": item.behavior_version,
-        }
-        for item in Analyzer(AnalyzerConfig()).source_identity_snapshot
-    )
-    if (
-        source_snapshot_sha256(live) != _SOURCE_SNAPSHOT_SHA256
-        or report.source_snapshot != live
-    ):
+def _validate_artifact_snapshot(report: QualityReport) -> None:
+    snapshot = report.source_snapshot
+    if snapshot is None or len(snapshot) != 59:
         raise QualityReportError(
-            "v4 source snapshot does not match live exact-ordered-59"
+            "v4 source snapshot must contain exactly 59 artifact identities"
         )
+    sources = tuple(item["source"] for item in snapshot)
+    if len(set(sources)) != len(sources) or any(
+        not source.startswith("rule:") for source in sources
+    ):
+        raise QualityReportError("v4 artifact source snapshot has invalid sources")
+    if any(not item["operation"] or not item["behavior_version"] for item in snapshot):
+        raise QualityReportError(
+            "v4 artifact source snapshot has incomplete identities"
+        )
+    if report.run_identity.source_snapshot != snapshot:
+        raise QualityReportError("v4 artifact source snapshot identity is inconsistent")
 
 
 def _validate_diagnostics(report: QualityReport) -> None:

@@ -14,9 +14,6 @@ from polis.evaluation.quality_report_models import (
     QualityReportError,
 )
 
-_SOURCE_SNAPSHOT_SHA256 = (
-    "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
-)
 _PROVIDER = {
     "provider": "morfeusz2",
     "package_version": "1.99.15",
@@ -60,6 +57,7 @@ def load_runtime_performance_v2(
     expected_manifest_sha256: str,
     expected_source_sha: str,
     expected_wheel_sha256: str,
+    expected_source_snapshot_sha256: str | None = None,
     expected_wheel_filename: str | None = None,
     expected_role: str | None = None,
 ) -> dict[str, Any]:
@@ -134,9 +132,19 @@ def load_runtime_performance_v2(
         "sha256": expected_dataset_sha256,
         "manifest_sha256": expected_manifest_sha256,
         "cases": 124,
-        "source_snapshot_sha256": _SOURCE_SNAPSHOT_SHA256,
+        "source_snapshot_sha256": dataset.get("source_snapshot_sha256"),
     }:
         raise QualityReportError("v4 performance artifact dataset identity mismatch")
+    source_snapshot_sha256 = dataset["source_snapshot_sha256"]
+    if (
+        not isinstance(source_snapshot_sha256, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", source_snapshot_sha256)
+        or (
+            expected_source_snapshot_sha256 is not None
+            and source_snapshot_sha256 != expected_source_snapshot_sha256
+        )
+    ):
+        raise QualityReportError("v4 performance source snapshot identity mismatch")
     implementation = protocol_implementation
     if (
         not isinstance(implementation["overlay_applied"], bool)

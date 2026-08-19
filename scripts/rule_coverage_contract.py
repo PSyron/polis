@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -23,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "62ebb4892db4ac60100bb5595f53d50e60617d69c18deb21157b58ec95a3cc3f"
+    "32685f21c60e2470276d8a00f93a291d8b182a4f7b7a03d9b3d42456d31e0513"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",
@@ -33,10 +34,19 @@ SOURCE_PRECEDENCE: Final = (
     "docs/rules.md",
     "public-v3-quality-and-isolated-performance-artifacts",
 )
-PLANNING_BASELINE_FULL_SHA: Final = "59d5a62f12d529f64b3355412d6d316a5d6eb4ae"
+PLANNING_BASELINE_FULL_SHA: Final = "37a2ecc471c1d15cd837a5a519ff9e1c1fde087b"
 PLANNING_BASELINE_SOURCE_COUNT: Final = 59
 PLANNING_BASELINE_SNAPSHOT_SHA256: Final = (
-    "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
+    "1eb1ea4ad357101374c19bf6d03c4ed2cdcc26923c6c5157e5407dd34d927500"
+)
+_RUNTIME_SOURCE_PATHS: Final = (
+    "src/polis/__init__.py",
+    "src/polis/analysis",
+    "src/polis/analyzer.py",
+    "src/polis/core",
+    "src/polis/correction",
+    "src/polis/rules",
+    "src/polis/segmentation",
 )
 SUPPORTED_CATEGORY_ORDER: Final = (
     "agreement",
@@ -182,6 +192,63 @@ def _sha256_file(path: Path, label: str) -> str:
         raise RuleCoverageContractError(f"{label} unavailable: {path}") from error
 
 
+def _validate_runtime_source_sha(repository_root: Path, source_sha: str) -> None:
+    git_root_result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=repository_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    git_root = (
+        Path(git_root_result.stdout.strip())
+        if git_root_result.returncode == 0
+        else Path(__file__).resolve().parents[1]
+    )
+    resolved = subprocess.run(
+        ["git", "rev-list", "--all"],
+        cwd=git_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if resolved.returncode != 0 or source_sha not in resolved.stdout.splitlines():
+        raise RuleCoverageContractError(
+            "planning baseline source SHA is not a resolvable commit from "
+            "an advertised ref"
+        )
+    for diff_args in (
+        [
+            "git",
+            "diff",
+            "--quiet",
+            source_sha,
+            "--",
+            *_RUNTIME_SOURCE_PATHS,
+        ],
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--quiet",
+            source_sha,
+            "--",
+            *_RUNTIME_SOURCE_PATHS,
+        ],
+    ):
+        diff = subprocess.run(
+            diff_args,
+            cwd=git_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if diff.returncode != 0:
+            raise RuleCoverageContractError(
+                "live runtime differs from the planning baseline source SHA"
+            )
+
+
 def validate_live_parity(
     contract: RuleCoverageContract,
     *,
@@ -199,6 +266,9 @@ def validate_live_parity(
         source_governance, "runtime_snapshot", "source governance"
     )
     baseline = _object_field(runtime_snapshot, "planning_baseline", "runtime snapshot")
+    _validate_runtime_source_sha(
+        repository_root, _string(baseline, "full_sha", "planning baseline")
+    )
     if len(snapshot) != _integer(baseline, "source_count", "planning baseline"):
         raise RuleCoverageContractError("live source count does not match the contract")
     encoded_snapshot = json.dumps(

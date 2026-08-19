@@ -30,7 +30,7 @@ from polis.rules.agreement import AgreementNominalGroupTaNowyKsiazkaRule
 
 _TEXT = "Ta nowy książka."
 _BEHAVIOR_VERSION = (
-    "agreement-nominal-group-ta-nowy-ksiazka/1.0+"
+    "agreement-nominal-group-ta-nowy-ksiazka/2.1+"
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
@@ -71,6 +71,19 @@ def test_default_analyzer_preserves_finding_through_json_and_explicit_apply() ->
     assert correction.applied_findings == ()
     assert correction.skipped_findings == (finding,)
     assert correction.apply_suggestions((finding.id,)) == "Ta nowa książka."
+
+
+def test_generalized_finding_remains_review_only_until_explicit_apply() -> None:
+    text = "To duży okno."
+    analyzer = Analyzer(AnalyzerConfig())
+    finding = analyzer.analyze(text).issues[0]
+
+    correction = analyzer.correct(text)
+
+    assert correction.corrected_text == text
+    assert correction.applied_findings == ()
+    assert correction.skipped_findings == (finding,)
+    assert correction.apply_suggestions((finding.id,)) == "To duże okno."
 
 
 def test_default_analyzer_runs_offline() -> None:
@@ -164,9 +177,10 @@ def test_missing_shared_provider_abstains_without_suppressing_existing_rule(
     (
         "Ta nowa książka.",
         "Te nowy książka.",
-        "Ta nowe książka.",
         "Ta nowy książki.",
-        "Ta stary książka.",
+        "Ta czerwony Warszawa.",
+        "Ta czerwony książka,",
+        "Ta czerwony książka i Ten nowy samochód.",
         "Napis „Ta nowy książka” omawiamy na zajęciach.",
         "Stała `ta_nowy_ksiazka` jest identyfikatorem testu.",
         "Termin „odnowy” nie tworzy grupy nominalnej z książką.",
@@ -181,6 +195,28 @@ def test_rule_abstains_outside_the_approved_exact_phrase(text: str) -> None:
 
     # Then
     assert result.issues == ()
+
+
+@pytest.mark.parametrize(
+    ("text", "original", "suggestion", "start", "end"),
+    (
+        ("Ta czerwony książka.", "czerwony", "czerwona", 3, 11),
+        ("To duży okno.", "duży", "duże", 3, 7),
+        ("Ten nowa samochód.", "nowa", "nowy", 4, 8),
+        ("Ta stary książka.", "stary", "stara", 3, 8),
+        ("Ta nowe książka.", "nowe", "nowa", 3, 7),
+    ),
+)
+def test_default_analyzer_reports_generalized_agreement_finding(
+    text: str, original: str, suggestion: str, start: int, end: int
+) -> None:
+    result = Analyzer(AnalyzerConfig()).analyze(text)
+
+    assert [
+        (finding.original, finding.suggestion, finding.start, finding.end)
+        for finding in result.issues
+        if str(finding.source) == "rule:agreement.nominal_group_ta_nowy_ksiazka"
+    ] == [(original, suggestion, start, end)]
 
 
 def test_cli_emits_the_approved_review_only_finding() -> None:
@@ -231,7 +267,7 @@ def test_behavior_identity_is_not_an_automatic_correction_policy_entry() -> None
     assert correction.skipped_findings[0].source.name == (
         "agreement.nominal_group_ta_nowy_ksiazka"
     )
-    assert _BEHAVIOR_VERSION.startswith("agreement-nominal-group-ta-nowy-ksiazka/1.0+")
+    assert _BEHAVIOR_VERSION.startswith("agreement-nominal-group-ta-nowy-ksiazka/2.1+")
 
 
 def test_v2_cases_change_expected_errors_to_matches_without_alarms() -> None:

@@ -358,9 +358,7 @@ def _performance_artifact(
                 ).read_bytes()
             ).hexdigest(),
             "cases": 124,
-            "source_snapshot_sha256": (
-                "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
-            ),
+            "source_snapshot_sha256": source_snapshot_sha256(tuple(_snapshot())),
         },
         "identity": {
             "profile": profile,
@@ -1055,5 +1053,5 @@ def test_quality_comparison_v4_incomplete_gate_coverage_fails(
 def test_quality_comparison_v4_snapshot_hash_is_canonical() -> None:
     snapshot = tuple(_snapshot())
     assert source_snapshot_sha256(snapshot) == (
-        "64b68c0c889aa0777b56e4730f0a1ec6ab82f4944512b05affc329cae2337a9c"
+        "1eb1ea4ad357101374c19bf6d03c4ed2cdcc26923c6c5157e5407dd34d927500"
     )

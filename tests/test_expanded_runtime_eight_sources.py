@@ -17,13 +17,11 @@ from polis import (
 )
 from polis.core import Category, Confidence, Source
 from polis.core.models import Severity
-from polis.evaluation._quality_v2_identities import SOURCE_IDENTITIES
 from polis.evaluation.quality_dataset import (
     QualityDatasetVersion,
     load_quality_dataset,
 )
 
-_EIGHT = tuple(item[0] for item in SOURCE_IDENTITIES)
 _POSITIVES = {
     "rule:spelling.wogole": "Wogole nie wiem.",
     "rule:spelling.narazie": "Narazie zostaję w domu.",
@@ -34,6 +32,36 @@ _POSITIVES = {
     "rule:inflection.government_szukac_klucz": "Szukam klucz.",
     "rule:syntax.initial_temporal_comma": "Kiedy pada zostaję w domu.",
 }
+_EIGHT = tuple(_POSITIVES)
+_EXPECTED_EIGHT_IDENTITIES = {
+    "rule:spelling.wogole": ("replace.common_typo", "spelling-wogole/1.0"),
+    "rule:spelling.narazie": ("replace.common_typo", "spelling-narazie/1.0"),
+    "rule:spelling.wziasc": ("replace.common_typo", "spelling-wziasc/1.0"),
+    "rule:agreement.nominal_group_ta_nowy_ksiazka": (
+        "replace.adjective_gender",
+        "agreement-nominal-group-ta-nowy-ksiazka/2.1+morfeusz2-1.99.15.pl-"
+        "sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    ),
+    "rule:agreement.subject_verb_my_czyta": (
+        "replace.subject_verb_number",
+        "agreement-subject-verb-my-czyta/1.0+morfeusz2-1.99.15.pl-"
+        "sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    ),
+    "rule:inflection.przygladac_sie_nowy_budynek": (
+        "replace.governed_nominal_group",
+        "inflection-przygladac-sie-nowy-budynek/1.0+morfeusz2-1.99.15.pl-"
+        "sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    ),
+    "rule:inflection.government_szukac_klucz": (
+        "replace.governed_form",
+        "inflection-government-szukac-klucz/1.0+morfeusz2-1.99.15.pl-"
+        "sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+    ),
+    "rule:syntax.initial_temporal_comma": (
+        "insert.temporal_clause_comma",
+        "syntax-initial-temporal-comma/1.0",
+    ),
+}
 
 
 def test_runtime_exposes_exactly_twenty_eight_sources_with_eight_review_only() -> None:
@@ -41,16 +69,11 @@ def test_runtime_exposes_exactly_twenty_eight_sources_with_eight_review_only() -
     snapshot = analyzer.source_identity_snapshot
     assert len(snapshot) == 59
     by_source = {item.source: item for item in snapshot}
-    for (
-        source,
-        _category,
-        operation,
-        behavior_version,
-        _confidence,
-    ) in SOURCE_IDENTITIES:
+    for source in _EIGHT:
         item = by_source[source]
-        assert item.operation == operation
-        assert item.behavior_version == behavior_version
+        assert (item.operation, item.behavior_version) == _EXPECTED_EIGHT_IDENTITIES[
+            source
+        ]
         correction = analyzer.correct(_POSITIVES[source])
         assert correction.applied_findings == ()
         assert any(
