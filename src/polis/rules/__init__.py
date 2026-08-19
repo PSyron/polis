@@ -65,6 +65,7 @@ from polis.rules.spelling import (
 from polis.rules.subject_verb import (
     AgreementSubjectVerbMyCzytaRule,
     AgreementSubjectVerbOniCzytaRule,
+    AgreementSubjectVerbPresentRule,
 )
 from polis.rules.syntax import (
     PunctuationAbbreviationDotRule,
@@ -366,6 +367,7 @@ __all__ = [
     "AgreementNominalGroupTeDuzeOknoRule",
     "AgreementSubjectVerbMyCzytaRule",
     "AgreementSubjectVerbOniCzytaRule",
+    "AgreementSubjectVerbPresentRule",
     "AgreementTeNeuterNounRule",
     "AgreementTeZdanieRule",
     "InflectionNegatedMiecCzasRule",
