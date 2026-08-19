@@ -68,11 +68,48 @@ Digest listy przejrzanych identyfikatorów to
 review obejmuje nadal wszystkie 124 przypadki. Wiązania bajtów v3 pozostają
 bez zmian.
 
-Konflikty i abstencje pozostają wynikami review-only. Zbiór nie ustanawia
-progów jakości, nie zmienia zachowania runtime'u i nie upoważnia do
-automatycznego wdrażania żadnej reguły. Przekazanie do #367 wymaga ponownego
-pomiaru clean-wheel z nową tożsamością zbioru; dopiero wynik #367 może zasilić
-kwalifikację #368.
+Konflikty i abstencje pozostają wynikami review-only. Zbiór nie zmienia
+zachowania runtime'u i nie upoważnia do automatycznego wdrażania żadnej reguły.
+
+## Kanoniczny pomiar i gate'y #367
+
+Pomiar wykonano z czystego commita
+`07cd485d9778c56d195f93da899917035a808a39` i jednego koła
+`polis_nlp-0.2.0-py3-none-any.whl` o SHA-256
+`7b8df55e83df14cfadf1cff974131a3030912346672e33bf3f4e0b0e6662e091`.
+Oba profile używają Pythona 3.13.12 na Darwin arm64. Profil `default` dowodzi
+braku `morfeusz2`; profil `morphology` wiąże kwalifikowany provider 1.99.15 i
+zaakceptowaną tożsamość słownika.
+
+Kanoniczne artefakty znajdują się w:
+
+- `docs/quality-baseline-v4-default.json` i
+  `docs/quality-baseline-v4-morphology.json`;
+- `docs/quality-result-v4-default.json` i
+  `docs/quality-result-v4-morphology.json`;
+- `docs/runtime-performance-v2-v4-{reference,current}-{default,morphology}.json`;
+- `docs/quality-threshold-proposal-v4.json`;
+- `docs/quality-comparison-v4.json`.
+
+W obu profilach precision, recall, F1, dokładność zakresu i dokładność sugestii
+wynoszą `1.0`; false-alarm rate, naruszenia konfliktu i naruszenia abstencji
+wynoszą `0`. Pięć mierzonych powtórzeń jest deterministycznych. Maintainer
+zatwierdził proposal 2026-08-19 bez dodatkowego marginesu stabilności.
+
+Gate'y izolowanej wydajności zachowują pełną precyzję surowego pomiaru; wartości
+w nawiasach są prezentacją do trzech miejsc po przecinku:
+
+| Profil | Maks. p95 | Min. throughput | Maks. incremental RSS |
+|---|---:|---:|---:|
+| default | 30 042 ns | 52 610.38294758326/s (52 610.383/s) | 147 456 B |
+| morphology | 37 500 ns | 39 030.16339159529/s (39 030.163/s) | 114 688 B |
+
+SHA-256 zatwierdzonej propozycji to
+`24e83bb6013934184c87f3e27ad90f2f3e773b8ad5f2a6eb54dc15f0279166e7`, a
+comparison — `b59a4fe78d5fa69fc18e00301809e52036f3f6ed343352eda5005fdefaaeb190`.
+Comparison ma `aggregate_verdict: pass`; oba profile przechodzą wszystkie
+gate'y. Wymuszenie tych gate'ów nie jest zgodą na zmianę reguł ani polityki
+korekt. Zweryfikowane luki można teraz kwalifikować wyłącznie w zakresie #368.
 
 ## Walidacja
 

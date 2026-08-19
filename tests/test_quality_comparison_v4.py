@@ -975,6 +975,27 @@ def test_quality_comparison_v4_isolated_performance_caps_fail(
     assert comparison["aggregate_verdict"] == "fail"
 
 
+def test_published_quality_comparison_v4_is_reproducible(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(ROOT)
+    output = tmp_path / "quality-comparison-v4.json"
+    comparison = compare_quality_v4(
+        baseline_default=Path("docs/quality-baseline-v4-default.json"),
+        baseline_morphology=Path("docs/quality-baseline-v4-morphology.json"),
+        result_default=Path("docs/quality-result-v4-default.json"),
+        result_morphology=Path("docs/quality-result-v4-morphology.json"),
+        proposal=Path("docs/quality-threshold-proposal-v4.json"),
+        output=output,
+        replace=False,
+    )
+    assert comparison["aggregate_verdict"] == "pass"
+    assert output.read_bytes() == Path("docs/quality-comparison-v4.json").read_bytes()
+    assert hashlib.sha256(output.read_bytes()).hexdigest() == (
+        "b59a4fe78d5fa69fc18e00301809e52036f3f6ed343352eda5005fdefaaeb190"
+    )
+
+
 @pytest.mark.parametrize(
     "field", ["protocol_implementation", "profile", "dataset", "source", "artifact"]
 )
