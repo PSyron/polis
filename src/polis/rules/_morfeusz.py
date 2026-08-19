@@ -144,12 +144,23 @@ class _QualifiedMorfeuszBackend(Protocol):
 @dataclass(frozen=True, slots=True)
 class _CanonicalMorfeuszBackend:
     backend: _QualifiedMorfeuszBackend
+    normalize_exact_duplicates: bool = False
 
     def analyse(self, text: str) -> Sequence[_AnalysisRow]:
-        return _deduplicate_provider_rows(self.backend.analyse(text))
+        rows = self.backend.analyse(text)
+        return (
+            _deduplicate_provider_rows(rows)
+            if self.normalize_exact_duplicates
+            else rows
+        )
 
     def generate(self, lemma: str) -> Sequence[_GenerationRow]:
-        return _deduplicate_provider_rows(self.backend.generate(lemma))
+        rows = self.backend.generate(lemma)
+        return (
+            _deduplicate_provider_rows(rows)
+            if self.normalize_exact_duplicates
+            else rows
+        )
 
 
 @runtime_checkable
@@ -948,7 +959,10 @@ def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
     if type(backend).__module__ != "morfeusz2" or type(backend).__name__ != "Morfeusz":
         return None
     return _QualifiedMorfeusz(
-        backend=_CanonicalMorfeuszBackend(backend),
+        backend=_CanonicalMorfeuszBackend(
+            backend,
+            normalize_exact_duplicates=True,
+        ),
         identity=identity,
     )
 
