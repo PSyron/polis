@@ -1,0 +1,1029 @@
+{
+  "schema_id": "polis.rule-family-qualification",
+  "schema_version": 1,
+  "stage": "approved",
+  "issue": 368,
+  "parent_issue": 363,
+  "contract_issue": 364,
+  "origin_issues": {
+    "rjp_audit": 365,
+    "quality_evidence": 367
+  },
+  "status": "approved",
+  "candidate_universe": {
+    "definition": "Exact union of every #365 deterministic_v1_candidate/provider_dependent_candidate row, every #365 change_required source row, every actual unexplained #367 public-v4 gap, and every actual #364 contract conflict; each input maps exactly once.",
+    "inputs": [
+      {
+        "origin_id": "issue-365:change:RJP-03",
+        "origin_type": "issue-365-candidate",
+        "source_issue": 365,
+        "key": "RJP-03",
+        "candidate_id": "rjp-2026-03"
+      },
+      {
+        "origin_id": "issue-365:change:RJP-04",
+        "origin_type": "issue-365-candidate",
+        "source_issue": 365,
+        "key": "RJP-04",
+        "candidate_id": "rjp-2026-04"
+      },
+      {
+        "origin_id": "issue-365:change:RJP-09A",
+        "origin_type": "issue-365-candidate",
+        "source_issue": 365,
+        "key": "RJP-09A",
+        "candidate_id": "rjp-2026-09a"
+      },
+      {
+        "origin_id": "issue-365:change:RJP-10",
+        "origin_type": "issue-365-candidate",
+        "source_issue": 365,
+        "key": "RJP-10",
+        "candidate_id": "rjp-2026-10"
+      }
+    ],
+    "unexplained_v4_gap_count": 0,
+    "contract_conflict_count": 0
+  },
+  "rows": [
+    {
+      "candidate_id": "rjp-2026-03",
+      "input_origins": [
+        {
+          "origin_id": "issue-365:change:RJP-03",
+          "origin_type": "issue-365-candidate",
+          "source_issue": 365,
+          "key": "RJP-03"
+        }
+      ],
+      "identity_and_origin": {
+        "candidate_id": "rjp-2026-03",
+        "proposed_family_name": "conditional particle spacing for exact czyby",
+        "category": "spelling",
+        "phenomenon": "conditional particle spacing",
+        "originating_365_audit_rows": [
+          {
+            "issue": 365,
+            "row_type": "change_row",
+            "key": "RJP-03",
+            "official_number_or_name": "RJP-03: Rozdzielna pisownia cząstek -by ze spójnikami."
+          }
+        ],
+        "originating_367_gap_case_ids": [],
+        "current_related_source_identities": [],
+        "exact_normative_references": [
+          {
+            "authority_id": "rjp-2025-withdrawal-notice",
+            "url": "https://rjp.pan.pl/komunikat-rady-jezyka-polskiego-przy-prezydium-pan-z-dnia-7-listopada-2025-r/",
+            "title": "Komunikat Rady Języka Polskiego przy Prezydium PAN z dnia 7 listopada 2025 r.",
+            "effective_date": "2026-01-01",
+            "locator": "Załącznik nr 1, pkt 3",
+            "official_number": "03"
+          }
+        ],
+        "proposed_provider_profile": "provider-absent"
+      },
+      "normative_assessment": {
+        "normative_certainty": "clear",
+        "effective_date": "2026-01-01",
+        "behavior_status": "prescriptive",
+        "rationale": "Candidate for #368 only; review-only and no runtime source here. Normatywna podstawa jest jawna, ale kwalifikacja nie może przejść bez kompletnego publicznego dowodu #364.",
+        "unresolved_normative_questions": []
+      },
+      "deterministic_boundary": {
+        "exact_locally_observable_trigger": "Admit only the exact fused token `czyby`; the replacement span covers the fused token. Lexical forms listed by RJP §4.5.1(c)-(d), including `aby`, `ażeby`, `byleby`, `chociażby`, `choćby`, `czyżby`, `gdyby`, `gdzieżby`, `iżby`, `jakby`, `jakoby`, `jakżeby`, `niby`, `niżby`, `oby`, and `żeby`, remain outside the candidate boundary.",
+        "token_context_window": "Only the exact lexical token boundary and the immediately adjacent separator/casing context named by the RJP audit; no unrestricted sentence generation.",
+        "explicit_exclusions": [
+          "Keep lexical `aby`, `ażeby`, `byleby`, `chociażby`, `choćby`, `czyżby`, `gdyby`, `gdzieżby`, `iżby`, `jakby`, `jakoby`, `jakżeby`, `niby`, `niżby`, `oby`, and `żeby` unchanged; only the exact fused token `czyby` admits replacement.",
+          "Keep already separated `czy by` unchanged; only the exact fused token `czyby` is eligible; this candidate is not a general conjunction inventory."
+        ],
+        "case_unicode_punctuation_handling": "Preserve original Unicode code points and case; admit only the stated case boundary, with document-relative offsets and punctuation treated as a boundary rather than normalized.",
+        "repeated_occurrence_and_multi_sentence": "Evaluate each occurrence independently in source order; offsets are half-open [start,end) in the complete input and sentence boundaries do not reset offsets.",
+        "quotation_literal_behavior": "Quoted, literal, mention-shaped, or code-like occurrences abstain unless a future public case establishes the exact normative boundary.",
+        "overlap_conflict_behavior": "Do not merge this family with another source identity; conflicting findings or competing suggestions abstain fail-closed.",
+        "provider_absent_behavior": "Execute only provider-independent local matching; provider absence is not a failure and does not authorize a guessed morphology result.",
+        "fail_closed_conditions": [
+          "provider-independent boundary cannot be established",
+          "ambiguous lexical or entity classification",
+          "overlapping or competing output",
+          "unsupported input shape",
+          "any non-minimal or non-deterministic suggestion"
+        ]
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation_type": "replace.fused_conditional_particle",
+        "exact_half_open_span_rule": "The span covers exactly the original token(s) and separator(s) named by the candidate, [start,end), measured before any edit.",
+        "exact_minimal_suggestion_rule": "Return exactly the single normative minimal replacement from the admitted trigger; never rewrite surrounding text or emit alternatives.",
+        "confidence_policy": "review-only suggestion with no automatic correction; abstain when the exact local predicate, provider identity, or conflict guard is not satisfied.",
+        "proposed_source_identity": "rule:spelling.rjp_2026_03_czyby",
+        "proposed_behavior_version": "spelling-rjp-2026-03/1.0",
+        "review_only_first": true
+      },
+      "public_evidence": {
+        "v4_positive_case_ids": [],
+        "v4_hard_negative_case_ids": [],
+        "controlled_pair_ids": [],
+        "category_stratum_counts": {
+          "category": {
+            "spelling": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "candidate-specific evidence absent"
+            }
+          },
+          "shape_strata": {
+            "simple-local": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "sentence-internal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "multi-sentence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "repeated-occurrence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "unicode-and-case": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "quotation-or-literal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "conflict-or-abstention": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            }
+          }
+        },
+        "provider_profile_coverage": {
+          "provider-absent": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          },
+          "qualified-morphology": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          }
+        },
+        "conflict_abstention_case_ids": [],
+        "evidence_gaps": [
+          "No candidate-specific public positive cases are present in the reviewed v4 dataset.",
+          "No candidate-specific public hard negatives or controlled positive/negative pairs are present.",
+          "All seven #364 shape strata are candidate-specific not-covered, not evidence to be filled during implementation.",
+          "Both required provider profiles lack candidate-specific coverage; provider-dependent execution may not be inferred from category totals.",
+          "No candidate-specific executable precision, correct-sentence FAR, offset, conflict, or isolated-performance evidence exists."
+        ],
+        "executable_risk_evidence": [],
+        "artifact_context": {
+          "dataset_id": "polis_v4_quality_development",
+          "dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+          "manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf",
+          "reviewed_case_count": 124,
+          "profiles": [
+            "provider-absent",
+            "qualified-morphology"
+          ],
+          "interpretation": "The v4 aggregate/category/profile baselines measure existing sources. They emit zero false negatives and no separate unexplained gap for this candidate; unmeasured source rows are not promoted to gaps."
+        }
+      },
+      "expected_value": {
+        "exact_v4_false_negatives": [],
+        "expected_category_recall_delta": "0.0 measured on v4; no candidate-specific denominator exists, so no gain is claimed.",
+        "expected_aggregate_delta_context_only": "0.0 measured on v4; the family is not represented and aggregate recall cannot estimate future value.",
+        "source_or_phenomenon_coverage": [
+          "Would add a separately identified spelling family for Rozdzielna pisownia cząstek -by ze spójnikami.; no current source is corrected."
+        ],
+        "user_value_rationale": "Potentially useful only for the explicitly bounded normative form; conservative v1 users receive no suggestion until complete public evidence proves precision and abstention safety."
+      },
+      "risk_and_cost": {
+        "false_positive_risk": "high",
+        "conflicts_with_current_sources": "No current source identity overlap was recorded by #365; future overlap must be checked before approval.",
+        "ambiguity_risk": "High until candidate-specific hard negatives establish lexical, case, entity, quotation, and context boundaries.",
+        "provider_drift_risk": "Low provider risk because the candidate is provider-independent, but boundary drift still requires source and behavior identity checks.",
+        "offset_suggestion_risk": "High until repeated, Unicode, multi-sentence, separator, and minimal-replacement cases are executable.",
+        "correction_policy_interaction": "Must remain review-only and must not add an automatic correction-policy identity.",
+        "estimated_dispatch_performance_cost": "Unknown; requires isolated protocol-v2 evidence and must not trade FAR or precision for recall.",
+        "maintenance_norm_change_risk": "RJP effective date is recorded; later norm changes require a new reviewed matrix decision, not silent mutation.",
+        "mitigation_or_abstention_strategy": "Reject now; reopen only after all #364 public minima, exact provider/source identity, fail-closed conflict tests, and separate precision/FAR/performance evidence are public and executable.",
+        "executable_risk_evidence": []
+      },
+      "decision": {
+        "disposition": "reject: insufficient public evidence",
+        "rationale": "#364 admission minima are not met: the candidate has no candidate-specific public positives, hard negatives, controlled pairs, required shape strata, profile coverage, or executable risk evidence. Zero v4 FN and zero unexplained gaps do not supply missing candidate evidence. Rejecting prevents a follow-up promise from becoming an implementation issue.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-19T10:03:00Z",
+          "bound_matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d"
+        },
+        "reopening_evidence": [
+          "A new public, licensed candidate-specific evidence set must meet every #364 category/shape/profile minimum with exact case IDs and controlled pairs.",
+          "Executable tests must demonstrate exact spans/suggestions, zero correct-sentence FAR, conflict abstention, provider boundary, and isolated performance without weakening precision safety.",
+          "Maintainer must review the new evidence and explicitly reopen this row in a later matrix."
+        ],
+        "child_allowed": false,
+        "future_child_metadata": {
+          "labels": [
+            "type:feature",
+            "area:rules",
+            "priority:P2"
+          ],
+          "milestone": "Rule Coverage v1",
+          "title_prefix": "Implement qualified rule family:",
+          "state": "open",
+          "blocked_by": [
+            368
+          ],
+          "note": "Per-row priority is provisional until maintainer approval; no child is permitted in PRE-APPROVAL."
+        }
+      }
+    },
+    {
+      "candidate_id": "rjp-2026-04",
+      "input_origins": [
+        {
+          "origin_id": "issue-365:change:RJP-04",
+          "origin_type": "issue-365-candidate",
+          "source_issue": 365,
+          "key": "RJP-04"
+        }
+      ],
+      "identity_and_origin": {
+        "candidate_id": "rjp-2026-04",
+        "proposed_family_name": "qualified joined nie with inflected participles",
+        "category": "spelling",
+        "phenomenon": "nie with participles",
+        "originating_365_audit_rows": [
+          {
+            "issue": 365,
+            "row_type": "change_row",
+            "key": "RJP-04",
+            "official_number_or_name": "RJP-04: Łączna pisownia nie- z imiesłowami odmiennymi."
+          }
+        ],
+        "originating_367_gap_case_ids": [],
+        "current_related_source_identities": [],
+        "exact_normative_references": [
+          {
+            "authority_id": "rjp-2025-withdrawal-notice",
+            "url": "https://rjp.pan.pl/komunikat-rady-jezyka-polskiego-przy-prezydium-pan-z-dnia-7-listopada-2025-r/",
+            "title": "Komunikat Rady Języka Polskiego przy Prezydium PAN z dnia 7 listopada 2025 r.",
+            "effective_date": "2026-01-01",
+            "locator": "Załącznik nr 1, pkt 4",
+            "official_number": "04"
+          }
+        ],
+        "proposed_provider_profile": "qualified-morphology"
+      },
+      "normative_assessment": {
+        "normative_certainty": "clear",
+        "effective_date": "2026-01-01",
+        "behavior_status": "prescriptive",
+        "rationale": "Only exact qualified provider; review-only; absence or drift abstains. Normatywna podstawa jest jawna, ale kwalifikacja nie może przejść bez kompletnego publicznego dowodu #364.",
+        "unresolved_normative_questions": []
+      },
+      "deterministic_boundary": {
+        "exact_locally_observable_trigger": "Needs participle classification and licensed-separation guard.",
+        "token_context_window": "Only the exact lexical token boundary and the immediately adjacent separator/casing context named by the RJP audit; no unrestricted sentence generation.",
+        "explicit_exclusions": [
+          "Keep finite `nie zrobiono` unchanged; only an inflected participle is eligible and provider absence or drift abstains."
+        ],
+        "case_unicode_punctuation_handling": "Preserve original Unicode code points and case; admit only the stated case boundary, with document-relative offsets and punctuation treated as a boundary rather than normalized.",
+        "repeated_occurrence_and_multi_sentence": "Evaluate each occurrence independently in source order; offsets are half-open [start,end) in the complete input and sentence boundaries do not reset offsets.",
+        "quotation_literal_behavior": "Quoted, literal, mention-shaped, or code-like occurrences abstain unless a future public case establishes the exact normative boundary.",
+        "overlap_conflict_behavior": "Do not merge this family with another source identity; conflicting findings or competing suggestions abstain fail-closed.",
+        "provider_absent_behavior": "For provider-independent candidates execute the exact local boundary. For the qualified-morphology candidate abstain when the exact authorized provider is absent or drifts.",
+        "fail_closed_conditions": [
+          "missing or drifted required provider",
+          "ambiguous lexical or entity classification",
+          "overlapping or competing output",
+          "unsupported input shape",
+          "any non-minimal or non-deterministic suggestion"
+        ]
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation_type": "replace.joined_nie_participle",
+        "exact_half_open_span_rule": "The span covers exactly the original token(s) and separator(s) named by the candidate, [start,end), measured before any edit.",
+        "exact_minimal_suggestion_rule": "Return exactly the single normative minimal replacement from the admitted trigger; never rewrite surrounding text or emit alternatives.",
+        "confidence_policy": "review-only suggestion with no automatic correction; abstain when the exact local predicate, provider identity, or conflict guard is not satisfied.",
+        "proposed_source_identity": "rule:spelling.rjp_2026_04_nie_participle",
+        "proposed_behavior_version": "spelling-rjp-2026-04/1.0",
+        "review_only_first": true
+      },
+      "public_evidence": {
+        "v4_positive_case_ids": [],
+        "v4_hard_negative_case_ids": [],
+        "controlled_pair_ids": [],
+        "category_stratum_counts": {
+          "category": {
+            "spelling": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "candidate-specific evidence absent"
+            }
+          },
+          "shape_strata": {
+            "simple-local": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "sentence-internal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "multi-sentence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "repeated-occurrence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "unicode-and-case": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "quotation-or-literal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "conflict-or-abstention": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            }
+          }
+        },
+        "provider_profile_coverage": {
+          "provider-absent": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          },
+          "qualified-morphology": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          }
+        },
+        "conflict_abstention_case_ids": [],
+        "evidence_gaps": [
+          "No candidate-specific public positive cases are present in the reviewed v4 dataset.",
+          "No candidate-specific public hard negatives or controlled positive/negative pairs are present.",
+          "All seven #364 shape strata are candidate-specific not-covered, not evidence to be filled during implementation.",
+          "Both required provider profiles lack candidate-specific coverage; provider-dependent execution may not be inferred from category totals.",
+          "No candidate-specific executable precision, correct-sentence FAR, offset, conflict, or isolated-performance evidence exists."
+        ],
+        "executable_risk_evidence": [],
+        "artifact_context": {
+          "dataset_id": "polis_v4_quality_development",
+          "dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+          "manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf",
+          "reviewed_case_count": 124,
+          "profiles": [
+            "provider-absent",
+            "qualified-morphology"
+          ],
+          "interpretation": "The v4 aggregate/category/profile baselines measure existing sources. They emit zero false negatives and no separate unexplained gap for this candidate; unmeasured source rows are not promoted to gaps."
+        }
+      },
+      "expected_value": {
+        "exact_v4_false_negatives": [],
+        "expected_category_recall_delta": "0.0 measured on v4; no candidate-specific denominator exists, so no gain is claimed.",
+        "expected_aggregate_delta_context_only": "0.0 measured on v4; the family is not represented and aggregate recall cannot estimate future value.",
+        "source_or_phenomenon_coverage": [
+          "Would add a separately identified spelling family for Łączna pisownia nie- z imiesłowami odmiennymi.; no current source is corrected."
+        ],
+        "user_value_rationale": "Potentially useful only for the explicitly bounded normative form; conservative v1 users receive no suggestion until complete public evidence proves precision and abstention safety."
+      },
+      "risk_and_cost": {
+        "false_positive_risk": "high",
+        "conflicts_with_current_sources": "No current source identity overlap was recorded by #365; future overlap must be checked before approval.",
+        "ambiguity_risk": "High until candidate-specific hard negatives establish lexical, case, entity, quotation, and context boundaries.",
+        "provider_drift_risk": "Exact qualified provider identity is required for morphology; provider-independent rows have no provider drift dependency.",
+        "offset_suggestion_risk": "High until repeated, Unicode, multi-sentence, separator, and minimal-replacement cases are executable.",
+        "correction_policy_interaction": "Must remain review-only and must not add an automatic correction-policy identity.",
+        "estimated_dispatch_performance_cost": "Unknown; requires isolated protocol-v2 evidence and must not trade FAR or precision for recall.",
+        "maintenance_norm_change_risk": "RJP effective date is recorded; later norm changes require a new reviewed matrix decision, not silent mutation.",
+        "mitigation_or_abstention_strategy": "Reject now; reopen only after all #364 public minima, exact provider/source identity, fail-closed conflict tests, and separate precision/FAR/performance evidence are public and executable.",
+        "executable_risk_evidence": []
+      },
+      "decision": {
+        "disposition": "reject: insufficient public evidence",
+        "rationale": "#364 admission minima are not met: the candidate has no candidate-specific public positives, hard negatives, controlled pairs, required shape strata, profile coverage, or executable risk evidence. Zero v4 FN and zero unexplained gaps do not supply missing candidate evidence. Rejecting prevents a follow-up promise from becoming an implementation issue.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-19T10:03:00Z",
+          "bound_matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d"
+        },
+        "reopening_evidence": [
+          "A new public, licensed candidate-specific evidence set must meet every #364 category/shape/profile minimum with exact case IDs and controlled pairs.",
+          "Executable tests must demonstrate exact spans/suggestions, zero correct-sentence FAR, conflict abstention, provider boundary, and isolated performance without weakening precision safety.",
+          "Maintainer must review the new evidence and explicitly reopen this row in a later matrix."
+        ],
+        "child_allowed": false,
+        "future_child_metadata": {
+          "labels": [
+            "type:feature",
+            "area:rules",
+            "priority:P2"
+          ],
+          "milestone": "Rule Coverage v1",
+          "title_prefix": "Implement qualified rule family:",
+          "state": "open",
+          "blocked_by": [
+            368
+          ],
+          "note": "Per-row priority is provisional until maintainer approval; no child is permitted in PRE-APPROVAL."
+        }
+      }
+    },
+    {
+      "candidate_id": "rjp-2026-09a",
+      "input_origins": [
+        {
+          "origin_id": "issue-365:change:RJP-09A",
+          "origin_type": "issue-365-candidate",
+          "source_issue": 365,
+          "key": "RJP-09A"
+        }
+      ],
+      "identity_and_origin": {
+        "candidate_id": "rjp-2026-09a",
+        "proposed_family_name": "arcy prefix spacing before uppercase target",
+        "category": "spelling",
+        "phenomenon": "prefix capitalization",
+        "originating_365_audit_rows": [
+          {
+            "issue": 365,
+            "row_type": "change_row",
+            "key": "RJP-09A",
+            "official_number_or_name": "RJP-09a: Prefixes joined to lowercase and hyphenated before uppercase."
+          }
+        ],
+        "originating_367_gap_case_ids": [],
+        "current_related_source_identities": [],
+        "exact_normative_references": [
+          {
+            "authority_id": "rjp-2025-withdrawal-notice",
+            "url": "https://rjp.pan.pl/komunikat-rady-jezyka-polskiego-przy-prezydium-pan-z-dnia-7-listopada-2025-r/",
+            "title": "Komunikat Rady Języka Polskiego przy Prezydium PAN z dnia 7 listopada 2025 r.",
+            "effective_date": "2026-01-01",
+            "locator": "Załącznik nr 1, pkt 9a",
+            "official_number": "09a"
+          }
+        ],
+        "proposed_provider_profile": "provider-absent"
+      },
+      "normative_assessment": {
+        "normative_certainty": "clear",
+        "effective_date": "2026-01-01",
+        "behavior_status": "prescriptive",
+        "rationale": "Candidate for #368 as review-only with hard negatives. Normatywna podstawa jest jawna, ale kwalifikacja nie może przejść bez kompletnego publicznego dowodu #364.",
+        "unresolved_normative_questions": []
+      },
+      "deterministic_boundary": {
+        "exact_locally_observable_trigger": "Admit only the exact token pair `arcy` + space + a non-sentence-initial uppercase target; no entity or NER inference is used and the replacement span covers both tokens plus the separator.",
+        "token_context_window": "Only the exact lexical token boundary and the immediately adjacent separator/casing context named by the RJP audit; no unrestricted sentence generation.",
+        "explicit_exclusions": [
+          "Keep lowercase `super pomysł` unchanged; the hyphen candidate requires the uppercase proper-name boundary.",
+          "Keep sentence-initial `Arcy Europa` unchanged; only non-sentence-initial uppercase targets qualify, because uppercase alone at sentence start is not a prefix target."
+        ],
+        "case_unicode_punctuation_handling": "Preserve original Unicode code points and case; admit only the stated case boundary, with document-relative offsets and punctuation treated as a boundary rather than normalized.",
+        "repeated_occurrence_and_multi_sentence": "Evaluate each occurrence independently in source order; offsets are half-open [start,end) in the complete input and sentence boundaries do not reset offsets.",
+        "quotation_literal_behavior": "Quoted, literal, mention-shaped, or code-like occurrences abstain unless a future public case establishes the exact normative boundary.",
+        "overlap_conflict_behavior": "Do not merge this family with another source identity; conflicting findings or competing suggestions abstain fail-closed.",
+        "provider_absent_behavior": "Execute only provider-independent local matching; provider absence is not a failure and does not authorize a guessed morphology result.",
+        "fail_closed_conditions": [
+          "provider-independent boundary cannot be established",
+          "ambiguous lexical or entity classification",
+          "overlapping or competing output",
+          "unsupported input shape",
+          "any non-minimal or non-deterministic suggestion"
+        ]
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation_type": "replace.prefix_separator",
+        "exact_half_open_span_rule": "The span covers exactly the original token(s) and separator(s) named by the candidate, [start,end), measured before any edit.",
+        "exact_minimal_suggestion_rule": "Return exactly the single normative minimal replacement from the admitted trigger; never rewrite surrounding text or emit alternatives.",
+        "confidence_policy": "review-only suggestion with no automatic correction; abstain when the exact local predicate, provider identity, or conflict guard is not satisfied.",
+        "proposed_source_identity": "rule:spelling.rjp_2026_09a_arcy",
+        "proposed_behavior_version": "spelling-rjp-2026-09a/1.0",
+        "review_only_first": true
+      },
+      "public_evidence": {
+        "v4_positive_case_ids": [],
+        "v4_hard_negative_case_ids": [],
+        "controlled_pair_ids": [],
+        "category_stratum_counts": {
+          "category": {
+            "spelling": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "candidate-specific evidence absent"
+            }
+          },
+          "shape_strata": {
+            "simple-local": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "sentence-internal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "multi-sentence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "repeated-occurrence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "unicode-and-case": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "quotation-or-literal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "conflict-or-abstention": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            }
+          }
+        },
+        "provider_profile_coverage": {
+          "provider-absent": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          },
+          "qualified-morphology": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          }
+        },
+        "conflict_abstention_case_ids": [],
+        "evidence_gaps": [
+          "No candidate-specific public positive cases are present in the reviewed v4 dataset.",
+          "No candidate-specific public hard negatives or controlled positive/negative pairs are present.",
+          "All seven #364 shape strata are candidate-specific not-covered, not evidence to be filled during implementation.",
+          "Both required provider profiles lack candidate-specific coverage; provider-dependent execution may not be inferred from category totals.",
+          "No candidate-specific executable precision, correct-sentence FAR, offset, conflict, or isolated-performance evidence exists."
+        ],
+        "executable_risk_evidence": [],
+        "artifact_context": {
+          "dataset_id": "polis_v4_quality_development",
+          "dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+          "manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf",
+          "reviewed_case_count": 124,
+          "profiles": [
+            "provider-absent",
+            "qualified-morphology"
+          ],
+          "interpretation": "The v4 aggregate/category/profile baselines measure existing sources. They emit zero false negatives and no separate unexplained gap for this candidate; unmeasured source rows are not promoted to gaps."
+        }
+      },
+      "expected_value": {
+        "exact_v4_false_negatives": [],
+        "expected_category_recall_delta": "0.0 measured on v4; no candidate-specific denominator exists, so no gain is claimed.",
+        "expected_aggregate_delta_context_only": "0.0 measured on v4; the family is not represented and aggregate recall cannot estimate future value.",
+        "source_or_phenomenon_coverage": [
+          "Would add a separately identified spelling family for Prefixes joined to lowercase and hyphenated before uppercase.; no current source is corrected."
+        ],
+        "user_value_rationale": "Potentially useful only for the explicitly bounded normative form; conservative v1 users receive no suggestion until complete public evidence proves precision and abstention safety."
+      },
+      "risk_and_cost": {
+        "false_positive_risk": "high",
+        "conflicts_with_current_sources": "No current source identity overlap was recorded by #365; future overlap must be checked before approval.",
+        "ambiguity_risk": "High until candidate-specific hard negatives establish lexical, case, entity, quotation, and context boundaries.",
+        "provider_drift_risk": "Low provider risk because the candidate is provider-independent, but boundary drift still requires source and behavior identity checks.",
+        "offset_suggestion_risk": "High until repeated, Unicode, multi-sentence, separator, and minimal-replacement cases are executable.",
+        "correction_policy_interaction": "Must remain review-only and must not add an automatic correction-policy identity.",
+        "estimated_dispatch_performance_cost": "Unknown; requires isolated protocol-v2 evidence and must not trade FAR or precision for recall.",
+        "maintenance_norm_change_risk": "RJP effective date is recorded; later norm changes require a new reviewed matrix decision, not silent mutation.",
+        "mitigation_or_abstention_strategy": "Reject now; reopen only after all #364 public minima, exact provider/source identity, fail-closed conflict tests, and separate precision/FAR/performance evidence are public and executable.",
+        "executable_risk_evidence": []
+      },
+      "decision": {
+        "disposition": "reject: insufficient public evidence",
+        "rationale": "#364 admission minima are not met: the candidate has no candidate-specific public positives, hard negatives, controlled pairs, required shape strata, profile coverage, or executable risk evidence. Zero v4 FN and zero unexplained gaps do not supply missing candidate evidence. Rejecting prevents a follow-up promise from becoming an implementation issue.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-19T10:03:00Z",
+          "bound_matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d"
+        },
+        "reopening_evidence": [
+          "A new public, licensed candidate-specific evidence set must meet every #364 category/shape/profile minimum with exact case IDs and controlled pairs.",
+          "Executable tests must demonstrate exact spans/suggestions, zero correct-sentence FAR, conflict abstention, provider boundary, and isolated performance without weakening precision safety.",
+          "Maintainer must review the new evidence and explicitly reopen this row in a later matrix."
+        ],
+        "child_allowed": false,
+        "future_child_metadata": {
+          "labels": [
+            "type:feature",
+            "area:rules",
+            "priority:P2"
+          ],
+          "milestone": "Rule Coverage v1",
+          "title_prefix": "Implement qualified rule family:",
+          "state": "open",
+          "blocked_by": [
+            368
+          ],
+          "note": "Per-row priority is provisional until maintainer approval; no child is permitted in PRE-APPROVAL."
+        }
+      }
+    },
+    {
+      "candidate_id": "rjp-2026-10",
+      "input_origins": [
+        {
+          "origin_id": "issue-365:change:RJP-10",
+          "origin_type": "issue-365-candidate",
+          "source_issue": 365,
+          "key": "RJP-10"
+        }
+      ],
+      "identity_and_origin": {
+        "candidate_id": "rjp-2026-10",
+        "proposed_family_name": "niby and quasi prefix joining before lowercase target",
+        "category": "spelling",
+        "phenomenon": "niby/quasi prefixes",
+        "originating_365_audit_rows": [
+          {
+            "issue": 365,
+            "row_type": "change_row",
+            "key": "RJP-10",
+            "official_number_or_name": "RJP-10: niby-/quasi- joined lowercase and hyphenated uppercase."
+          }
+        ],
+        "originating_367_gap_case_ids": [],
+        "current_related_source_identities": [],
+        "exact_normative_references": [
+          {
+            "authority_id": "rjp-2025-withdrawal-notice",
+            "url": "https://rjp.pan.pl/komunikat-rady-jezyka-polskiego-przy-prezydium-pan-z-dnia-7-listopada-2025-r/",
+            "title": "Komunikat Rady Języka Polskiego przy Prezydium PAN z dnia 7 listopada 2025 r.",
+            "effective_date": "2026-01-01",
+            "locator": "Załącznik nr 1, pkt 10",
+            "official_number": "10"
+          }
+        ],
+        "proposed_provider_profile": "provider-absent"
+      },
+      "normative_assessment": {
+        "normative_certainty": "clear",
+        "effective_date": "2026-01-01",
+        "behavior_status": "prescriptive",
+        "rationale": "Candidate for #368 as bounded review-only. Normatywna podstawa jest jawna, ale kwalifikacja nie może przejść bez kompletnego publicznego dowodu #364.",
+        "unresolved_normative_questions": []
+      },
+      "deterministic_boundary": {
+        "exact_locally_observable_trigger": "Finite prefixes and case boundaries are locally testable.",
+        "token_context_window": "Only the exact lexical token boundary and the immediately adjacent separator/casing context named by the RJP audit; no unrestricted sentence generation.",
+        "explicit_exclusions": [
+          "Keep `niby-Polak` hyphenated before an uppercase proper name; joining is limited to lowercase targets."
+        ],
+        "case_unicode_punctuation_handling": "Preserve original Unicode code points and case; admit only the stated case boundary, with document-relative offsets and punctuation treated as a boundary rather than normalized.",
+        "repeated_occurrence_and_multi_sentence": "Evaluate each occurrence independently in source order; offsets are half-open [start,end) in the complete input and sentence boundaries do not reset offsets.",
+        "quotation_literal_behavior": "Quoted, literal, mention-shaped, or code-like occurrences abstain unless a future public case establishes the exact normative boundary.",
+        "overlap_conflict_behavior": "Do not merge this family with another source identity; conflicting findings or competing suggestions abstain fail-closed.",
+        "provider_absent_behavior": "Execute only provider-independent local matching; provider absence is not a failure and does not authorize a guessed morphology result.",
+        "fail_closed_conditions": [
+          "provider-independent boundary cannot be established",
+          "ambiguous lexical or entity classification",
+          "overlapping or competing output",
+          "unsupported input shape",
+          "any non-minimal or non-deterministic suggestion"
+        ]
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation_type": "replace.prefix_separator",
+        "exact_half_open_span_rule": "The span covers exactly the original token(s) and separator(s) named by the candidate, [start,end), measured before any edit.",
+        "exact_minimal_suggestion_rule": "Return exactly the single normative minimal replacement from the admitted trigger; never rewrite surrounding text or emit alternatives.",
+        "confidence_policy": "review-only suggestion with no automatic correction; abstain when the exact local predicate, provider identity, or conflict guard is not satisfied.",
+        "proposed_source_identity": "rule:spelling.rjp_2026_10_niby_quasi",
+        "proposed_behavior_version": "spelling-rjp-2026-10/1.0",
+        "review_only_first": true
+      },
+      "public_evidence": {
+        "v4_positive_case_ids": [],
+        "v4_hard_negative_case_ids": [],
+        "controlled_pair_ids": [],
+        "category_stratum_counts": {
+          "category": {
+            "spelling": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "candidate-specific evidence absent"
+            }
+          },
+          "shape_strata": {
+            "simple-local": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "sentence-internal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "multi-sentence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "repeated-occurrence": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "unicode-and-case": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "quotation-or-literal": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            },
+            "conflict-or-abstention": {
+              "positive_cases": 0,
+              "hard_negative_cases": 0,
+              "paired_examples": 0,
+              "status": "not-covered"
+            }
+          }
+        },
+        "provider_profile_coverage": {
+          "provider-absent": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          },
+          "qualified-morphology": {
+            "positive_cases": 0,
+            "hard_negative_cases": 0,
+            "status": "not-covered for candidate family"
+          }
+        },
+        "conflict_abstention_case_ids": [],
+        "evidence_gaps": [
+          "No candidate-specific public positive cases are present in the reviewed v4 dataset.",
+          "No candidate-specific public hard negatives or controlled positive/negative pairs are present.",
+          "All seven #364 shape strata are candidate-specific not-covered, not evidence to be filled during implementation.",
+          "Both required provider profiles lack candidate-specific coverage; provider-dependent execution may not be inferred from category totals.",
+          "No candidate-specific executable precision, correct-sentence FAR, offset, conflict, or isolated-performance evidence exists."
+        ],
+        "executable_risk_evidence": [],
+        "artifact_context": {
+          "dataset_id": "polis_v4_quality_development",
+          "dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+          "manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf",
+          "reviewed_case_count": 124,
+          "profiles": [
+            "provider-absent",
+            "qualified-morphology"
+          ],
+          "interpretation": "The v4 aggregate/category/profile baselines measure existing sources. They emit zero false negatives and no separate unexplained gap for this candidate; unmeasured source rows are not promoted to gaps."
+        }
+      },
+      "expected_value": {
+        "exact_v4_false_negatives": [],
+        "expected_category_recall_delta": "0.0 measured on v4; no candidate-specific denominator exists, so no gain is claimed.",
+        "expected_aggregate_delta_context_only": "0.0 measured on v4; the family is not represented and aggregate recall cannot estimate future value.",
+        "source_or_phenomenon_coverage": [
+          "Would add a separately identified spelling family for niby-/quasi- joined lowercase and hyphenated uppercase.; no current source is corrected."
+        ],
+        "user_value_rationale": "Potentially useful only for the explicitly bounded normative form; conservative v1 users receive no suggestion until complete public evidence proves precision and abstention safety."
+      },
+      "risk_and_cost": {
+        "false_positive_risk": "high",
+        "conflicts_with_current_sources": "No current source identity overlap was recorded by #365; future overlap must be checked before approval.",
+        "ambiguity_risk": "High until candidate-specific hard negatives establish lexical, case, entity, quotation, and context boundaries.",
+        "provider_drift_risk": "Low provider risk because the candidate is provider-independent, but boundary drift still requires source and behavior identity checks.",
+        "offset_suggestion_risk": "High until repeated, Unicode, multi-sentence, separator, and minimal-replacement cases are executable.",
+        "correction_policy_interaction": "Must remain review-only and must not add an automatic correction-policy identity.",
+        "estimated_dispatch_performance_cost": "Unknown; requires isolated protocol-v2 evidence and must not trade FAR or precision for recall.",
+        "maintenance_norm_change_risk": "RJP effective date is recorded; later norm changes require a new reviewed matrix decision, not silent mutation.",
+        "mitigation_or_abstention_strategy": "Reject now; reopen only after all #364 public minima, exact provider/source identity, fail-closed conflict tests, and separate precision/FAR/performance evidence are public and executable.",
+        "executable_risk_evidence": []
+      },
+      "decision": {
+        "disposition": "reject: insufficient public evidence",
+        "rationale": "#364 admission minima are not met: the candidate has no candidate-specific public positives, hard negatives, controlled pairs, required shape strata, profile coverage, or executable risk evidence. Zero v4 FN and zero unexplained gaps do not supply missing candidate evidence. Rejecting prevents a follow-up promise from becoming an implementation issue.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-19T10:03:00Z",
+          "bound_matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d"
+        },
+        "reopening_evidence": [
+          "A new public, licensed candidate-specific evidence set must meet every #364 category/shape/profile minimum with exact case IDs and controlled pairs.",
+          "Executable tests must demonstrate exact spans/suggestions, zero correct-sentence FAR, conflict abstention, provider boundary, and isolated performance without weakening precision safety.",
+          "Maintainer must review the new evidence and explicitly reopen this row in a later matrix."
+        ],
+        "child_allowed": false,
+        "future_child_metadata": {
+          "labels": [
+            "type:feature",
+            "area:rules",
+            "priority:P2"
+          ],
+          "milestone": "Rule Coverage v1",
+          "title_prefix": "Implement qualified rule family:",
+          "state": "open",
+          "blocked_by": [
+            368
+          ],
+          "note": "Per-row priority is provisional until maintainer approval; no child is permitted in PRE-APPROVAL."
+        }
+      }
+    }
+  ],
+  "prioritization": {
+    "method": "Accepted rows only are ranked lexicographically by evidence completeness/strength, false-positive safety, provider scope, implementation cost, and candidate ID. Rejected/deferred rows are never ranked or used to trade precision/FAR for recall.",
+    "dimensions": [
+      "normative urgency and certainty",
+      "user-visible category gap",
+      "public evidence strength",
+      "expected category-level gain",
+      "false-positive risk",
+      "implementation scope",
+      "provider requirement",
+      "source-overlap/conflict risk",
+      "performance cost",
+      "maintenance stability"
+    ],
+    "precision_safety_rule": "Any precision regression, correct-sentence FAR regression, incomplete evidence, provider drift, conflict, or parity failure dominates recall and makes acceptance invalid.",
+    "accepted_row_ids": [],
+    "ranked_rows": [],
+    "tie_breaker": "candidate_id ascending after all safety dimensions tie; no tie is currently ranked because accepted_row_ids is empty.",
+    "zero_accepted_rows": true,
+    "priority_policy": "No child priority is assigned while accepted_row_ids is empty. If a row is later accepted, its priority label must be recorded in that row future_child_metadata and must not default silently to P1."
+  },
+  "approval": {
+    "status": "approved",
+    "decision_owner": "Paweł Cyroń",
+    "approved_by": "Paweł Cyroń",
+    "approved_at": "2026-08-19T10:03:00Z",
+    "bound_matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d",
+    "child_creation_allowed": true,
+    "note": "Maintainer approved the exact digest after independent review preparation; zero accepted rows require zero child issues."
+  },
+  "canonicalization": {
+    "algorithm": "SHA-256",
+    "encoding": "UTF-8",
+    "json": "sort_keys=true, separators=(\",\", \":\"), ensure_ascii=false",
+    "excluded_paths": [
+      "stage",
+      "status",
+      "approval",
+      "integrity.matrix_sha256",
+      "integrity.digest_status",
+      "rows[*].decision.maintainer_approval"
+    ],
+    "digest_field": "integrity.matrix_sha256",
+    "proposal": "Digest canonicalizes qualification content without lifecycle, approval-attestation, or digest-state fields, so later approval can bind the exact proposed content without changing the digest or creating circular row-level self-hashing."
+  },
+  "integrity": {
+    "matrix_sha256": "66040415f9c9491054fda0232c00d39f4d8a2c311d1e44240acb797ca4a5e20d",
+    "digest_status": "approved"
+  },
+  "child_issue_template": {
+    "creation_rule": "Create exactly one child per accepted row only after approval binds this digest; create none for rejected/deferred rows.",
+    "required_body_sections": [
+      "Parent #368",
+      "Umbrella #363",
+      "Qualification row ID:",
+      "Qualification matrix SHA-256:",
+      "Exact normative reference and disposition",
+      "Proposed source identity and behavior version",
+      "Supported profile/provider identity",
+      "Exact positive inputs and expected findings",
+      "Exact hard negatives and required abstentions",
+      "Exact span and suggestion contract",
+      "Conflict/overlap and repeated/casing/segmentation behavior",
+      "Review-only-first requirement",
+      "Regression-test IDs",
+      "Required v4 category/stratum delta",
+      "Precision and correct-sentence false-alarm non-regression",
+      "Isolated performance limit",
+      "Documentation/source-inventory updates",
+      "Explicit non-goals",
+      "Blocked-by references",
+      "Literal verification commands and binary PASS conditions"
+    ],
+    "required_metadata": {
+      "labels": [
+        "type:feature",
+        "area:rules",
+        "priority:P2"
+      ],
+      "milestone": "Rule Coverage v1",
+      "title_prefix": "Implement qualified rule family:",
+      "state": "open",
+      "parent_issue": 368,
+      "umbrella_issue": 363,
+      "blocked_by": [
+        368
+      ]
+    },
+    "live_mapping_marker": "Qualification row ID: <candidate_id>"
+  },
+  "evidence_snapshot": {
+    "rjp_audit_path": "docs/project/rule-coverage-rjp-2026.json",
+    "rjp_audit_issue": 365,
+    "rjp_audited_full_sha": "fa12f1538ebad2ca250658eca2d79fbf1fd9affc",
+    "quality_handoff_path": "docs/project/quality-v4-368-handoff.md",
+    "quality_source_sha": "07cd485d9778c56d195f93da899917035a808a39",
+    "quality_dataset_sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+    "quality_manifest_sha256": "120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf",
+    "quality_case_id_digest": "0ca59077aa406d02128147b63a95116eec67f886c569129207a6b872d2ab7703",
+    "quality_baseline_profiles": {
+      "provider-absent": {
+        "false_negatives": 0,
+        "false_positives": 0,
+        "correct_sentence_false_alarm_rate": 0.0
+      },
+      "qualified-morphology": {
+        "false_negatives": 0,
+        "false_positives": 0,
+        "correct_sentence_false_alarm_rate": 0.0
+      }
+    },
+    "quality_interpretation": "The reviewed v4 artifacts report zero FN on their scored supported subset. Raw source diagnostics contain 35 unmeasured rows and six provider-absent abstained rows, but no separate unexplained gap emission; unmeasured is not a gap."
+  }
+}

@@ -100,6 +100,7 @@ FORBIDDEN_REPOSITORY_MODULES = tuple(
             EVALUATION_SOURCE / "__main__.py",
             *EVALUATION_SOURCE.glob("calibration_*.py"),
             *EVALUATION_SOURCE.glob("holdout_*.py"),
+            EVALUATION_SOURCE / "rule_family_qualification.py",
         )
     )
 )

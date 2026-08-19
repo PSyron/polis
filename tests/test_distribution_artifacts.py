@@ -49,6 +49,7 @@ EXPECTED_SOURCE_MEMBERS = tuple(
     and path != ROOT / "src/polis/evaluation/__main__.py"
     and not path.name.startswith("holdout_")
     and not path.name.startswith("calibration_")
+    and path != ROOT / "src/polis/evaluation/rule_family_qualification.py"
 )
 
 
