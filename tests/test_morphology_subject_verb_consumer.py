@@ -81,6 +81,11 @@ class _FailingBackend(_QualifiedBackend):
         raise RuntimeError(text)
 
 
+class _OSErrorBackend(_QualifiedBackend):
+    def analyse(self, text: str) -> Sequence[_AnalysisRow]:
+        raise OSError(text)
+
+
 class _MalformedRowsBackend:
     def analyse(self, text: str) -> Sequence[_AnalysisRow]:
         del text
@@ -169,6 +174,7 @@ def test_rule_abstains_when_provider_identity_drifts(
         _QualifiedBackend(czyta_analyses=()),
         _QualifiedBackend(czytaja_forms=()),
         _FailingBackend(),
+        _OSErrorBackend(),
     ),
 )
 def test_rule_abstains_on_missing_malformed_unknown_or_failing_provider_output(
