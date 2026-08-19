@@ -53,6 +53,7 @@ exclude = [
   "/src/polis/evaluation/__main__.py",
   "/src/polis/evaluation/calibration_*.py",
   "/src/polis/evaluation/holdout_*.py",
+  "/src/polis/evaluation/rule_family_qualification.py",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]
@@ -64,6 +65,7 @@ exclude = [
   "/src/polis/evaluation/__main__.py",
   "/src/polis/evaluation/calibration_*.py",
   "/src/polis/evaluation/holdout_*.py",
+  "/src/polis/evaluation/rule_family_qualification.py",
 ]
 include = [
   "/LICENSE",
