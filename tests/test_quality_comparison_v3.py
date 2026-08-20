@@ -137,5 +137,5 @@ def test_v3_proposal_validates_against_remeasured_baselines() -> None:
     assert default.dataset_sha256 == V3_DATASET_SHA
 
 
-def test_runtime_cohort_remains_fifty_nine_sources() -> None:
-    assert len(Analyzer(AnalyzerConfig()).source_identity_snapshot) == 59
+def test_current_runtime_cohort_contains_the_new_review_only_source() -> None:
+    assert len(Analyzer(AnalyzerConfig()).source_identity_snapshot) == 60

@@ -71,7 +71,7 @@ RJP_WITHDRAWAL_TITLE: Final = (
 )
 EXPECTED_CATEGORY_SUMMARY: Final[dict[str, dict[str, JsonValue]]] = {
     "agreement": {
-        "source_count": 8,
+        "source_count": 9,
         "rjp_normative_scope": "not claimed",
         "claim_boundary": "Source audit, not completeness.",
     },

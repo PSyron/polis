@@ -118,6 +118,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:agreement.nominal_group_ta_nowy_ksiazka",
     "rule:agreement.subject_verb_oni_czyta",
     "rule:agreement.subject_verb_my_czyta",
+    "rule:agreement.subject_verb_present",
     "rule:inflection.negated_widziec",
     "rule:inflection.negated_widziec_nominal_group",
     "rule:inflection.negated_miec_czas",

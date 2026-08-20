@@ -37,12 +37,12 @@ def test_valid_rjp_audit_has_full_snapshot_and_change_matrix() -> None:
     assert audit["schema_id"] == "polis.rule-coverage-rjp-2026-audit"
     snapshot = audit["source_snapshot"]
     assert isinstance(snapshot, dict)
-    assert snapshot["count"] == 59
+    assert snapshot["count"] == 60
     rows = audit["source_rows"]
     changes = audit["change_rows"]
     assert isinstance(rows, list)
     assert isinstance(changes, list)
-    assert len(rows) == 59
+    assert len(rows) == 60
     assert len(changes) == len(CHANGE_NUMBERS)
 
 
@@ -58,7 +58,7 @@ def test_source_rows_keep_live_order_and_category_counts() -> None:
     assert isinstance(summary, dict)
     categories = [row["category"] for row in rows if isinstance(row, dict)]
     assert {category: categories.count(category) for category in set(categories)} == {
-        "agreement": 8,
+        "agreement": 9,
         "inflection": 14,
         "punctuation": 5,
         "spelling": 23,
@@ -149,24 +149,24 @@ def test_rjp_source_reference_and_non_rjp_boundary_are_executable(
     data = copy.deepcopy(_data())
     rows = data["source_rows"]
     assert isinstance(rows, list)
-    assert isinstance(rows[22], dict)
-    rows[22]["normative_references"] = []
+    assert isinstance(rows[23], dict)
+    rows[23]["normative_references"] = []
     with pytest.raises(RjpAuditError, match="RJP reference missing"):
         validate_rjp_2026_audit(_write(tmp_path, data))
 
     data = copy.deepcopy(_data())
     rows = data["source_rows"]
     assert isinstance(rows, list)
-    assert isinstance(rows[22], dict)
-    rows[22]["normative_references"] = [{"fabricated": "accepted"}]
+    assert isinstance(rows[23], dict)
+    rows[23]["normative_references"] = [{"fabricated": "accepted"}]
     with pytest.raises(RjpAuditError, match="fields drifted"):
         validate_rjp_2026_audit(_write(tmp_path, data))
 
     data = copy.deepcopy(_data())
     rows = data["source_rows"]
     assert isinstance(rows, list)
-    assert isinstance(rows[22], dict)
-    references = rows[22]["normative_references"]
+    assert isinstance(rows[23], dict)
+    references = rows[23]["normative_references"]
     assert isinstance(references, list)
     assert isinstance(references[0], dict)
     references[0]["locator"] = "dokument jednolity; fabricated locator"

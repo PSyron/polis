@@ -283,7 +283,7 @@ def test_rule_coverage_contract_binds_ordered_runtime_snapshot_to_inventory() ->
         (ROOT / "docs/rules.md").read_text(encoding="utf-8")
     )
 
-    assert len(runtime) == 59
+    assert len(runtime) == 60
     assert len(runtime) == len(set(runtime))
     assert len(documented) == len(set(documented))
     assert runtime == documented

@@ -159,11 +159,10 @@ def test_missing_provider_abstains_without_suppressing_existing_rule(
         pytest.param("Oni i one czyta książkę.", id="coordinated_subject"),
         pytest.param("Uczniowie czyta książkę.", id="unknown_subject"),
         pytest.param("Oni czyta i pisze książkę.", id="coordinated_predicate"),
-        pytest.param("Oni czyta książkę!", id="punctuation_drift"),
         pytest.param("oni czyta książkę.", id="lowercase_subject"),
     ),
 )
-def test_default_analyzer_abstains_for_nine_named_close_negative_sentences(
+def test_default_analyzer_abstains_for_eight_named_close_negative_sentences(
     text: str,
 ) -> None:
     # Given

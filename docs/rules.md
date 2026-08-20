@@ -18,6 +18,7 @@ kompletności języka.
 | `rule:agreement.nominal_group_ta_nowy_ksiazka` | `agreement` | opcjonalne lokalne grupy `przymiotnik + rzeczownik`, a przy jednoznacznym demonstratywie także `demonstratyw + przymiotnik + rzeczownik`; minimalna korekta przymiotnika, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_my_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `My czyta książkę.` → `My czytamy książkę.`, wyłącznie do przeglądu |
+| `rule:agreement.subject_verb_present` | `agreement` | lokalna zgoda osoby i liczby jawnego zaimka osobowego z jednoznacznym czasownikiem finitywnym czasu teraźniejszego, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_miec_czas` | `inflection` | zamknięta konstrukcja `Nie mam czas.` → `czasu`, wyłącznie do przeglądu (bez morfologii) |
@@ -73,7 +74,8 @@ kompletności języka.
 Reguły `rule:agreement.nominal_group_te_duze_okno`,
 `rule:agreement.nominal_group_ta_nowy_ksiazka`,
 `rule:agreement.subject_verb_oni_czyta`,
-`rule:agreement.subject_verb_my_czyta`,
+`rule:agreement.subject_verb_my_czyta` i
+`rule:agreement.subject_verb_present`,
 `rule:inflection.negated_widziec`,
 `rule:inflection.negated_widziec_nominal_group`,
 `rule:inflection.przygladac_sie_nowy_budynek`,
@@ -119,6 +121,19 @@ oraz jednoznaczne cechy liczby i rodzaju; zaimek, nazwa własna, koordynacja,
 cudzysłów, brak `się`, niepełne dane lub dryft providera kończą się abstencją.
 Sugestia obejmuje tylko zmieniony rzeczownik albo pełną grupę
 `przymiotnik + rzeczownik` i nie jest dodana do polityki automatycznej.
+
+`rule:agreement.subject_verb_present` dopuszcza wyłącznie zaimki `Ja`, `Ty`,
+`On`, `Ona`, `Ono`, `My`, `Wy`, `Oni` i `One` oraz jeden jednoznaczny tag
+`fin:*:*:imperf`; obsługiwane są także lokalne `nie` i pojedynczy separator
+interpunkcyjny. Provider musi potwierdzić dokładny profil zaimka, jeden leksem
+czasownika i jedną formę docelową z kwalifikowanego Morfeusza. Dodatkowy odczyt
+leksykalny poza czasownikiem kończy się abstencją, chyba że bezpośrednio po
+czasowniku występuje obsługiwany przyimek z następującym słowem, jak w
+`Oni mieszka w Warszawie.`. Elipsa, podmiot nominalny lub koordynowany, czas
+przeszły, tryb warunkowy lub rozkazujący, cytat, wieloznaczność i dryft danych
+kończą się abstencją. Sugestia obejmuje wyłącznie formę czasownika i zachowuje
+wielkość liter oraz zakres `[start,end)`; zachowanie nie rozszerza twierdzenia o
+pełną zgodę języka polskiego.
 
 ## Zasady bezpieczeństwa
 
