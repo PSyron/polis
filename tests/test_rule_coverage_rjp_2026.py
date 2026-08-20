@@ -37,12 +37,12 @@ def test_valid_rjp_audit_has_full_snapshot_and_change_matrix() -> None:
     assert audit["schema_id"] == "polis.rule-coverage-rjp-2026-audit"
     snapshot = audit["source_snapshot"]
     assert isinstance(snapshot, dict)
-    assert snapshot["count"] == 60
+    assert snapshot["count"] == 61
     rows = audit["source_rows"]
     changes = audit["change_rows"]
     assert isinstance(rows, list)
     assert isinstance(changes, list)
-    assert len(rows) == 60
+    assert len(rows) == 61
     assert len(changes) == len(CHANGE_NUMBERS)
 
 
@@ -61,12 +61,64 @@ def test_source_rows_keep_live_order_and_category_counts() -> None:
         "agreement": 9,
         "inflection": 14,
         "punctuation": 5,
-        "spelling": 23,
+        "spelling": 24,
         "syntax": 9,
     }
     assert all(
         isinstance(item, dict) and item["source"].startswith("rule:") for item in rows
     )
+
+
+def test_czyby_source_row_is_bound_to_rjp_03_and_review_only() -> None:
+    audit = validate_rjp_2026_audit()
+    rows = audit["source_rows"]
+    assert isinstance(rows, list)
+    row = next(
+        item
+        for item in rows
+        if isinstance(item, dict) and item["source"] == "rule:spelling.czyby"
+    )
+    assert row["operation"] == "replace.common_typo"
+    assert row["behavior_version"] == "spelling-czyby/1.0"
+    assert row["correction_policy_status"] == "review-only"
+    assert row["provider_requirement"] == "provider-independent"
+    assert row["normative_scope"] == "governed-by-rjp"
+    assert row["normative_references"][0]["locator"] == "Część I, pkt 4.5.1(c)-(d)"
+    assert row["supporting_public_positives"] == [
+        {
+            "path": "docs/behavior-reference.md",
+            "locator": "rule:spelling.czyby",
+        },
+        {
+            "path": "tests/test_issue_398_czyby.py",
+            "locator": (
+                "test_czyby_emits_exact_review_only_findings_for_each_occurrence"
+            ),
+        },
+    ]
+    assert row["supporting_public_hard_negatives"] == [
+        {
+            "path": "docs/rules.md",
+            "locator": "rule:spelling.czyby scope boundary",
+        },
+        {
+            "path": "tests/test_issue_398_czyby.py",
+            "locator": "test_czyby_rejects_rjp_lexical_negatives_and_embedded_hosts",
+        },
+    ]
+    assert row["action_required"] == (
+        "No further runtime action; #398 implements this bounded source as review-only."
+    )
+    changes = audit["change_rows"]
+    assert isinstance(changes, list)
+    rjp_03 = next(
+        item
+        for item in changes
+        if isinstance(item, dict)
+        and item["official_number_or_name"].startswith("RJP-03:")
+    )
+    assert rjp_03["existing_polis_source_identities"] == ["rule:spelling.czyby"]
+    assert rjp_03["implementation_disposition"] == "deterministic_v1_candidate"
 
 
 def test_rjp_comma_sources_and_withdrawal_title_use_exact_authority() -> None:

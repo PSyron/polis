@@ -86,7 +86,7 @@ EXPECTED_CATEGORY_SUMMARY: Final[dict[str, dict[str, JsonValue]]] = {
         "claim_boundary": "Source audit, not completeness.",
     },
     "spelling": {
-        "source_count": 23,
+        "source_count": 24,
         "rjp_normative_scope": "bounded only",
         "claim_boundary": "Source audit, not completeness.",
     },
@@ -182,6 +182,7 @@ AUTHORIZED_PROVIDER_REQUIREMENT: Final = (
 )
 SOURCE_RJP_LOCATORS: Final[dict[str, str]] = {
     "rule:spelling.jestes": "Część I, pkt 3.2(a), PDF s. 14",
+    "rule:spelling.czyby": "Część I, pkt 4.5.1(c)-(d)",
     "rule:spelling.napewno": "Część I, pkt 4.4.1, PDF s. 24",
     "rule:spelling.wlasnie": "Część I, pkt 3.2(a), PDF s. 14",
     "rule:spelling.zeby": "Część I, pkt 3.5.2, PDF s. 17-18",
@@ -215,8 +216,10 @@ SOURCE_RJP_LOCATORS: Final[dict[str, str]] = {
 }
 PUBLIC_EVIDENCE_PATHS: Final[frozenset[str]] = frozenset(
     {
+        "docs/behavior-reference.md",
         "docs/rules.md",
         "docs/quality-comparison-v3.json",
+        "tests/test_issue_398_czyby.py",
         "tests/test_rule_source_contract.py",
     }
 )

@@ -11,7 +11,7 @@
     "product": "conservative deterministic Polis v1",
     "categories": ["agreement", "inflection", "punctuation", "spelling", "syntax"],
     "claim_boundary": "A coverage claim describes only the mapped, reviewed, public evidence units and never follows from source count or aggregate score alone.",
-    "runtime_behavior_change": "Issue #396 extends one existing review-only spelling source with one closed surface; it adds no runtime source, correction policy entry, provider, dependency, or v4 case.",
+    "runtime_behavior_change": "Issues #396 and #398 add bounded review-only spelling behavior; #398 adds one provider-independent source and no correction policy entry, provider, dependency, or v4 case.",
     "numeric_v4_thresholds": "No v4 quality threshold is selected here; thresholds require a measured reviewed baseline and a later approval."
   },
   "source_precedence": [
@@ -182,12 +182,12 @@
       "fields": ["source", "operation", "behavior_version"],
       "order": "Exact deterministic registration order; sets and manually duplicated counts are invalid.",
       "digest": {"algorithm": "sha256", "canonicalization": "UTF-8 JSON array of ordered identity objects, sorted object keys, compact separators, ensure_ascii=false."},
-      "planning_baseline": {"full_sha": "f536da5698815a76dd5d332e58df6bc934c6c664", "source_count": 60, "snapshot_sha256": "503f04cac68dc8d5aec782ac2a3bdbe26ad09bbf0c6cfde4f5562019d5b3e22d"}
+      "planning_baseline": {"full_sha": "e4b47a6c13e5d63fc5b4e4023f89f55be13e69f0", "source_count": 61, "snapshot_sha256": "428a384aacdc8147f3daea6e5fe73a3d983c26abce48eceac7ac7bbbdb0ebd81"}
     },
     "maintained_rule_inventory": {
       "path": "docs/rules.md",
       "parity_rule": "Every runtime source identity appears exactly once in the maintained table; missing, extra, duplicate, category, or scope identities fail.",
-      "rows_sha256": "8ed46101612d21cefed2005ffcb473912c3664e958155e60dcdc557795ed17ad",
+      "rows_sha256": "6ce2a0593cdcfaaa022e0179c03a84d84541e632b1d6f92a0cdd3c88d844e84f",
       "row_canonicalization": "UTF-8 JSON array of ordered source, category, and scope objects, sorted object keys, compact separators, ensure_ascii=false."
     },
     "behavior_versions": {"path": "Analyzer.source_identity_snapshot and the registered VersionedRule metadata", "parity_rule": "Every quality and policy artifact records the exact operation and behavior_version; drift is an error."},

@@ -134,6 +134,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:inflection.government_ufac_lekarz",
     "rule:inflection.numeral_five_genitive_plural",
     "rule:spelling.jestes",
+    "rule:spelling.czyby",
     "rule:spelling.napewno",
     "rule:spelling.wlasnie",
     "rule:spelling.zeby",
