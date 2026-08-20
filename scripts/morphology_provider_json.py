@@ -10,7 +10,7 @@ type JsonValue = (
 )
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class ContractError(Exception):
     detail: str
 

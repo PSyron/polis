@@ -1,0 +1,291 @@
+{
+  "schema_id": "polis.spelling-provider-qualification",
+  "schema_version": 1,
+  "dataset_id": "polis-polish-spelling-provider-v1",
+  "dataset_version": 1,
+  "license": "CC0-1.0",
+  "source": {
+    "author": "Paweł Cyroń",
+    "created": "2026-08-20",
+    "description": "Project-authored synthetic Polish token probes for offline candidate-provider qualification; no external corpus.",
+    "protected_data_overlap": false,
+    "provenance": "Original examples authored for Polis issue #388."
+  },
+  "cases": [
+    {
+      "id": "typo_chmrua",
+      "category": "transposition",
+      "text": "Pierwsze zdanie. Druga chmrua nad miastem.",
+      "start": 23,
+      "end": 29,
+      "expected_action": "candidate",
+      "expected_candidates": ["chmura"],
+      "expected_top1": "chmura",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_internte",
+      "category": "transposition",
+      "text": "Drugie zdanie. Szybki internte wykryto.",
+      "start": 22,
+      "end": 30,
+      "expected_action": "candidate",
+      "expected_candidates": ["internet"],
+      "expected_top1": "internet",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_insertion_chmurra",
+      "category": "insertion",
+      "text": "Na niebie widać chmurra.",
+      "start": 16,
+      "end": 23,
+      "expected_action": "candidate",
+      "expected_candidates": ["chmura"],
+      "expected_top1": "chmura",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_substitution_chmuta",
+      "category": "substitution",
+      "text": "Na niebie widać chmuta.",
+      "start": 16,
+      "end": 22,
+      "expected_action": "candidate",
+      "expected_candidates": ["chmura"],
+      "expected_top1": "chmura",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_ksiazka",
+      "category": "missing_diacritic",
+      "text": "Pierwsze. Czytam ksiazka w domu.",
+      "start": 17,
+      "end": 24,
+      "expected_action": "candidate",
+      "expected_candidates": ["książka"],
+      "expected_top1": "książka",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_konstytucj",
+      "category": "truncated_form",
+      "text": "Ważne zdanie. Brakuje końcówki konstytucj.",
+      "start": 31,
+      "end": 41,
+      "expected_action": "candidate",
+      "expected_candidates": ["konstytucja"],
+      "expected_top1": "konstytucja",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_zolw",
+      "category": "missing_diacritic",
+      "text": "Pierwsze. Na ścieżce leży zolw.",
+      "start": 26,
+      "end": 30,
+      "expected_action": "candidate",
+      "expected_candidates": ["żółw"],
+      "expected_top1": "żółw",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_zrodlo",
+      "category": "missing_diacritic",
+      "text": "Źródło. W raporcie brakuje zrodlo.",
+      "start": 27,
+      "end": 33,
+      "expected_action": "candidate",
+      "expected_candidates": ["źródło"],
+      "expected_top1": "źródło",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_wspolpraca",
+      "category": "missing_diacritic",
+      "text": "Długi tekst. Potrzebna jest wspolpraca.",
+      "start": 28,
+      "end": 38,
+      "expected_action": "candidate",
+      "expected_candidates": ["współpraca"],
+      "expected_top1": "współpraca",
+      "guard": "natural_language"
+    },
+    {
+      "id": "typo_swiatlo",
+      "category": "missing_diacritic",
+      "text": "Krótkie zdanie. Widzimy swiatlo.",
+      "start": 24,
+      "end": 31,
+      "expected_action": "candidate",
+      "expected_candidates": ["światło"],
+      "expected_top1": "światło",
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_valid_rzad",
+      "category": "ambiguous_diacritic",
+      "text": "Rzadki przypadek: rzad oznacza porządek.",
+      "start": 18,
+      "end": 22,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_ambiguous_suggestions",
+      "category": "ambiguous_suggestions",
+      "text": "W dokumencie znaleziono rzd.",
+      "start": 24,
+      "end": 27,
+      "expected_action": "abstain",
+      "expected_candidates": ["rzad", "rząd"],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_valid_ksiazka",
+      "category": "valid_inflection",
+      "text": "Poprawne zdanie. Książka leży na stole.",
+      "start": 17,
+      "end": 24,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_proper_warszawa",
+      "category": "proper_name",
+      "text": "Stolica Polski to Warszawa.",
+      "start": 18,
+      "end": 26,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_valid_wspolpraca",
+      "category": "valid_inflection",
+      "text": "W zdaniu występuje współpraca.",
+      "start": 19,
+      "end": 29,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "negative_valid_zolw",
+      "category": "valid_inflection",
+      "text": "Poprawna forma: żółw.",
+      "start": 16,
+      "end": 20,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "natural_language"
+    },
+    {
+      "id": "guard_url",
+      "category": "url",
+      "text": "Otwórz https://polis.example/ksiazka?q=zolw.",
+      "start": 7,
+      "end": 43,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "url"
+    },
+    {
+      "id": "guard_email",
+      "category": "email",
+      "text": "Napisz na test@example.com.",
+      "start": 10,
+      "end": 26,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "email"
+    },
+    {
+      "id": "guard_literal",
+      "category": "literal",
+      "text": "Wartość to --debug.",
+      "start": 11,
+      "end": 18,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "literal"
+    },
+    {
+      "id": "guard_technical_utf8",
+      "category": "technical_token",
+      "text": "Używamy UTF-8 i Morfeusz2.",
+      "start": 8,
+      "end": 13,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "technical"
+    },
+    {
+      "id": "guard_code_identifier",
+      "category": "technical_token",
+      "text": "Importujemy polis_nlp bez zmian.",
+      "start": 12,
+      "end": 21,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "technical"
+    },
+    {
+      "id": "guard_punctuation_literal",
+      "category": "literal",
+      "text": "Opcja ma wartość ---.",
+      "start": 17,
+      "end": 20,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "literal"
+    },
+    {
+      "id": "guard_acronym_api",
+      "category": "acronym",
+      "text": "API działa poprawnie.",
+      "start": 0,
+      "end": 3,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "technical"
+    },
+    {
+      "id": "guard_numeral_2026",
+      "category": "numeral",
+      "text": "Rok 2026 jest ważny.",
+      "start": 4,
+      "end": 8,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "numeral"
+    },
+    {
+      "id": "guard_mixed_language_feature",
+      "category": "mixed_language",
+      "text": "Włącz feature flag.",
+      "start": 6,
+      "end": 13,
+      "expected_action": "abstain",
+      "expected_candidates": [],
+      "expected_top1": null,
+      "guard": "mixed_language"
+    }
+  ]
+}

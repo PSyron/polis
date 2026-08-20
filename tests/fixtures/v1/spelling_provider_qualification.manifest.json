@@ -1,0 +1,39 @@
+{
+  "schema_id": "polis.spelling-provider-qualification-manifest",
+  "schema_version": 1,
+  "dataset_id": "polis-polish-spelling-provider-v1",
+  "dataset_version": 1,
+  "canonical_sha256": "a090e7b8ff3b18bc11dfc39fd7ca564f6768fe9f9555068e923268fe4602a8a3",
+  "source": {
+    "license": "CC0-1.0",
+    "provenance": "Project-authored synthetic cases; no external corpus and no overlap with protected evidence.",
+    "protected_data_overlap": false
+  },
+  "case_ids": [
+    "typo_chmrua",
+    "typo_internte",
+    "typo_insertion_chmurra",
+    "typo_substitution_chmuta",
+    "typo_ksiazka",
+    "typo_konstytucj",
+    "typo_zolw",
+    "typo_zrodlo",
+    "typo_wspolpraca",
+    "typo_swiatlo",
+    "negative_valid_rzad",
+    "negative_ambiguous_suggestions",
+    "negative_valid_ksiazka",
+    "negative_proper_warszawa",
+    "negative_valid_wspolpraca",
+    "negative_valid_zolw",
+    "guard_url",
+    "guard_email",
+    "guard_literal",
+    "guard_technical_utf8",
+    "guard_code_identifier",
+    "guard_punctuation_literal",
+    "guard_acronym_api",
+    "guard_numeral_2026",
+    "guard_mixed_language_feature"
+  ]
+}

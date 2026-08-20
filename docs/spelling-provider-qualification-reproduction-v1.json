@@ -1,0 +1,94 @@
+{
+  "schema_id": "polis.spelling-provider-qualification-reproduction",
+  "schema_version": 1,
+  "dataset_canonical_sha256": "a090e7b8ff3b18bc11dfc39fd7ca564f6768fe9f9555068e923268fe4602a8a3",
+  "artifact_acquisition": {
+    "network_allowed_only_for_research_setup": true,
+    "runtime_network_used": false,
+    "verify_command": "shasum -a 256 <tmp>/spylls-0.1.7-py2.py3-none-any.whl <tmp>/symspellpy-6.10.0-py3-none-any.whl <tmp>/pl_PL.aff <tmp>/pl_PL.dic <tmp>/README_en.txt <tmp>/polish-pinned.csv",
+    "files": [
+      {
+        "filename": "spylls-0.1.7-py2.py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/cd/19/ce6fcb4b86e188983bcfc1f84e4ac6f3038ca8d68b6d70a678cdc566f66c/spylls-0.1.7-py2.py3-none-any.whl",
+        "sha256": "0c7fa4b66615f390bd12fd37939b85934c012309fd3cce8584844c54270b7776",
+        "command": "curl --fail --location --output <tmp>/spylls-0.1.7-py2.py3-none-any.whl https://files.pythonhosted.org/packages/cd/19/ce6fcb4b86e188983bcfc1f84e4ac6f3038ca8d68b6d70a678cdc566f66c/spylls-0.1.7-py2.py3-none-any.whl"
+      },
+      {
+        "filename": "symspellpy-6.10.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c2/02/1124824a3e2842f42f45278f8eef94c5cb989055064e3473e8281f5deb0c/symspellpy-6.10.0-py3-none-any.whl",
+        "sha256": "e31707f6d6e06b89973588c02c0c7941c9ca1e3144859a8e2e46d8b815dda75e",
+        "command": "curl --fail --location --output <tmp>/symspellpy-6.10.0-py3-none-any.whl https://files.pythonhosted.org/packages/c2/02/1124824a3e2842f42f45278f8eef94c5cb989055064e3473e8281f5deb0c/symspellpy-6.10.0-py3-none-any.whl"
+      },
+      {
+        "filename": "pl_PL.aff",
+        "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/pl_PL.aff",
+        "sha256": "82973651651aa930335c865b339b98db376ca3dbf3a661b70b9eeb71fdf41dca",
+        "command": "curl --fail --location --output <tmp>/pl_PL.aff https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/pl_PL.aff"
+      },
+      {
+        "filename": "pl_PL.dic",
+        "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/pl_PL.dic",
+        "sha256": "c0848440599eb88e5aca500418d5f389e562ec2c157b63dbe39d354658ffba49",
+        "command": "curl --fail --location --output <tmp>/pl_PL.dic https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/pl_PL.dic"
+      },
+      {
+        "filename": "README_en.txt",
+        "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/README_en.txt",
+        "sha256": "fb5f9b4a0643821cf88775c0932810c1cd05f236136c913e3eaf1e24806f3f44",
+        "command": "curl --fail --location --output <tmp>/README_en.txt https://raw.githubusercontent.com/LibreOffice/dictionaries/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL/README_en.txt"
+      },
+      {
+        "filename": "polish-pinned.csv",
+        "url": "https://raw.githubusercontent.com/K7TRY/WordFreqLists/204bc67cca6daee769137ec95169afb5ccb2b565/Polish%20Word%20Frequency%20List.txt",
+        "sha256": "956b2071998cbe72edb8eac070aa792cf00b171faddf7403116d8d9b8f47e783",
+        "command": "curl --fail --location --output <tmp>/polish-pinned.csv https://raw.githubusercontent.com/K7TRY/WordFreqLists/204bc67cca6daee769137ec95169afb5ccb2b565/Polish%20Word%20Frequency%20List.txt"
+      }
+    ]
+  },
+  "frequency_preparation": {
+    "source_revision": "204bc67cca6daee769137ec95169afb5ccb2b565",
+    "source_sha256": "956b2071998cbe72edb8eac070aa792cf00b171faddf7403116d8d9b8f47e783",
+    "derived_sha256": "516543c11caca422912eef552bbd8cceeb1110bfdecc6a1cf3918f3f1a28acd8",
+    "command": "uv run --offline --no-index --no-project python scripts/prepare_spelling_provider_frequency.py --input <tmp>/polish-pinned.csv --output <tmp>/symspell.txt --expected-input-sha256 956b2071998cbe72edb8eac070aa792cf00b171faddf7403116d8d9b8f47e783"
+  },
+  "command_templates": {
+    "spylls": "uv run --offline --no-index --no-project --with <tmp>/spylls-0.1.7-py2.py3-none-any.whl --python 3.12 python scripts/spelling_provider_qualification.py --provider spylls --dataset tests/fixtures/v1/spelling_provider_qualification.json --manifest tests/fixtures/v1/spelling_provider_qualification.manifest.json --output <tmp>/spylls-report.json --package-artifact <tmp>/spylls-0.1.7-py2.py3-none-any.whl --data-file <tmp>/pl_PL.aff --data-file <tmp>/pl_PL.dic --data-file <tmp>/README_en.txt --dictionary-prefix <tmp>/pl_PL --data-id LibreOffice/dictionaries@f2ff99058268502bdcf4cad25c1ca2935ad8aa7d:pl_PL --data-license 'GPL OR LGPL OR MPL OR Apache-2.0 OR CC-ShareAlike' --data-license-status unresolved-multi-license --data-source https://github.com/LibreOffice/dictionaries/tree/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL --data-source-sha256 f17a7b7ddcdeef3e40d01aaaee496dc15b1888041d702eddddc7e2fbb2cc33b2 --package-license 'MPL-2.0 upstream; wheel metadata UNKNOWN/classifier MIT; PyPI license field empty' --package-license-status unresolved-contradictory --expected-package-version 0.1.7 --expected-artifact-sha256 spylls-0.1.7-py2.py3-none-any.whl=0c7fa4b66615f390bd12fd37939b85934c012309fd3cce8584844c54270b7776 --expected-data-sha256 pl_PL.aff=82973651651aa930335c865b339b98db376ca3dbf3a661b70b9eeb71fdf41dca --expected-data-sha256 pl_PL.dic=c0848440599eb88e5aca500418d5f389e562ec2c157b63dbe39d354658ffba49 --expected-data-sha256 README_en.txt=fb5f9b4a0643821cf88775c0932810c1cd05f236136c913e3eaf1e24806f3f44 --repetitions 5 --limit 5",
+    "symspellpy": "uv run --offline --no-index --no-project --with <tmp>/symspellpy-6.10.0-py3-none-any.whl --python 3.12 python scripts/spelling_provider_qualification.py --provider symspellpy --dataset tests/fixtures/v1/spelling_provider_qualification.json --manifest tests/fixtures/v1/spelling_provider_qualification.manifest.json --output <tmp>/symspell-report.json --package-artifact <tmp>/symspellpy-6.10.0-py3-none-any.whl --data-file <tmp>/symspell.txt --frequency-file <tmp>/symspell.txt --data-id 'K7TRY/WordFreqLists@204bc67cca6daee769137ec95169afb5ccb2b565:Polish Word Frequency List.txt -> deterministic SymSpell 2-column derivation' --data-license GPL-3.0 --data-license-status incompatible-for-Polis-distribution --data-source https://raw.githubusercontent.com/K7TRY/WordFreqLists/204bc67cca6daee769137ec95169afb5ccb2b565/Polish%20Word%20Frequency%20List.txt --data-source-sha256 956b2071998cbe72edb8eac070aa792cf00b171faddf7403116d8d9b8f47e783 --package-license MIT --package-license-status clear --expected-package-version 6.10.0 --expected-artifact-sha256 symspellpy-6.10.0-py3-none-any.whl=e31707f6d6e06b89973588c02c0c7941c9ca1e3144859a8e2e46d8b815dda75e --expected-data-sha256 symspell.txt=516543c11caca422912eef552bbd8cceeb1110bfdecc6a1cf3918f3f1a28acd8 --repetitions 5 --limit 5"
+  },
+  "runs": [
+    {
+      "provider": "spylls",
+      "attempt": 1,
+      "exit_code": 0,
+      "normalized_digest": "b19f1f86f3756ae4e2349802ecefc44a36f026fcc2dbfab21fab7272e8a0a697",
+      "report_sha256": "4823a228ba32fc135e7e06ca33a182d57a83290383c44d5c26cad1f4e14e7095",
+      "result_repetitions_stable": true
+    },
+    {
+      "provider": "spylls",
+      "attempt": 2,
+      "exit_code": 0,
+      "normalized_digest": "b19f1f86f3756ae4e2349802ecefc44a36f026fcc2dbfab21fab7272e8a0a697",
+      "report_sha256": "295f4c8e14906062263a34884ce7f45414fa097aae13703e965e63bd980900b7",
+      "result_repetitions_stable": true
+    },
+    {
+      "provider": "symspellpy",
+      "attempt": 1,
+      "exit_code": 0,
+      "normalized_digest": "090bb718adaafa6d39a5dec6b2ceee8bcf9bd3cec5f309cb298a576dbcccf112",
+      "report_sha256": "49fe94b97d0a6a258c063c03f8f8d3018f3050d3bf78f08ed96ecb962e10b19b",
+      "result_repetitions_stable": true
+    },
+    {
+      "provider": "symspellpy",
+      "attempt": 2,
+      "exit_code": 0,
+      "normalized_digest": "090bb718adaafa6d39a5dec6b2ceee8bcf9bd3cec5f309cb298a576dbcccf112",
+      "report_sha256": "bb79c9d67cb263563e7f1255f1c3a213be18486de7b394af49e270f2c38a1a44",
+      "result_repetitions_stable": true
+    }
+  ],
+  "normalized_digest_match": true,
+  "runtime_dependencies_changed": false
+}
