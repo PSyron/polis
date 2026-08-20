@@ -135,6 +135,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:inflection.numeral_five_genitive_plural",
     "rule:spelling.jestes",
     "rule:spelling.czyby",
+    "rule:spelling.arcy_prefix",
     "rule:spelling.napewno",
     "rule:spelling.wlasnie",
     "rule:spelling.zeby",
