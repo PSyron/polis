@@ -34,6 +34,7 @@ kompletności języka.
 | `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta rekcja `ufać` dla jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Ufam nowy lekarz.` → `nowemu lekarzowi`), wyłącznie do przeglądu |
 | `rule:inflection.numeral_five_genitive_plural` | `inflection` | zamknięta, zakotwiczona konstrukcja `Pięć książki` → `książek`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
+| `rule:spelling.czyby` | `spelling` | dokładna forma łączna `czyby` → `czy by`, wyłącznie do przeglądu |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |

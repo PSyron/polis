@@ -107,7 +107,7 @@ _WAVE4 = tuple(item[0] for item in _CASES)
 
 def test_runtime_exposes_sixty_sources_after_issue_386() -> None:
     snapshot = Analyzer(AnalyzerConfig()).source_identity_snapshot
-    assert len(snapshot) == 60
+    assert len(snapshot) == 61
     sources = [item.source for item in snapshot]
     for source in _WAVE4:
         assert source in sources

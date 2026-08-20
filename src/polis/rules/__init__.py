@@ -36,6 +36,7 @@ from polis.rules.inflection import (
 from polis.rules.przygladac import InflectionPrzygladacSieNowyBudynekRule
 from polis.rules.spelling import (
     SpellingConajmniejRule,
+    SpellingCzybyRule,
     SpellingJestesRule,
     SpellingMonthWeekdayLowercaseRule,
     SpellingNapewnoRule,
@@ -338,6 +339,7 @@ __all__ = [
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
     "SpellingConajmniejRule",
+    "SpellingCzybyRule",
     "SpellingJestesRule",
     "SpellingNapewnoRule",
     "SpellingNaprawdeRule",

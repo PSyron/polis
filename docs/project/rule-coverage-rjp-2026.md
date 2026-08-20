@@ -9,12 +9,12 @@ obserwowalną, bezpieczną granicę dla v1.
 
 ## Zakres i źródła normy
 
-Audyt wiąże dokładnie 60 tożsamości zwróconych przez
+Audyt wiąże dokładnie 61 tożsamości zwróconych przez
 `Analyzer(AnalyzerConfig()).source_identity_snapshot`. Wykaz zachowuje
 kolejność runtime'u, operację, wersję zachowania, provider, politykę korekty,
 status konformancji, publiczne pozytywy, hard negatives, notatkę abstencji i
 następną czynność. Bieżący podział to: agreement 9, inflection 14,
-punctuation 5, spelling 23 i syntax 9.
+punctuation 5, spelling 24 i syntax 9.
 
 `audited_full_sha` oznacza dokładny, rozwiązywalny commit źródłowy, którego
 kohort opisuje macierz. Audytowane ścieżki tego commita muszą być identyczne z
@@ -57,8 +57,10 @@ wiedzy o świecie i swobodne generowanie. Kandydat zależny od Morfeusza2 musi
 wskazywać istniejącą, zakwalifikowaną granicę providera; bez niej pozostaje
 abstencją.
 
-W obecnym audycie cztery wiersze mają kandydata do dalszej implementacji:
-RJP-03, RJP-04, RJP-09a i RJP-10. RJP-03 ogranicza kandydata do dokładnego
+W obecnym audycie RJP-03 ma już jedno bieżące, review-only źródło
+`rule:spelling.czyby`; jego rekord kandydata zachowuje normatywną granicę i
+wykluczenia. Pozostałe wiersze kandydackie dotyczą RJP-04, RJP-09a i RJP-10.
+RJP-03 ogranicza zachowanie do dokładnego
 zleksykalizowanego przypadku `czyby` i odrzuca pełny zestaw form wymienionych
 w §4.5.1(c–d), między innymi `aby`, `ażeby`, `byleby`, `jakby`, `choćby`,
 `chociażby`, `gdyby`, `czyżby`, `żeby`, `niby` i `oby`, a także już rozdzielone
