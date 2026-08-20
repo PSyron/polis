@@ -730,7 +730,7 @@ class SpellingNaprawdeRule(TypoSpellingRule):
 
 
 class SpellingNieBycJointRule(TypoSpellingRule):
-    """Closed ``być`` joint-spelling surfaces only (no ``niejestes``)."""
+    """Closed ``być`` joint-spelling surfaces only."""
 
     _IGNORE_WRAPPED_MENTIONS = True
 
@@ -742,6 +742,7 @@ class SpellingNieBycJointRule(TypoSpellingRule):
             confidence=0.98,
             surfaces={
                 "niejestem": "nie jestem",
+                "niejestes": "nie jesteś",
                 "niebędzie": "nie będzie",
                 "niebedzie": "nie będzie",
                 "niebył": "nie był",
