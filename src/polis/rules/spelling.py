@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections.abc import Mapping
 from functools import lru_cache
 from types import MappingProxyType
@@ -22,11 +23,78 @@ from polis.rules.syntax import _is_quoted_position
 _MENTION_WRAPPERS: Final = frozenset(
     {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
 )
+_ARCY_BOUNDARY_MARKS: Final = frozenset("()[]{}<>\"'`„”“«»‘’‹›")
+_ARCY_CONTEXT_PAIRS: Final = (
+    ('"', '"'),
+    ("`", "`"),
+    ("'", "'"),
+    ("„", "”"),
+    ("“", "”"),
+    ("‘", "’"),
+    ("«", "»"),
+    ("‹", "›"),
+    ("(", ")"),
+    ("[", "]"),
+    ("{", "}"),
+    ("<", ">"),
+)
+_ARCY_CONTEXT_MARKS: Final = frozenset(
+    character for pair in _ARCY_CONTEXT_PAIRS for character in pair
+)
+_ARCY_APOSTROPHE_NAME_PARTS: Final = (
+    "APOSTROPHE",
+    "GERESH",
+    "PRIME",
+    "QUOTATION MARK",
+    "REVERSED COMMA",
+    "TURNED COMMA",
+)
+
+
+def _is_arcy_apostrophe_like(character: str) -> bool:
+    name = unicodedata.name(character, "")
+    return any(part in name for part in _ARCY_APOSTROPHE_NAME_PARTS)
+
+
+def _is_arcy_sentence_closing_mark(character: str) -> bool:
+    return character in _SENTENCE_CLOSING_MARKS or unicodedata.category(character) in {
+        "Pe",
+        "Pf",
+    }
+
+
+def _is_arcy_boundary_mark(character: str) -> bool:
+    return character in _ARCY_BOUNDARY_MARKS or unicodedata.category(character) in {
+        "Ps",
+        "Pe",
+        "Pi",
+        "Pf",
+    }
+
+
+def _arcy_matching_opening_index(
+    text: str, closing_index: int, opening: str, closing: str
+) -> int | None:
+    if opening == closing:
+        return text.rfind(opening, 0, closing_index)
+    depth = 0
+    for index in range(closing_index, -1, -1):
+        character = text[index]
+        if character == closing:
+            depth += 1
+        elif character == opening:
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
 
 # Characters that glue a match into a larger address/identifier host token.
 _HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=")
 # Sentence/clause punctuation stripped from host edges so `wogole.` stays prose.
 _HOST_EDGE_TRIM: Final = frozenset('.,;:!?)]}"»”\'„“«"')
+_SENTENCE_CLOSING_MARKS: Final = frozenset("'\"”’»›)]}")
+_ARCY_LINE_BREAKS: Final = frozenset("\r\n\u0085\u2028\u2029")
 _SCHEME_RE: Final = re.compile(r"(?i)\b(?:https?|ftp)://")
 _DOMAINISH_RE: Final = re.compile(
     r"(?i)\b(?:www\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b"
@@ -147,7 +215,13 @@ def _is_mixed_case_identifier_context(text: str, start: int, end: int) -> bool:
     return False
 
 
-def should_abstain_literal_context(text: str, start: int, end: int) -> bool:
+def should_abstain_literal_context(
+    text: str,
+    start: int,
+    end: int,
+    *,
+    quoted_position: bool | None = None,
+) -> bool:
     """Return True when a closed literal match must not emit a suggestion.
 
     Fail-closed: any recognized non-prose context abstains. Unrecognized
@@ -157,7 +231,9 @@ def should_abstain_literal_context(text: str, start: int, end: int) -> bool:
         return True
     if _is_wrapped_mention(text, start, end):
         return True
-    if _is_quoted_position(text, start):
+    if quoted_position is None:
+        quoted_position = _is_quoted_position(text, start)
+    if quoted_position:
         return True
     if _is_email_context(text, start, end):
         return True
@@ -410,6 +486,143 @@ class SpellingCzybyRule(TypoSpellingRule):
         """Return the qualified implementation behavior version."""
 
         return "spelling-czyby/1.0"
+
+
+class SpellingArcyPrefixRule:
+    """Hyphenates the bounded ``arcy`` prefix before uppercase targets."""
+
+    _CATEGORY = Category.SPELLING
+
+    def __init__(self) -> None:
+        self.source = Source(SourceKind.RULE, "spelling.arcy_prefix")
+        self._pattern = re.compile(
+            r"(?<!\w)(?P<prefix>arcy) (?P<target>[A-ZĄĆĘŁŃÓŚŹŻ]"
+            r"[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]*)(?![\w-])"
+        )
+        self._confidence = Confidence(0.95)
+
+    @property
+    def operation(self) -> str:
+        return "replace.prefix_hyphenation"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-arcy-prefix/1.0"
+
+    def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
+        if options.categories is not None and self._CATEGORY not in options.categories:
+            return ()
+        findings: list[Finding] = []
+        context_stack: list[str] = []
+        uncertain_context = False
+        scanned = 0
+        for match in self._pattern.finditer(text):
+            while scanned < match.start("prefix"):
+                character = text[scanned]
+                for opening, closing in _ARCY_CONTEXT_PAIRS:
+                    if character == opening:
+                        if opening == closing and context_stack[-1:] == [closing]:
+                            context_stack.pop()
+                        else:
+                            context_stack.append(closing)
+                        break
+                    if character == closing:
+                        if context_stack[-1:] == [closing]:
+                            context_stack.pop()
+                        else:
+                            uncertain_context = True
+                        break
+                else:
+                    if (
+                        _is_arcy_boundary_mark(character)
+                        and character not in _ARCY_CONTEXT_MARKS
+                    ):
+                        uncertain_context = True
+                scanned += 1
+            start = match.start("prefix")
+            end = match.end("target")
+            boundary = start - 1
+            wrapper_sentence_boundary = False
+            while boundary >= 0 and text[boundary].isspace():
+                boundary -= 1
+            while boundary >= 0 and _is_arcy_sentence_closing_mark(text[boundary]):
+                closing = text[boundary]
+                if _is_arcy_boundary_mark(closing):
+                    for opening, expected_closing in _ARCY_CONTEXT_PAIRS:
+                        if expected_closing != closing:
+                            continue
+                        opening_index = _arcy_matching_opening_index(
+                            text, boundary, opening, expected_closing
+                        )
+                        if opening_index is None:
+                            continue
+                        before_wrapper = opening_index - 1
+                        while before_wrapper >= 0 and text[before_wrapper].isspace():
+                            before_wrapper -= 1
+                        if before_wrapper >= 0 and text[before_wrapper] in ".!?…":
+                            wrapper_sentence_boundary = True
+                boundary -= 1
+                while boundary >= 0 and text[boundary].isspace():
+                    boundary -= 1
+            if (
+                boundary < 0
+                or text[boundary] in ".!?…"
+                or wrapper_sentence_boundary
+                or uncertain_context
+                or any(
+                    character in _ARCY_LINE_BREAKS
+                    for character in text[boundary + 1 : start]
+                )
+            ):
+                continue
+            if (start > 0 and _is_arcy_boundary_mark(text[start - 1])) or (
+                end < len(text) and _is_arcy_boundary_mark(text[end])
+            ):
+                continue
+            if (boundary >= 0 and text[boundary] in ",;:") or (
+                end < len(text) and text[end] in ",;:"
+            ):
+                continue
+            if end < len(text) and unicodedata.combining(text[end]):
+                continue
+            if end < len(text) and _is_arcy_apostrophe_like(text[end]):
+                continue
+            if start > 0 and not text[start - 1].isspace():
+                continue
+            if (
+                end + 1 < len(text)
+                and text[end] in ",;:"
+                and not text[end + 1].isspace()
+            ):
+                continue
+            if should_abstain_literal_context(
+                text,
+                start,
+                end,
+                quoted_position=bool(context_stack),
+            ):
+                continue
+            original = text[start:end]
+            target = match.group("target")
+            suggestion = f"arcy-{target}"
+            findings.append(
+                Finding.create(
+                    category=self._CATEGORY,
+                    severity=Severity.SUGGESTION,
+                    message="Prefiks „arcy” przed wielką literą łączy się łącznikiem.",
+                    explanation=(
+                        f"Zamiast „{original}” zwykle poprawnie pisze się "
+                        f"„{suggestion}”."
+                    ),
+                    original=original,
+                    suggestion=suggestion,
+                    start=start,
+                    end=end,
+                    confidence=self._confidence,
+                    source=self.source,
+                )
+            )
+        return tuple(findings)
 
 
 class SpellingWlasnieRule(TypoSpellingRule):

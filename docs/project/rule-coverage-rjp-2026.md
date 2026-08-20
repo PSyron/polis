@@ -9,12 +9,12 @@ obserwowalną, bezpieczną granicę dla v1.
 
 ## Zakres i źródła normy
 
-Audyt wiąże dokładnie 61 tożsamości zwróconych przez
+Audyt wiąże dokładnie 62 tożsamości zwróconych przez
 `Analyzer(AnalyzerConfig()).source_identity_snapshot`. Wykaz zachowuje
 kolejność runtime'u, operację, wersję zachowania, provider, politykę korekty,
 status konformancji, publiczne pozytywy, hard negatives, notatkę abstencji i
 następną czynność. Bieżący podział to: agreement 9, inflection 14,
-punctuation 5, spelling 24 i syntax 9.
+punctuation 5, spelling 25 i syntax 9.
 
 `audited_full_sha` oznacza dokładny, rozwiązywalny commit źródłowy, którego
 kohort opisuje macierz. Audytowane ścieżki tego commita muszą być identyczne z
@@ -71,7 +71,10 @@ niejednoznaczne, ponieważ
 `nielepiej` albo `nienajlepiej`. Pozostałe wiersze są jawnie
 `ambiguous_or_non_deterministic`, `outside_supported_categories` albo
 `not_applicable_to_analyzed_prose`. To są decyzje dla kolejnych issue, nie
-zmiany runtime'u wykonane przez #365.
+zmiany runtime'u wykonane przez #365. Issue #400 dodaje dla RJP-09a jedno
+provider-independent źródło `rule:spelling.arcy_prefix`, ograniczone do
+niepoczątkowej pary `arcy` + cel pisany wielką literą; nadal pozostaje ono
+wyłącznie review-only.
 
 ## Walidacja i ograniczenia
 

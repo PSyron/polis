@@ -67,7 +67,7 @@ _EXPECTED_EIGHT_IDENTITIES = {
 def test_runtime_exposes_exactly_twenty_eight_sources_with_eight_review_only() -> None:
     analyzer = Analyzer(AnalyzerConfig())
     snapshot = analyzer.source_identity_snapshot
-    assert len(snapshot) == 61
+    assert len(snapshot) == 62
     by_source = {item.source: item for item in snapshot}
     for source in _EIGHT:
         item = by_source[source]
