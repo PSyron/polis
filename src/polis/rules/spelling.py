@@ -386,6 +386,32 @@ class SpellingZebyRule(TypoSpellingRule):
         return "spelling-zeby/1.0"
 
 
+class SpellingCzybyRule(TypoSpellingRule):
+    """Corrects the exact fused ``czyby`` surface to ``czy by``."""
+
+    _IGNORE_WRAPPED_MENTIONS = True
+
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.czyby",
+            typed="czyby",
+            corrected="czy by",
+            confidence=0.98,
+        )
+
+    @property
+    def operation(self) -> str:
+        """Return the qualified action performed by this rule."""
+
+        return "replace.common_typo"
+
+    @property
+    def behavior_version(self) -> str:
+        """Return the qualified implementation behavior version."""
+
+        return "spelling-czyby/1.0"
+
+
 class SpellingWlasnieRule(TypoSpellingRule):
     """Corrects ``wlasnie`` -> ``właśnie``."""
 
