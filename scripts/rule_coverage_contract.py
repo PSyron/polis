@@ -24,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "a78c3576e857cdae995633b446a8099737ce8cb8cb46ead8c46a0df9f8d45c00"
+    "a14d6d322c80bd06b5ba0ec3ce4783bee6a4e014153903488c68157c11b2fea1"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",
@@ -34,7 +34,7 @@ SOURCE_PRECEDENCE: Final = (
     "docs/rules.md",
     "public-v3-quality-and-isolated-performance-artifacts",
 )
-PLANNING_BASELINE_FULL_SHA: Final = "165434e243360bb534d5eda8782ff089c087632c"
+PLANNING_BASELINE_FULL_SHA: Final = "f536da5698815a76dd5d332e58df6bc934c6c664"
 PLANNING_BASELINE_SOURCE_COUNT: Final = 60
 PLANNING_BASELINE_SNAPSHOT_SHA256: Final = (
     "503f04cac68dc8d5aec782ac2a3bdbe26ad09bbf0c6cfde4f5562019d5b3e22d"

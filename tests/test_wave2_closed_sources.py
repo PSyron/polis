@@ -138,13 +138,10 @@ def test_wkoncu_registers_both_joint_surfaces() -> None:
     assert any(str(i.source) == "rule:spelling.wkoncu" for i in b.issues)
 
 
-def test_nie_byc_joint_excludes_niejestes_and_maps_closed_surfaces() -> None:
+def test_nie_byc_joint_maps_all_closed_surfaces() -> None:
     analyzer = Analyzer(AnalyzerConfig())
-    assert not any(
-        str(i.source) == "rule:spelling.nie_byc_joint"
-        for i in analyzer.analyze("Niejestes gotowy.").issues
-    )
     for text, suggestion in (
+        ("Niejestes gotowy.", "Nie jesteś"),
         ("Niebędzie padać.", "Nie będzie"),
         ("Niebył gotowy.", "Nie był"),
     ):
