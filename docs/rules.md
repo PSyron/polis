@@ -50,7 +50,7 @@ kompletności języka.
 | `rule:spelling.spowrotem` | `spelling` | `spowrotem` → `z powrotem`, wyłącznie do przeglądu |
 | `rule:spelling.tymbardziej` | `spelling` | `tymbardziej` → `tym bardziej`, wyłącznie do przeglądu |
 | `rule:spelling.naprawde` | `spelling` | `naprawde` → `naprawdę`, wyłącznie do przeglądu |
-| `rule:spelling.nie_byc_joint` | `spelling` | zamknięte formy łączne `być` (`niejestem`, `niebędzie`, `niebył`; bez `niejestes`), wyłącznie do przeglądu |
+| `rule:spelling.nie_byc_joint` | `spelling` | zamknięte formy łączne `być` (`niejestem`, `niejestes`, `niebędzie`, `niebył`), wyłącznie do przeglądu |
 | `rule:spelling.poszlem` | `spelling` | `poszłem` → `poszedłem` (bez `przeszłem`/`przyszłem`), wyłącznie do przeglądu |
 | `rule:spelling.wlanczac` | `spelling` | dosłowna mapa `włanczać`/`wyłanczać` → `włączać`/`wyłączać`, wyłącznie do przeglądu |
 | `rule:spelling.month_weekday_lowercase` | `spelling` | `w`/`we` + zamknięta forma kalendarzowa z wielkiej litery → mała; abstencja gdy następny token wielką literą (święta), wyłącznie do przeglądu |
