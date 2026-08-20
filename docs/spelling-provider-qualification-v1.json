@@ -1,0 +1,218 @@
+{
+  "schema_id": "polis.spelling-provider-qualification-report",
+  "schema_version": 1,
+  "dataset": {
+    "dataset_id": "polis-polish-spelling-provider-v1",
+    "dataset_version": 1,
+    "canonical_sha256": "a090e7b8ff3b18bc11dfc39fd7ca564f6768fe9f9555068e923268fe4602a8a3"
+  },
+  "protocol": {
+    "same_dataset_and_case_order": true,
+    "same_text_and_hardware": true,
+    "suggestion_limit": 5,
+    "max_edit_distance": 2,
+    "repetitions": 5,
+    "thresholds_precommitted": false,
+    "protected_holdout_used": false,
+    "runtime_network_used": false,
+    "platform_constraints": {
+      "python": ">=3.12",
+      "supported_platforms": [
+        "darwin",
+        "linux"
+      ],
+      "rss_units": {
+        "darwin": "bytes",
+        "linux": "kibibytes converted to bytes"
+      }
+    },
+    "case_counts": {
+      "total": 25,
+      "natural_language": 16,
+      "correction": 10,
+      "negative": 6,
+      "guarded": 9
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-15.3.1-arm64-arm-64bit",
+    "machine": "arm64"
+  },
+  "providers": {
+    "spylls": {
+      "identity": {
+        "data_id": "LibreOffice/dictionaries@f2ff99058268502bdcf4cad25c1ca2935ad8aa7d:pl_PL",
+        "data_license": "GPL OR LGPL OR MPL OR Apache-2.0 OR CC-ShareAlike",
+        "data_license_status": "unresolved-multi-license",
+        "data_source": "https://github.com/LibreOffice/dictionaries/tree/f2ff99058268502bdcf4cad25c1ca2935ad8aa7d/pl_PL",
+        "data_source_sha256": "f17a7b7ddcdeef3e40d01aaaee496dc15b1888041d702eddddc7e2fbb2cc33b2",
+        "package_license": "MPL-2.0 upstream; wheel metadata UNKNOWN/classifier MIT; PyPI license field empty",
+        "package_license_status": "unresolved-contradictory",
+        "package_version": "0.1.7",
+        "provider": "spylls"
+      },
+      "artifacts": {
+        "data": [
+          {
+            "filename": "pl_PL.aff",
+            "sha256": "82973651651aa930335c865b339b98db376ca3dbf3a661b70b9eeb71fdf41dca",
+            "size_bytes": 257542
+          },
+          {
+            "filename": "pl_PL.dic",
+            "sha256": "c0848440599eb88e5aca500418d5f389e562ec2c157b63dbe39d354658ffba49",
+            "size_bytes": 5252096
+          },
+          {
+            "filename": "README_en.txt",
+            "sha256": "fb5f9b4a0643821cf88775c0932810c1cd05f236136c913e3eaf1e24806f3f44",
+            "size_bytes": 2282
+          }
+        ],
+        "dependencies": [],
+        "package": {
+          "filename": "spylls-0.1.7-py2.py3-none-any.whl",
+          "sha256": "0c7fa4b66615f390bd12fd37939b85934c012309fd3cce8584844c54270b7776",
+          "size_bytes": 1509482
+        }
+      },
+      "quality": {
+        "ambiguous_diacritic_abstentions": 1,
+        "ambiguous_diacritic_cases": 1,
+        "ambiguous_suggestion_abstentions": 0,
+        "ambiguous_suggestion_cases": 1,
+        "candidate_detection_rate": 1.0,
+        "candidate_recall": 1.0,
+        "correction_cases": 10,
+        "false_alarm_case_ids": [
+          "negative_ambiguous_suggestions"
+        ],
+        "false_alarm_cases": 1,
+        "false_alarm_rate": 0.16666666666666666,
+        "guarded_cases": 9,
+        "guarded_provider_calls": 0,
+        "negative_cases": 6,
+        "top1_exactness": 1.0
+      },
+      "performance": {
+        "data_size_bytes": 5511920,
+        "dependency_size_bytes": 1509482,
+        "measured_queries": 80,
+        "peak_rss_bytes": 368508928,
+        "query_p50_ns": 724864542,
+        "query_p95_ns": 1809947166,
+        "repetition_mean_ns": 13400476216,
+        "repetition_total_ns": [
+          13335964041,
+          13349976042,
+          13390436124,
+          13442292377,
+          13483712500
+        ],
+        "startup_ns": 1013919834,
+        "throughput_cases_per_second": 1.1939874181442158
+      },
+      "reproducibility": {
+        "repetition_hashes": [
+          "95257f9d580aea3ca86b80ad011b565ca132e3727c5d7555ef81b3778c1a4d51",
+          "95257f9d580aea3ca86b80ad011b565ca132e3727c5d7555ef81b3778c1a4d51",
+          "95257f9d580aea3ca86b80ad011b565ca132e3727c5d7555ef81b3778c1a4d51",
+          "95257f9d580aea3ca86b80ad011b565ca132e3727c5d7555ef81b3778c1a4d51",
+          "95257f9d580aea3ca86b80ad011b565ca132e3727c5d7555ef81b3778c1a4d51"
+        ],
+        "repetitions": 5,
+        "stable": true
+      }
+    },
+    "symspellpy": {
+      "identity": {
+        "data_id": "K7TRY/WordFreqLists@204bc67cca6daee769137ec95169afb5ccb2b565:Polish Word Frequency List.txt -> deterministic SymSpell 2-column derivation",
+        "data_license": "GPL-3.0",
+        "data_license_status": "incompatible-for-Polis-distribution",
+        "data_source": "https://raw.githubusercontent.com/K7TRY/WordFreqLists/204bc67cca6daee769137ec95169afb5ccb2b565/Polish%20Word%20Frequency%20List.txt",
+        "data_source_sha256": "956b2071998cbe72edb8eac070aa792cf00b171faddf7403116d8d9b8f47e783",
+        "package_license": "MIT",
+        "package_license_status": "clear",
+        "package_version": "6.10.0",
+        "provider": "symspellpy"
+      },
+      "artifacts": {
+        "data": [
+          {
+            "filename": "symspell.txt",
+            "sha256": "516543c11caca422912eef552bbd8cceeb1110bfdecc6a1cf3918f3f1a28acd8",
+            "size_bytes": 1937192
+          }
+        ],
+        "dependencies": [],
+        "package": {
+          "filename": "symspellpy-6.10.0-py3-none-any.whl",
+          "sha256": "e31707f6d6e06b89973588c02c0c7941c9ca1e3144859a8e2e46d8b815dda75e",
+          "size_bytes": 2612381
+        }
+      },
+      "quality": {
+        "ambiguous_diacritic_abstentions": 0,
+        "ambiguous_diacritic_cases": 1,
+        "ambiguous_suggestion_abstentions": 0,
+        "ambiguous_suggestion_cases": 1,
+        "candidate_detection_rate": 1.0,
+        "candidate_recall": 0.7,
+        "correction_cases": 10,
+        "false_alarm_case_ids": [
+          "negative_valid_rzad",
+          "negative_ambiguous_suggestions",
+          "negative_valid_ksiazka",
+          "negative_proper_warszawa"
+        ],
+        "false_alarm_cases": 4,
+        "false_alarm_rate": 0.6666666666666666,
+        "guarded_cases": 9,
+        "guarded_provider_calls": 0,
+        "negative_cases": 6,
+        "top1_exactness": 0.7
+      },
+      "performance": {
+        "data_size_bytes": 1937192,
+        "dependency_size_bytes": 2612381,
+        "measured_queries": 80,
+        "peak_rss_bytes": 286572544,
+        "query_p50_ns": 23917,
+        "query_p95_ns": 71375,
+        "repetition_mean_ns": 438066,
+        "repetition_total_ns": [
+          534207,
+          483957,
+          399167,
+          388419,
+          384582
+        ],
+        "startup_ns": 1064525375,
+        "throughput_cases_per_second": 36524.14337187239
+      },
+      "reproducibility": {
+        "repetition_hashes": [
+          "e95272016393a7be29300701d76ccfd1f7f7c759aa7b3a39b48cf7daaec657ff",
+          "e95272016393a7be29300701d76ccfd1f7f7c759aa7b3a39b48cf7daaec657ff",
+          "e95272016393a7be29300701d76ccfd1f7f7c759aa7b3a39b48cf7daaec657ff",
+          "e95272016393a7be29300701d76ccfd1f7f7c759aa7b3a39b48cf7daaec657ff",
+          "e95272016393a7be29300701d76ccfd1f7f7c759aa7b3a39b48cf7daaec657ff"
+        ],
+        "repetitions": 5,
+        "stable": true
+      }
+    }
+  },
+  "decision": {
+    "verdict": "NO_PROVIDER_QUALIFIED",
+    "selected_provider": null,
+    "reasons": [
+      "No quality threshold was set before the baseline measurement.",
+      "spylls package metadata and upstream license wording are unresolved, and the pinned Polish dictionary declares a multi-license family including copyleft terms.",
+      "symspellpy package is MIT, but the pinned Polish frequency source is GPL-3.0 and its baseline has 0.7 candidate recall, 0.7 top-1 exactness, and 0.6666666666666666 false-alarm rate.",
+      "No provider, dictionary, dependency, runtime rule, or correction policy was added to Polis."
+    ]
+  },
+  "normalized_digest": "d1c627ef15f86e509026d9cb3d46a10e60c2e9d32a5542e67c3919d01ec9b833"
+}
