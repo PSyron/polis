@@ -5,8 +5,8 @@
 Kwalifikacja obejmuje dokładnie sześć zamkniętych powierzchni. Wszystkie
 uzyskały decyzję `accept: deterministic provider-absent`, ponieważ forma
 docelowa i minimalny zakres są jednoznaczne, a publiczny, projektowy materiał
-spełnia minima dowodowe. Ta decyzja nie implementuje reguł. Bieżący runtime
-Polis nadal nie zgłasza tych sześciu błędów.
+spełnia minima dowodowe. `PI-TYPO-01` jest zaimplementowany przez #404 jako
+review-only; pozostałe pięć wierszy nie ma jeszcze implementacji runtime.
 
 | Kolejność | Wiersz | Wejście | Minimalny cel | Proponowane źródło | Behavior version |
 | ---: | --- | --- | --- | --- | --- |
@@ -81,8 +81,9 @@ wyniku. Konflikt albo niepełna informacja oznaczają brak sugestii.
 Po zamknięciu #402 należy tworzyć dzieci w kolejności rankingu. Każdy
 zaakceptowany wiersz otrzymuje osobne issue, krótkotrwałą gałąź, jeden skupiony
 commit i osobny PR. Następny wiersz można rozpocząć dopiero po zamknięciu
-poprzedniego. Pierwszą dozwoloną implementacją jest więc wyłącznie
-`PI-TYPO-01`: `coniemiara` → `co niemiara`.
+poprzedniego. `PI-TYPO-01`: `coniemiara` → `co niemiara` jest implementowany
+przez #404 jako review-only. `PI-TYPO-02`: `złodzieji` → `złodziei` stanie się
+następną dozwoloną implementacją dopiero po zamknięciu #404.
 
 Macierz #368 pozostaje niezmienna i nadal opisuje swój historyczny wynik zero
 zaakceptowanych rodzin RJP/v4. #402 jest nową kwalifikacją zamkniętych

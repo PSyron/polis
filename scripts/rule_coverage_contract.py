@@ -24,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "f24b203fab30cb6f9b313e909c1e5d5520fe76df4907d7f3ebd2dbb3f885b743"
+    "0ef5e03cd6357e5532a1e215ead6d0a8052165d7c9e4487f42245df31626e6f3"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",
@@ -34,10 +34,10 @@ SOURCE_PRECEDENCE: Final = (
     "docs/rules.md",
     "public-v3-quality-and-isolated-performance-artifacts",
 )
-PLANNING_BASELINE_FULL_SHA: Final = "29139a141ab415a20c17d69b1d1773724ab007ee"
-PLANNING_BASELINE_SOURCE_COUNT: Final = 62
+PLANNING_BASELINE_FULL_SHA: Final = "68f9e1c3aec130315bd29dd267f1ccc221e4a796"
+PLANNING_BASELINE_SOURCE_COUNT: Final = 63
 PLANNING_BASELINE_SNAPSHOT_SHA256: Final = (
-    "c4d95dcd8184f6838902b580cae0a0532f31524d482ec59c680d1e5a7eb55766"
+    "e36cfd483bf3399287cca7b39546d4e8e9d04c87dcee24597f1df008676fe7fc"
 )
 _RUNTIME_SOURCE_PATHS: Final = (
     "src/polis/__init__.py",
