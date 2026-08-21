@@ -339,6 +339,10 @@ _CO_PROPER_NAME_CUE_RE: Final = re.compile(
     r"produkt(?:u|owa|owej)?)\s*$",
     flags=re.IGNORECASE,
 )
+_CO_PROPER_NAME_SUFFIX_RE: Final = re.compile(
+    r"^\s+(?:sp\.\s+z\s+o\.o\.|s\.a\.|spółka\s+z\s+o\.o\.)",
+    flags=re.IGNORECASE,
+)
 
 
 class _CoQuoteFrame:
@@ -356,6 +360,7 @@ class _CoMatchQuoteContext:
     __slots__ = (
         "has_frames",
         "has_invalid_frame",
+        "has_unsupported_delimiter",
         "sentence_initial",
         "uncertain",
     )
@@ -364,11 +369,13 @@ class _CoMatchQuoteContext:
         self,
         has_frames: bool,
         has_invalid_frame: bool,
+        has_unsupported_delimiter: bool,
         sentence_initial: bool,
         uncertain: bool,
     ) -> None:
         self.has_frames = has_frames
         self.has_invalid_frame = has_invalid_frame
+        self.has_unsupported_delimiter = has_unsupported_delimiter
         self.sentence_initial = sentence_initial
         self.uncertain = uncertain
 
@@ -399,19 +406,26 @@ def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContex
     }
     target_starts = set(starts)
     contexts: dict[int, _CoMatchQuoteContext] = {}
+    sentence_contexts: list[_CoMatchQuoteContext] = []
     stack: list[_CoQuoteFrame] = []
     invalid_frame_count = 0
     last_nonspace_character: str | None = None
+    sentence_has_unsupported_delimiter = False
     uncertain = False
 
     for index, character in enumerate(text):
         if index in target_starts:
-            contexts[index] = _CoMatchQuoteContext(
+            context = _CoMatchQuoteContext(
                 bool(stack),
                 invalid_frame_count > 0,
+                sentence_has_unsupported_delimiter,
                 last_nonspace_character is None or last_nonspace_character in ".!?…",
                 uncertain,
             )
+            contexts[index] = context
+            sentence_contexts.append(context)
+        if _co_is_unsupported_delimiter(character):
+            sentence_has_unsupported_delimiter = True
         if not character.isspace():
             last_nonspace_character = character
 
@@ -461,8 +475,16 @@ def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContex
                 invalid_frame_count = 0
                 uncertain = True
 
+        if character in ".!?…\r\n":
+            for context in sentence_contexts:
+                context.has_unsupported_delimiter = sentence_has_unsupported_delimiter
+            sentence_contexts.clear()
+            sentence_has_unsupported_delimiter = False
+
     if stack:
         uncertain = True
+    for context in sentence_contexts:
+        context.has_unsupported_delimiter = sentence_has_unsupported_delimiter
     if uncertain:
         for context in contexts.values():
             context.uncertain = True
@@ -525,18 +547,15 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
     )
 
 
-def _is_co_unsupported_quote_context(text: str, start: int, end: int) -> bool:
-    left = start - 1
-    while left >= 0 and text[left] not in ".!?…\r\n":
-        left -= 1
-    right = end
-    while right < len(text) and text[right] not in ".!?…\r\n":
-        right += 1
-    return any(
-        "QUOTATION" in unicodedata.name(character, "")
-        and character not in _CO_SUPPORTED_QUOTE_CHARACTERS
-        for character in text[left + 1 : right]
-    )
+def _co_is_unsupported_delimiter(character: str) -> bool:
+    if not character:
+        return False
+    if character in _CO_SUPPORTED_QUOTE_CHARACTERS:
+        return False
+    if character in _CO_SAFE_BOUNDARY_CHARACTERS:
+        return False
+    category = unicodedata.category(character)
+    return category in {"Ps", "Pe"} or "QUOTATION" in unicodedata.name(character, "")
 
 
 def _is_co_extended_identifier_context(text: str, start: int, end: int) -> bool:
@@ -635,6 +654,10 @@ def _is_co_bare_proper_name_context(text: str, start: int) -> bool:
     return bool(
         _CO_PROPER_NAME_CUE_RE.search(text[max(0, start - _CO_CUE_LOOKBEHIND) : start])
     )
+
+
+def _is_co_bare_company_name_context(text: str, end: int) -> bool:
+    return bool(_CO_PROPER_NAME_SUFFIX_RE.match(text[end:]))
 
 
 def _is_co_bare_metalinguistic_context(text: str, start: int) -> bool:
@@ -922,8 +945,6 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
         end: int,
         prepared_context: object | None = None,
     ) -> bool:
-        if _is_co_unsupported_quote_context(text, start, end):
-            return True
         if _is_co_unicode_extension_context(text, start, end):
             return True
         if _is_co_extended_identifier_context(text, start, end):
@@ -941,11 +962,18 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
                 or _is_co_bare_metalinguistic_context(text, start)
             )
         if quote_context.has_frames:
-            if quote_context.has_invalid_frame:
+            if (
+                quote_context.has_invalid_frame
+                or quote_context.has_unsupported_delimiter
+            ):
                 return True
-        elif _is_co_bare_metalinguistic_context(
-            text, start
-        ) or _is_co_bare_proper_name_context(text, start):
+        elif (
+            _is_co_bare_metalinguistic_context(text, start)
+            or _is_co_bare_proper_name_context(text, start)
+            or _is_co_bare_company_name_context(text, end)
+        ):
+            return True
+        if quote_context.has_unsupported_delimiter:
             return True
 
         if _is_co_operator_context(

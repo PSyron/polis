@@ -233,6 +233,9 @@ def test_pi01_analyzes_one_word_dialogue(text: str) -> None:
         'Powiedział: „Mamy problemów coniemiara”".',
         "⹂ Mamy problemów coniemiara ⹃",
         "〝 Mamy problemów coniemiara 〞",
+        "⟦ Mamy problemów coniemiara ⟧",
+        "⟪ Mamy problemów coniemiara ⟫",
+        "Coniemiara Sp. z o.o. działa.",
     ),
 )
 def test_pi01_abstains_on_malformed_or_nested_non_prose_context(text: str) -> None:
