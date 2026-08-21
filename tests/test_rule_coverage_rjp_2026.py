@@ -37,12 +37,12 @@ def test_valid_rjp_audit_has_full_snapshot_and_change_matrix() -> None:
     assert audit["schema_id"] == "polis.rule-coverage-rjp-2026-audit"
     snapshot = audit["source_snapshot"]
     assert isinstance(snapshot, dict)
-    assert snapshot["count"] == 62
+    assert snapshot["count"] == 63
     rows = audit["source_rows"]
     changes = audit["change_rows"]
     assert isinstance(rows, list)
     assert isinstance(changes, list)
-    assert len(rows) == 62
+    assert len(rows) == 63
     assert len(changes) == len(CHANGE_NUMBERS)
 
 
@@ -61,7 +61,7 @@ def test_source_rows_keep_live_order_and_category_counts() -> None:
         "agreement": 9,
         "inflection": 14,
         "punctuation": 5,
-        "spelling": 25,
+        "spelling": 26,
         "syntax": 9,
     }
     assert all(
@@ -173,6 +173,46 @@ def test_arcy_source_row_is_bound_to_rjp_09a_and_review_only() -> None:
     )
     assert rjp_09a["existing_polis_source_identities"] == ["rule:spelling.arcy_prefix"]
     assert rjp_09a["implementation_disposition"] == "deterministic_v1_candidate"
+
+
+def test_co_niemiara_source_row_is_provider_independent_and_review_only() -> None:
+    audit = validate_rjp_2026_audit()
+    rows = audit["source_rows"]
+    assert isinstance(rows, list)
+    row = next(
+        item
+        for item in rows
+        if isinstance(item, dict) and item["source"] == "rule:spelling.co_niemiara"
+    )
+    assert row["operation"] == "replace.closed_literal_spacing"
+    assert row["behavior_version"] == "spelling-co-niemiara/1.0"
+    assert row["correction_policy_status"] == "review-only"
+    assert row["provider_requirement"] == "provider-independent"
+    assert row["normative_scope"] == "not-governed-by-audited-rjp-material"
+    assert row["normative_references"] == []
+    assert row["supporting_public_positives"] == [
+        {
+            "path": "docs/behavior-reference.md",
+            "locator": "rule:spelling.co_niemiara",
+        },
+        {
+            "path": "tests/test_issue_404_co_niemiara.py",
+            "locator": "test_pi01_matches_the_approved_evidence_contract",
+        },
+    ]
+    assert row["supporting_public_hard_negatives"] == [
+        {
+            "path": "docs/rules.md",
+            "locator": "rule:spelling.co_niemiara scope boundary",
+        },
+        {
+            "path": "tests/test_issue_404_co_niemiara.py",
+            "locator": "test_pi01_matches_the_approved_evidence_contract",
+        },
+    ]
+    assert row["action_required"] == (
+        "No further runtime action; #404 implements this bounded source as review-only."
+    )
 
 
 def test_rjp_comma_sources_and_withdrawal_title_use_exact_authority() -> None:
