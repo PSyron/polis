@@ -8,7 +8,6 @@ import pytest
 
 from polis import Analyzer, AnalyzerConfig, Severity
 from polis.core import Finding
-from polis.rules.spelling import _prepare_co_context
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "tests/fixtures/v1/provider_independent_spelling_qualification.json"
@@ -232,6 +231,8 @@ def test_pi01_analyzes_one_word_dialogue(text: str) -> None:
         "coniemiara™ pozostaje nazwą produktu.",
         "coniemiara☃ pozostaje symbolem.",
         'Powiedział: „Mamy problemów coniemiara”".',
+        "⹂ Mamy problemów coniemiara ⹃",
+        "〝 Mamy problemów coniemiara 〞",
     ),
 )
 def test_pi01_abstains_on_malformed_or_nested_non_prose_context(text: str) -> None:
@@ -270,25 +271,15 @@ def test_pi01_abstains_on_unicode_token_extensions(suffix: str) -> None:
 
 def test_pi01_quote_context_keeps_deep_nesting_compact() -> None:
     text = "„" * 240 + ("coniemiara " * 240)
-    start = text.index("coniemiara")
-
-    context = _prepare_co_context(text, (start,)).for_start(start)
-
-    assert context is not None
-    assert context.has_frames
-    assert context.has_invalid_frame
+    assert _source_findings(text) == ()
 
 
 def test_pi01_quote_context_tracks_sentence_initial_incrementally() -> None:
     text = "Zdanie. Coniemiara problemów, Coniemiara też."
-    starts = tuple(
-        index for index in range(len(text)) if text.startswith("Coniemiara", index)
-    )
+    findings = _source_findings(text)
 
-    prepared = _prepare_co_context(text, starts)
-
-    assert prepared.for_start(starts[0]).sentence_initial
-    assert not prepared.for_start(starts[1]).sentence_initial
+    assert len(findings) == 1
+    assert findings[0].start == text.index("Coniemiara")
 
 
 @pytest.mark.parametrize(

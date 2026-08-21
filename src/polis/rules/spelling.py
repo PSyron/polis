@@ -322,6 +322,9 @@ _CO_QUOTE_WRAPPERS: Final = (
     ("〈", "〉"),
     ("《", "》"),
 )
+_CO_SUPPORTED_QUOTE_CHARACTERS: Final = frozenset(
+    character for pair in _CO_QUOTE_WRAPPERS for character in pair
+)
 _CO_SAFE_BOUNDARY_CHARACTERS: Final = frozenset(
     ".,;:!?…()[]{}<>-–—'\"`„”“«»‘’‹›「」『』〈〉《》"
 )
@@ -519,6 +522,20 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
             text[start - 1] if start > 0 else "",
             text[end] if end < len(text) else "",
         )
+    )
+
+
+def _is_co_unsupported_quote_context(text: str, start: int, end: int) -> bool:
+    left = start - 1
+    while left >= 0 and text[left] not in ".!?…\r\n":
+        left -= 1
+    right = end
+    while right < len(text) and text[right] not in ".!?…\r\n":
+        right += 1
+    return any(
+        "QUOTATION" in unicodedata.name(character, "")
+        and character not in _CO_SUPPORTED_QUOTE_CHARACTERS
+        for character in text[left + 1 : right]
     )
 
 
@@ -905,6 +922,8 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
         end: int,
         prepared_context: object | None = None,
     ) -> bool:
+        if _is_co_unsupported_quote_context(text, start, end):
+            return True
         if _is_co_unicode_extension_context(text, start, end):
             return True
         if _is_co_extended_identifier_context(text, start, end):
