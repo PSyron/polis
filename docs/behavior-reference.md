@@ -54,6 +54,7 @@ runtime abstenuje: nie zwraca findingu, a wynik pozostaje równy wejściu.
 | `rule:spelling.jestes` | `Jestes gotowy.` | `Jestes` → `Jesteś` `[0, 6)` | `Jesteś gotowy.` |
 | `rule:spelling.czyby` | `Czyby to prawda?` | `Czyby` → `Czy by` `[0, 5)` | `Czy by to prawda?` |
 | `rule:spelling.arcy_prefix` | `To jest arcy Europa.` | `arcy Europa` → `arcy-Europa` `[8, 19)` | `To jest arcy-Europa.` |
+| `rule:spelling.co_niemiara` | `Mamy problemów coniemiara.` | `coniemiara` → `co niemiara` `[15, 25)` | `Mamy problemów co niemiara.` |
 | `rule:spelling.napewno` | `Napewno przyjdę.` | `Napewno` → `Na pewno` `[0, 7)` | `Na pewno przyjdę.` |
 | `rule:spelling.wlasnie` | `Wlasnie wróciłem.` | `Wlasnie` → `Właśnie` `[0, 7)` | `Właśnie wróciłem.` |
 | `rule:spelling.zeby` | `Zeby zdążyć, wyjdę wcześniej.` | `Zeby` → `Żeby` `[0, 4)` | `Żeby zdążyć, wyjdę wcześniej.` |
