@@ -36,6 +36,7 @@ kompletności języka.
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.czyby` | `spelling` | dokładna forma łączna `czyby` → `czy by`, wyłącznie do przeglądu |
 | `rule:spelling.arcy_prefix` | `spelling` | zamknięty wzorzec `arcy` + niepoczątkowy cel z wielkiej litery → `arcy-...`, wyłącznie do przeglądu |
+| `rule:spelling.co_niemiara` | `spelling` | dokładna forma łączna `coniemiara` → `co niemiara`, z zachowaniem casing na początku zdania i w dialogu oraz abstencją cytatów metajęzykowych, kodu, operatorów i niejednoznacznych granic, wyłącznie do przeglądu |
 | `rule:spelling.napewno` | `spelling` | `napewno` → `na pewno` |
 | `rule:spelling.wlasnie` | `spelling` | `wlasnie` → `właśnie` |
 | `rule:spelling.zeby` | `spelling` | `zeby` → `żeby` |
