@@ -138,4 +138,4 @@ def test_v3_proposal_validates_against_remeasured_baselines() -> None:
 
 
 def test_current_runtime_cohort_contains_the_new_review_only_source() -> None:
-    assert len(Analyzer(AnalyzerConfig()).source_identity_snapshot) == 62
+    assert len(Analyzer(AnalyzerConfig()).source_identity_snapshot) == 63
