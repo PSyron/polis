@@ -23,6 +23,43 @@ from polis.rules.syntax import _is_quoted_position
 _MENTION_WRAPPERS: Final = frozenset(
     {('"', '"'), ("`", "`"), ("„", "”"), ("“", "”"), ("«", "»")}
 )
+_METALINGUISTIC_QUOTE_CUES: Final = (
+    "napis",
+    "napisano",
+    "napisy",
+    "słowo",
+    "wyraz",
+    "forma",
+    "termin",
+    "przykład",
+    "przyklad",
+    "pisownia",
+)
+_METALINGUISTIC_QUOTE_CUE_RE: Final = re.compile(
+    r"(?:^|[\s(\[{:;,.!?])(?:"
+    + "|".join(re.escape(cue) for cue in _METALINGUISTIC_QUOTE_CUES)
+    + r")\s*(?:(?:[:;,!.?]|[-–—])\s*)?$",
+    flags=re.IGNORECASE,
+)
+_DIALOGUE_QUOTE_CUES: Final = (
+    "powiedział",
+    "powiedziała",
+    "powiedzieli",
+    "rzekł",
+    "rzekła",
+    "zapytał",
+    "zapytała",
+    "krzyknął",
+    "krzyknęła",
+    "odparł",
+    "odparła",
+)
+_DIALOGUE_QUOTE_CUE_RE: Final = re.compile(
+    r"(?:^|[\s(\[{:;,.!?])(?:"
+    + "|".join(re.escape(cue) for cue in _DIALOGUE_QUOTE_CUES)
+    + r")(?:\s+\w+){0,4}\s*(?:(?::|[-–—])\s*)$",
+    flags=re.IGNORECASE,
+)
 _ARCY_BOUNDARY_MARKS: Final = frozenset("()[]{}<>\"'`„”“«»‘’‹›")
 _ARCY_CONTEXT_PAIRS: Final = (
     ('"', '"'),
@@ -90,7 +127,7 @@ def _arcy_matching_opening_index(
 
 
 # Characters that glue a match into a larger address/identifier host token.
-_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=")
+_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_=-")
 # Sentence/clause punctuation stripped from host edges so `wogole.` stays prose.
 _HOST_EDGE_TRIM: Final = frozenset('.,;:!?)]}"»”\'„“«"')
 _SENTENCE_CLOSING_MARKS: Final = frozenset("'\"”’»›)]}")
@@ -221,6 +258,8 @@ def should_abstain_literal_context(
     end: int,
     *,
     quoted_position: bool | None = None,
+    ignore_wrapped_mention: bool = False,
+    allow_sentence_question: bool = False,
 ) -> bool:
     """Return True when a closed literal match must not emit a suggestion.
 
@@ -229,7 +268,7 @@ def should_abstain_literal_context(
     """
     if start < 0 or end > len(text) or start >= end:
         return True
-    if _is_wrapped_mention(text, start, end):
+    if not ignore_wrapped_mention and _is_wrapped_mention(text, start, end):
         return True
     if quoted_position is None:
         quoted_position = _is_quoted_position(text, start)
@@ -237,7 +276,16 @@ def should_abstain_literal_context(
         return True
     if _is_email_context(text, start, end):
         return True
-    if _is_url_or_domain_context(text, start, end):
+    if _is_url_or_domain_context(text, start, end) and not (
+        allow_sentence_question
+        and end < len(text)
+        and text[end] == "?"
+        and (
+            end + 1 == len(text)
+            or text[end + 1].isspace()
+            or text[end + 1] in _HOST_EDGE_TRIM
+        )
+    ):
         return True
     if _is_mixed_case_identifier_context(text, start, end):
         return True
@@ -256,6 +304,226 @@ def _is_wrapped_mention(text: str, start: int, end: int) -> bool:
         rest = text[end:]
         return rest.startswith("`") or rest.startswith("()`")
     return False
+
+
+_CO_QUOTE_WRAPPERS: Final = (
+    ('"', '"'),
+    ("'", "'"),
+    ("`", "`"),
+    ("„", "”"),
+    ("“", "”"),
+    ("‘", "’"),
+    ("‚", "’"),
+    ("«", "»"),
+    ("‹", "›"),
+    ("<", ">"),
+    ("「", "」"),
+    ("『", "』"),
+    ("〈", "〉"),
+    ("《", "》"),
+)
+_CO_SAFE_BOUNDARY_CHARACTERS: Final = frozenset(
+    ".,;:!?…()[]{}<>-–—'\"`„”“«»‘’‹›「」『』〈〉《》"
+)
+_CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^")
+_CO_MENTION_TRAILING_PUNCTUATION: Final = frozenset(".,;:!?…")
+_CO_CUE_LOOKBEHIND: Final = 256
+_CO_SYMMETRIC_QUOTES: Final = frozenset({'"', "'", "`"})
+_CO_OPERATOR_CHARACTERS: Final = frozenset("=|^+*/%<>→←⇐⇒↔±×÷")
+_CO_PROPER_NAME_CUE_RE: Final = re.compile(
+    r"(?:^|[\s(\[{:;,.!?])(?:marka|markę|nazwa\s+produktu|"
+    r"produkt(?:u|owa|owej)?)\s*$",
+    flags=re.IGNORECASE,
+)
+
+
+class _CoQuoteFrame:
+    __slots__ = ("opening", "closing", "opening_index", "closing_index", "valid")
+
+    def __init__(self, opening: str, closing: str, opening_index: int) -> None:
+        self.opening = opening
+        self.closing = closing
+        self.opening_index = opening_index
+        self.closing_index: int | None = None
+        self.valid = True
+
+
+class _CoMatchQuoteContext:
+    __slots__ = ("frames", "uncertain")
+
+    def __init__(self, frames: tuple[_CoQuoteFrame, ...], uncertain: bool) -> None:
+        self.frames = frames
+        self.uncertain = uncertain
+
+
+class _CoPreparedContext:
+    __slots__ = ("matches",)
+
+    def __init__(self, matches: dict[int, _CoMatchQuoteContext]) -> None:
+        self.matches = matches
+
+    def for_start(self, start: int) -> _CoMatchQuoteContext | None:
+        return self.matches.get(start)
+
+
+def _co_symmetric_quote_is_ambiguous(text: str, index: int) -> bool:
+    if index + 1 >= len(text):
+        return False
+    next_character = text[index + 1]
+    return next_character.isalnum() or next_character in _CO_SYMMETRIC_QUOTES
+
+
+def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContext:
+    if not starts:
+        return _CoPreparedContext({})
+    pairs = dict(_CO_QUOTE_WRAPPERS)
+    closing_characters = {
+        closing for opening, closing in _CO_QUOTE_WRAPPERS if opening != closing
+    }
+    target_starts = set(starts)
+    contexts: dict[int, _CoMatchQuoteContext] = {}
+    stack: list[_CoQuoteFrame] = []
+    uncertain = False
+
+    for index, character in enumerate(text):
+        if index in target_starts:
+            contexts[index] = _CoMatchQuoteContext(tuple(stack), uncertain)
+
+        if (
+            character == "'"
+            and index > 0
+            and index + 1 < len(text)
+            and text[index - 1].isalnum()
+            and text[index + 1].isalnum()
+        ):
+            continue
+
+        closing = pairs.get(character)
+        if closing is not None:
+            if closing == character and stack and stack[-1].closing == character:
+                if _co_symmetric_quote_is_ambiguous(text, index):
+                    for frame in stack:
+                        frame.valid = False
+                    stack.clear()
+                    uncertain = True
+                else:
+                    stack.pop().closing_index = index
+            else:
+                stack.append(_CoQuoteFrame(character, closing, index))
+            continue
+
+        if character in closing_characters:
+            if stack and stack[-1].closing == character:
+                stack.pop().closing_index = index
+            else:
+                for frame in stack:
+                    frame.valid = False
+                stack.clear()
+                uncertain = True
+
+    if stack:
+        uncertain = True
+    if uncertain:
+        for context in contexts.values():
+            context.uncertain = True
+    return _CoPreparedContext(contexts)
+
+
+def _co_quote_is_dialogue(text: str, frame: _CoQuoteFrame) -> bool:
+    if frame.opening == "`":
+        return False
+    return bool(
+        _DIALOGUE_QUOTE_CUE_RE.search(
+            text[max(0, frame.opening_index - _CO_CUE_LOOKBEHIND) : frame.opening_index]
+        )
+    )
+
+
+def _co_quote_is_metalinguistic(text: str, frame: _CoQuoteFrame) -> bool:
+    return bool(
+        _METALINGUISTIC_QUOTE_CUE_RE.search(
+            text[max(0, frame.opening_index - _CO_CUE_LOOKBEHIND) : frame.opening_index]
+        )
+    )
+
+
+def _is_co_wrapped_mention(text: str, start: int, end: int) -> bool:
+    if start <= 0 or end >= len(text):
+        return False
+    left = text[start - 1]
+    for opening, closing in _CO_QUOTE_WRAPPERS:
+        if left != opening:
+            continue
+        closing_start = end
+        while (
+            closing_start < len(text)
+            and text[closing_start] in _CO_MENTION_TRAILING_PUNCTUATION
+        ):
+            closing_start += 1
+        if closing_start < len(text) and text[closing_start] == closing:
+            return True
+    return False
+
+
+def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
+    return any(
+        character
+        and (
+            unicodedata.category(character).startswith(("M", "Cf", "S"))
+            or (
+                unicodedata.category(character).startswith("P")
+                and character not in _CO_SAFE_BOUNDARY_CHARACTERS
+            )
+        )
+        for character in (
+            text[start - 1] if start > 0 else "",
+            text[end] if end < len(text) else "",
+        )
+    )
+
+
+def _is_co_extended_identifier_context(text: str, start: int, end: int) -> bool:
+    left_character = text[start - 1] if start > 0 else ""
+    if left_character in _CO_EXTENDED_HOST_TOKEN_CHARS:
+        return True
+    right_character = text[end] if end < len(text) else ""
+    if right_character not in _CO_EXTENDED_HOST_TOKEN_CHARS:
+        return False
+    if right_character not in _CO_MENTION_TRAILING_PUNCTUATION:
+        return True
+    return not (
+        end + 1 == len(text)
+        or text[end + 1].isspace()
+        or text[end + 1] in _CO_MENTION_TRAILING_PUNCTUATION
+        or text[end + 1] in {"'", '"', "”", "’", "»", "›"}
+    )
+
+
+def _is_co_operator_context(text: str, start: int, end: int) -> bool:
+    for index, step in ((start - 1, -1), (end, 1)):
+        skipped = 0
+        while 0 <= index < len(text) and text[index].isspace():
+            skipped += 1
+            if skipped > _CO_CUE_LOOKBEHIND:
+                return True
+            index += step
+        if 0 <= index < len(text) and text[index] in _CO_OPERATOR_CHARACTERS:
+            return True
+    return False
+
+
+def _is_co_bare_proper_name_context(text: str, start: int) -> bool:
+    return bool(
+        _CO_PROPER_NAME_CUE_RE.search(text[max(0, start - _CO_CUE_LOOKBEHIND) : start])
+    )
+
+
+def _is_co_bare_metalinguistic_context(text: str, start: int) -> bool:
+    return bool(
+        _METALINGUISTIC_QUOTE_CUE_RE.search(
+            text[max(0, start - _CO_CUE_LOOKBEHIND) : start]
+        )
+    )
 
 
 @lru_cache(maxsize=32)
@@ -326,8 +594,20 @@ def collect_closed_literal_findings(
     lookup = _closed_literal_lookup(rules)
     pattern = _closed_literal_pattern(rules)
     empty_buckets = _closed_literal_empty_buckets(rules)
+    matches = tuple(pattern.finditer(text))
+    prepared_contexts = {
+        id(rule): rule._prepare_context(
+            text,
+            tuple(
+                match.start()
+                for match in matches
+                if lookup.get(match.group().lower(), (None, ""))[0] is rule
+            ),
+        )
+        for rule in rules
+    }
     buckets: dict[Source, tuple[Finding, ...] | list[Finding]] | None = None
-    for match in pattern.finditer(text):
+    for match in matches:
         observed = match.group()
         entry = lookup.get(observed.lower())
         if entry is None:
@@ -335,10 +615,12 @@ def collect_closed_literal_findings(
         matched_rule, corrected = entry
         start = match.start()
         end = match.end()
-        if should_abstain_literal_context(text, start, end):
+        if matched_rule._should_abstain_context(
+            text, start, end, prepared_contexts[id(matched_rule)]
+        ):
             continue
-        candidate = matched_rule._apply_case(observed, corrected)
-        if candidate == observed:
+        candidate = matched_rule._candidate(observed, corrected)
+        if candidate is None or candidate == observed:
             continue
         finding = Finding.create(
             category=matched_rule._CATEGORY,
@@ -396,6 +678,17 @@ class _CasePatternRule:
         if self._surfaces is not None:
             return self._surfaces
         return {self._typed: self._corrected}
+
+    def _prepare_context(self, text: str, starts: tuple[int, ...]) -> object | None:
+        return None
+
+    def _should_abstain_context(
+        self, text: str, start: int, end: int, prepared_context: object | None = None
+    ) -> bool:
+        return should_abstain_literal_context(text, start, end)
+
+    def _candidate(self, observed: str, replacement: str) -> str | None:
+        return self._apply_case(observed, replacement)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
@@ -486,6 +779,92 @@ class SpellingCzybyRule(TypoSpellingRule):
         """Return the qualified implementation behavior version."""
 
         return "spelling-czyby/1.0"
+
+
+class SpellingCoNiemiaraRule(TypoSpellingRule):
+    def __init__(self) -> None:
+        super().__init__(
+            source_name="spelling.co_niemiara",
+            typed="coniemiara",
+            corrected="co niemiara",
+            confidence=0.98,
+        )
+
+    def _prepare_context(
+        self, text: str, starts: tuple[int, ...]
+    ) -> _CoPreparedContext:
+        return _prepare_co_context(text, starts)
+
+    def _should_abstain_context(
+        self,
+        text: str,
+        start: int,
+        end: int,
+        prepared_context: object | None = None,
+    ) -> bool:
+        if _is_co_unicode_extension_context(text, start, end):
+            return True
+        if _is_co_extended_identifier_context(text, start, end):
+            return True
+
+        if isinstance(prepared_context, _CoPreparedContext):
+            quote_context = prepared_context.for_start(start)
+        else:
+            quote_context = _prepare_co_context(text, (start,)).for_start(start)
+        if quote_context is None or quote_context.uncertain:
+            return (
+                True
+                if quote_context is not None
+                else _is_co_wrapped_mention(text, start, end)
+                or _is_co_bare_metalinguistic_context(text, start)
+            )
+        if quote_context.frames:
+            if any(
+                frame.closing_index is None
+                or not frame.valid
+                or not _co_quote_is_dialogue(text, frame)
+                or _co_quote_is_metalinguistic(text, frame)
+                for frame in quote_context.frames
+            ):
+                return True
+        elif _is_co_bare_metalinguistic_context(
+            text, start
+        ) or _is_co_bare_proper_name_context(text, start):
+            return True
+
+        if _is_co_operator_context(text, start, end):
+            return True
+
+        observed = text[start:end]
+        if (
+            not quote_context.frames
+            and observed[:1].isupper()
+            and observed[1:].islower()
+        ):
+            return True
+
+        return should_abstain_literal_context(
+            text,
+            start,
+            end,
+            quoted_position=False,
+            ignore_wrapped_mention=True,
+            allow_sentence_question=True,
+        )
+
+    def _candidate(self, observed: str, replacement: str) -> str | None:
+        if not (observed.islower() or observed.isupper()):
+            if not (observed[:1].isupper() and observed[1:].islower()):
+                return None
+        return self._apply_case(observed, replacement)
+
+    @property
+    def operation(self) -> str:
+        return "replace.closed_literal_spacing"
+
+    @property
+    def behavior_version(self) -> str:
+        return "spelling-co-niemiara/1.0"
 
 
 class SpellingArcyPrefixRule:
@@ -1317,6 +1696,7 @@ class SpellingSentenceInitialCapitalRule:
 
 
 __all__ = [
+    "SpellingCoNiemiaraRule",
     "SpellingConajmniejRule",
     "SpellingJestesRule",
     "SpellingMonthWeekdayLowercaseRule",
