@@ -325,7 +325,7 @@ _CO_QUOTE_WRAPPERS: Final = (
 _CO_SAFE_BOUNDARY_CHARACTERS: Final = frozenset(
     ".,;:!?…()[]{}<>-–—'\"`„”“«»‘’‹›「」『』〈〉《》"
 )
-_CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^'’")
+_CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^,;'’")
 _CO_MENTION_TRAILING_PUNCTUATION: Final = frozenset(".,;:!?…")
 _CO_CUE_LOOKBEHIND: Final = 256
 _CO_SYMMETRIC_QUOTES: Final = frozenset({'"', "'", "`"})
@@ -527,10 +527,26 @@ def _is_co_extended_identifier_context(text: str, start: int, end: int) -> bool:
     if left_character in _CO_EXTENDED_HOST_TOKEN_CHARS:
         return True
     right_character = text[end] if end < len(text) else ""
+    if right_character in {"'", '"', "”", "’", "»", "›"}:
+        after_quote = end + 1
+        while (
+            after_quote < len(text)
+            and text[after_quote] in _CO_MENTION_TRAILING_PUNCTUATION
+        ):
+            after_quote += 1
+        return after_quote < len(text) and not text[after_quote].isspace()
     if right_character not in _CO_EXTENDED_HOST_TOKEN_CHARS:
         return False
     if right_character not in _CO_MENTION_TRAILING_PUNCTUATION:
         return True
+    if end + 1 < len(text) and text[end + 1] in {"'", '"', "”", "’", "»", "›"}:
+        after_quote = end + 2
+        while (
+            after_quote < len(text)
+            and text[after_quote] in _CO_MENTION_TRAILING_PUNCTUATION
+        ):
+            after_quote += 1
+        return after_quote < len(text) and not text[after_quote].isspace()
     return not (
         end + 1 == len(text)
         or text[end + 1].isspace()
@@ -539,7 +555,9 @@ def _is_co_extended_identifier_context(text: str, start: int, end: int) -> bool:
     )
 
 
-def _is_co_operator_context(text: str, start: int, end: int) -> bool:
+def _is_co_operator_context(
+    text: str, start: int, end: int, *, sentence_initial: bool
+) -> bool:
     for index, step in ((start - 1, -1), (end, 1)):
         skipped = 0
         while 0 <= index < len(text) and text[index].isspace():
@@ -554,7 +572,9 @@ def _is_co_operator_context(text: str, start: int, end: int) -> bool:
                 or unicodedata.category(character) == "Sm"
             ):
                 return True
-            if character == "?":
+            if character == "?" and (
+                not sentence_initial or _co_has_ternary_colon_after(text, end)
+            ):
                 left = index - 1
                 while left >= 0 and text[left].isspace():
                     left -= 1
@@ -569,6 +589,13 @@ def _is_co_operator_context(text: str, start: int, end: int) -> bool:
                 ):
                     return True
     return False
+
+
+def _co_has_ternary_colon_after(text: str, end: int) -> bool:
+    index = end
+    while index < len(text) and text[index].isspace():
+        index += 1
+    return index < len(text) and text[index] == ":"
 
 
 def _is_co_bare_proper_name_context(text: str, start: int) -> bool:
@@ -886,7 +913,9 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
         ) or _is_co_bare_proper_name_context(text, start):
             return True
 
-        if _is_co_operator_context(text, start, end):
+        if _is_co_operator_context(
+            text, start, end, sentence_initial=quote_context.sentence_initial
+        ):
             return True
 
         observed = text[start:end]
