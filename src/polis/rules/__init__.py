@@ -37,6 +37,7 @@ from polis.rules.przygladac import InflectionPrzygladacSieNowyBudynekRule
 from polis.rules.spelling import (
     SpellingArcyPrefixRule,
     SpellingConajmniejRule,
+    SpellingCoNiemiaraRule,
     SpellingCzybyRule,
     SpellingJestesRule,
     SpellingMonthWeekdayLowercaseRule,
@@ -340,6 +341,7 @@ __all__ = [
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
     "SpellingArcyPrefixRule",
+    "SpellingCoNiemiaraRule",
     "SpellingConajmniejRule",
     "SpellingCzybyRule",
     "SpellingJestesRule",
