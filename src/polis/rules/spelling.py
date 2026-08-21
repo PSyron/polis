@@ -328,6 +328,13 @@ _CO_SAFE_BOUNDARY_CHARACTERS: Final = frozenset(
 _CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^")
 _CO_MENTION_TRAILING_PUNCTUATION: Final = frozenset(".,;:!?…")
 _CO_CUE_LOOKBEHIND: Final = 256
+_CO_SYMMETRIC_QUOTES: Final = frozenset({'"', "'", "`"})
+_CO_OPERATOR_CHARACTERS: Final = frozenset("=|^+*/%<>→←⇐⇒↔±×÷")
+_CO_PROPER_NAME_CUE_RE: Final = re.compile(
+    r"(?:^|[\s(\[{:;,.!?])(?:marka|markę|nazwa\s+produktu|"
+    r"produkt(?:u|owa|owej)?)\s*$",
+    flags=re.IGNORECASE,
+)
 
 
 class _CoQuoteFrame:
@@ -359,7 +366,16 @@ class _CoPreparedContext:
         return self.matches.get(start)
 
 
+def _co_symmetric_quote_is_ambiguous(text: str, index: int) -> bool:
+    if index + 1 >= len(text):
+        return False
+    next_character = text[index + 1]
+    return next_character.isalnum() or next_character in _CO_SYMMETRIC_QUOTES
+
+
 def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContext:
+    if not starts:
+        return _CoPreparedContext({})
     pairs = dict(_CO_QUOTE_WRAPPERS)
     closing_characters = {
         closing for opening, closing in _CO_QUOTE_WRAPPERS if opening != closing
@@ -385,7 +401,13 @@ def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContex
         closing = pairs.get(character)
         if closing is not None:
             if closing == character and stack and stack[-1].closing == character:
-                stack.pop().closing_index = index
+                if _co_symmetric_quote_is_ambiguous(text, index):
+                    for frame in stack:
+                        frame.valid = False
+                    stack.clear()
+                    uncertain = True
+                else:
+                    stack.pop().closing_index = index
             else:
                 stack.append(_CoQuoteFrame(character, closing, index))
             continue
@@ -399,6 +421,11 @@ def _prepare_co_context(text: str, starts: tuple[int, ...]) -> _CoPreparedContex
                 stack.clear()
                 uncertain = True
 
+    if stack:
+        uncertain = True
+    if uncertain:
+        for context in contexts.values():
+            context.uncertain = True
     return _CoPreparedContext(contexts)
 
 
@@ -442,7 +469,7 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
     return any(
         character
         and (
-            unicodedata.category(character).startswith(("M", "Cf"))
+            unicodedata.category(character).startswith(("M", "Cf", "S"))
             or (
                 unicodedata.category(character).startswith("P")
                 and character not in _CO_SAFE_BOUNDARY_CHARACTERS
@@ -456,10 +483,38 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
 
 
 def _is_co_extended_identifier_context(text: str, start: int, end: int) -> bool:
-    left, right = _host_token_span(text, start, end)
-    return any(
-        character in _CO_EXTENDED_HOST_TOKEN_CHARS
-        for character in text[left:start] + text[end:right]
+    left_character = text[start - 1] if start > 0 else ""
+    if left_character in _CO_EXTENDED_HOST_TOKEN_CHARS:
+        return True
+    right_character = text[end] if end < len(text) else ""
+    if right_character not in _CO_EXTENDED_HOST_TOKEN_CHARS:
+        return False
+    if right_character not in _CO_MENTION_TRAILING_PUNCTUATION:
+        return True
+    return not (
+        end + 1 == len(text)
+        or text[end + 1].isspace()
+        or text[end + 1] in _CO_MENTION_TRAILING_PUNCTUATION
+        or text[end + 1] in {"'", '"', "”", "’", "»", "›"}
+    )
+
+
+def _is_co_operator_context(text: str, start: int, end: int) -> bool:
+    for index, step in ((start - 1, -1), (end, 1)):
+        skipped = 0
+        while 0 <= index < len(text) and text[index].isspace():
+            skipped += 1
+            if skipped > _CO_CUE_LOOKBEHIND:
+                return True
+            index += step
+        if 0 <= index < len(text) and text[index] in _CO_OPERATOR_CHARACTERS:
+            return True
+    return False
+
+
+def _is_co_bare_proper_name_context(text: str, start: int) -> bool:
+    return bool(
+        _CO_PROPER_NAME_CUE_RE.search(text[max(0, start - _CO_CUE_LOOKBEHIND) : start])
     )
 
 
@@ -772,7 +827,12 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
                 for frame in quote_context.frames
             ):
                 return True
-        elif _is_co_bare_metalinguistic_context(text, start):
+        elif _is_co_bare_metalinguistic_context(
+            text, start
+        ) or _is_co_bare_proper_name_context(text, start):
+            return True
+
+        if _is_co_operator_context(text, start, end):
             return True
 
         observed = text[start:end]
