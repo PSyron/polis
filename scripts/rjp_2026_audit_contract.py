@@ -86,7 +86,7 @@ EXPECTED_CATEGORY_SUMMARY: Final[dict[str, dict[str, JsonValue]]] = {
         "claim_boundary": "Source audit, not completeness.",
     },
     "spelling": {
-        "source_count": 25,
+        "source_count": 26,
         "rjp_normative_scope": "bounded only",
         "claim_boundary": "Source audit, not completeness.",
     },
@@ -222,6 +222,7 @@ PUBLIC_EVIDENCE_PATHS: Final[frozenset[str]] = frozenset(
         "docs/quality-comparison-v3.json",
         "tests/test_issue_398_czyby.py",
         "tests/test_issue_400_arcy.py",
+        "tests/test_issue_404_co_niemiara.py",
         "tests/test_rule_source_contract.py",
     }
 )
