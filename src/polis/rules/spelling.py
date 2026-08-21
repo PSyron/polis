@@ -469,7 +469,7 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
     return any(
         character
         and (
-            unicodedata.category(character).startswith(("M", "Cf", "S"))
+            unicodedata.category(character).startswith(("C", "M", "S"))
             or (
                 unicodedata.category(character).startswith("P")
                 and character not in _CO_SAFE_BOUNDARY_CHARACTERS
