@@ -329,7 +329,7 @@ _CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^")
 _CO_MENTION_TRAILING_PUNCTUATION: Final = frozenset(".,;:!?…")
 _CO_CUE_LOOKBEHIND: Final = 256
 _CO_SYMMETRIC_QUOTES: Final = frozenset({'"', "'", "`"})
-_CO_OPERATOR_CHARACTERS: Final = frozenset("=|^+*/%<>→←⇐⇒↔±×÷")
+_CO_OPERATOR_CHARACTERS: Final = frozenset("=|^+*/%<>→←⇐⇒↔±×÷&~")
 _CO_PROPER_NAME_CUE_RE: Final = re.compile(
     r"(?:^|[\s(\[{:;,.!?])(?:marka|markę|nazwa\s+produktu|"
     r"produkt(?:u|owa|owej)?)\s*$",
@@ -507,9 +507,30 @@ def _is_co_operator_context(text: str, start: int, end: int) -> bool:
             if skipped > _CO_CUE_LOOKBEHIND:
                 return True
             index += step
-        if 0 <= index < len(text) and text[index] in _CO_OPERATOR_CHARACTERS:
-            return True
+        if 0 <= index < len(text):
+            character = text[index]
+            if character in _CO_OPERATOR_CHARACTERS:
+                return True
+            if character == "?":
+                left = index - 1
+                while left >= 0 and text[left].isspace():
+                    left -= 1
+                right = index + 1
+                while right < len(text) and text[right].isspace():
+                    right += 1
+                if (
+                    left >= 0
+                    and right < len(text)
+                    and (text[left].isalnum() or text[left] in "_)]}")
+                    and (text[right].isalnum() or text[right] in "_([{`")
+                ):
+                    return True
     return False
+
+
+def _is_co_sentence_initial(text: str, start: int) -> bool:
+    prefix = text[:start].rstrip()
+    return not prefix or prefix[-1] in ".!?…"
 
 
 def _is_co_bare_proper_name_context(text: str, start: int) -> bool:
@@ -595,16 +616,17 @@ def collect_closed_literal_findings(
     pattern = _closed_literal_pattern(rules)
     empty_buckets = _closed_literal_empty_buckets(rules)
     matches = tuple(pattern.finditer(text))
+    starts_by_rule: dict[int, tuple[_CasePatternRule, list[int]]] = {}
+    for match in matches:
+        entry = lookup.get(match.group().lower())
+        if entry is None:
+            continue
+        matched_rule, _ = entry
+        rule_entry = starts_by_rule.setdefault(id(matched_rule), (matched_rule, []))
+        rule_entry[1].append(match.start())
     prepared_contexts = {
-        id(rule): rule._prepare_context(
-            text,
-            tuple(
-                match.start()
-                for match in matches
-                if lookup.get(match.group().lower(), (None, ""))[0] is rule
-            ),
-        )
-        for rule in rules
+        rule_id: rule._prepare_context(text, tuple(starts))
+        for rule_id, (rule, starts) in starts_by_rule.items()
     }
     buckets: dict[Source, tuple[Finding, ...] | list[Finding]] | None = None
     for match in matches:
@@ -840,6 +862,7 @@ class SpellingCoNiemiaraRule(TypoSpellingRule):
             not quote_context.frames
             and observed[:1].isupper()
             and observed[1:].islower()
+            and not _is_co_sentence_initial(text, start)
         ):
             return True
 
