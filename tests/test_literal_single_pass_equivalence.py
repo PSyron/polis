@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import re
+import unicodedata
+
 from polis import Analyzer, AnalyzerConfig
 from polis.core import AnalysisOptions, Category, Finding
 from polis.evaluation.quality_dataset import QualityDatasetVersion, load_quality_dataset
 from polis.rules.spelling import (
+    SpellingCoNiemiaraRule,
     SpellingJestesRule,
     SpellingNapewnoRule,
     SpellingNarazieRule,
@@ -18,6 +22,78 @@ from polis.rules.spelling import (
     should_abstain_literal_context,
 )
 
+_ORACLE_QUOTE_WRAPPERS = (
+    ('"', '"'),
+    ("'", "'"),
+    ("`", "`"),
+    ("„", "”"),
+    ("“", "”"),
+    ("‘", "’"),
+    ("‚", "’"),
+    ("«", "»"),
+    ("‹", "›"),
+    ("<", ">"),
+)
+_ORACLE_DIALOGUE_RE = re.compile(
+    r"(?:^|[\s(\[{:;,.!?])(?:powiedział|powiedziała|powiedzieli|"
+    r"rzekł|rzekła|zapytał|zapytała|krzyknął|krzyknęła|odparł|odparła)"
+    r"(?:\s+\w+){0,4}\s*(?:(?::|[-–—])\s*)?$",
+    flags=re.IGNORECASE,
+)
+_ORACLE_SAFE_BOUNDARIES = frozenset(".,;:!?…()[]{}<>-'\"`„”“«»‘’‹›「」『』〈〉《》-–—")
+
+
+def _oracle_quote_context(text: str, start: int) -> tuple[str, int] | None:
+    pairs = {opening: closing for opening, closing in _ORACLE_QUOTE_WRAPPERS}
+    closing_characters = {
+        closing for opening, closing in _ORACLE_QUOTE_WRAPPERS if opening != closing
+    }
+    stack: list[tuple[str, str, int]] = []
+    for index, character in enumerate(text[:start]):
+        closing = pairs.get(character)
+        if closing is not None:
+            if closing == character and stack and stack[-1][0] == character:
+                stack.pop()
+            else:
+                stack.append((character, closing, index))
+            continue
+        if character in closing_characters:
+            if not stack or stack[-1][1] != character:
+                return "", index
+            stack.pop()
+    return (stack[-1][0], stack[-1][2]) if stack else None
+
+
+def _oracle_co_niemiara_abstains(text: str, start: int, end: int) -> bool:
+    for character in (
+        text[start - 1] if start > 0 else "",
+        text[end] if end < len(text) else "",
+    ):
+        category = unicodedata.category(character) if character else ""
+        if category.startswith(("M", "Cf")) or (
+            category.startswith("P") and character not in _ORACLE_SAFE_BOUNDARIES
+        ):
+            return True
+    left = start
+    while left > 0 and not text[left - 1].isspace():
+        left -= 1
+    right = end
+    while right < len(text) and not text[right].isspace():
+        right += 1
+    host = text[left:right]
+    if any(
+        character in host[: start - left] + host[end - left :]
+        for character in "\\$()[]{}"
+    ):
+        return True
+    context = _oracle_quote_context(text, start)
+    if context is None:
+        return False
+    opening, opening_index = context
+    if opening in {"", "`"}:
+        return True
+    return not bool(_ORACLE_DIALOGUE_RE.search(text[:opening_index]))
+
 
 def _all_literal_rules() -> tuple[_CasePatternRule, ...]:
     return (
@@ -28,6 +104,7 @@ def _all_literal_rules() -> tuple[_CasePatternRule, ...]:
         SpellingWogoleRule(),
         SpellingNarazieRule(),
         SpellingWziascRule(),
+        SpellingCoNiemiaraRule(),
     )
 
 
@@ -50,9 +127,30 @@ def scan_closed_literals_multipass(
         for match in rule._pattern.finditer(text):
             start = match.start()
             end = match.end()
-            if should_abstain_literal_context(text, start, end):
+            is_co_niemiara = str(rule.source) == "rule:spelling.co_niemiara"
+            if is_co_niemiara and _oracle_co_niemiara_abstains(text, start, end):
+                continue
+            quote_context = _oracle_quote_context(text, start)
+            allow_dialogue = bool(
+                is_co_niemiara
+                and quote_context is not None
+                and _ORACLE_DIALOGUE_RE.search(text[: quote_context[1]])
+            )
+            if should_abstain_literal_context(
+                text,
+                start,
+                end,
+                quoted_position=False if is_co_niemiara else None,
+                allow_dialogue=allow_dialogue,
+            ):
                 continue
             observed = match.group()
+            if is_co_niemiara and not (
+                observed.islower()
+                or observed.isupper()
+                or (observed[:1].isupper() and observed[1:].islower())
+            ):
+                continue
             candidate = rule._apply_case(observed, rule._corrected)
             if candidate == observed:
                 continue
@@ -105,6 +203,14 @@ def test_single_pass_matches_multipass_on_hard_negative_and_mixed_contexts() -> 
         "https://example.org/zeby/docs",
         "ŁÓDŹ: WOGOLE; Wogole, wogole.",
         "Ona jestem gotowa.Jestes pewna?",
+        'Powiedział: "Coniemiara".',
+        "Powiedział: «Coniemiara?»",
+        'Napis, "Mamy coniemiara problemów."',
+        "Kod: `coniemiara + x`.",
+        r"Path docs\coniemiara\index.",
+        "Mamy problemów coniemiara‿wariant.",
+        "Napis: „tekst “cytat” coniemiara”.",
+        "Powiedział do Jana: „Mamy problemów coniemiara”.",
     )
     for text in texts:
         single = collect_closed_literal_findings(text, rules)
