@@ -1,0 +1,3993 @@
+{
+  "schema_id": "polis.provider-independent-spelling-qualification-evidence",
+  "schema_version": 1,
+  "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+  "dataset_version": 1,
+  "issue": 402,
+  "license": "CC0-1.0",
+  "source": {
+    "author": "Paweł Cyroń",
+    "created": "2026-08-21",
+    "description": "Project-authored synthetic Polish examples for closed literal spelling qualification; no external corpus examples were copied.",
+    "provenance": "Original cases authored for Polis issue #402 from the declared normative boundaries.",
+    "protected_data_overlap": false,
+    "private_text_used": false
+  },
+  "authorities": {
+    "frequency_report_2024": "https://nadwyraz.com/userdata/public/assets/2024%20raport%20b%C5%82%C4%99d%C3%B3w/Kt%C3%B3re%20b%C5%82%C4%99dy%20j%C4%99zykowe%20pope%C5%82niamy%20najcz%C4%99%C5%9Bciej%20Raport%20o%20kondycji%20polszczyzny%20w%20internecie%20w%202024%20roku.pdf",
+    "nck_co_niemiara": "https://nck.pl/projekty-kulturalne/projekty/ojczysty-dodaj-do-ulubionych/ciekawostki-jezykowe/co-niemiara-%2Cc.ajax",
+    "wsjp_zlodziej": "https://wsjp.pl/haslo/podglad/10848/zlodziej",
+    "wsjp_co_nieco": "https://wsjp.pl/haslo/podglad/58987/co-nieco",
+    "wsjp_in_vitro": "https://wsjp.pl/haslo/podglad/67446/in-vitro",
+    "wsjp_naprzeciwko": "https://wsjp.pl/haslo/podglad/3712/naprzeciwko",
+    "rjp_2026": "https://rjp.pan.pl/app/uploads/2026/03/Zalacznik-do-komunikatu-11-25-wersja-ostateczna-jednolita.pdf"
+  },
+  "profile_contract": {
+    "supported_profile": "provider-absent",
+    "comparison_profile": "qualified-morphology",
+    "required_relation": "identical decisions; provider presence, absence, or drift cannot affect these candidates"
+  },
+  "required_shape_strata": [
+    "simple-local",
+    "sentence-internal",
+    "multi-sentence",
+    "repeated-occurrence",
+    "unicode-and-case",
+    "quotation-or-literal",
+    "conflict-or-abstention"
+  ],
+  "case_count": 144,
+  "positive_case_count": 48,
+  "positive_expected_finding_count": 54,
+  "hard_negative_case_count": 96,
+  "candidates": [
+    {
+      "id": "PI-TYPO-01",
+      "incorrect_surface": "coniemiara",
+      "minimal_target": "co niemiara",
+      "proposed_source_identity": "rule:spelling.co_niemiara",
+      "proposed_behavior_version": "spelling-co-niemiara/1.0",
+      "operation": "replace.closed_literal_spacing",
+      "normative_authority_id": "nck_co_niemiara",
+      "priority_rank": 1,
+      "positive_cases": [
+        {
+          "id": "pi-typo-01-p01",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Mamy problemów coniemiara.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 25,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-01-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p02",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Coniemiara kłopotów nas czeka”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 23,
+              "original": "Coniemiara",
+              "suggestion": "Co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-01-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p03",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Mamy problemów coniemiara.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 32,
+              "end": 42,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-01-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p04",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Mamy problemów coniemiara. Mamy problemów coniemiara.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 25,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            },
+            {
+              "category": "spelling",
+              "start": 42,
+              "end": 52,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p05",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "MAMY PROBLEMÓW CONIEMIARA.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 25,
+              "original": "CONIEMIARA",
+              "suggestion": "CO NIEMIARA"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p06",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Mamy problemów coniemiara”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 29,
+              "end": 39,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-01-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p07",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Mamy problemów coniemiara. Napis „coniemiara” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 25,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-01-p08",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "error",
+          "role": "positive",
+          "text": "Kłopotów było coniemiara od początku.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 14,
+              "end": 24,
+              "original": "coniemiara",
+              "suggestion": "co niemiara"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-01-n01",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Mamy problemów co niemiara.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 15,
+              "end": 26,
+              "original": "co niemiara"
+            }
+          ],
+          "pair_id": "PI-TYPO-01-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n02",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „coniemiara” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 17,
+              "original": "coniemiara"
+            }
+          ],
+          "pair_id": "PI-TYPO-01-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n03",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość coniemiara_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 29,
+              "original": "coniemiara_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-01-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n04",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=coniemiara pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 46,
+              "original": "coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n05",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt coniemiara@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 31,
+              "original": "coniemiara@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n06",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `coniemiara` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 15,
+              "original": "coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n07",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --coniemiara nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 18,
+              "original": "--coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n08",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xconiemiarax pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 18,
+              "original": "xconiemiarax"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n09",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma coniemiara-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 24,
+              "original": "coniemiara-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n10",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma CO NIEMIARA jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 17,
+              "original": "CO NIEMIARA"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n11",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Coniemiara” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 17,
+              "original": "Coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n12",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/coniemiara/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 24,
+              "original": "coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n13",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token coniemiаra miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 16,
+              "original": "coniemiаra"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n14",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: conie. miara pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 14,
+              "original": "conie"
+            },
+            {
+              "start": 16,
+              "end": 21,
+              "original": "miara"
+            }
+          ],
+          "pair_id": "PI-TYPO-01-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n15",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma conie,miara ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 17,
+              "original": "conie,miara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-01-n16",
+          "candidate_id": "PI-TYPO-01",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „coniemiara” i „coniemiara” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 18,
+              "original": "coniemiara"
+            },
+            {
+              "start": 23,
+              "end": 33,
+              "original": "coniemiara"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PI-TYPO-02",
+      "incorrect_surface": "złodzieji",
+      "minimal_target": "złodziei",
+      "proposed_source_identity": "rule:spelling.zlodzieji",
+      "proposed_behavior_version": "spelling-zlodzieji/1.0",
+      "operation": "replace.closed_literal",
+      "normative_authority_id": "wsjp_zlodziej",
+      "priority_rank": 2,
+      "positive_cases": [
+        {
+          "id": "pi-typo-02-p01",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Bali się złodzieji nocą.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 18,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-02-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p02",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Złodzieji bali się wszyscy”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 22,
+              "original": "Złodzieji",
+              "suggestion": "Złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-02-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p03",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Bali się złodzieji nocą.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 26,
+              "end": 35,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-02-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p04",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Bali się złodzieji nocą. Bali się złodzieji nocą.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 18,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            },
+            {
+              "category": "spelling",
+              "start": 34,
+              "end": 43,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p05",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "BALI SIĘ ZŁODZIEJI NOCĄ.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 18,
+              "original": "ZŁODZIEJI",
+              "suggestion": "ZŁODZIEI"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p06",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Bali się złodzieji nocą”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 23,
+              "end": 32,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-02-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p07",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Bali się złodzieji nocą. Napis „złodzieji” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 18,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-02-p08",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "error",
+          "role": "positive",
+          "text": "Obawiali się tamtejszych złodzieji.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 25,
+              "end": 34,
+              "original": "złodzieji",
+              "suggestion": "złodziei"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-02-n01",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Bali się złodziei nocą.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 17,
+              "original": "złodziei"
+            }
+          ],
+          "pair_id": "PI-TYPO-02-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n02",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „złodzieji” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 16,
+              "original": "złodzieji"
+            }
+          ],
+          "pair_id": "PI-TYPO-02-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n03",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość zlodzieji_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 28,
+              "original": "zlodzieji_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-02-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n04",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=z%C5%82odzieji pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 50,
+              "original": "z%C5%82odzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n05",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt zlodzieji@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 30,
+              "original": "zlodzieji@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n06",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `złodzieji` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 14,
+              "original": "złodzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n07",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --zlodzieji nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 17,
+              "original": "--zlodzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n08",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xzłodziejix pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 17,
+              "original": "xzłodziejix"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n09",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma złodzieji-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 23,
+              "original": "złodzieji-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n10",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma ZŁODZIEI jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "ZŁODZIEI"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n11",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Złodzieji” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 16,
+              "original": "Złodzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n12",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/z%C5%82odzieji/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 28,
+              "original": "z%C5%82odzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n13",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token złodzіeji miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "złodzіeji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n14",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: złod. zieji pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 13,
+              "original": "złod"
+            },
+            {
+              "start": 15,
+              "end": 20,
+              "original": "zieji"
+            }
+          ],
+          "pair_id": "PI-TYPO-02-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n15",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma złod,zieji ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 16,
+              "original": "złod,zieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-02-n16",
+          "candidate_id": "PI-TYPO-02",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „złodzieji” i „złodzieji” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 17,
+              "original": "złodzieji"
+            },
+            {
+              "start": 22,
+              "end": 31,
+              "original": "złodzieji"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PI-TYPO-03",
+      "incorrect_surface": "conieco",
+      "minimal_target": "co nieco",
+      "proposed_source_identity": "rule:spelling.co_nieco",
+      "proposed_behavior_version": "spelling-co-nieco/1.0",
+      "operation": "replace.closed_literal_spacing",
+      "normative_authority_id": "wsjp_co_nieco",
+      "priority_rank": 3,
+      "positive_cases": [
+        {
+          "id": "pi-typo-03-p01",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wiem conieco o sprawie.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 5,
+              "end": 12,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-03-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p02",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Conieco już o tym wiem”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 20,
+              "original": "Conieco",
+              "suggestion": "Co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-03-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p03",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Wiem conieco o sprawie.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 22,
+              "end": 29,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-03-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p04",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wiem conieco o sprawie. Wiem conieco o sprawie.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 5,
+              "end": 12,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            },
+            {
+              "category": "spelling",
+              "start": 29,
+              "end": 36,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p05",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "WIEM CONIECO O SPRAWIE.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 5,
+              "end": 12,
+              "original": "CONIECO",
+              "suggestion": "CO NIECO"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p06",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Wiem conieco o sprawie”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 19,
+              "end": 26,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-03-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p07",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wiem conieco o sprawie. Napis „conieco” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 5,
+              "end": 12,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-03-p08",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "error",
+          "role": "positive",
+          "text": "Opowiedział nam conieco o podróży.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 16,
+              "end": 23,
+              "original": "conieco",
+              "suggestion": "co nieco"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-03-n01",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Wiem co nieco o sprawie.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 13,
+              "original": "co nieco"
+            }
+          ],
+          "pair_id": "PI-TYPO-03-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n02",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „conieco” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "conieco"
+            }
+          ],
+          "pair_id": "PI-TYPO-03-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n03",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość conieco_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 26,
+              "original": "conieco_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-03-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n04",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=conieco pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 43,
+              "original": "conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n05",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt conieco@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 28,
+              "original": "conieco@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n06",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `conieco` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 12,
+              "original": "conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n07",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --conieco nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "--conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n08",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xconiecox pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "xconiecox"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n09",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma conieco-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 21,
+              "original": "conieco-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n10",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma CO NIECO jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "CO NIECO"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n11",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Conieco” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "Conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n12",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/conieco/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 21,
+              "original": "conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n13",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token conіeco miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 13,
+              "original": "conіeco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n14",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: con. ieco pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 12,
+              "original": "con"
+            },
+            {
+              "start": 14,
+              "end": 18,
+              "original": "ieco"
+            }
+          ],
+          "pair_id": "PI-TYPO-03-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n15",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma con,ieco ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "con,ieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-03-n16",
+          "candidate_id": "PI-TYPO-03",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „conieco” i „conieco” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 15,
+              "original": "conieco"
+            },
+            {
+              "start": 20,
+              "end": 27,
+              "original": "conieco"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PI-TYPO-04",
+      "incorrect_surface": "invitro",
+      "minimal_target": "in vitro",
+      "proposed_source_identity": "rule:spelling.in_vitro",
+      "proposed_behavior_version": "spelling-in-vitro/1.0",
+      "operation": "replace.closed_literal_spacing",
+      "normative_authority_id": "wsjp_in_vitro",
+      "priority_rank": 4,
+      "positive_cases": [
+        {
+          "id": "pi-typo-04-p01",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wybrali metodę invitro.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 22,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-04-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p02",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Invitro wykonano próbę”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 20,
+              "original": "Invitro",
+              "suggestion": "In vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-04-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p03",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Wybrali metodę invitro.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 32,
+              "end": 39,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-04-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p04",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wybrali metodę invitro. Wybrali metodę invitro.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 22,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            },
+            {
+              "category": "spelling",
+              "start": 39,
+              "end": 46,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p05",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "WYBRALI METODĘ INVITRO.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 22,
+              "original": "INVITRO",
+              "suggestion": "IN VITRO"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p06",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Wybrali metodę invitro”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 29,
+              "end": 36,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-04-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p07",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wybrali metodę invitro. Napis „invitro” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 15,
+              "end": 22,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-04-p08",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "error",
+          "role": "positive",
+          "text": "Zapłodnienie wykonano metodą invitro.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 29,
+              "end": 36,
+              "original": "invitro",
+              "suggestion": "in vitro"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-04-n01",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Wybrali metodę in vitro.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 15,
+              "end": 23,
+              "original": "in vitro"
+            }
+          ],
+          "pair_id": "PI-TYPO-04-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n02",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „invitro” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "invitro"
+            }
+          ],
+          "pair_id": "PI-TYPO-04-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n03",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość invitro_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 26,
+              "original": "invitro_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-04-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n04",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=invitro pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 43,
+              "original": "invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n05",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt invitro@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 28,
+              "original": "invitro@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n06",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `invitro` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 12,
+              "original": "invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n07",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --invitro nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "--invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n08",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xinvitrox pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "xinvitrox"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n09",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma invitro-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 21,
+              "original": "invitro-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n10",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma IN VITRO jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "IN VITRO"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n11",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Invitro” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "Invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n12",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/invitro/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 21,
+              "original": "invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n13",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token іnvitro miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 13,
+              "original": "іnvitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n14",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: inv. itro pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 12,
+              "original": "inv"
+            },
+            {
+              "start": 14,
+              "end": 18,
+              "original": "itro"
+            }
+          ],
+          "pair_id": "PI-TYPO-04-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n15",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma inv,itro ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "inv,itro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-04-n16",
+          "candidate_id": "PI-TYPO-04",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „invitro” i „invitro” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 15,
+              "original": "invitro"
+            },
+            {
+              "start": 20,
+              "end": 27,
+              "original": "invitro"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PI-TYPO-05",
+      "incorrect_surface": "na przeciwko",
+      "minimal_target": "naprzeciwko",
+      "proposed_source_identity": "rule:spelling.naprzeciwko_spacing",
+      "proposed_behavior_version": "spelling-naprzeciwko-spacing/1.0",
+      "operation": "replace.closed_literal_spacing",
+      "normative_authority_id": "wsjp_naprzeciwko",
+      "priority_rank": 5,
+      "positive_cases": [
+        {
+          "id": "pi-typo-05-p01",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Usiadł na przeciwko okna.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 7,
+              "end": 19,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-05-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p02",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Na przeciwko stał stary dom”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 25,
+              "original": "Na przeciwko",
+              "suggestion": "Naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-05-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p03",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Usiadł na przeciwko okna.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 24,
+              "end": 36,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-05-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p04",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Usiadł na przeciwko okna. Usiadł na przeciwko okna.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 7,
+              "end": 19,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            },
+            {
+              "category": "spelling",
+              "start": 33,
+              "end": 45,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p05",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "USIADŁ NA PRZECIWKO OKNA.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 7,
+              "end": 19,
+              "original": "NA PRZECIWKO",
+              "suggestion": "NAPRZECIWKO"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p06",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Usiadł na przeciwko okna”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 21,
+              "end": 33,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-05-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p07",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Usiadł na przeciwko okna. Napis „na przeciwko” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 7,
+              "end": 19,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-05-p08",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "error",
+          "role": "positive",
+          "text": "Ławka stała na przeciwko wejścia.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 12,
+              "end": 24,
+              "original": "na przeciwko",
+              "suggestion": "naprzeciwko"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-05-n01",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Usiadł naprzeciwko okna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 18,
+              "original": "naprzeciwko"
+            }
+          ],
+          "pair_id": "PI-TYPO-05-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n02",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „na przeciwko” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 19,
+              "original": "na przeciwko"
+            }
+          ],
+          "pair_id": "PI-TYPO-05-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n03",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość na-przeciwko_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 31,
+              "original": "na-przeciwko_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-05-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n04",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=na%20przeciwko pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 50,
+              "original": "na%20przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n05",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt naprzeciwko@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 32,
+              "original": "naprzeciwko@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n06",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `na przeciwko` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 17,
+              "original": "na przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n07",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --na-przeciwko nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 20,
+              "original": "--na-przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n08",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xnaprzeciwkox pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 19,
+              "original": "xnaprzeciwkox"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n09",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma naprzeciwko-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 25,
+              "original": "naprzeciwko-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n10",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma NAPRZECIWKO jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 17,
+              "original": "NAPRZECIWKO"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n11",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Na przeciwko” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 19,
+              "original": "Na przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n12",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/na%20przeciwko/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 28,
+              "original": "na%20przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n13",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token nа przeciwko miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 18,
+              "original": "nа przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n14",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: na prz. eciwko pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 15,
+              "original": "na prz"
+            },
+            {
+              "start": 17,
+              "end": 23,
+              "original": "eciwko"
+            }
+          ],
+          "pair_id": "PI-TYPO-05-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n15",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma na prz,eciwko ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 19,
+              "original": "na prz,eciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-05-n16",
+          "candidate_id": "PI-TYPO-05",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „na przeciwko” i „na przeciwko” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 20,
+              "original": "na przeciwko"
+            },
+            {
+              "start": 25,
+              "end": 37,
+              "original": "na przeciwko"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PI-TYPO-06",
+      "incorrect_surface": "niewiem",
+      "minimal_target": "nie wiem",
+      "proposed_source_identity": "rule:spelling.nie_wiem",
+      "proposed_behavior_version": "spelling-nie-wiem/1.0",
+      "operation": "replace.closed_literal_spacing",
+      "normative_authority_id": "rjp_2026",
+      "priority_rank": 6,
+      "positive_cases": [
+        {
+          "id": "pi-typo-06-p01",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Naprawdę niewiem, co wybrać.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 16,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-06-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p02",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedział: „Niewiem, którą opcję wybrać”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 13,
+              "end": 20,
+              "original": "Niewiem",
+              "suggestion": "Nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-06-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p03",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Wstęp bez błędu. Naprawdę niewiem, co wybrać.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 26,
+              "end": 33,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-06-PAIR-04",
+          "shape_strata": [
+            "multi-sentence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p04",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Naprawdę niewiem, co wybrać. Naprawdę niewiem, co wybrać.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 16,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            },
+            {
+              "category": "spelling",
+              "start": 38,
+              "end": 45,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p05",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "NAPRAWDĘ NIEWIEM, CO WYBRAĆ.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 16,
+              "original": "NIEWIEM",
+              "suggestion": "NIE WIEM"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving the closed literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p06",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Powiedziała: „Naprawdę niewiem, co wybrać”.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 23,
+              "end": 30,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": "PI-TYPO-06-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "natural-language-dialogue",
+          "rationale": "Quoted dialogue remains analyzed prose, not a metalinguistic mention.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p07",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Naprawdę niewiem, co wybrać. Napis „niewiem” pozostaje przykładem.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 9,
+              "end": 16,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "conflict-or-abstention",
+            "quotation-or-literal"
+          ],
+          "guard": "mixed-prose-and-mention",
+          "rationale": "Only the prose occurrence qualifies; the later metalinguistic mention abstains.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        },
+        {
+          "id": "pi-typo-06-p08",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "error",
+          "role": "positive",
+          "text": "Ciągle niewiem, którą trasę wybrać.",
+          "expected_findings": [
+            {
+              "category": "spelling",
+              "start": 7,
+              "end": 14,
+              "original": "niewiem",
+              "suggestion": "nie wiem"
+            }
+          ],
+          "probes": [],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "natural-language",
+          "rationale": "Project-authored positive proving a sentence-internal literal boundary.",
+          "provider_behavior": {
+            "provider-absent": "execute",
+            "qualified-morphology": "execute"
+          }
+        }
+      ],
+      "hard_negative_cases": [
+        {
+          "id": "pi-typo-06-n01",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Naprawdę nie wiem, co wybrać.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 17,
+              "original": "nie wiem"
+            }
+          ],
+          "pair_id": "PI-TYPO-06-PAIR-01",
+          "shape_strata": [
+            "simple-local"
+          ],
+          "guard": "already-correct",
+          "rationale": "The normative target must remain unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n02",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napis „niewiem” jest omawianym przykładem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "niewiem"
+            }
+          ],
+          "pair_id": "PI-TYPO-06-PAIR-02",
+          "shape_strata": [
+            "quotation-or-literal",
+            "conflict-or-abstention"
+          ],
+          "guard": "metalinguistic-mention",
+          "rationale": "A quoted metalinguistic mention is data, not prose to correct.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n03",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Żółć: wartość niewiem_case pozostaje identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 26,
+              "original": "niewiem_case"
+            }
+          ],
+          "pair_id": "PI-TYPO-06-PAIR-03",
+          "shape_strata": [
+            "sentence-internal",
+            "unicode-and-case",
+            "quotation-or-literal"
+          ],
+          "guard": "identifier",
+          "rationale": "Identifier boundaries fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n04",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Adres https://example.test/search?q=niewiem pozostaje bez zmian.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 36,
+              "end": 43,
+              "original": "niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "url",
+          "rationale": "URL encoding is outside analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n05",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kontakt niewiem@example.test pozostaje adresem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 28,
+              "original": "niewiem@example.test"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "email",
+          "rationale": "An e-mail address is not analyzed prose.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n06",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Kod `niewiem` pozostaje literalny.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 5,
+              "end": 12,
+              "original": "niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "code",
+          "rationale": "Inline code is preserved.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n07",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Flaga --niewiem nie jest polskim zdaniem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "--niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "command-flag",
+          "rationale": "Command-line flags are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n08",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token xniewiemx pozostaje większym identyfikatorem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 15,
+              "original": "xniewiemx"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "substring",
+          "rationale": "The candidate must not match inside a longer token.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n09",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma niewiem-wariant jest złożeniem technicznym.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 21,
+              "original": "niewiem-wariant"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal"
+          ],
+          "guard": "hyphenated-token",
+          "rationale": "Hyphenated technical compounds abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n10",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma NIE WIEM jest już poprawna.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "NIE WIEM"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case"
+          ],
+          "guard": "already-correct",
+          "rationale": "Uppercase correct spelling remains unchanged.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n11",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Marka „Niewiem” jest nazwą własną produktu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 7,
+              "end": 14,
+              "original": "Niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "proper-name",
+          "rationale": "Title-cased product names fail closed.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n12",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Ścieżka /docs/niewiem/index.html pozostaje literałem.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 14,
+              "end": 21,
+              "original": "niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "quotation-or-literal"
+          ],
+          "guard": "path",
+          "rationale": "Encoded path segments are excluded.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n13",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Token nіewiem miesza alfabety.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 13,
+              "original": "nіewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "unicode-and-case",
+            "conflict-or-abstention"
+          ],
+          "guard": "mixed-script",
+          "rationale": "Mixed-script lookalikes are not normalized into candidates.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n14",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Granica: nie. wiem pozostaje w drugim zdaniu.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 9,
+              "end": 12,
+              "original": "nie"
+            },
+            {
+              "start": 14,
+              "end": 18,
+              "original": "wiem"
+            }
+          ],
+          "pair_id": "PI-TYPO-06-PAIR-04",
+          "shape_strata": [
+            "multi-sentence",
+            "conflict-or-abstention"
+          ],
+          "guard": "sentence-boundary",
+          "rationale": "A candidate cannot cross a sentence boundary.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n15",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Forma nie,wiem ma przerwaną granicę.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 6,
+              "end": 14,
+              "original": "nie,wiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "sentence-internal",
+            "conflict-or-abstention"
+          ],
+          "guard": "interrupted-token",
+          "rationale": "Internal punctuation prevents the exact literal trigger.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        },
+        {
+          "id": "pi-typo-06-n16",
+          "candidate_id": "PI-TYPO-06",
+          "kind": "correct",
+          "role": "hard-negative",
+          "text": "Napisy „niewiem” i „niewiem” są przykładami.",
+          "expected_findings": [],
+          "probes": [
+            {
+              "start": 8,
+              "end": 15,
+              "original": "niewiem"
+            },
+            {
+              "start": 20,
+              "end": 27,
+              "original": "niewiem"
+            }
+          ],
+          "pair_id": null,
+          "shape_strata": [
+            "repeated-occurrence",
+            "quotation-or-literal"
+          ],
+          "guard": "repeated-mentions",
+          "rationale": "Repeated metalinguistic mentions both abstain.",
+          "provider_behavior": {
+            "provider-absent": "abstain",
+            "qualified-morphology": "abstain"
+          }
+        }
+      ]
+    }
+  ]
+}

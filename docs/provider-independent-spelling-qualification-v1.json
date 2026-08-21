@@ -1,0 +1,1073 @@
+{
+  "schema_id": "polis.provider-independent-spelling-qualification",
+  "schema_version": 1,
+  "issue": 402,
+  "stage": "approved",
+  "status": "approved",
+  "corpus": {
+    "path": "tests/fixtures/v1/provider_independent_spelling_qualification.json",
+    "manifest_path": "tests/fixtures/v1/provider_independent_spelling_qualification.manifest.json",
+    "dataset_id": "polis-provider-independent-spelling-qualification-v1"
+  },
+  "candidate_universe": {
+    "definition": "Exact ordered PI-TYPO-01..PI-TYPO-06 universe approved in #402; no inferred candidates.",
+    "ids": [
+      "PI-TYPO-01",
+      "PI-TYPO-02",
+      "PI-TYPO-03",
+      "PI-TYPO-04",
+      "PI-TYPO-05",
+      "PI-TYPO-06"
+    ]
+  },
+  "required_minima": {
+    "positive_expected_findings": 8,
+    "hard_negative_cases": 16,
+    "controlled_pairs": 4,
+    "shape_strata": [
+      "simple-local",
+      "sentence-internal",
+      "multi-sentence",
+      "repeated-occurrence",
+      "unicode-and-case",
+      "quotation-or-literal",
+      "conflict-or-abstention"
+    ],
+    "provider_profile": "provider-absent"
+  },
+  "rows": [
+    {
+      "id": "PI-TYPO-01",
+      "identity": {
+        "incorrect_surface": "coniemiara",
+        "minimal_target": "co niemiara",
+        "proposed_source_identity": "rule:spelling.co_niemiara",
+        "proposed_behavior_version": "spelling-co-niemiara/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "nck_co_niemiara",
+        "authority_url": "https://nck.pl/projekty-kulturalne/projekty/ojczysty-dodaj-do-ulubionych/ciekawostki-jezykowe/co-niemiara-%2Cc.ajax",
+        "frequency_report_role": "prioritization-only; not normative",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"coniemiara\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "co niemiara",
+        "source_identity": "rule:spelling.co_niemiara",
+        "behavior_version": "spelling-co-niemiara/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-01-p01",
+          "pi-typo-01-p02",
+          "pi-typo-01-p03",
+          "pi-typo-01-p04",
+          "pi-typo-01-p05",
+          "pi-typo-01-p06",
+          "pi-typo-01-p07",
+          "pi-typo-01-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-01-n01",
+          "pi-typo-01-n02",
+          "pi-typo-01-n03",
+          "pi-typo-01-n04",
+          "pi-typo-01-n05",
+          "pi-typo-01-n06",
+          "pi-typo-01-n07",
+          "pi-typo-01-n08",
+          "pi-typo-01-n09",
+          "pi-typo-01-n10",
+          "pi-typo-01-n11",
+          "pi-typo-01-n12",
+          "pi-typo-01-n13",
+          "pi-typo-01-n14",
+          "pi-typo-01-n15",
+          "pi-typo-01-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-01-PAIR-01",
+          "PI-TYPO-01-PAIR-02",
+          "PI-TYPO-01-PAIR-03",
+          "PI-TYPO-01-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 1,
+        "measured_public_frequency_role": "candidate ordering only",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    },
+    {
+      "id": "PI-TYPO-02",
+      "identity": {
+        "incorrect_surface": "złodzieji",
+        "minimal_target": "złodziei",
+        "proposed_source_identity": "rule:spelling.zlodzieji",
+        "proposed_behavior_version": "spelling-zlodzieji/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "wsjp_zlodziej",
+        "authority_url": "https://wsjp.pl/haslo/podglad/10848/zlodziej",
+        "frequency_report_role": "prioritization-only; not normative",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"złodzieji\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "złodziei",
+        "source_identity": "rule:spelling.zlodzieji",
+        "behavior_version": "spelling-zlodzieji/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-02-p01",
+          "pi-typo-02-p02",
+          "pi-typo-02-p03",
+          "pi-typo-02-p04",
+          "pi-typo-02-p05",
+          "pi-typo-02-p06",
+          "pi-typo-02-p07",
+          "pi-typo-02-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-02-n01",
+          "pi-typo-02-n02",
+          "pi-typo-02-n03",
+          "pi-typo-02-n04",
+          "pi-typo-02-n05",
+          "pi-typo-02-n06",
+          "pi-typo-02-n07",
+          "pi-typo-02-n08",
+          "pi-typo-02-n09",
+          "pi-typo-02-n10",
+          "pi-typo-02-n11",
+          "pi-typo-02-n12",
+          "pi-typo-02-n13",
+          "pi-typo-02-n14",
+          "pi-typo-02-n15",
+          "pi-typo-02-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-02-PAIR-01",
+          "PI-TYPO-02-PAIR-02",
+          "PI-TYPO-02-PAIR-03",
+          "PI-TYPO-02-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 2,
+        "measured_public_frequency_role": "candidate ordering only",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    },
+    {
+      "id": "PI-TYPO-03",
+      "identity": {
+        "incorrect_surface": "conieco",
+        "minimal_target": "co nieco",
+        "proposed_source_identity": "rule:spelling.co_nieco",
+        "proposed_behavior_version": "spelling-co-nieco/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "wsjp_co_nieco",
+        "authority_url": "https://wsjp.pl/haslo/podglad/58987/co-nieco",
+        "frequency_report_role": "prioritization-only; not normative",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"conieco\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "co nieco",
+        "source_identity": "rule:spelling.co_nieco",
+        "behavior_version": "spelling-co-nieco/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-03-p01",
+          "pi-typo-03-p02",
+          "pi-typo-03-p03",
+          "pi-typo-03-p04",
+          "pi-typo-03-p05",
+          "pi-typo-03-p06",
+          "pi-typo-03-p07",
+          "pi-typo-03-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-03-n01",
+          "pi-typo-03-n02",
+          "pi-typo-03-n03",
+          "pi-typo-03-n04",
+          "pi-typo-03-n05",
+          "pi-typo-03-n06",
+          "pi-typo-03-n07",
+          "pi-typo-03-n08",
+          "pi-typo-03-n09",
+          "pi-typo-03-n10",
+          "pi-typo-03-n11",
+          "pi-typo-03-n12",
+          "pi-typo-03-n13",
+          "pi-typo-03-n14",
+          "pi-typo-03-n15",
+          "pi-typo-03-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-03-PAIR-01",
+          "PI-TYPO-03-PAIR-02",
+          "PI-TYPO-03-PAIR-03",
+          "PI-TYPO-03-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 3,
+        "measured_public_frequency_role": "candidate ordering only",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    },
+    {
+      "id": "PI-TYPO-04",
+      "identity": {
+        "incorrect_surface": "invitro",
+        "minimal_target": "in vitro",
+        "proposed_source_identity": "rule:spelling.in_vitro",
+        "proposed_behavior_version": "spelling-in-vitro/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "wsjp_in_vitro",
+        "authority_url": "https://wsjp.pl/haslo/podglad/67446/in-vitro",
+        "frequency_report_role": "prioritization-only; not normative",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"invitro\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "in vitro",
+        "source_identity": "rule:spelling.in_vitro",
+        "behavior_version": "spelling-in-vitro/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-04-p01",
+          "pi-typo-04-p02",
+          "pi-typo-04-p03",
+          "pi-typo-04-p04",
+          "pi-typo-04-p05",
+          "pi-typo-04-p06",
+          "pi-typo-04-p07",
+          "pi-typo-04-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-04-n01",
+          "pi-typo-04-n02",
+          "pi-typo-04-n03",
+          "pi-typo-04-n04",
+          "pi-typo-04-n05",
+          "pi-typo-04-n06",
+          "pi-typo-04-n07",
+          "pi-typo-04-n08",
+          "pi-typo-04-n09",
+          "pi-typo-04-n10",
+          "pi-typo-04-n11",
+          "pi-typo-04-n12",
+          "pi-typo-04-n13",
+          "pi-typo-04-n14",
+          "pi-typo-04-n15",
+          "pi-typo-04-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-04-PAIR-01",
+          "PI-TYPO-04-PAIR-02",
+          "PI-TYPO-04-PAIR-03",
+          "PI-TYPO-04-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 4,
+        "measured_public_frequency_role": "candidate ordering only",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    },
+    {
+      "id": "PI-TYPO-05",
+      "identity": {
+        "incorrect_surface": "na przeciwko",
+        "minimal_target": "naprzeciwko",
+        "proposed_source_identity": "rule:spelling.naprzeciwko_spacing",
+        "proposed_behavior_version": "spelling-naprzeciwko-spacing/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "wsjp_naprzeciwko",
+        "authority_url": "https://wsjp.pl/haslo/podglad/3712/naprzeciwko",
+        "frequency_report_role": "prioritization-only; not normative",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"na przeciwko\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "naprzeciwko",
+        "source_identity": "rule:spelling.naprzeciwko_spacing",
+        "behavior_version": "spelling-naprzeciwko-spacing/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-05-p01",
+          "pi-typo-05-p02",
+          "pi-typo-05-p03",
+          "pi-typo-05-p04",
+          "pi-typo-05-p05",
+          "pi-typo-05-p06",
+          "pi-typo-05-p07",
+          "pi-typo-05-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-05-n01",
+          "pi-typo-05-n02",
+          "pi-typo-05-n03",
+          "pi-typo-05-n04",
+          "pi-typo-05-n05",
+          "pi-typo-05-n06",
+          "pi-typo-05-n07",
+          "pi-typo-05-n08",
+          "pi-typo-05-n09",
+          "pi-typo-05-n10",
+          "pi-typo-05-n11",
+          "pi-typo-05-n12",
+          "pi-typo-05-n13",
+          "pi-typo-05-n14",
+          "pi-typo-05-n15",
+          "pi-typo-05-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-05-PAIR-01",
+          "PI-TYPO-05-PAIR-02",
+          "PI-TYPO-05-PAIR-03",
+          "PI-TYPO-05-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 5,
+        "measured_public_frequency_role": "candidate ordering only",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    },
+    {
+      "id": "PI-TYPO-06",
+      "identity": {
+        "incorrect_surface": "niewiem",
+        "minimal_target": "nie wiem",
+        "proposed_source_identity": "rule:spelling.nie_wiem",
+        "proposed_behavior_version": "spelling-nie-wiem/1.0",
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "provider_profile": "provider-absent"
+      },
+      "normative_basis": {
+        "authority_id": "rjp_2026",
+        "authority_url": "https://rjp.pan.pl/app/uploads/2026/03/Zalacznik-do-komunikatu-11-25-wersja-ostateczna-jednolita.pdf",
+        "frequency_report_role": "not-ranked; project-selected closed literal",
+        "rule_status": "required spelling form is explicit"
+      },
+      "deterministic_boundary": {
+        "trigger": "Exact Unicode-aware closed literal \"niewiem\" with casing preservation.",
+        "guards": [
+          "metalinguistic quotation",
+          "code/literal",
+          "URL",
+          "e-mail",
+          "identifier",
+          "substring",
+          "mixed script",
+          "cross-sentence span",
+          "unsupported internal punctuation",
+          "proper-name/product context"
+        ],
+        "casing": "preserve lower, sentence/title initial, and coherent all-uppercase forms only; otherwise abstain",
+        "unicode": "match NFC text without folding mixed scripts; offsets remain original code-point indexes",
+        "repetition": "emit every non-overlapping qualified occurrence in document order",
+        "multi_sentence": "evaluate within sentence boundaries and map spans to original text",
+        "conflict": "use existing normalization/deduplication; overlapping or competing edits fail closed"
+      },
+      "output_contract": {
+        "category": "spelling",
+        "operation": "replace.closed_literal_spacing",
+        "span_rule": "minimal exact incorrect surface only, half-open [start,end) against original text",
+        "suggestion_rule": "nie wiem",
+        "source_identity": "rule:spelling.nie_wiem",
+        "behavior_version": "spelling-nie-wiem/1.0",
+        "severity": "suggestion",
+        "policy": "review-only",
+        "automatic_policy_entry": false,
+        "explicit_apply_required": true
+      },
+      "public_evidence": {
+        "dataset_id": "polis-provider-independent-spelling-qualification-v1",
+        "positive_case_ids": [
+          "pi-typo-06-p01",
+          "pi-typo-06-p02",
+          "pi-typo-06-p03",
+          "pi-typo-06-p04",
+          "pi-typo-06-p05",
+          "pi-typo-06-p06",
+          "pi-typo-06-p07",
+          "pi-typo-06-p08"
+        ],
+        "positive_expected_finding_count": 9,
+        "hard_negative_case_ids": [
+          "pi-typo-06-n01",
+          "pi-typo-06-n02",
+          "pi-typo-06-n03",
+          "pi-typo-06-n04",
+          "pi-typo-06-n05",
+          "pi-typo-06-n06",
+          "pi-typo-06-n07",
+          "pi-typo-06-n08",
+          "pi-typo-06-n09",
+          "pi-typo-06-n10",
+          "pi-typo-06-n11",
+          "pi-typo-06-n12",
+          "pi-typo-06-n13",
+          "pi-typo-06-n14",
+          "pi-typo-06-n15",
+          "pi-typo-06-n16"
+        ],
+        "controlled_pair_ids": [
+          "PI-TYPO-06-PAIR-01",
+          "PI-TYPO-06-PAIR-02",
+          "PI-TYPO-06-PAIR-03",
+          "PI-TYPO-06-PAIR-04"
+        ],
+        "shape_strata": {
+          "simple-local": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "sentence-internal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "multi-sentence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "repeated-occurrence": {
+            "positive_cases": 1,
+            "hard_negative_cases": 1
+          },
+          "unicode-and-case": {
+            "positive_cases": 2,
+            "hard_negative_cases": 4
+          },
+          "quotation-or-literal": {
+            "positive_cases": 2,
+            "hard_negative_cases": 8
+          },
+          "conflict-or-abstention": {
+            "positive_cases": 1,
+            "hard_negative_cases": 6
+          }
+        },
+        "provider_profiles": {
+          "provider-absent": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "qualified"
+          },
+          "qualified-morphology": {
+            "positive_cases": 8,
+            "hard_negative_cases": 16,
+            "status": "same-as-provider-absent"
+          }
+        },
+        "evidence_gaps": []
+      },
+      "expected_value": {
+        "priority_rank": 6,
+        "measured_public_frequency_role": "not ranked",
+        "runtime_claim": "one exact closed literal family; no generic spellchecking claim"
+      },
+      "risk_and_cost": {
+        "false_positive_mechanisms": [
+          "literal mentions and technical wrappers",
+          "token/subtoken boundary ambiguity",
+          "proper-name or product use",
+          "mixed script"
+        ],
+        "mitigation": "all listed guards abstain; prefer no finding",
+        "provider_drift_risk": "none; provider-independent",
+        "offset_risk": "minimal span is explicitly enumerated in public cases",
+        "performance_cost": "one bounded literal matcher in a later implementation issue; not measured or implemented here",
+        "maintenance_risk": "normative URL and exact target are recorded; norm changes require a new behavior version"
+      },
+      "decision": {
+        "disposition": "accept: deterministic provider-absent",
+        "rationale": "Normative target and exact local trigger are explicit; project-authored evidence meets all per-candidate minima and fail-closed guards.",
+        "child_allowed": true,
+        "reopening_evidence": "A normative change, a demonstrated unguardable false positive, or a failing controlled case reopens qualification.",
+        "maintainer_approval": {
+          "status": "approved",
+          "approved_by": "Paweł Cyroń",
+          "approved_at": "2026-08-21",
+          "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e"
+        }
+      }
+    }
+  ],
+  "prioritization": {
+    "method": "Ascending priority_rank after admission; safety and complete evidence precede rank.",
+    "accepted_row_ids": [
+      "PI-TYPO-01",
+      "PI-TYPO-02",
+      "PI-TYPO-03",
+      "PI-TYPO-04",
+      "PI-TYPO-05",
+      "PI-TYPO-06"
+    ],
+    "ranked_rows": [
+      {
+        "candidate_id": "PI-TYPO-01",
+        "rank": 1
+      },
+      {
+        "candidate_id": "PI-TYPO-02",
+        "rank": 2
+      },
+      {
+        "candidate_id": "PI-TYPO-03",
+        "rank": 3
+      },
+      {
+        "candidate_id": "PI-TYPO-04",
+        "rank": 4
+      },
+      {
+        "candidate_id": "PI-TYPO-05",
+        "rank": 5
+      },
+      {
+        "candidate_id": "PI-TYPO-06",
+        "rank": 6
+      }
+    ]
+  },
+  "child_issue_policy": {
+    "creation_rule": "After #402 closes, create exactly one focused implementation issue per accepted row in rank order.",
+    "serial_delivery": true,
+    "one_branch_one_commit_one_pr": true,
+    "review_only_first": true,
+    "automatic_policy_changes": false,
+    "required_body_markers": [
+      "Parent #402",
+      "Qualification row ID:",
+      "Qualification matrix SHA-256:"
+    ],
+    "out_of_scope": "No implementation child is created or implemented by #402."
+  },
+  "runtime_change": "none",
+  "protected_data_accessed": false,
+  "integrity": {
+    "algorithm": "SHA-256",
+    "canonicalization": "UTF-8 JSON, sorted keys, compact separators, ensure_ascii=false; exclude stage, status, approval, integrity digest fields, and row maintainer approvals",
+    "matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e",
+    "digest_status": "approved"
+  },
+  "approval": {
+    "status": "approved",
+    "decision_owner": "Paweł Cyroń",
+    "approved_by": "Paweł Cyroń",
+    "approved_at": "2026-08-21",
+    "bound_matrix_sha256": "b0486476564de67b3e9e40a4026ad1fa422121c17146e6ebc58331875aaa906e",
+    "child_creation_allowed": true,
+    "note": "Approval binds the exact six-row qualification content after independent validation; runtime implementation remains forbidden in #402."
+  }
+}
