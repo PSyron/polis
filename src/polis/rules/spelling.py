@@ -329,6 +329,7 @@ _CO_EXTENDED_HOST_TOKEN_CHARS: Final = frozenset("./:@?#%&+~_-=\\.$()[]{}|^")
 _CO_MENTION_TRAILING_PUNCTUATION: Final = frozenset(".,;:!?…")
 _CO_CUE_LOOKBEHIND: Final = 256
 _CO_SYMMETRIC_QUOTES: Final = frozenset({'"', "'", "`"})
+_CO_SAFE_CONTROL_CHARACTERS: Final = frozenset("\t\n\r")
 _CO_OPERATOR_CHARACTERS: Final = frozenset("=|^+*/%<>→←⇐⇒↔±×÷&~")
 _CO_PROPER_NAME_CUE_RE: Final = re.compile(
     r"(?:^|[\s(\[{:;,.!?])(?:marka|markę|nazwa\s+produktu|"
@@ -469,7 +470,10 @@ def _is_co_unicode_extension_context(text: str, start: int, end: int) -> bool:
     return any(
         character
         and (
-            unicodedata.category(character).startswith(("C", "M", "S"))
+            (
+                unicodedata.category(character).startswith(("C", "M", "S"))
+                and character not in _CO_SAFE_CONTROL_CHARACTERS
+            )
             or (
                 unicodedata.category(character).startswith("P")
                 and character not in _CO_SAFE_BOUNDARY_CHARACTERS
