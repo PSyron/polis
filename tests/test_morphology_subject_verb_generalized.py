@@ -188,7 +188,7 @@ def test_public_analyzer_handles_byc_auxiliary_generation_tags(
     monkeypatch.setattr(
         analyzer_module,
         "_make_default_registry",
-        lambda: DeterministicRuleRegistry(
+        lambda _morphology: DeterministicRuleRegistry(
             (RuleRegistration(rule=AgreementSubjectVerbPresentRule(qualified)),)
         ),
     )

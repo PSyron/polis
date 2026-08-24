@@ -4,16 +4,14 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Final, Literal, Self
 
-from .core.models import (
-    AnalysisOptions as AnalysisOptions,
-    AnalysisResult as AnalysisResult,
-    Category as Category,
-    Confidence as Confidence,
-    Finding as Finding,
-    Severity as Severity,
-    Source as Source,
-    SourceKind as SourceKind,
-)
+from .core.models import AnalysisOptions as AnalysisOptions
+from .core.models import AnalysisResult as AnalysisResult
+from .core.models import Category as Category
+from .core.models import Confidence as Confidence
+from .core.models import Finding as Finding
+from .core.models import Severity as Severity
+from .core.models import Source as Source
+from .core.models import SourceKind as SourceKind
 
 ANALYSIS_SCHEMA_VERSION: Final[int]
 __version__: str
@@ -66,6 +64,29 @@ class SuggestionOutcome:
     operation_version: str
     source_policy_version: str
 
+class MorphologyProviderIdentity:
+    @property
+    def package_version(self) -> str: ...
+    @property
+    def dictionary_id(self) -> str: ...
+    @property
+    def dictionary_notice_sha256(self) -> str: ...
+    def __init__(
+        self,
+        *,
+        package_version: str,
+        dictionary_id: str,
+        dictionary_notice_sha256: str,
+    ) -> None: ...
+
+class MorphologyStatus:
+    @property
+    def state(self) -> Literal["active", "unavailable", "drifted"]: ...
+    @property
+    def expected_identity(self) -> MorphologyProviderIdentity: ...
+    @property
+    def actual_identity(self) -> MorphologyProviderIdentity | None: ...
+
 class Analyzer:
     def __init__(self, config: AnalyzerConfig) -> None: ...
     @classmethod
@@ -80,6 +101,8 @@ class Analyzer:
     async def correct_async(self, text: str) -> CorrectionResult: ...
     @property
     def language_tool_process_start_count(self) -> int: ...
+    @property
+    def morphology_status(self) -> MorphologyStatus: ...
     def close(self) -> None: ...
     def __enter__(self) -> Self: ...
     def __exit__(self, *args: object) -> None: ...

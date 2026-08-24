@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Any, Final, Literal, cast
 
+import polis.rules._morfeusz as morfeusz_module
 from polis.analysis.pipeline import analyze_text, analyze_text_async
 from polis.core import (
     AnalysisOptions,
@@ -90,12 +93,19 @@ from polis.rules import (
     SyntaxQuoteSpacingRule,
     SyntaxSentenceSpacingRule,
 )
-from polis.rules._morfeusz import _load_qualified_morfeusz
+from polis.rules._morfeusz import (
+    _load_qualified_morfeusz,
+    _observed_morfeusz_identity,
+    _ProviderIdentity,
+    _QualifiedMorfeusz,
+)
 
 __all__ = [
     "Analyzer",
     "AnalyzerConfig",
     "CorrectionResult",
+    "MorphologyProviderIdentity",
+    "MorphologyStatus",
     "SuggestionOutcome",
     "SuggestionStatus",
 ]
@@ -115,6 +125,8 @@ _UNSUPPORTED_V1_SECTIONS: Final[tuple[str, ...]] = (
     "contextual_inflection",
     "vendored_language_tool",
 )
+_MORPHOLOGY_DRIFT_WARNING_LOCK: Final = Lock()
+_morphology_drift_warning_emitted = False
 
 
 @dataclass(frozen=True)
@@ -265,6 +277,24 @@ class AnalyzerConfig:
         return cls.from_toml(path)
 
 
+@dataclass(frozen=True, slots=True)
+class MorphologyProviderIdentity:
+    """Identifies the optional morphology provider used by an analyzer."""
+
+    package_version: str
+    dictionary_id: str
+    dictionary_notice_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class MorphologyStatus:
+    """Immutable morphology-provider availability observed at construction."""
+
+    state: Literal["active", "unavailable", "drifted"]
+    expected_identity: MorphologyProviderIdentity
+    actual_identity: MorphologyProviderIdentity | None
+
+
 @dataclass(frozen=True)
 class CorrectionResult:
     """Conservative correction outcome for one sentence or paragraph."""
@@ -307,7 +337,9 @@ class Analyzer:
         if not isinstance(config, AnalyzerConfig):
             raise TypeError("config must be AnalyzerConfig")
         self._config = config
-        self._registry: DeterministicRuleRegistry = _make_default_registry()
+        morphology = _load_qualified_morfeusz()
+        self._morphology_status = _morphology_status(morphology)
+        self._registry: DeterministicRuleRegistry = _make_default_registry(morphology)
 
     @classmethod
     def from_config(cls, path: str | Path) -> Analyzer:
@@ -318,6 +350,12 @@ class Analyzer:
         """Return zero because the conservative v1 analyzer owns no process."""
 
         return 0
+
+    @property
+    def morphology_status(self) -> MorphologyStatus:
+        """Return the immutable morphology-provider state observed at construction."""
+
+        return self._morphology_status
 
     @property
     def source_identity_snapshot(self) -> tuple[RuleSourceIdentity, ...]:
@@ -419,10 +457,11 @@ class Analyzer:
         )
 
 
-def _make_default_registry() -> DeterministicRuleRegistry:
+def _make_default_registry(
+    morphology: _QualifiedMorfeusz | None,
+) -> DeterministicRuleRegistry:
     """Compose the fixed conservative v1 rule set in public evaluation order."""
 
-    morphology = _load_qualified_morfeusz()
     return DeterministicRuleRegistry(
         (
             RuleRegistration(rule=AgreementCopulaRule()),
@@ -492,3 +531,66 @@ def _make_default_registry() -> DeterministicRuleRegistry:
             RuleRegistration(rule=PunctuationAbbreviationDotRule()),
         )
     )
+
+
+def _morphology_status(
+    morphology: _QualifiedMorfeusz | None,
+) -> MorphologyStatus:
+    expected = morfeusz_module._qualified_identity()
+    actual = (
+        morphology.identity if morphology is not None else _observed_morfeusz_identity()
+    )
+    if actual is None:
+        return MorphologyStatus(
+            state="unavailable",
+            expected_identity=_public_morphology_identity(expected),
+            actual_identity=None,
+        )
+
+    expected_identity = _public_morphology_identity(expected)
+    actual_identity = _public_morphology_identity(actual)
+    if actual == expected:
+        return MorphologyStatus(
+            state="active",
+            expected_identity=expected_identity,
+            actual_identity=actual_identity,
+        )
+
+    _warn_morphology_drift(expected_identity, actual_identity)
+    return MorphologyStatus(
+        state="drifted",
+        expected_identity=expected_identity,
+        actual_identity=actual_identity,
+    )
+
+
+def _public_morphology_identity(
+    identity: _ProviderIdentity,
+) -> MorphologyProviderIdentity:
+    return MorphologyProviderIdentity(
+        package_version=identity.package_version,
+        dictionary_id=identity.dictionary_id,
+        dictionary_notice_sha256=identity.dictionary_notice_sha256,
+    )
+
+
+def _warn_morphology_drift(
+    expected: MorphologyProviderIdentity,
+    actual: MorphologyProviderIdentity,
+) -> None:
+    global _morphology_drift_warning_emitted
+    with _MORPHOLOGY_DRIFT_WARNING_LOCK:
+        if _morphology_drift_warning_emitted:
+            return
+        _morphology_drift_warning_emitted = True
+        warnings.warn(
+            "Morfeusz2 provider identity drift: "
+            f"expected package_version={expected.package_version!r}, "
+            f"dictionary_id={expected.dictionary_id!r}, "
+            f"dictionary_notice_sha256={expected.dictionary_notice_sha256!r}; "
+            f"actual package_version={actual.package_version!r}, "
+            f"dictionary_id={actual.dictionary_id!r}, "
+            f"dictionary_notice_sha256={actual.dictionary_notice_sha256!r}",
+            UserWarning,
+            stacklevel=3,
+        )

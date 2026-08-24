@@ -6,6 +6,8 @@ from polis.analyzer import (
     Analyzer,
     AnalyzerConfig,
     CorrectionResult,
+    MorphologyProviderIdentity,
+    MorphologyStatus,
     SuggestionOutcome,
     SuggestionStatus,
 )
@@ -39,6 +41,8 @@ __all__ = [
     "Analyzer",
     "AnalyzerConfig",
     "CorrectionResult",
+    "MorphologyProviderIdentity",
+    "MorphologyStatus",
     "SuggestionOutcome",
     "SuggestionStatus",
     "AnalysisOptions",

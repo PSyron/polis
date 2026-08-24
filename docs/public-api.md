@@ -32,6 +32,36 @@ w wersji 1. `SourceKind.LLM`, `SuggestionOutcome` i `SuggestionStatus` pozostaj�
 w publicznym schemacie dla zgodności danych linii 0.x, lecz domyślny runtime v1
 nie generuje takich wyników.
 
+## Status opcjonalnej morfologii
+
+`Analyzer.morphology_status` zwraca niemutowalny `MorphologyStatus` zarejestrowany
+podczas tworzenia analizatora. Pole `state` ma jedną z wartości:
+
+- `active` — opcjonalny provider jest dostępny i ma oczekiwaną tożsamość;
+- `unavailable` — provider nie jest dostępny, na przykład nie zainstalowano
+  opcjonalnego extra `morphology`;
+- `drifted` — provider jest dostępny, ale jego tożsamość różni się od
+  przypiętej tożsamości runtime'u.
+
+`MorphologyStatus` zawiera `state`, `expected_identity` oraz
+`actual_identity`. Oba pola tożsamości mają typ `MorphologyProviderIdentity`,
+który udostępnia `package_version`, `dictionary_id` i
+`dictionary_notice_sha256`. Przy `unavailable` pole `actual_identity` ma wartość
+`None`; przy pozostałych stanach zawiera faktycznie odczytaną tożsamość.
+
+```python
+from polis import Analyzer, AnalyzerConfig
+
+status = Analyzer(AnalyzerConfig()).morphology_status
+print(status.state)  # "active", "unavailable" albo "drifted"
+if status.state == "drifted" and status.actual_identity is not None:
+    print(status.expected_identity.package_version)
+    print(status.actual_identity.package_version)
+```
+
+Odczyt statusu jest diagnostyką dostępności providera. Nie zmienia zasad
+wyznaczania znalezisk ani polityki bezpiecznej korekty.
+
 ## Korekta
 
 `Analyzer.correct(text)` zwraca `CorrectionResult` z polami:
