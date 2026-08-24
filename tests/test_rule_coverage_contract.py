@@ -11,9 +11,11 @@ import sys
 from pathlib import Path
 
 import pytest
+import scripts.rule_coverage_contract as rule_coverage_contract
 from scripts.rule_coverage_contract import (
     REQUIRED_SHAPE_STRATA,
     RuleCoverageContractError,
+    _load_target_runtime_state,
     _read_documented_rule_inventory,
     _validate_runtime_source_sha,
     load_rule_coverage_contract,
@@ -21,8 +23,7 @@ from scripts.rule_coverage_contract import (
     validate_rule_coverage_contract,
 )
 
-from polis import Analyzer, AnalyzerConfig, Category
-from polis.correction import policy as correction_policy
+from polis import Analyzer, AnalyzerConfig
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "rule_coverage_contract.py"
@@ -267,12 +268,139 @@ def test_rule_coverage_contract_rejects_contradictory_fail_open_additions() -> N
         validate_rule_coverage_contract(raw)
 
 
+def test_rule_coverage_contract_keeps_digest_strict_after_derived_bindings_change() -> (
+    None
+):
+    raw = copy.deepcopy(load_rule_coverage_contract().data)
+    source_governance = raw["source_governance"]
+    assert isinstance(source_governance, dict)
+    baseline = source_governance["runtime_snapshot"]["planning_baseline"]
+    assert isinstance(baseline, dict)
+    baseline["full_sha"] = "1" * 40
+    baseline["snapshot_sha256"] = "2" * 64
+    inventory = source_governance["maintained_rule_inventory"]
+    assert isinstance(inventory, dict)
+    inventory["rows_sha256"] = "3" * 64
+    correction_governance = raw["correction_governance"]
+    assert isinstance(correction_governance, dict)
+    correction_governance["automatic_promotion"] += " Permissive drift."
+
+    with pytest.raises(RuleCoverageContractError, match="canonical digest"):
+        validate_rule_coverage_contract(raw)
+
+
 def test_rule_coverage_contract_rejects_duplicate_json_keys(tmp_path: Path) -> None:
     path = tmp_path / "duplicate.json"
     path.write_text('{"schema_id": 1, "schema_id": 2}', encoding="utf-8")
 
     with pytest.raises(RuleCoverageContractError, match="duplicate JSON key"):
         load_rule_coverage_contract(path)
+
+
+@pytest.mark.parametrize(
+    ("package_source", "message"),
+    [
+        ('raise RuntimeError("fixture failure")\n', "subprocess failed"),
+        (
+            "print('noise')\n"
+            "class AnalyzerConfig: pass\n"
+            "class Analyzer:\n"
+            "    def __init__(self, config): pass\n"
+            "    source_identity_snapshot = ()\n",
+            "invalid JSON",
+        ),
+        (
+            "from types import SimpleNamespace\n"
+            "class AnalyzerConfig: pass\n"
+            "class Analyzer:\n"
+            "    def __init__(self, config): pass\n"
+            "    source_identity_snapshot = "
+            "(SimpleNamespace(source=1, operation='op', behavior_version='1'),)\n",
+            "source must be a non-empty string",
+        ),
+    ],
+)
+def test_target_runtime_state_fails_closed_on_invalid_subprocess_result(
+    tmp_path: Path,
+    package_source: str,
+    message: str,
+) -> None:
+    package_path = tmp_path / "src/polis/__init__.py"
+    package_path.parent.mkdir(parents=True)
+    package_path.write_text(package_source, encoding="utf-8")
+    policy_path = tmp_path / "src/polis/correction/policy.py"
+    policy_path.parent.mkdir(parents=True)
+    policy_path.write_text(
+        "SOURCE_POLICY_VERSION = '1.2'\n_ACTIVE_POLICY_ENTRIES = ()\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuleCoverageContractError, match=message):
+        _load_target_runtime_state(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("stdout", "message"),
+    [
+        ("[]", "target runtime state must be an object"),
+        (
+            json.dumps(
+                {
+                    "source_identities": [],
+                    "source_policy_version": "1.2",
+                    "active_policy_entries": [],
+                    "unexpected": True,
+                }
+            ),
+            "target runtime state fields mismatch",
+        ),
+        (
+            json.dumps(
+                {
+                    "source_identities": [],
+                    "source_policy_version": 1,
+                    "active_policy_entries": [],
+                }
+            ),
+            "source_policy_version must be a non-empty string",
+        ),
+        (
+            json.dumps(
+                {
+                    "source_identities": [],
+                    "source_policy_version": "1.2",
+                    "active_policy_entries": [
+                        {
+                            "source": "rule:agreement.copula",
+                            "category": 1,
+                            "operation": "replace.copula_form",
+                            "behavior_version": "agreement-copula/1.0",
+                            "source_policy_version": "1.2",
+                        }
+                    ],
+                }
+            ),
+            "category must be a non-empty string",
+        ),
+    ],
+)
+def test_target_runtime_state_strictly_parses_json_shape(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    stdout: str,
+    message: str,
+) -> None:
+    result = subprocess.CompletedProcess(
+        args=(), returncode=0, stdout=stdout, stderr=""
+    )
+    monkeypatch.setattr(
+        rule_coverage_contract.subprocess,
+        "run",
+        lambda *_args, **_kwargs: result,
+    )
+
+    with pytest.raises(RuleCoverageContractError, match=message):
+        _load_target_runtime_state(tmp_path)
 
 
 def test_rule_coverage_contract_binds_ordered_runtime_snapshot_to_inventory() -> None:
@@ -320,10 +448,14 @@ def test_rule_coverage_contract_rejects_missing_active_policy_entry(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     contract = load_rule_coverage_contract()
+    runtime_state = _load_target_runtime_state(ROOT)
     monkeypatch.setattr(
-        correction_policy,
-        "_ACTIVE_POLICY_ENTRIES",
-        correction_policy._ACTIVE_POLICY_ENTRIES[:-1],
+        rule_coverage_contract,
+        "_load_target_runtime_state",
+        lambda root: dataclasses.replace(
+            runtime_state,
+            active_policy_entries=runtime_state.active_policy_entries[:-1],
+        ),
     )
 
     with pytest.raises(
@@ -337,17 +469,21 @@ def test_rule_coverage_contract_rejects_complete_policy_key_drift(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     contract = load_rule_coverage_contract()
-    first = correction_policy._ACTIVE_POLICY_ENTRIES[0]
-    drifted_key = dataclasses.replace(
-        first.key,
-        category=Category.SPELLING,
+    runtime_state = _load_target_runtime_state(ROOT)
+    first = runtime_state.active_policy_entries[0]
+    drifted_entry = dataclasses.replace(
+        first,
+        category="spelling",
         source_policy_version="9.9",
     )
     monkeypatch.setattr(
-        correction_policy,
-        "_ACTIVE_POLICY_ENTRIES",
-        (dataclasses.replace(first, key=drifted_key),)
-        + correction_policy._ACTIVE_POLICY_ENTRIES[1:],
+        rule_coverage_contract,
+        "_load_target_runtime_state",
+        lambda root: dataclasses.replace(
+            runtime_state,
+            active_policy_entries=(drifted_entry,)
+            + runtime_state.active_policy_entries[1:],
+        ),
     )
 
     with pytest.raises(
@@ -571,6 +707,538 @@ def test_rule_coverage_contract_cli_validates_and_fails_closed(
     )
     assert drifted.returncode != 0
     assert "rule coverage contract validation failed" in drifted.stderr
+
+
+def test_rule_coverage_contract_cli_refreshes_and_validates_digest_fields(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    runtime_path = repository / "src/polis/rules/spelling.py"
+    runtime_source = runtime_path.read_text(encoding="utf-8")
+    old_behavior_version = 'return "spelling-co-niemiara/1.0"'
+    assert old_behavior_version in runtime_source
+    runtime_path.write_text(
+        runtime_source.replace(
+            old_behavior_version,
+            'return "spelling-co-niemiara/1.1"',
+            1,
+        ),
+        encoding="utf-8",
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Polis test",
+            "-c",
+            "user.email=polis-test@example.invalid",
+            "commit",
+            "-am",
+            "test: commit runtime source fixture",
+        ],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    pycache_path = repository / "src/polis/rules/__pycache__/generated.pyc"
+    pycache_path.parent.mkdir(parents=True)
+    pycache_path.write_bytes(b"generated bytecode fixture")
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    planning_baseline = contract["source_governance"]["runtime_snapshot"][
+        "planning_baseline"
+    ]
+    planning_baseline["full_sha"] = "0" * 40
+    planning_baseline["snapshot_sha256"] = "0" * 64
+    contract["source_governance"]["maintained_rule_inventory"]["rows_sha256"] = "0" * 64
+    contract_path.write_text(
+        json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    pre_refresh_contract = contract_path.read_bytes()
+    assert pre_refresh_contract.endswith(b"\n")
+
+    command = [
+        sys.executable,
+        str(VALIDATOR),
+        "--root",
+        str(repository),
+        "--refresh",
+    ]
+    refreshed = subprocess.run(
+        command, cwd=ROOT, text=True, capture_output=True, check=False
+    )
+    assert refreshed.returncode == 0, refreshed.stderr
+    validated = subprocess.run(
+        command[:-1], cwd=ROOT, text=True, capture_output=True, check=False
+    )
+    assert validated.returncode == 0, validated.stderr
+    assert validated.stdout == "rule coverage contract is valid\n"
+
+    refreshed_contract_bytes = contract_path.read_bytes()
+    assert refreshed_contract_bytes.endswith(b"\n")
+    normalized_pre_refresh = pre_refresh_contract
+    normalized_refreshed = refreshed_contract_bytes
+    for field in ("full_sha", "snapshot_sha256", "rows_sha256"):
+        pattern = re.compile(rf'("{field}"\s*:\s*)"([^"]+)"'.encode())
+        pre_refresh_match = pattern.search(normalized_pre_refresh)
+        refreshed_match = pattern.search(normalized_refreshed)
+        assert pre_refresh_match is not None
+        assert refreshed_match is not None
+        assert pre_refresh_match.group(1) == refreshed_match.group(1)
+        assert pre_refresh_match.group(2) != refreshed_match.group(2)
+        normalized_pre_refresh = (
+            normalized_pre_refresh[: pre_refresh_match.start(2)]
+            + b"<digest>"
+            + normalized_pre_refresh[pre_refresh_match.end(2) :]
+        )
+        normalized_refreshed = (
+            normalized_refreshed[: refreshed_match.start(2)]
+            + b"<digest>"
+            + normalized_refreshed[refreshed_match.end(2) :]
+        )
+    assert normalized_refreshed == normalized_pre_refresh
+
+    refreshed_contract = json.loads(refreshed_contract_bytes)
+    source_governance = refreshed_contract["source_governance"]
+    expected_full_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repository,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    assert source_governance["runtime_snapshot"]["planning_baseline"]["full_sha"] == (
+        expected_full_sha
+    )
+    validator_snapshot = hashlib.sha256(
+        json.dumps(
+            [
+                {
+                    "source": identity.source,
+                    "operation": identity.operation,
+                    "behavior_version": identity.behavior_version,
+                }
+                for identity in Analyzer(AnalyzerConfig()).source_identity_snapshot
+            ],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    target_snapshot = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import hashlib,json,sys\n"
+                "sys.path.insert(0,sys.argv[1])\n"
+                "from polis import Analyzer,AnalyzerConfig\n"
+                "snapshot=[{'source': item.source, 'operation': item.operation, "
+                "'behavior_version': item.behavior_version} for item in "
+                "Analyzer(AnalyzerConfig()).source_identity_snapshot]\n"
+                "encoded=json.dumps(snapshot,ensure_ascii=False,sort_keys=True,"
+                "separators=(',',':')).encode('utf-8')\n"
+                "print(hashlib.sha256(encoded).hexdigest())\n"
+            ),
+            str(repository / "src"),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    assert target_snapshot != validator_snapshot
+    assert (
+        source_governance["runtime_snapshot"]["planning_baseline"]["snapshot_sha256"]
+        == target_snapshot
+    )
+    assert (
+        source_governance["runtime_snapshot"]["planning_baseline"]["snapshot_sha256"]
+        != validator_snapshot
+    )
+    assert (
+        source_governance["maintained_rule_inventory"]["rows_sha256"]
+        == hashlib.sha256(
+            json.dumps(
+                [
+                    dict(row)
+                    for row in _read_documented_rule_inventory(
+                        repository / "docs/rules.md"
+                    )
+                ],
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+    )
+
+
+def test_rule_coverage_contract_cli_uses_target_correction_policy(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    policy_path = repository / "src/polis/correction/policy.py"
+    policy_source = policy_path.read_text(encoding="utf-8")
+    assert 'SOURCE_POLICY_VERSION: Final[str] = "1.2"' in policy_source
+    policy_path.write_text(
+        policy_source.replace(
+            'SOURCE_POLICY_VERSION: Final[str] = "1.2"',
+            'SOURCE_POLICY_VERSION: Final[str] = "9.9"',
+            1,
+        ),
+        encoding="utf-8",
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Polis test",
+            "-c",
+            "user.email=polis-test@example.invalid",
+            "commit",
+            "-am",
+            "test: commit correction policy drift fixture",
+        ],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    target_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    source_governance = contract["source_governance"]
+    assert isinstance(source_governance, dict)
+    runtime_snapshot = source_governance["runtime_snapshot"]
+    assert isinstance(runtime_snapshot, dict)
+    planning_baseline = runtime_snapshot["planning_baseline"]
+    assert isinstance(planning_baseline, dict)
+    planning_baseline["full_sha"] = target_sha
+    contract_path.write_text(
+        json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+    validated = subprocess.run(
+        [sys.executable, str(VALIDATOR), "--root", str(repository)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert validated.returncode != 0
+    assert "correction policy version drifted" in validated.stderr
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_dirty_runtime_source(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    runtime_path = repository / "src/polis/__init__.py"
+    runtime_path.write_bytes(runtime_path.read_bytes() + b"\n")
+
+    refreshed = subprocess.run(
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--root",
+            str(repository),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert refreshed.returncode != 0
+    assert "committed source" in refreshed.stderr.lower()
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_nested_root_in_parent_repository(
+    tmp_path: Path,
+) -> None:
+    parent_repository = tmp_path / "parent-repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(parent_repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    nested_root = parent_repository / "nested"
+    for relative in ("docs", "src"):
+        shutil.copytree(parent_repository / relative, nested_root / relative)
+    subprocess.run(
+        ["git", "add", "--", "nested"],
+        cwd=parent_repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Polis test",
+            "-c",
+            "user.email=polis-test@example.invalid",
+            "commit",
+            "-m",
+            "test: add nested project fixture",
+        ],
+        cwd=parent_repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = nested_root / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    runtime_path = nested_root / "src/polis/__init__.py"
+    runtime_path.write_bytes(runtime_path.read_bytes() + b"\n")
+
+    refreshed = subprocess.run(
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--root",
+            str(nested_root),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert refreshed.returncode != 0
+    assert (
+        "refresh --root must resolve to the exact Git top-level used for HEAD and "
+        "dirty checks" in refreshed.stderr
+    )
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_staged_runtime_source(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    runtime_path = repository / "src/polis/__init__.py"
+    runtime_path.write_bytes(runtime_path.read_bytes() + b"\n")
+    subprocess.run(
+        ["git", "add", "--", "src/polis/__init__.py"],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    refreshed = subprocess.run(
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--root",
+            str(repository),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert refreshed.returncode != 0
+    assert "committed source" in refreshed.stderr.lower()
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_untracked_runtime_source(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    untracked_path = repository / "src/polis/rules/untracked_runtime_file.py"
+    untracked_path.write_text("UNTRACKED_RUNTIME_FILE = True\n", encoding="utf-8")
+
+    refreshed = subprocess.run(
+        [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "dev",
+            "python",
+            str(VALIDATOR),
+            "--root",
+            str(repository),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert refreshed.returncode != 0
+    assert "committed source" in refreshed.stderr
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_ignored_runtime_source(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    ignored_runtime_path = repository / "src/polis/rules/ignored_runtime_file.py"
+    with (repository / ".git/info/exclude").open("a", encoding="utf-8") as exclude:
+        exclude.write("\n/src/polis/rules/ignored_runtime_file.py\n")
+    ignored_runtime_path.write_text("IGNORED_RUNTIME_FILE = True\n", encoding="utf-8")
+
+    refreshed = subprocess.run(
+        [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "dev",
+            "python",
+            str(VALIDATOR),
+            "--root",
+            str(repository),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert refreshed.returncode != 0
+    assert "committed source" in refreshed.stderr
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_refresh_rejects_ignored_python_source_in_pycache(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    subprocess.run(
+        ["git", "clone", "--no-local", str(ROOT), str(repository)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    contract_path = repository / "docs/project/rule-coverage-contract-v1.json"
+    original_contract = contract_path.read_bytes()
+    ignored_runtime_path = repository / "src/polis/rules/__pycache__/ignored_source.py"
+    ignored_runtime_path.parent.mkdir(parents=True)
+    ignored_runtime_path.write_text("IGNORED_RUNTIME_SOURCE = True\n", encoding="utf-8")
+
+    refreshed = subprocess.run(
+        [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "dev",
+            "python",
+            str(VALIDATOR),
+            "--root",
+            str(repository),
+            "--refresh",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert refreshed.returncode != 0
+    assert "committed source" in refreshed.stderr
+    assert contract_path.read_bytes() == original_contract
+
+
+def test_rule_coverage_contract_cli_validates_without_refresh(
+    tmp_path: Path,
+) -> None:
+    for relative in (
+        "docs/project/rule-coverage-contract-v1.json",
+        "docs/rules.md",
+        "docs/quality-comparison-v3.json",
+        "docs/quality-baseline-v3-default.json",
+        "docs/quality-baseline-v3-morphology.json",
+        "docs/quality-result-v3-default.json",
+        "docs/quality-result-v3-morphology.json",
+        "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
+        "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
+    ):
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+
+    valid = subprocess.run(
+        [sys.executable, str(VALIDATOR), "--root", str(tmp_path)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert valid.returncode == 0, valid.stderr
+    assert valid.stdout == "rule coverage contract is valid\n"
 
 
 def _documented_source_identifiers(markdown: str) -> tuple[str, ...]:
