@@ -58,9 +58,9 @@ czemu nie emituje ostrzeżenia o nieoczekiwanym braku `await`.
 domyślnego analizatora. `AnalyzerConfig.from_toml(path)` i
 `Analyzer.from_config(path)` wczytują lokalny plik z sekcją `[analysis]`.
 Próg pewności musi być skończoną liczbą od `0.0` do `1.0`; `categories` musi
-być `None` albo dokładny wbudowany `frozenset` zawierającym wyłącznie wartości
-`Category`. Klasy pochodne `frozenset` są odrzucane, także wtedy, gdy ich
-pierwsze przejzenie wydawałoby się poprawne.
+być `None` albo dokładnym wbudowanym zbiorem `frozenset` zawierającym wyłącznie
+wartości `Category`. Klasy pochodne `frozenset` są odrzucane, także wtedy, gdy
+pierwsze przejście po ich elementach wydawałoby się poprawne.
 Bezpośrednie tworzenie `AnalyzerConfig(...)` zgłasza nieprawidłową wartość
 jako `ConfigurationError` z kodem `configuration.invalid` i kontekstem
 `operation`, przed rozpoczęciem analizy, bez ujawniania analizowanego tekstu
