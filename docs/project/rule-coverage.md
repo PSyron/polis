@@ -17,6 +17,14 @@ Uruchomienie `uv run --locked --extra dev python scripts/rule_coverage_contract.
 sprawdza cały kontrakt i parity lokalnego repozytorium; ta sama komenda jest
 wymagana przez fast CI i kończy się błędem przy każdym driftcie.
 
+Po każdej zmianie reguły runtime'u maintainer musi wykonać sekwencję
+`zmiana kodu → commit → --refresh → commit kontraktu`; opcja `--refresh`
+odświeża dokładnie trzy pola pochodnych digestów: `planning_baseline.full_sha`,
+`planning_baseline.snapshot_sha256` i `maintained_rule_inventory.rows_sha256`,
+a przed zapisem odrzuca zmiany staged i unstaged w `_RUNTIME_SOURCE_PATHS`.
+Polecenie bez `--refresh` pozostaje wyłącznie walidacyjne i nie modyfikuje
+kontraktu.
+
 ## Profile
 
 Raportuj osobno:

@@ -24,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "fc3911d8aee8fd77bbe26fd9ecf49edeadde596d578f642e9fb076c7794444b9"
+    "4bd7c5bd2eebd60a279277b7ef8f1ce6bc819a9510c851cf3fa2e7fa8ee33a08"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",
@@ -34,11 +34,7 @@ SOURCE_PRECEDENCE: Final = (
     "docs/rules.md",
     "public-v3-quality-and-isolated-performance-artifacts",
 )
-PLANNING_BASELINE_FULL_SHA: Final = "2081d17019aeb11ea4ec839ae17cc10d63711f2e"
 PLANNING_BASELINE_SOURCE_COUNT: Final = 63
-PLANNING_BASELINE_SNAPSHOT_SHA256: Final = (
-    "e36cfd483bf3399287cca7b39546d4e8e9d04c87dcee24597f1df008676fe7fc"
-)
 _RUNTIME_SOURCE_PATHS: Final = (
     "src/polis/__init__.py",
     "src/polis/analysis",
@@ -47,6 +43,25 @@ _RUNTIME_SOURCE_PATHS: Final = (
     "src/polis/correction",
     "src/polis/rules",
     "src/polis/segmentation",
+)
+_RUNTIME_SNAPSHOT_SCRIPT: Final = (
+    "import json,sys\n"
+    "sys.path.insert(0,sys.argv[1])\n"
+    "from polis import Analyzer,AnalyzerConfig\n"
+    "from polis.correction import policy\n"
+    "identities=[{'source': item.source, 'operation': item.operation, "
+    "'behavior_version': item.behavior_version} for item in "
+    "Analyzer(AnalyzerConfig()).source_identity_snapshot]\n"
+    "entries=[{'source': str(item.key.source), "
+    "'category': item.key.category.value, 'operation': item.key.operation, "
+    "'behavior_version': item.key.behavior_version, "
+    "'source_policy_version': item.key.source_policy_version} for item in "
+    "policy._ACTIVE_POLICY_ENTRIES]\n"
+    "state={'source_identities': identities, "
+    "'source_policy_version': policy.SOURCE_POLICY_VERSION, "
+    "'active_policy_entries': entries}\n"
+    "print(json.dumps(state,ensure_ascii=False,sort_keys=True,"
+    "separators=(',',':')))\n"
 )
 SUPPORTED_CATEGORY_ORDER: Final = (
     "agreement",
@@ -135,6 +150,29 @@ class RuleCoverageContract:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class _RuntimeSourceIdentity:
+    source: str
+    operation: str
+    behavior_version: str
+
+
+@dataclass(frozen=True, slots=True)
+class _RuntimeCorrectionPolicyEntry:
+    source: str
+    category: str
+    operation: str
+    behavior_version: str
+    source_policy_version: str
+
+
+@dataclass(frozen=True, slots=True)
+class _TargetRuntimeState:
+    source_identities: tuple[_RuntimeSourceIdentity, ...]
+    source_policy_version: str
+    active_policy_entries: tuple[_RuntimeCorrectionPolicyEntry, ...]
+
+
 def load_rule_coverage_contract(
     path: Path = CONTRACT_PATH,
     *,
@@ -190,6 +228,243 @@ def _sha256_file(path: Path, label: str) -> str:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError as error:
         raise RuleCoverageContractError(f"{label} unavailable: {path}") from error
+
+
+def _validate_committed_runtime_source(repository_root: Path) -> str:
+    git_root_result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=repository_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if git_root_result.returncode != 0 or not git_root_result.stdout.strip():
+        raise RuleCoverageContractError(
+            "refresh requires a git repository with committed source"
+        )
+    git_root = Path(git_root_result.stdout.strip()).resolve()
+    if repository_root.resolve() != git_root:
+        raise RuleCoverageContractError(
+            "refresh --root must resolve to the exact Git top-level used for "
+            f"HEAD and dirty checks: {git_root}"
+        )
+    head_result = subprocess.run(
+        ["git", "rev-parse", "--verify", "HEAD^{commit}"],
+        cwd=git_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if head_result.returncode != 0 or not head_result.stdout.strip():
+        raise RuleCoverageContractError("refresh requires a committed source at HEAD")
+    for diff_args in (
+        ["git", "diff", "--quiet", "--", *_RUNTIME_SOURCE_PATHS],
+        ["git", "diff", "--cached", "--quiet", "--", *_RUNTIME_SOURCE_PATHS],
+    ):
+        diff = subprocess.run(
+            diff_args,
+            cwd=git_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if diff.returncode != 0:
+            raise RuleCoverageContractError(
+                "refresh requires committed source: runtime source paths have "
+                "staged or unstaged changes"
+            )
+    untracked = subprocess.run(
+        [
+            "git",
+            "status",
+            "--short",
+            "--untracked-files=all",
+            "--ignored",
+            "--",
+            *_RUNTIME_SOURCE_PATHS,
+        ],
+        cwd=git_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    unexpected_untracked = tuple(
+        line
+        for line in untracked.stdout.splitlines()
+        if line.strip() and not _is_ignored_generated_runtime_path(line)
+    )
+    if untracked.returncode != 0 or unexpected_untracked:
+        raise RuleCoverageContractError(
+            "refresh requires committed source: runtime source paths have "
+            "staged or unstaged changes"
+        )
+    return head_result.stdout.strip()
+
+
+def _is_ignored_generated_runtime_path(status_line: str) -> bool:
+    if not status_line.startswith("!! "):
+        return False
+    relative_path = Path(status_line[3:].strip())
+    return relative_path.suffix in (".pyc", ".pyo")
+
+
+def _replace_json_string(text: str, field: str, old_value: str, new_value: str) -> str:
+    pattern = re.compile(rf'("{re.escape(field)}"\s*:\s*)"{re.escape(old_value)}"')
+    matches = tuple(pattern.finditer(text))
+    if len(matches) != 1:
+        raise RuleCoverageContractError(
+            f"refresh could not locate exactly one JSON field: {field}"
+        )
+    match = matches[0]
+    replacement = f"{match.group(1)}{json.dumps(new_value)}"
+    return text[: match.start()] + replacement + text[match.end() :]
+
+
+def _load_target_runtime_state(root: Path) -> _TargetRuntimeState:
+    try:
+        result = subprocess.run(
+            [sys.executable, "-I", "-c", _RUNTIME_SNAPSHOT_SCRIPT, str(root / "src")],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError as error:
+        raise RuleCoverageContractError(
+            "target runtime snapshot subprocess unavailable"
+        ) from error
+    if result.returncode != 0:
+        raise RuleCoverageContractError("target runtime snapshot subprocess failed")
+    try:
+        raw = cast(
+            JsonValue,
+            json.loads(result.stdout, object_pairs_hook=_reject_duplicate_json_keys),
+        )
+    except json.JSONDecodeError as error:
+        raise RuleCoverageContractError(
+            "target runtime snapshot subprocess returned invalid JSON"
+        ) from error
+    state = _object(raw, "target runtime state")
+    _exact_fields(
+        state,
+        {"source_identities", "source_policy_version", "active_policy_entries"},
+        "target runtime state",
+    )
+    source_identities: list[_RuntimeSourceIdentity] = []
+    for index, item in enumerate(
+        _list_field(state, "source_identities", "target runtime state")
+    ):
+        label = f"target runtime source identity {index}"
+        identity = _object(item, label)
+        _exact_fields(identity, {"source", "operation", "behavior_version"}, label)
+        source_identities.append(
+            _RuntimeSourceIdentity(
+                source=_string(identity, "source", label),
+                operation=_string(identity, "operation", label),
+                behavior_version=_string(identity, "behavior_version", label),
+            )
+        )
+    active_policy_entries: list[_RuntimeCorrectionPolicyEntry] = []
+    policy_entry_fields = {
+        "source",
+        "category",
+        "operation",
+        "behavior_version",
+        "source_policy_version",
+    }
+    for index, item in enumerate(
+        _list_field(state, "active_policy_entries", "target runtime state")
+    ):
+        label = f"target runtime correction policy entry {index}"
+        entry = _object(item, label)
+        _exact_fields(entry, policy_entry_fields, label)
+        active_policy_entries.append(
+            _RuntimeCorrectionPolicyEntry(
+                source=_string(entry, "source", label),
+                category=_string(entry, "category", label),
+                operation=_string(entry, "operation", label),
+                behavior_version=_string(entry, "behavior_version", label),
+                source_policy_version=_string(entry, "source_policy_version", label),
+            )
+        )
+    return _TargetRuntimeState(
+        source_identities=tuple(source_identities),
+        source_policy_version=_string(
+            state, "source_policy_version", "target runtime state"
+        ),
+        active_policy_entries=tuple(active_policy_entries),
+    )
+
+
+def _runtime_snapshot_sha(snapshot: tuple[_RuntimeSourceIdentity, ...]) -> str:
+    encoded = json.dumps(
+        [
+            {
+                "source": identity.source,
+                "operation": identity.operation,
+                "behavior_version": identity.behavior_version,
+            }
+            for identity in snapshot
+        ],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _refresh_rule_coverage_contract(path: Path, *, root: Path) -> None:
+    try:
+        original_text = path.read_text(encoding="utf-8")
+    except FileNotFoundError as error:
+        raise RuleCoverageContractError(f"contract file not found: {path}") from error
+    contract = _load_json_object(path, "contract")
+    head_sha = _validate_committed_runtime_source(root)
+
+    runtime_state = _load_target_runtime_state(root)
+    snapshot_sha = _runtime_snapshot_sha(runtime_state.source_identities)
+    documented_rows = _read_documented_rule_inventory(root / "docs/rules.md")
+    encoded_inventory = json.dumps(
+        [dict(row) for row in documented_rows],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    rows_sha = hashlib.sha256(encoded_inventory).hexdigest()
+
+    source_governance = _object_field(contract, "source_governance", "contract")
+    runtime_snapshot = _object_field(
+        source_governance, "runtime_snapshot", "source governance"
+    )
+    baseline = _object_field(runtime_snapshot, "planning_baseline", "runtime snapshot")
+    inventory_governance = _object_field(
+        source_governance, "maintained_rule_inventory", "source governance"
+    )
+    old_values = (
+        _string(baseline, "full_sha", "planning baseline"),
+        _string(baseline, "snapshot_sha256", "planning baseline"),
+        _string(inventory_governance, "rows_sha256", "maintained rule inventory"),
+    )
+    baseline["full_sha"] = head_sha
+    baseline["snapshot_sha256"] = snapshot_sha
+    inventory_governance["rows_sha256"] = rows_sha
+    refreshed = validate_rule_coverage_contract(contract)
+    _validate_live_parity(refreshed, root, runtime_state)
+
+    refreshed_text = original_text
+    for field, old_value, new_value in zip(
+        ("full_sha", "snapshot_sha256", "rows_sha256"),
+        old_values,
+        (head_sha, snapshot_sha, rows_sha),
+        strict=True,
+    ):
+        refreshed_text = _replace_json_string(
+            refreshed_text, field, old_value, new_value
+        )
+    try:
+        path.write_text(refreshed_text, encoding="utf-8")
+    except OSError as error:
+        raise RuleCoverageContractError(f"could not write contract: {path}") from error
 
 
 def _validate_runtime_source_sha(repository_root: Path, source_sha: str) -> None:
@@ -257,10 +532,16 @@ def validate_live_parity(
     """Fail closed when live public identities drift from the accepted contract."""
 
     repository_root = root or CONTRACT_PATH.parents[2]
-    from polis import Analyzer, AnalyzerConfig
-    from polis.correction import policy as correction_policy
+    runtime_state = _load_target_runtime_state(repository_root)
+    _validate_live_parity(contract, repository_root, runtime_state)
 
-    snapshot = tuple(Analyzer(AnalyzerConfig()).source_identity_snapshot)
+
+def _validate_live_parity(
+    contract: RuleCoverageContract,
+    repository_root: Path,
+    runtime_state: _TargetRuntimeState,
+) -> None:
+    snapshot = runtime_state.source_identities
     source_governance = _object_field(contract.data, "source_governance", "contract")
     runtime_snapshot = _object_field(
         source_governance, "runtime_snapshot", "source governance"
@@ -271,20 +552,7 @@ def validate_live_parity(
     )
     if len(snapshot) != _integer(baseline, "source_count", "planning baseline"):
         raise RuleCoverageContractError("live source count does not match the contract")
-    encoded_snapshot = json.dumps(
-        [
-            {
-                "source": identity.source,
-                "operation": identity.operation,
-                "behavior_version": identity.behavior_version,
-            }
-            for identity in snapshot
-        ],
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    if hashlib.sha256(encoded_snapshot).hexdigest() != _string(
+    if _runtime_snapshot_sha(snapshot) != _string(
         baseline, "snapshot_sha256", "planning baseline"
     ):
         raise RuleCoverageContractError("live source snapshot digest drifted")
@@ -316,7 +584,7 @@ def validate_live_parity(
     policy_governance = _object_field(
         source_governance, "correction_policy", "source governance"
     )
-    if correction_policy.SOURCE_POLICY_VERSION != _string(
+    if runtime_state.source_policy_version != _string(
         policy_governance, "policy_version", "correction policy"
     ):
         raise RuleCoverageContractError("correction policy version drifted")
@@ -340,13 +608,13 @@ def validate_live_parity(
     )
     live_policy = tuple(
         {
-            "source": str(entry.key.source),
-            "category": entry.key.category.value,
-            "operation": entry.key.operation,
-            "behavior_version": entry.key.behavior_version,
-            "source_policy_version": entry.key.source_policy_version,
+            "source": entry.source,
+            "category": entry.category,
+            "operation": entry.operation,
+            "behavior_version": entry.behavior_version,
+            "source_policy_version": entry.source_policy_version,
         }
-        for entry in correction_policy._ACTIVE_POLICY_ENTRIES
+        for entry in runtime_state.active_policy_entries
     )
     if live_policy != expected_policy:
         raise RuleCoverageContractError(
@@ -923,6 +1191,30 @@ def _relative_artifact_path(root: Path, value: str) -> Path:
     return root / relative
 
 
+def _canonical_contract(contract: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    canonical = dict(contract)
+    source_governance = dict(_object_field(contract, "source_governance", "contract"))
+    runtime_snapshot = dict(
+        _object_field(source_governance, "runtime_snapshot", "source governance")
+    )
+    baseline = dict(
+        _object_field(runtime_snapshot, "planning_baseline", "runtime snapshot")
+    )
+    del baseline["full_sha"]
+    del baseline["snapshot_sha256"]
+    runtime_snapshot["planning_baseline"] = baseline
+    source_governance["runtime_snapshot"] = runtime_snapshot
+    inventory_governance = dict(
+        _object_field(
+            source_governance, "maintained_rule_inventory", "source governance"
+        )
+    )
+    del inventory_governance["rows_sha256"]
+    source_governance["maintained_rule_inventory"] = inventory_governance
+    canonical["source_governance"] = source_governance
+    return canonical
+
+
 def validate_rule_coverage_contract(raw: JsonValue) -> RuleCoverageContract:
     """Validate every decision-bearing field and reject silent contract drift."""
 
@@ -994,7 +1286,7 @@ def validate_rule_coverage_contract(raw: JsonValue) -> RuleCoverageContract:
         _object_field(contract, "maintainer_approval", "contract")
     )
     encoded = json.dumps(
-        contract,
+        _canonical_contract(contract),
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -1666,24 +1958,20 @@ def _validate_source_governance(governance: dict[str, JsonValue]) -> None:
     _exact_fields(
         baseline, {"full_sha", "source_count", "snapshot_sha256"}, "planning baseline"
     )
-    _literal(
-        baseline,
-        "full_sha",
-        PLANNING_BASELINE_FULL_SHA,
-        "planning baseline",
-    )
+    full_sha = _string(baseline, "full_sha", "planning baseline")
+    if re.fullmatch(r"[0-9a-f]{40}", full_sha) is None:
+        raise RuleCoverageContractError("planning baseline full SHA is invalid")
     _literal(
         baseline,
         "source_count",
         PLANNING_BASELINE_SOURCE_COUNT,
         "planning baseline",
     )
-    _literal(
-        baseline,
-        "snapshot_sha256",
-        PLANNING_BASELINE_SNAPSHOT_SHA256,
-        "planning baseline",
-    )
+    planning_snapshot_sha = _string(baseline, "snapshot_sha256", "planning baseline")
+    if re.fullmatch(r"[0-9a-f]{64}", planning_snapshot_sha) is None:
+        raise RuleCoverageContractError(
+            "planning baseline snapshot digest must be SHA-256"
+        )
     if _string(digest, "canonicalization", "runtime snapshot digest") != (
         "UTF-8 JSON array of ordered identity objects, sorted object keys, "
         "compact separators, ensure_ascii=false."
@@ -1984,11 +2272,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=CONTRACT_PATH.parents[2],
         help="repository root containing docs/project and docs/rules.md",
     )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="refresh the live runtime and inventory digest bindings",
+    )
     args = parser.parse_args(argv)
     root = args.root.resolve()
     path = root / "docs" / "project" / "rule-coverage-contract-v1.json"
     try:
-        load_rule_coverage_contract(path, root=root)
+        if args.refresh:
+            _refresh_rule_coverage_contract(path, root=root)
+        else:
+            load_rule_coverage_contract(path, root=root)
     except RuleCoverageContractError as error:
         print(f"rule coverage contract validation failed: {error}", file=sys.stderr)
         return 1
