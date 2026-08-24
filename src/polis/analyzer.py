@@ -151,6 +151,19 @@ class AnalyzerConfig:
             ) from exc
         object.__setattr__(self, "minimum_confidence", minimum_confidence)
 
+        categories = self.categories
+        if categories is None:
+            return
+        if type(categories) is not frozenset or not all(
+            isinstance(item, Category) for item in categories
+        ):
+            raise ConfigurationError(
+                "'analysis.categories' must be None or a frozenset of Category values",
+                code="configuration.invalid",
+                retryable=False,
+                context={"operation": "configuration.construct"},
+            )
+
     @classmethod
     def from_toml(cls, path: str | Path) -> AnalyzerConfig:
         """Load supported analysis settings from a local TOML file."""

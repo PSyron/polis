@@ -57,11 +57,19 @@ czemu nie emituje ostrzeżenia o nieoczekiwanym braku `await`.
 `AnalyzerConfig(categories=None, minimum_confidence=0.0)` określa filtry
 domyślnego analizatora. `AnalyzerConfig.from_toml(path)` i
 `Analyzer.from_config(path)` wczytują lokalny plik z sekcją `[analysis]`.
-Próg pewności musi być skończoną liczbą od `0.0` do `1.0`; nieprawidłowa
-wartość zgłasza `ConfigurationError` przy tworzeniu lub wczytywaniu
-konfiguracji, przed rozpoczęciem analizy. Błąd ma stabilny kod
-`configuration.invalid` i kontekst `operation`; przy wczytywaniu z pliku
-kontekst zawiera również `path`.
+Próg pewności musi być skończoną liczbą od `0.0` do `1.0`; `categories` musi
+być `None` albo dokładnym wbudowanym zbiorem `frozenset` zawierającym wyłącznie
+wartości `Category`. Klasy pochodne `frozenset` są odrzucane, także wtedy, gdy
+pierwsze przejście po ich elementach wydawałoby się poprawne.
+Bezpośrednie tworzenie `AnalyzerConfig(...)` zgłasza nieprawidłową wartość
+jako `ConfigurationError` z kodem `configuration.invalid` i kontekstem
+`operation`, przed rozpoczęciem analizy, bez ujawniania analizowanego tekstu
+ani pełnej wartości konfiguracji.
+Wczytywanie `AnalyzerConfig.from_toml(...)` zachowuje wcześniejszy kontrakt:
+nieznana kategoria albo niepoprawny typ `analysis.categories` zgłasza kod
+`configuration.invalid_value` z kontekstem `path`, a nieprawidłowe
+`minimum_confidence` zgłasza kod `configuration.invalid` z kontekstem
+`operation` i `path`.
 
 Wszystkie kontrolowane błędy dziedziczą po `PolisError` i mają stabilne pola
 `code`, `retryable` i bezpieczny `context`. Publiczne typy obejmują błędy

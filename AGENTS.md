@@ -52,8 +52,9 @@ Jeśli źródła są sprzeczne, zatrzymaj pracę i poproś maintainera o decyzj�
   akceptacji przed zmianą plików.
 - Używaj krótkotrwałej gałęzi i osobnego pull requestu. Nie implementuj
   bezpośrednio na `main`.
-- Jedno issue odpowiada jednemu skupionemu commitowi; nie mieszaj niezwiązanych
-  refaktoryzacji z funkcją ani poprawką.
+- Pull request może zawierać kilka skupionych commitów dotyczących jednego issue;
+  podczas scalania użyj squash merge, aby na `main` powstał jeden commit. Nie
+  mieszaj niezwiązanych refaktoryzacji z funkcją ani poprawką.
 - Komunikat commita musi odwoływać się do numeru issue.
 - Pull request wymaga niezależnego review i zielonego CI przed scaleniem.
 - Nie zamykaj issue, dopóki każde kryterium akceptacji nie zostanie zweryfikowane.
