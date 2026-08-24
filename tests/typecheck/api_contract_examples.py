@@ -70,6 +70,19 @@ def analyzer_result_as_root(analyzer: Analyzer) -> polis.AnalysisResult:
     return analyzer.analyze("Tekst")
 
 
+def morphology_status_exposes_public_provider_identities(
+    analyzer: Analyzer,
+) -> tuple[str, str, str | None]:
+    status: polis.MorphologyStatus = analyzer.morphology_status
+    expected: polis.MorphologyProviderIdentity = status.expected_identity
+    actual = status.actual_identity
+    return (
+        status.state,
+        expected.dictionary_id,
+        None if actual is None else actual.dictionary_id,
+    )
+
+
 def classify_configuration_failure() -> tuple[str, bool, str]:
     try:
         Analyzer.from_config("missing.toml")

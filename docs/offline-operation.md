@@ -33,7 +33,27 @@ Wszystkie pozostają do przeglądu. Dostawca analizuje
 i generuje formy lokalnie; nie otwiera połączenia, nie pobiera słownika i nie
 uruchamia procesu Java.
 
-Runtime sprawdza wersję pakietu, identyfikator słownika
-`pl.sgjp.sgjp-2026.06.01` oraz skrót jego noty. Brak extra, błąd dostawcy,
-niepełne dane, niejednoznaczna analiza lub dryft któregokolwiek elementu
-powodują abstencję. Pozostałe reguły działają wtedy normalnie.
+Runtime przypina i lokalnie sprawdza następującą oczekiwaną tożsamość providera:
+
+- `package_version`: `1.99.15`;
+- `dictionary_id`: `pl.sgjp.sgjp-2026.06.01`;
+- `dictionary_notice_sha256`:
+  `84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393`.
+
+Diagnoza nie wymaga sieci ani czytania kodu: odczytaj
+`Analyzer(AnalyzerConfig()).morphology_status`. Dla `drifted` porównaj
+`expected_identity.package_version`, `expected_identity.dictionary_id` i
+`expected_identity.dictionary_notice_sha256` z odpowiadającymi polami
+`actual_identity`. W ten sposób widać zarówno wartość oczekiwaną, jak i
+faktyczną dla każdego elementu, który spowodował dryft.
+
+Stan `drifted` emituje dokładnie jedno `UserWarning` na proces, nawet jeśli
+tworzonych jest więcej analizatorów. Stan `unavailable` nie emituje ostrzeżenia:
+brak opcjonalnego extra `morphology` jest prawidłową, udokumentowaną
+konfiguracją.
+
+Brak extra, błąd dostawcy, niepełne dane, niejednoznaczna analiza lub dryft
+któregokolwiek elementu nadal powodują abstencję reguł zależnych od morfologii;
+pozostałe reguły działają wtedy normalnie. Pinning, fail-closed i kształt
+znalezisk pozostają bez zmian — status oraz ostrzeżenie tylko ujawniają przyczynę
+abstencji.

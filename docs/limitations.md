@@ -19,6 +19,10 @@
   oraz dryftu providera. Morfeusz2 1.99.15 nie ma
   opublikowanego sdistu ani kół Linux arm64/musl; jego koła obejmują macOS
   universal2, manylinux 2.28 x86_64 oraz Windows amd64.
+- Dryft tożsamości opcjonalnego providera jest obserwowalny przez
+  `Analyzer.morphology_status` oraz jednorazowy `UserWarning`, ale nadal
+  uruchamia abstencję reguł zależnych od morfologii; nie oznacza to ogólnej
+  obsługi polskiej morfologii ani automatycznej akceptacji innego słownika.
 - Wspierane są zwykłe napisy Pythona oraz indeksy Unicode `[start, end)`; Polis
   nie zachowuje struktury dokumentów biurowych i nie dostarcza GUI.
 

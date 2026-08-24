@@ -6,6 +6,7 @@ import hashlib
 import importlib
 import importlib.metadata
 from collections.abc import Callable, Sequence
+from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Final, Protocol, runtime_checkable
@@ -180,6 +181,12 @@ class _ProviderIdentity:
     package_version: str
     dictionary_id: str
     dictionary_notice_sha256: str
+
+
+_OBSERVED_PROVIDER_IDENTITY: ContextVar[_ProviderIdentity | None] = ContextVar(
+    "polis_observed_morfeusz_identity",
+    default=None,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -938,6 +945,7 @@ def _tags_for_lemma(analyses: set[tuple[str, str]] | None, lemma: str) -> set[st
 
 
 def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
+    _OBSERVED_PROVIDER_IDENTITY.set(None)
     try:
         module = importlib.import_module("morfeusz2")
         if not isinstance(module, _MorfeuszModule):
@@ -954,9 +962,10 @@ def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
         )
     except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError):
         return None
-    if identity != _qualified_identity():
-        return None
     if type(backend).__module__ != "morfeusz2" or type(backend).__name__ != "Morfeusz":
+        return None
+    _OBSERVED_PROVIDER_IDENTITY.set(identity)
+    if identity != _qualified_identity():
         return None
     return _QualifiedMorfeusz(
         backend=_CanonicalMorfeuszBackend(
@@ -965,6 +974,10 @@ def _load_qualified_morfeusz() -> _QualifiedMorfeusz | None:
         ),
         identity=identity,
     )
+
+
+def _observed_morfeusz_identity() -> _ProviderIdentity | None:
+    return _OBSERVED_PROVIDER_IDENTITY.get()
 
 
 __all__: list[str] = []
