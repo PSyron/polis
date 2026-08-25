@@ -31,14 +31,42 @@ class _CanonicalWorkspaceIdentity:
 
 
 class _ReservationToken:
+    __slots__ = (
+        "_seal",
+        "_workspace_identity",
+        "_marker_path",
+        "_dataset_identity",
+        "consumed",
+    )
+
     def __init__(
         self,
         seal: _ReservationSeal,
         workspace_identity: _CanonicalWorkspaceIdentity | None,
+        marker_path: Path,
+        dataset_identity: str | None,
     ) -> None:
-        self.seal = seal
-        self.workspace_identity = workspace_identity
+        self._seal = seal
+        self._workspace_identity = workspace_identity
+        self._marker_path = marker_path
+        self._dataset_identity = dataset_identity
         self.consumed = False
+
+    @property
+    def seal(self) -> _ReservationSeal:
+        return self._seal
+
+    @property
+    def workspace_identity(self) -> _CanonicalWorkspaceIdentity | None:
+        return self._workspace_identity
+
+    @property
+    def marker_path(self) -> Path:
+        return self._marker_path
+
+    @property
+    def dataset_identity(self) -> str | None:
+        return self._dataset_identity
 
 
 _RESERVATION_SEAL = _ReservationSeal()
@@ -105,7 +133,7 @@ def reserve_consumption(
         fs.fsync(directory_descriptor)
     finally:
         fs.close(directory_descriptor)
-    token = _ReservationToken(_RESERVATION_SEAL, None)
+    token = _ReservationToken(_RESERVATION_SEAL, None, marker, None)
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
     return _ConsumptionCapability(marker, None, None, token)
@@ -131,7 +159,12 @@ def reserve_consumption_secure(
         write_marker(marker.name, content)
     except FileExistsError as error:
         raise HoldoutAlreadyConsumedError("holdout already consumed") from error
-    token = _ReservationToken(_RESERVATION_SEAL, workspace_identity)
+    token = _ReservationToken(
+        _RESERVATION_SEAL,
+        workspace_identity,
+        marker,
+        dataset_identity,
+    )
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
     return _ConsumptionCapability(marker, workspace_identity, dataset_identity, token)
@@ -163,14 +196,17 @@ def consume_consumption_capability(
             not isinstance(value, _ConsumptionCapability)
             or value._token.seal is not _RESERVATION_SEAL
             or value._token not in _ISSUED_TOKENS
-            or (expected_marker is not None and value.marker_path != expected_marker)
+            or (
+                expected_marker is not None
+                and value._token.marker_path != expected_marker
+            )
             or (
                 expected_workspace_identity is not None
-                and value._workspace_identity is not expected_workspace_identity
+                and value._token.workspace_identity is not expected_workspace_identity
             )
             or (
                 expected_dataset_identity is not None
-                and value._dataset_identity != expected_dataset_identity
+                and value._token.dataset_identity != expected_dataset_identity
             )
         ):
             if isinstance(value, _ConsumptionCapability) and value._token.consumed:

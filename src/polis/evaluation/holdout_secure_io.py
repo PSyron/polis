@@ -5,6 +5,7 @@ import secrets
 import stat
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Final
 
 from polis.evaluation.holdout_models import (
@@ -30,6 +31,7 @@ _OUTPUT_NAMES: Final = frozenset(
         "result.manifest.json",
     }
 )
+_MAX_METADATA_BYTES: Final = 1 << 20
 
 
 def _secure_flags(*, directory: bool) -> int:
@@ -88,7 +90,17 @@ def _file_identity(metadata: os.stat_result) -> tuple[int, ...]:
     return (metadata.st_dev, metadata.st_ino, metadata.st_nlink, metadata.st_mode)
 
 
-def _read_file(parent: int, name: str) -> SecureFile:
+def _read_file(
+    parent: int,
+    name: str,
+    *,
+    max_size: int,
+    expected_size: int | None = None,
+) -> SecureFile:
+    if max_size < 0 or (
+        expected_size is not None and (expected_size < 0 or expected_size > max_size)
+    ):
+        raise HoldoutAdmissionError("secure holdout file size contract is invalid")
     try:
         descriptor = os.open(name, _secure_flags(directory=False), dir_fd=parent)
     except OSError as error:
@@ -99,18 +111,121 @@ def _read_file(parent: int, name: str) -> SecureFile:
             raise HoldoutAdmissionError("secure holdout file is invalid")
         if before.st_nlink != 1:
             raise HoldoutAdmissionError("secure holdout file has multiple links")
+        if before.st_size > max_size:
+            raise HoldoutAdmissionError("secure holdout file exceeds size bound")
         before_state = _file_state(before)
         chunks: list[bytes] = []
-        while chunk := os.read(descriptor, 65536):
+        size = 0
+        while size <= max_size:
+            chunk = os.read(descriptor, min(65536, max_size - size + 1))
+            if not chunk:
+                break
             chunks.append(chunk)
+            size += len(chunk)
+            if size > max_size:
+                raise HoldoutAdmissionError("secure holdout file exceeds size bound")
         after = os.fstat(descriptor)
         if _file_state(after) != before_state:
             raise HoldoutAdmissionError("secure holdout file changed during read")
+        if expected_size is not None and size != expected_size:
+            raise HoldoutAdmissionError(
+                "secure holdout file size does not match contract"
+            )
         return SecureFile(b"".join(chunks), f"{stat.S_IMODE(before.st_mode):04o}")
     except OSError as error:
         raise HoldoutAdmissionError("secure holdout file read failed") from error
     finally:
         os.close(descriptor)
+
+
+def _verify_published_destination(
+    parent: int,
+    name: str,
+    source_descriptor: int,
+    expected_content: bytes,
+    expected_links: int,
+    expected_state: tuple[int, ...],
+) -> None:
+    try:
+        destination = os.open(name, _secure_flags(directory=False), dir_fd=parent)
+    except FileNotFoundError as error:
+        raise HoldoutAdmissionError(
+            "published holdout output destination is missing"
+        ) from error
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "published holdout output destination is invalid"
+        ) from error
+    try:
+        source_metadata = os.fstat(source_descriptor)
+        destination_metadata = os.fstat(destination)
+        if (source_metadata.st_dev, source_metadata.st_ino) != (
+            destination_metadata.st_dev,
+            destination_metadata.st_ino,
+        ):
+            raise HoldoutAdmissionError("published holdout output destination changed")
+        _verify_output(destination, expected_content, expected_links, expected_state)
+    finally:
+        os.close(destination)
+
+
+def _restore_published_destination(
+    parent: int, name: str, temporary_name: str, source_descriptor: int
+) -> None:
+    destination_exists = False
+    try:
+        os.link(
+            temporary_name,
+            name,
+            src_dir_fd=parent,
+            dst_dir_fd=parent,
+            follow_symlinks=False,
+        )
+        return
+    except FileExistsError:
+        destination_exists = True
+    except OSError:
+        return
+    if not destination_exists:
+        return
+    try:
+        destination = os.open(name, _secure_flags(directory=False), dir_fd=parent)
+    except FileNotFoundError:
+        try:
+            os.link(
+                temporary_name,
+                name,
+                src_dir_fd=parent,
+                dst_dir_fd=parent,
+                follow_symlinks=False,
+            )
+        except OSError:
+            return
+        return
+    except OSError:
+        return
+    try:
+        source_metadata = os.fstat(source_descriptor)
+        destination_metadata = os.fstat(destination)
+        same_inode = (source_metadata.st_dev, source_metadata.st_ino) == (
+            destination_metadata.st_dev,
+            destination_metadata.st_ino,
+        )
+    finally:
+        os.close(destination)
+    if same_inode:
+        return
+    try:
+        os.unlink(name, dir_fd=parent)
+        os.link(
+            temporary_name,
+            name,
+            src_dir_fd=parent,
+            dst_dir_fd=parent,
+            follow_symlinks=False,
+        )
+    except OSError:
+        return
 
 
 def _require_output_name(name: str) -> None:
@@ -152,6 +267,9 @@ class SecureHoldoutWorkspace:
         "_root",
         "_sealed",
         "_approved_dataset_sha256",
+        "_approved_dataset_size_bytes",
+        "_closed",
+        "_lifecycle_lock",
     )
 
     def __init__(
@@ -163,6 +281,9 @@ class SecureHoldoutWorkspace:
         self._config = config
         self._reservation_workspace = _CanonicalWorkspaceIdentity()
         self._approved_dataset_sha256: str | None = None
+        self._approved_dataset_size_bytes: int | None = None
+        self._closed = False
+        self._lifecycle_lock = Lock()
 
     @classmethod
     def open(cls, repository_root: Path) -> SecureHoldoutWorkspace:
@@ -192,7 +313,7 @@ class SecureHoldoutWorkspace:
             opened.append(sealed_root)
             sealed = _open_directory(sealed_root, "a-b-one-shot-v1")
             opened.append(sealed)
-            config = _read_file(experiment, "config.json")
+            config = _read_file(experiment, "config.json", max_size=_MAX_METADATA_BYTES)
         except (HoldoutAdmissionError, OSError):
             for descriptor in reversed(opened):
                 os.close(descriptor)
@@ -203,89 +324,130 @@ class SecureHoldoutWorkspace:
         return cls(root, experiment, sealed, config)
 
     def read_config(self) -> bytes:
-        return self._config.content
+        with self._lifecycle_lock:
+            self._require_open()
+            return self._config.content
 
     def read_manifest(self) -> bytes:
-        return _read_file(self._experiment, "dataset.manifest.json").content
+        with self._lifecycle_lock:
+            self._require_open()
+            return _read_file(
+                self._experiment,
+                "dataset.manifest.json",
+                max_size=_MAX_METADATA_BYTES,
+            ).content
 
     def bind_approved_dataset_identity(self, dataset: DatasetIdentity) -> None:
-        if (
-            self._approved_dataset_sha256 is not None
-            and self._approved_dataset_sha256 != dataset.sha256
-        ):
-            raise HoldoutAdmissionError("approved dataset identity changed")
-        self._approved_dataset_sha256 = dataset.sha256
+        with self._lifecycle_lock:
+            self._require_open()
+            if self._approved_dataset_sha256 is not None and (
+                self._approved_dataset_sha256 != dataset.sha256
+                or self._approved_dataset_size_bytes != dataset.size_bytes
+            ):
+                raise HoldoutAdmissionError("approved dataset identity changed")
+            self._approved_dataset_sha256 = dataset.sha256
+            self._approved_dataset_size_bytes = dataset.size_bytes
 
     def read_evidence(self, name: str) -> bytes:
-        if name not in {
-            "merge-verification.json",
-            "run-authorization.json",
-            "run-authorization.sig",
-        }:
-            raise HoldoutAdmissionError("unregistered evidence file")
-        return _read_file(self._sealed, name).content
+        with self._lifecycle_lock:
+            self._require_open()
+            if name not in {
+                "merge-verification.json",
+                "run-authorization.json",
+                "run-authorization.sig",
+            }:
+                raise HoldoutAdmissionError("unregistered evidence file")
+            return _read_file(self._sealed, name, max_size=_MAX_METADATA_BYTES).content
 
     def read_dataset(
         self, capability: _ConsumptionCapability | None = None
     ) -> SecureFile:
-        try:
-            consume_consumption_capability(
-                capability,
-                expected_marker=CANONICAL_MARKER,
-                expected_workspace_identity=self._reservation_workspace,
-                expected_dataset_identity=self._approved_dataset_sha256,
+        with self._lifecycle_lock:
+            self._require_open()
+            if (
+                self._approved_dataset_sha256 is None
+                or self._approved_dataset_size_bytes is None
+            ):
+                raise HoldoutAdmissionError("approved dataset identity is unavailable")
+            try:
+                consume_consumption_capability(
+                    capability,
+                    expected_marker=CANONICAL_MARKER,
+                    expected_workspace_identity=self._reservation_workspace,
+                    expected_dataset_identity=self._approved_dataset_sha256,
+                )
+            except HoldoutAlreadyConsumedError as error:
+                raise HoldoutAdmissionError(
+                    "sealed dataset read requires an active reservation authorization"
+                ) from error
+            return _read_file(
+                self._sealed,
+                "cases.json",
+                max_size=self._approved_dataset_size_bytes,
+                expected_size=self._approved_dataset_size_bytes,
             )
-        except HoldoutAlreadyConsumedError as error:
-            raise HoldoutAdmissionError(
-                "sealed dataset read requires an active reservation authorization"
-            ) from error
-        return _read_file(self._sealed, "cases.json")
 
     def reserve_dataset(
         self, identity: JsonObject, *, reserved_at: str
     ) -> _ConsumptionCapability:
-        if self._approved_dataset_sha256 is None:
-            raise HoldoutAdmissionError("approved dataset identity is unavailable")
-        if identity.get("dataset_sha256") != self._approved_dataset_sha256:
-            raise HoldoutAdmissionError(
-                "dataset identity does not match approved manifest"
+        with self._lifecycle_lock:
+            self._require_open()
+            if self._approved_dataset_sha256 is None:
+                raise HoldoutAdmissionError("approved dataset identity is unavailable")
+            if identity.get("dataset_sha256") != self._approved_dataset_sha256:
+                raise HoldoutAdmissionError(
+                    "dataset identity does not match approved manifest"
+                )
+            return reserve_consumption_secure(
+                CANONICAL_MARKER,
+                identity,
+                reserved_at=reserved_at,
+                write_marker=self._create_output_locked,
+                workspace_identity=self._reservation_workspace,
+                dataset_identity=self._approved_dataset_sha256,
             )
-        return reserve_consumption_secure(
-            CANONICAL_MARKER,
-            identity,
-            reserved_at=reserved_at,
-            write_marker=self.create_output,
-            workspace_identity=self._reservation_workspace,
-            dataset_identity=self._approved_dataset_sha256,
-        )
 
     def read_output(self, name: str) -> bytes:
-        _require_output_name(name)
-        return _read_file(self._experiment, name).content
+        with self._lifecycle_lock:
+            self._require_open()
+            _require_output_name(name)
+            return _read_file(
+                self._experiment, name, max_size=_MAX_METADATA_BYTES
+            ).content
 
     def output_exists(self, name: str) -> bool:
-        _require_output_name(name)
-        try:
-            descriptor = os.open(
-                name, _secure_flags(directory=False), dir_fd=self._experiment
-            )
-        except FileNotFoundError:
-            return False
-        except OSError as error:
-            raise HoldoutAdmissionError("holdout output state is invalid") from error
-        try:
-            metadata = os.fstat(descriptor)
-            if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
-                raise HoldoutAdmissionError("holdout output state is invalid")
-        finally:
-            os.close(descriptor)
-        return True
+        with self._lifecycle_lock:
+            self._require_open()
+            _require_output_name(name)
+            try:
+                descriptor = os.open(
+                    name, _secure_flags(directory=False), dir_fd=self._experiment
+                )
+            except FileNotFoundError:
+                return False
+            except OSError as error:
+                raise HoldoutAdmissionError(
+                    "holdout output state is invalid"
+                ) from error
+            try:
+                metadata = os.fstat(descriptor)
+                if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+                    raise HoldoutAdmissionError("holdout output state is invalid")
+            finally:
+                os.close(descriptor)
+            return True
 
     def create_output(self, name: str, content: bytes) -> None:
+        with self._lifecycle_lock:
+            self._require_open()
+            self._create_output_locked(name, content)
+
+    def _create_output_locked(self, name: str, content: bytes) -> None:
         _require_output_name(name)
         temporary_name = f".{name}.{secrets.token_hex(16)}"
         descriptor: int | None = None
         published = False
+        publication_failed = False
         try:
             descriptor = os.open(
                 temporary_name,
@@ -317,6 +479,14 @@ class SecureHoldoutWorkspace:
                 *expected_state[6:],
             )
             _verify_output(descriptor, content, 2, linked_state)
+            _verify_published_destination(
+                self._experiment,
+                name,
+                descriptor,
+                content,
+                2,
+                linked_state,
+            )
             os.fsync(self._experiment)
             os.unlink(temporary_name, dir_fd=self._experiment)
             temporary_name = ""
@@ -325,20 +495,33 @@ class SecureHoldoutWorkspace:
             raise
         except HoldoutAdmissionError:
             if published:
-                os.unlink(name, dir_fd=self._experiment)
+                publication_failed = True
+                assert descriptor is not None
+                _restore_published_destination(
+                    self._experiment, name, temporary_name, descriptor
+                )
             raise
         except OSError as error:
+            publication_failed = published
             raise HoldoutAdmissionError("exclusive holdout output failed") from error
         finally:
             if descriptor is not None:
                 os.close(descriptor)
-            if temporary_name:
+            if temporary_name and not publication_failed:
                 try:
                     os.unlink(temporary_name, dir_fd=self._experiment)
                 except FileNotFoundError:
                     pass
 
     def close(self) -> None:
-        invalidate_consumption_capabilities(self._reservation_workspace)
-        for descriptor in (self._sealed, self._experiment, self._root):
-            os.close(descriptor)
+        with self._lifecycle_lock:
+            if self._closed:
+                return
+            self._closed = True
+            invalidate_consumption_capabilities(self._reservation_workspace)
+            for descriptor in (self._sealed, self._experiment, self._root):
+                os.close(descriptor)
+
+    def _require_open(self) -> None:
+        if self._closed:
+            raise HoldoutAdmissionError("secure holdout workspace is closed")

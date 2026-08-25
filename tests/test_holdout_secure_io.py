@@ -35,7 +35,7 @@ def _layout(root: Path) -> tuple[Path, Path]:
 def _synthetic_dataset_identity() -> DatasetIdentity:
     return DatasetIdentity(
         "synthetic-dataset",
-        0,
+        len(b"trusted-dataset"),
         0,
         0,
         "synthetic",
@@ -208,12 +208,23 @@ def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
     release_read = Event()
     original_read_file = secure_io._read_file
 
-    def blocked_read(parent: int, name: str) -> SecureFile:
+    def blocked_read(
+        parent: int,
+        name: str,
+        *,
+        max_size: int,
+        expected_size: int | None = None,
+    ) -> SecureFile:
         if name == "cases.json":
             read_started.set()
             if not release_read.wait(timeout=2):
                 raise AssertionError("synthetic dataset read was not released")
-        return original_read_file(parent, name)
+        return original_read_file(
+            parent,
+            name,
+            max_size=max_size,
+            expected_size=expected_size,
+        )
 
     monkeypatch.setattr(secure_io, "_read_file", blocked_read)
 

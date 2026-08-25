@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
+from dataclasses import replace
 from pathlib import Path
 from typing import Literal, assert_never
 
@@ -28,7 +29,7 @@ def _layout(root: Path) -> tuple[Path, Path]:
 def _synthetic_dataset_identity(sha256: str = "synthetic-dataset") -> DatasetIdentity:
     return DatasetIdentity(
         sha256,
-        0,
+        len(b"trusted-dataset"),
         0,
         0,
         "synthetic",
@@ -168,6 +169,229 @@ def test_create_output_publishes_only_after_complete_file_verification(
 
     assert target_states == [False]
     assert (experiment / "report.json").read_bytes() == b"TRUSTED"
+
+
+def test_create_output_rejects_destination_removed_after_source_verification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    original_verify = secure_io._verify_output
+    removed = False
+
+    def remove_destination_after_verification(
+        descriptor: int,
+        expected_content: bytes,
+        expected_links: int,
+        expected_state: tuple[int, ...],
+    ) -> None:
+        nonlocal removed
+        original_verify(descriptor, expected_content, expected_links, expected_state)
+        if expected_links == 2 and not removed:
+            (experiment / "report.json").unlink()
+            removed = True
+
+    monkeypatch.setattr(
+        secure_io, "_verify_output", remove_destination_after_verification
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="destination"):
+            workspace.create_output("report.json", b"TRUSTED")
+    finally:
+        workspace.close()
+
+    assert (experiment / "report.json").read_bytes() == b"TRUSTED"
+
+
+def test_create_output_replaces_attacker_destination_after_post_link_race(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    original_verify = secure_io._verify_output
+    attacker = tmp_path / "synthetic-attacker-output"
+    replaced = False
+
+    def replace_destination_after_verification(
+        descriptor: int,
+        expected_content: bytes,
+        expected_links: int,
+        expected_state: tuple[int, ...],
+    ) -> None:
+        nonlocal replaced
+        original_verify(descriptor, expected_content, expected_links, expected_state)
+        if expected_links == 2 and not replaced:
+            attacker.write_bytes(b"ATTACKER")
+            (experiment / "report.json").unlink()
+            os.link(attacker, experiment / "report.json")
+            replaced = True
+
+    monkeypatch.setattr(
+        secure_io, "_verify_output", replace_destination_after_verification
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="destination"):
+            workspace.create_output("report.json", b"TRUSTED")
+    finally:
+        workspace.close()
+
+    assert (experiment / "report.json").read_bytes() == b"TRUSTED"
+
+
+def test_create_output_keeps_published_marker_after_post_publication_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    original_verify = secure_io._verify_output
+
+    def fail_after_publication(
+        descriptor: int,
+        expected_content: bytes,
+        expected_links: int,
+        expected_state: tuple[int, ...],
+    ) -> None:
+        original_verify(descriptor, expected_content, expected_links, expected_state)
+        if expected_links == 2:
+            raise HoldoutAdmissionError("synthetic post-publication failure")
+
+    monkeypatch.setattr(secure_io, "_verify_output", fail_after_publication)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="post-publication"):
+            workspace.create_output("holdout.started", b"reserved\n")
+    finally:
+        workspace.close()
+
+    assert (experiment / "holdout.started").read_bytes() == b"reserved\n"
+
+
+def test_create_output_keeps_published_marker_after_post_publication_fsync_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    original_fsync = secure_io.os.fsync
+
+    def fail_experiment_fsync(descriptor: int) -> None:
+        if descriptor == workspace._experiment:
+            raise OSError("synthetic publication fsync failure")
+        original_fsync(descriptor)
+
+    monkeypatch.setattr(secure_io.os, "fsync", fail_experiment_fsync)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="exclusive holdout output"):
+            workspace.create_output("holdout.started", b"reserved\n")
+        assert (experiment / "holdout.started").read_bytes() == b"reserved\n"
+        with pytest.raises(FileExistsError):
+            workspace.create_output("holdout.started", b"replacement\n")
+    finally:
+        workspace.close()
+
+
+def test_workspace_rejects_operation_after_close_even_when_descriptor_is_reused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    experiment_descriptor = workspace._experiment
+    workspace.close()
+    workspace.close()
+
+    attacker = tmp_path / "attacker-directory"
+    attacker.mkdir()
+    (attacker / "report.json").write_bytes(b"attacker")
+    attacker_descriptor = os.open(attacker, os.O_RDONLY | os.O_DIRECTORY)
+    os.dup2(attacker_descriptor, experiment_descriptor)
+    if attacker_descriptor != experiment_descriptor:
+        os.close(attacker_descriptor)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="closed"):
+            workspace.read_output("report.json")
+    finally:
+        os.close(experiment_descriptor)
+
+
+def test_capability_claims_cannot_be_rewrapped_for_another_workspace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    issuing_workspace = SecureHoldoutWorkspace.open(tmp_path)
+    reading_workspace = SecureHoldoutWorkspace.open(tmp_path)
+    identity = _synthetic_dataset_identity()
+    issuing_workspace.bind_approved_dataset_identity(identity)
+    reading_workspace.bind_approved_dataset_identity(identity)
+    capability = issuing_workspace.reserve_dataset(
+        {"experiment_id": "synthetic", "dataset_sha256": identity.sha256},
+        reserved_at="2026-08-25T00:00:00Z",
+    )
+    forged = replace(
+        capability,
+        marker_path=Path("forged.marker"),
+        _workspace_identity=reading_workspace._reservation_workspace,
+        _dataset_identity=identity.sha256,
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            reading_workspace.read_dataset(forged)
+        assert issuing_workspace.read_dataset(capability).content == b"trusted-dataset"
+    finally:
+        issuing_workspace.close()
+        reading_workspace.close()
+
+
+def test_workspace_rejects_dataset_append_before_unbounded_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    dataset_path = tmp_path / ".omo/sealed/a-b-one-shot-v1/cases.json"
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    capability = workspace.reserve_dataset(
+        {"experiment_id": "synthetic", "dataset_sha256": "synthetic-dataset"},
+        reserved_at="2026-08-25T00:00:00Z",
+    )
+    original_read: Callable[[int, int], bytes] = os.read
+    appended = False
+
+    def append_before_read(descriptor: int, size: int) -> bytes:
+        nonlocal appended
+        if not appended:
+            dataset_path.write_bytes(dataset_path.read_bytes() + b"x" * 100_000)
+            appended = True
+        return original_read(descriptor, size)
+
+    monkeypatch.setattr(secure_io.os, "read", append_before_read)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="size bound"):
+            workspace.read_dataset(capability)
+    finally:
+        workspace.close()
 
 
 def test_dataset_capability_rejects_identity_not_matching_approved_manifest(
