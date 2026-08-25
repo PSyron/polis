@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from polis.evaluation import rule_family_qualification
 from polis.evaluation.rule_family_qualification import (
     QualificationError,
     matrix_digest,
@@ -91,6 +92,29 @@ def _approve_matrix(matrix: dict[str, object]) -> str:
         )
     assert isinstance(proposal_digest, str)
     return proposal_digest
+
+
+def test_v4_gap_inputs_read_canonical_regression_artifacts(tmp_path: Path) -> None:
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    for kind, profile in (
+        ("baseline", "default"),
+        ("baseline", "morphology"),
+        ("result", "default"),
+        ("result", "morphology"),
+    ):
+        path = docs / f"regression-{kind}-v4-{profile}.json"
+        path.write_text(
+            json.dumps(
+                {
+                    "diagnostics": {"source": []},
+                    "profile": {"id": profile},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    assert rule_family_qualification._v4_gap_inputs(tmp_path) == []
 
 
 def test_matrix_has_exact_pending_zero_acceptance_state() -> None:

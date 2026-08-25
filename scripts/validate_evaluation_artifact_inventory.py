@@ -154,6 +154,35 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
             errors.append(f"legacy schema id drifted: {legacy}")
         if _numeric_values(canonical_payload) != _numeric_values(legacy_payload):
             errors.append(f"numeric parity drifted: {canonical} / {legacy}")
+        if kind == "comparison":
+            proposal_path = canonical_payload.get("proposal_path")
+            proposal_sha256 = canonical_payload.get("proposal_sha256")
+            if not isinstance(proposal_path, str) or not proposal_path.startswith(
+                "docs/"
+            ):
+                errors.append(f"comparison proposal path is invalid: {canonical}")
+                continue
+            proposal_file = root / proposal_path
+            if not proposal_file.is_file():
+                errors.append(f"comparison proposal is missing: {proposal_path}")
+                continue
+            try:
+                proposal_payload = _load_json(proposal_file, "comparison proposal")
+                serialized = (
+                    json.dumps(
+                        proposal_payload,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        indent=2,
+                    )
+                    + "\n"
+                ).encode("utf-8")
+            except (TypeError, ValueError):
+                errors.append(f"comparison proposal is not canonical JSON: {canonical}")
+                continue
+            expected_sha256 = hashlib.sha256(serialized).hexdigest()
+            if proposal_sha256 != expected_sha256:
+                errors.append(f"canonical proposal SHA-256 mismatch: {canonical}")
     return errors
 
 

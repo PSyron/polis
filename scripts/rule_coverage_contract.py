@@ -24,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "0f4986ec31911c359576638594bc80056732bce4295b8735af495b6df7076bc6"
+    "1095ce6262ce1ce7503743c42662939730f9b119df344de457a4e6b32738c488"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",

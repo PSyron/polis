@@ -884,6 +884,8 @@ def test_quality_runner_generated_proposal_loads_and_validates(
     )
     monkeypatch.setattr(quality_runner, "_validate_wheel_file", lambda *_: None)
     quality_runner._pending_v4_proposal(args)
+    generated_payload = json.loads(args.output.read_text(encoding="utf-8"))
+    assert generated_payload["schema_id"] == "polis.regression-threshold-proposal"
     generated = load_threshold_proposal(args.output)
     assert isinstance(generated, ThresholdProposalV4)
     assert generated.status == "pending_maintainer_approval"

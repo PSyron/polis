@@ -906,6 +906,11 @@ def test_rule_coverage_contract_cli_uses_target_correction_policy(
         capture_output=True,
         text=True,
     )
+    for relative in (
+        "docs/project/rule-coverage-contract-v1.json",
+        "docs/regression-comparison-v3.json",
+    ):
+        shutil.copy2(ROOT / relative, repository / relative)
     policy_path = repository / "src/polis/correction/policy.py"
     policy_source = policy_path.read_text(encoding="utf-8")
     assert 'SOURCE_POLICY_VERSION: Final[str] = "1.2"' in policy_source

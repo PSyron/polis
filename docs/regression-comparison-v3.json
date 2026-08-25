@@ -395,7 +395,7 @@
     }
   },
   "proposal_path": "docs/regression-threshold-proposal-v3.json",
-  "proposal_sha256": "dd88e505705af51115af41279ad9dd82f0a01ee607f27d24ebf907ef0df0eb40",
+  "proposal_sha256": "aa5904fffdbd45d6b6c166f2719fdec4fddce6aabd4ce82f0d765dc89de9a56b",
   "schema_id": "polis.regression-comparison",
   "schema_version": 1,
   "source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a"

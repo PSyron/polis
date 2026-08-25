@@ -1,7 +1,8 @@
 # Przekazanie jakości v4 do #368
 
 Ten dokument jest maszynowo używalnym handoffem z #367 do #368. Kanoniczne
-dowody jakości pozostają w wersjonowanych artefaktach `docs/quality-*-v4*.json`;
+dowody regresji pozostają w wersjonowanych artefaktach
+`docs/regression-*-v4*.json`; historyczne `quality-*` są wyłącznie aliasami;
 ten skrót nie zastępuje ich walidacji i nie jest zgodą na implementację reguły.
 
 ## Stan po #376
@@ -21,6 +22,10 @@ ten skrót nie zastępuje ich walidacji i nie jest zgodą na implementację regu
   wiązania v3 pozostają niezmienione.
 
 ## Tożsamość artefaktu
+
+Kanoniczne dowody regresji pozostają w wersjonowanych artefaktach
+`docs/regression-*-v4*.json`; historyczne `quality-*` pozostają wyłącznie
+niezmiennymi aliasami zgodności.
 
 Canonical digest datasetu v4:
 
@@ -42,12 +47,12 @@ chronieni i niezmienieni.
 - source SHA: `07cd485d9778c56d195f93da899917035a808a39`;
 - wheel SHA-256:
   `7b8df55e83df14cfadf1cff974131a3030912346672e33bf3f4e0b0e6662e091`;
-- proposal: `docs/quality-threshold-proposal-v4.json`, status `approved`,
+- proposal: `docs/regression-threshold-proposal-v4.json`, status `approved`,
   `enforced: true`, SHA-256
-  `24e83bb6013934184c87f3e27ad90f2f3e773b8ad5f2a6eb54dc15f0279166e7`;
-- comparison: `docs/quality-comparison-v4.json`, `aggregate_verdict: pass`,
+  `166bf574cbda19b2f4f386ab602db6ba31d986b3b2cf44ede99491359de72610`;
+- comparison: `docs/regression-comparison-v4.json`, `aggregate_verdict: pass`,
   SHA-256
-  `b59a4fe78d5fa69fc18e00301809e52036f3f6ed343352eda5005fdefaaeb190`;
+  `adb52d0e8b53ef553f08977eb42345a0df05bcd7190641fc1ef25c18d4666016`;
 - default: TP 39 / FP 0 / FN 0;
 - morphology: TP 45 / FP 0 / FN 0;
 - conflict violations: 0; abstention violations: 0 w obu profilach;

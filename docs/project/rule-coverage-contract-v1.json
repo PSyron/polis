@@ -211,7 +211,7 @@
       "parity_rule": "Artifacts bind their published source SHA, dataset identity, profile, and provider identity where applicable; historical source SHAs are paired with the durable offline provenance manifest, while the runtime snapshot and behavior versions are checked independently because the historical v3 artifacts do not publish those fields.",
       "comparison_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
       "comparison_source_snapshot_sha256": null,
-      "comparison_sha256": "b07d4a1ef97d16ec8d8995eaf2a4ab99616b955ed3c561b9b6fdbcf62d2ac6bb",
+      "comparison_sha256": "5f588ff1e22729b2b4edbcf5929fc624bbc92b4c2be7b64dc889a528b64acb42",
       "baseline_source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5",
       "result_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
       "provenance_manifest_path": "docs/project/rule-coverage-quality-artifact-provenance-v1.json",

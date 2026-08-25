@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -92,6 +93,42 @@ def test_inventory_validates_alias_parity_and_canonical_parsers_read_new_names()
     assert result.quality_f1 == 1.0
     assert comparison.aggregate_verdict == "pass"
     assert proposal.enforced is True
+
+
+def test_canonical_comparisons_bind_canonical_proposal_serialization() -> None:
+    for version in ("v2", "v3", "v4"):
+        proposal_path = ROOT / f"docs/regression-threshold-proposal-{version}.json"
+        comparison_path = ROOT / f"docs/regression-comparison-{version}.json"
+        proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+        comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+        canonical_proposal = (
+            json.dumps(proposal, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+        ).encode("utf-8")
+
+        assert comparison["proposal_path"] == str(proposal_path.relative_to(ROOT))
+        assert (
+            comparison["proposal_sha256"]
+            == hashlib.sha256(canonical_proposal).hexdigest()
+        )
+
+
+def test_inventory_rejects_a_canonical_comparison_with_stale_proposal_hash(
+    tmp_path: Path,
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    comparison_path = tmp_path / "docs" / "regression-comparison-v4.json"
+    legacy_comparison_path = tmp_path / "docs" / "quality-comparison-v4.json"
+    comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+    legacy_comparison = json.loads(legacy_comparison_path.read_text(encoding="utf-8"))
+    comparison["proposal_sha256"] = legacy_comparison["proposal_sha256"]
+    comparison_path.write_text(
+        json.dumps(comparison, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    errors = validate_inventory(tmp_path)
+
+    assert any("canonical proposal SHA-256 mismatch" in error for error in errors)
 
 
 def test_quality_baseline_document_disclaims_product_quality() -> None:
