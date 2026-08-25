@@ -182,7 +182,7 @@
       "fields": ["source", "operation", "behavior_version"],
       "order": "Exact deterministic registration order; sets and manually duplicated counts are invalid.",
       "digest": {"algorithm": "sha256", "canonicalization": "UTF-8 JSON array of ordered identity objects, sorted object keys, compact separators, ensure_ascii=false."},
-      "planning_baseline": {"full_sha": "e915d1e9b91646cb0c28b848f0618004fae40eb1", "source_count": 63, "snapshot_sha256": "c7a76fcc45d6d797a8d632d42ca18a847df07bad6c2d3dbb1cfc327853f22dd1"}
+      "planning_baseline": {"full_sha": "a31a4afa414614b4a1512cd9b1577c3439af29e8", "source_count": 63, "snapshot_sha256": "c7a76fcc45d6d797a8d632d42ca18a847df07bad6c2d3dbb1cfc327853f22dd1"}
     },
     "maintained_rule_inventory": {
       "path": "docs/rules.md",
