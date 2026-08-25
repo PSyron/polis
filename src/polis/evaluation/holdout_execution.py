@@ -100,6 +100,7 @@ def _run_open_workspace(
     config = parse_holdout_config(config_document)
     manifest = metadata_bytes(workspace.read_manifest(), "dataset.manifest.json")
     parse_dataset_manifest(manifest, config)
+    workspace.bind_approved_dataset_identity(config.dataset)
 
     def load_secure_metadata(path: Path) -> JsonObject:
         return metadata_bytes(workspace.read_evidence(path.name), path.name)

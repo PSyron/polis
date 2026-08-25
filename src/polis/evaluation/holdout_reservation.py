@@ -31,8 +31,13 @@ class _CanonicalWorkspaceIdentity:
 
 
 class _ReservationToken:
-    def __init__(self, seal: _ReservationSeal) -> None:
+    def __init__(
+        self,
+        seal: _ReservationSeal,
+        workspace_identity: _CanonicalWorkspaceIdentity | None,
+    ) -> None:
         self.seal = seal
+        self.workspace_identity = workspace_identity
         self.consumed = False
 
 
@@ -46,6 +51,7 @@ _ISSUED_TOKENS: set[_ReservationToken] = set()
 class _ConsumptionCapability:
     marker_path: Path
     _workspace_identity: _CanonicalWorkspaceIdentity | None
+    _dataset_identity: str | None
     _token: _ReservationToken
 
 
@@ -99,10 +105,10 @@ def reserve_consumption(
         fs.fsync(directory_descriptor)
     finally:
         fs.close(directory_descriptor)
-    token = _ReservationToken(_RESERVATION_SEAL)
+    token = _ReservationToken(_RESERVATION_SEAL, None)
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
-    return _ConsumptionCapability(marker, None, token)
+    return _ConsumptionCapability(marker, None, None, token)
 
 
 def reserve_consumption_secure(
@@ -112,6 +118,7 @@ def reserve_consumption_secure(
     reserved_at: str,
     write_marker: Callable[[str, bytes], None],
     workspace_identity: _CanonicalWorkspaceIdentity,
+    dataset_identity: str,
 ) -> _ConsumptionCapability:
     if marker != CANONICAL_MARKER:
         raise HoldoutAlreadyConsumedError("reservation marker is not canonical")
@@ -124,10 +131,24 @@ def reserve_consumption_secure(
         write_marker(marker.name, content)
     except FileExistsError as error:
         raise HoldoutAlreadyConsumedError("holdout already consumed") from error
-    token = _ReservationToken(_RESERVATION_SEAL)
+    token = _ReservationToken(_RESERVATION_SEAL, workspace_identity)
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
-    return _ConsumptionCapability(marker, workspace_identity, token)
+    return _ConsumptionCapability(marker, workspace_identity, dataset_identity, token)
+
+
+def invalidate_consumption_capabilities(
+    workspace_identity: _CanonicalWorkspaceIdentity,
+) -> None:
+    with _RESERVATION_LOCK:
+        invalidated = [
+            token
+            for token in _ISSUED_TOKENS
+            if token.workspace_identity is workspace_identity
+        ]
+        for token in invalidated:
+            _ISSUED_TOKENS.remove(token)
+            token.consumed = True
 
 
 def consume_consumption_capability(
@@ -135,6 +156,7 @@ def consume_consumption_capability(
     *,
     expected_marker: Path | None = None,
     expected_workspace_identity: _CanonicalWorkspaceIdentity | None = None,
+    expected_dataset_identity: str | None = None,
 ) -> None:
     with _RESERVATION_LOCK:
         if (
@@ -145,6 +167,10 @@ def consume_consumption_capability(
             or (
                 expected_workspace_identity is not None
                 and value._workspace_identity is not expected_workspace_identity
+            )
+            or (
+                expected_dataset_identity is not None
+                and value._dataset_identity != expected_dataset_identity
             )
         ):
             if isinstance(value, _ConsumptionCapability) and value._token.consumed:
