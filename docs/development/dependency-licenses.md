@@ -100,6 +100,15 @@ niż 0.11.2, a README wskazuje dokładnie to wydanie.
 | --- | --- | --- | --- | --- |
 | `uv` | 0.11.2 | Apache-2.0 OR MIT | inicjowanie środowiska i workflow oparty na lockfile | [Metadane PyPI](https://pypi.org/pypi/uv/0.11.2/json) i [licencja upstream](https://github.com/astral-sh/uv/tree/0.11.2#license); złożone wyrażenie zatwierdzono w wariancie MIT. |
 
+## WikEd Error Corpus (niebundlowany artefakt badawczy)
+
+Protokół #427 zapisuje deklarowaną licencję źródła jako `CC-BY-SA-3.0`, zgodnie
+z opisem WikEd mówiącym o dziedziczeniu licencji źródłowych rewizji Wikipedii.
+To nie jest potwierdzenie warunków konkretnego pliku `wiked-v1.0.pl.tgz`:
+status pozostaje `pending_artifact_authority_confirmation`, dopóki maintainer
+nie uzyska i nie zwiąże niezmiennego dowodu dla tego wydania. Archiwum, staging,
+plaintext i ewentualne noty upstream nie są częścią wheel ani sdist Polis.
+
 ## Akcje workflow CI i wydania
 
 Workflow szybkiego CI i chronionego wydania używają wyłącznie poniższych akcji

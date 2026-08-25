@@ -146,3 +146,12 @@ def reserve_and_load[T](
 ) -> T:
     capability = reserve_consumption(marker, identity, reserved_at=reserved_at)
     return load_reserved_dataset(capability, loader)
+
+
+def is_valid_consumption_capability(value: object) -> bool:
+    return (
+        isinstance(value, _ConsumptionCapability)
+        and value._token.seal is _RESERVATION_SEAL
+        and value._token in _ISSUED_TOKENS
+        and not value._token.consumed
+    )

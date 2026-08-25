@@ -75,7 +75,8 @@ def test_open_workspace_keeps_evidence_and_dataset_on_verified_directory(
             b"trusted-authorization"
         )
         assert workspace.read_evidence("run-authorization.sig") == b"trusted-signature"
-        assert workspace.read_dataset().content == b"trusted-dataset"
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            workspace.read_dataset()
     finally:
         workspace.close()
 

@@ -141,7 +141,7 @@ def _run_open_workspace(
         write_marker=workspace.create_output,
     )
     try:
-        secure_dataset = workspace.read_dataset()
+        secure_dataset = workspace.read_dataset(capability)
         dataset = load_reserved_dataset(
             capability,
             lambda: load_holdout_dataset_bytes(
