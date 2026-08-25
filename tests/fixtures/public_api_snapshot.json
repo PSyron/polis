@@ -9,6 +9,8 @@
     "AnalysisTimeoutError",
     "Analyzer",
     "AnalyzerConfig",
+    "analyze",
+    "correct",
     "BackendUnavailableError",
     "Category",
     "Confidence",

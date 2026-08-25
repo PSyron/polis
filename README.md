@@ -55,15 +55,31 @@ tożsamości albo niejednoznaczny wynik oznacza abstencję bez częściowej suge
 Wszystkie cztery konstrukcje działają bez sieci, modelu i procesu Java.
 
 ```python
-from polis import Analyzer, AnalyzerConfig
+from polis import correct
 
-result = Analyzer(AnalyzerConfig()).correct("Zeby jutro,powiem o tym.")
-assert result.corrected_text == "Żeby jutro, powiem o tym."
+assert correct("Zeby jutro,powiem o tym.").corrected_text == (
+    "Żeby jutro, powiem o tym."
+)
 ```
 
-`Analyzer.analyze()` zwraca `AnalysisResult` ze znaleziskami i przesunięciami
-`[start, end)`. `Analyzer.correct()` zwraca oryginalny oraz poprawiony tekst,
-znaleziska zastosowane i pominięte. Szczegóły zawiera
+Jednorazowe wywołania mogą korzystać z `polis.analyze(text)` i
+`polis.correct(text)`. Obie funkcje leniwie współdzielą analizator dla każdej
+wartości `AnalyzerConfig`, więc przy wielu wywołaniach warto zbudować jeden
+`Analyzer` jawnie:
+
+```python
+from polis import Analyzer, AnalyzerConfig
+
+analyzer = Analyzer(AnalyzerConfig())
+texts = ["Te zdanie.", "Ona jestem tutaj."]
+for text in texts:
+    result = analyzer.analyze(text)
+```
+
+`Analyzer.analyze()` oraz `polis.analyze()` zwracają `AnalysisResult` ze
+znaleziskami i przesunięciami `[start, end)`. `Analyzer.correct()` oraz
+`polis.correct()` zwracają oryginalny oraz poprawiony tekst, znaleziska
+zastosowane i pominięte. Szczegóły zawiera
 [publiczne API](docs/public-api.md) oraz [szybki start](docs/quick-start.md).
 
 ## Konfiguracja

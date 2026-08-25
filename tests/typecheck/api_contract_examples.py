@@ -41,6 +41,17 @@ async def correct_without_blocking_an_event_loop() -> str:
     return result.corrected_text
 
 
+def module_level_analyze() -> polis.AnalysisResult:
+    return polis.analyze(
+        "Te zdanie zawiera błąd.",
+        options=AnalysisOptions(categories={"agreement"}),
+    )
+
+
+def module_level_correct() -> str:
+    return polis.correct("Zeby zacząć, przyjdź jutro.").corrected_text
+
+
 def correction_result_exposes_active_policy_identity(
     result: polis.CorrectionResult,
 ) -> bool:

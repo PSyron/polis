@@ -56,6 +56,8 @@ def test_api_contract_documents_the_accepted_adr_and_public_error_examples() -> 
     required = (
         "ADR-0003",
         "Analyzer.from_config",
+        "polis.analyze",
+        "polis.correct",
         "BackendUnavailableError",
         "AnalysisTimeoutError",
         "InvalidBackendResponseError",

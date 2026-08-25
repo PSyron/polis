@@ -11,6 +11,8 @@ EXPECTED_PUBLIC_EXPORTS = (
     "ANALYSIS_SCHEMA_VERSION",
     "Analyzer",
     "AnalyzerConfig",
+    "analyze",
+    "correct",
     "CorrectionResult",
     "MorphologyProviderIdentity",
     "MorphologyStatus",

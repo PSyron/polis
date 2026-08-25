@@ -10,6 +10,8 @@ from polis.analyzer import (
     MorphologyStatus,
     SuggestionOutcome,
     SuggestionStatus,
+    analyze,
+    correct,
 )
 from polis.core import (
     ANALYSIS_SCHEMA_VERSION,
@@ -40,6 +42,8 @@ __all__ = [
     "ANALYSIS_SCHEMA_VERSION",
     "Analyzer",
     "AnalyzerConfig",
+    "analyze",
+    "correct",
     "CorrectionResult",
     "MorphologyProviderIdentity",
     "MorphologyStatus",

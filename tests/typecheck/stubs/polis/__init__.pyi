@@ -109,3 +109,15 @@ class Analyzer:
 
 def analysis_result_to_json(result: AnalysisResult) -> str: ...
 def analysis_result_from_json(value: str) -> AnalysisResult: ...
+def analyze(
+    text: str,
+    *,
+    config: AnalyzerConfig | None = None,
+    options: AnalysisOptions | None = None,
+) -> AnalysisResult: ...
+def correct(
+    text: str,
+    *,
+    config: AnalyzerConfig | None = None,
+    options: AnalysisOptions | None = None,
+) -> CorrectionResult: ...
