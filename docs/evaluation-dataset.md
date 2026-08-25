@@ -1,5 +1,51 @@
 # Zbiory ewaluacyjne i aktywny protokół regresyjny
 
+## Odtwarzalny korpus syntetycznego psucia (#426)
+
+Issue #426 dostarcza odtwarzalny, rozwojowy korpus par poprawny tekst–tekst z
+błędem. Generator korzysta wyłącznie z poprawnych przypadków z istniejących
+projektowych zbiorów `quality/v1`–`quality/v4`, których manifesty deklarują
+`CC0-1.0` i źródło `project-authored`. Nie pobiera danych, nie otwiera
+holdoutu i nie wysyła tekstu do sieci.
+
+Artefakty bieżącego uruchomienia zapisuje się do jawnie podanej lokalizacji
+poza repozytorium. Generator i korpus są narzędziem rozwojowym; nie są
+commitowane jako duży zbiór i nie wchodzą do wheel ani sdist produktu
+runtime-first.
+
+Każdy rekord przechowuje `incorrect_text`, `correct_text`, klasę błędu oraz
+półotwarty zakres `[start, end)` w tekście błędnym. Zastosowanie `suggestion`
+do tego zakresu odtwarza `correct_text` dokładnie. Klasy obejmują:
+
+- `case` — inną formę rzeczownika zwróconą przez
+  `Morfeusz.generate(lemma)` dla tego samego lematu;
+- `agreement` — formę przymiotnika z `generate()` o niezgodnej liczbie lub
+  rodzaju względem sąsiedniego rzeczownika;
+- `punctuation` — usunięcie istniejącego przecinka;
+- `diacritics` — usunięcie polskiego znaku diakrytycznego.
+
+Generator wymaga opcjonalnego extra `morphology` z przypiętym
+`morfeusz2==1.99.15` i działa offline:
+
+```shell
+uv run --extra dev python -m polis.evaluation.synthetic_corpus \
+  --output /tmp/polis-synthetic-cases.jsonl \
+  --manifest /tmp/polis-synthetic-manifest.json \
+  --seed 426 --count 5000
+```
+
+Biblioteka przyjmuje także tekst dostarczony przez wywołującego przez
+`generate(clean_texts=..., source_license=..., source_origin=...)`. Manifest
+zapisuje wtedy skrót wejścia, deklarowaną licencję i pochodzenie; brak jawnej
+proweniencji powoduje błąd zamiast nieuzasadnionej deklaracji.
+
+Generator jest reprodukowalny, a liczba dostępnych par zależy od podanego tekstu
+źródłowego; narzędzie jest przeznaczone wyłącznie do rozwoju oraz regresji.
+Pole `holdout: false` jest częścią manifestu; korpus nie może zastąpić
+niezależnego, jednorazowego pomiaru jakości. Zewnętrzny korpus
+WikEd PL z #427 pozostaje zablokowany przez brak dostarczonej władzy/licencji i
+nie jest używany ani fabrykowany w ramach #426.
+
 ## WikEd PL: protokół zapieczętowanego holdoutu (#427)
 
 Issue #427 rejestruje wyłącznie bezpieczny protokół dla zewnętrznego
