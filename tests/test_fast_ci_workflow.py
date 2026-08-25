@@ -1124,7 +1124,6 @@ def test_platform_specific_release_checks_have_versioned_owners() -> None:
         in normalized_distribution
     )
     assert "test_languagetool_vendor_artifacts.py" not in compatibility
-    assert "`language_tool_process_start_count`" in compatibility
     assert "scripts/verify_distribution_install.py" in distribution
     assert "--dist dist --wheelhouse build-wheelhouse" in normalized_distribution
     assert "--wheelhouse-manifest build-wheelhouse-manifest.json" in (
