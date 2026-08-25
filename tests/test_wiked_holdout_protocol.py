@@ -8,6 +8,7 @@ import stat
 import tarfile
 from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import pytest
 import scripts.wiked_holdout as protocol
@@ -27,6 +28,33 @@ def _synthetic_archive(path: Path) -> str:
         info.size = len(payload)
         bundle.addfile(info, io.BytesIO(payload))
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _write_manifest(
+    repository_root: Path,
+    *,
+    extractor_overrides: dict[str, object] | None = None,
+) -> None:
+    extractor: dict[str, object] = {
+        "tool": "snukky/wikiedits",
+        "wikiedits_version": "2.0",
+        "parameters": ExtractionParameters().as_dict(),
+    }
+    if extractor_overrides is not None:
+        extractor.update(extractor_overrides)
+    manifest_path = repository_root / "docs/project/wiked-pl-holdout-manifest.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_id": "polis.wiked-pl-holdout-manifest",
+                "schema_version": 1,
+                "status": "blocked_external_authority",
+                "extractor": extractor,
+            }
+        ),
+        encoding="utf-8",
+    )
 
 
 def test_pending_manifest_records_the_external_authority_limitation() -> None:
@@ -260,6 +288,8 @@ def test_archive_manifest_is_reproducible_for_a_synthetic_external_fixture(
     tmp_path: Path,
 ) -> None:
     archive = tmp_path / "synthetic.tgz"
+    repository = tmp_path / "repository"
+    _write_manifest(repository)
     payload = b"synthetic old\tsynthetic new\n"
     with tarfile.open(archive, "w:gz") as bundle:
         info = tarfile.TarInfo("pairs.tsv")
@@ -273,7 +303,7 @@ def test_archive_manifest_is_reproducible_for_a_synthetic_external_fixture(
         expected_archive_sha256=digest,
         member_name="pairs.tsv",
         classifications={1: ("agreement", "development", True)},
-        repository_root=tmp_path / "repository",
+        repository_root=repository,
     )
 
     assert result.archive_sha256 == digest
@@ -293,6 +323,8 @@ def test_archive_digest_and_read_use_one_open_file_descriptor(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     archive = tmp_path / "synthetic.tgz"
+    repository = tmp_path / "repository"
+    _write_manifest(repository)
     digest = _synthetic_archive(archive)
     original_open: Callable[..., int] = protocol._open_regular_descriptor
 
@@ -311,7 +343,7 @@ def test_archive_digest_and_read_use_one_open_file_descriptor(
         expected_archive_sha256=digest,
         member_name="pairs.tsv",
         classifications={1: ("agreement", "development", True)},
-        repository_root=tmp_path / "repository",
+        repository_root=repository,
     )
 
     assert result.archive_sha256 == digest
@@ -321,6 +353,7 @@ def test_archive_parent_race_requires_descriptor_relative_open(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repository = tmp_path / "repository"
+    _write_manifest(repository)
     sealed = repository / ".omo" / "sealed"
     sealed.mkdir(parents=True)
     real_parent = tmp_path / "external"
@@ -359,6 +392,118 @@ def test_archive_parent_race_requires_descriptor_relative_open(
 
     assert result.archive_sha256 == digest
     assert not pathname_race_triggered
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("tool", "untrusted/wikiedits"),
+        ("wikiedits_version", "different"),
+        ("parameters", {"language": "not-polish"}),
+    ],
+)
+def test_archive_extraction_rejects_manifest_extractor_drift(
+    field: str, value: object, tmp_path: Path
+) -> None:
+    repository = tmp_path / "repository"
+    _write_manifest(repository, extractor_overrides={field: value})
+
+    with pytest.raises(WikEdProtocolError, match="manifest extractor"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={},
+            repository_root=repository,
+        )
+
+
+def test_cli_rejects_repository_root_that_is_not_the_script_repository(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def unexpected_extract(*args: object, **kwargs: object) -> object:
+        raise AssertionError("extraction must not start with a mismatched root")
+
+    monkeypatch.setattr(protocol, "extract_archive", unexpected_extract)
+    fake_repository = tmp_path / "claimed-repository"
+    fake_repository.mkdir()
+
+    result = protocol.main(
+        [
+            "--archive",
+            str(tmp_path / "external.tgz"),
+            "--archive-sha256",
+            "0" * 64,
+            "--member",
+            "pairs.tsv",
+            "--classification-map",
+            str(tmp_path / "classification.jsonl"),
+            "--output",
+            str(tmp_path / "output"),
+            "--repository-root",
+            str(fake_repository),
+        ]
+    )
+
+    assert result == 2
+    assert "repository root does not match" in capsys.readouterr().err
+
+
+def test_archive_hash_and_parse_use_the_same_immutable_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive = tmp_path / "synthetic.tgz"
+    replacement = tmp_path / "replacement.tgz"
+    repository = tmp_path / "repository"
+    _write_manifest(repository)
+    digest = _synthetic_archive(archive)
+    _synthetic_archive(replacement)
+    replacement_payload = b"replacement old\treplacement new\n"
+    with tarfile.open(replacement, "w:gz") as bundle:
+        info = tarfile.TarInfo("pairs.tsv")
+        info.size = len(replacement_payload)
+        bundle.addfile(info, io.BytesIO(replacement_payload))
+
+    def mutate_in_place() -> None:
+        with replacement.open("rb") as source, archive.open("r+b") as target:
+            target.seek(0)
+            target.truncate()
+            target.write(source.read())
+
+    original_read = protocol._read_descriptor
+
+    def read_snapshot_then_mutate(descriptor: int) -> bytes:
+        snapshot = cast(bytes, original_read(descriptor))
+        mutate_in_place()
+        return snapshot
+
+    original_digest = protocol._descriptor_digest
+    digest_calls = 0
+
+    def digest_then_mutate(descriptor: int) -> tuple[int, str]:
+        nonlocal digest_calls
+        result = cast(tuple[int, str], original_digest(descriptor))
+        if digest_calls == 0:
+            mutate_in_place()
+        digest_calls += 1
+        return result
+
+    monkeypatch.setattr(protocol, "_read_descriptor", read_snapshot_then_mutate)
+    monkeypatch.setattr(protocol, "_descriptor_digest", digest_then_mutate)
+    result = extract_archive(
+        archive,
+        tmp_path / "output",
+        expected_archive_sha256=digest,
+        member_name="pairs.tsv",
+        classifications={1: ("agreement", "development", True)},
+        repository_root=repository,
+    )
+
+    development = (tmp_path / "output" / "development.jsonl").read_text()
+    assert result.archive_sha256 == digest
+    assert '"old":"synthetic old"' in development
+    assert "replacement old" not in development
 
 
 def test_archive_parent_replacement_is_rejected_before_pathname_escape(

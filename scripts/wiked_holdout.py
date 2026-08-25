@@ -94,6 +94,20 @@ def load_manifest(path: Path) -> dict[str, object]:
     return raw
 
 
+def _validate_manifest_extractor(
+    manifest: Mapping[str, object], parameters: ExtractionParameters
+) -> None:
+    extractor = manifest.get("extractor")
+    if not isinstance(extractor, dict):
+        raise WikEdProtocolError("WikEd manifest extractor is invalid")
+    if extractor.get("tool") != "snukky/wikiedits":
+        raise WikEdProtocolError("WikEd manifest extractor tool is invalid")
+    if extractor.get("wikiedits_version") != "2.0":
+        raise WikEdProtocolError("WikEd manifest extractor version is invalid")
+    if extractor.get("parameters") != parameters.as_dict():
+        raise WikEdProtocolError("WikEd manifest extractor parameters are invalid")
+
+
 def load_classifications(
     path: Path, *, repository_root: Path | None = None
 ) -> dict[int, Classification]:
@@ -168,44 +182,48 @@ def extract_archive(
         or ".." in Path(member_name).parts
     ):
         raise WikEdProtocolError("archive member name is unsafe")
+    effective_parameters = parameters or ExtractionParameters()
+    manifest = load_manifest(
+        repository_root / "docs/project/wiked-pl-holdout-manifest.json"
+    )
+    _validate_manifest_extractor(manifest, effective_parameters)
     archive_descriptor = -1
     try:
         try:
             archive_descriptor = _open_regular_descriptor(archive_path)
-            archive_size, archive_sha256 = _descriptor_digest(archive_descriptor)
+            archive_snapshot = _read_descriptor(archive_descriptor)
+            archive_size = len(archive_snapshot)
+            archive_sha256 = hashlib.sha256(archive_snapshot).hexdigest()
         except OSError as error:
             raise WikEdProtocolError("external WikEd archive is unavailable") from error
         if archive_sha256 != expected_archive_sha256:
             raise WikEdProtocolError("external WikEd archive SHA-256 mismatch")
-        os.lseek(archive_descriptor, 0, os.SEEK_SET)
-        with os.fdopen(archive_descriptor, "rb") as archive_source:
-            archive_descriptor = -1
-            with tarfile.open(fileobj=archive_source, mode="r:gz") as archive:
-                try:
-                    member = archive.getmember(member_name)
-                except KeyError as error:
-                    raise WikEdProtocolError(
-                        "declared archive member is unavailable"
-                    ) from error
-                if not member.isfile() or member.issym() or member.islnk():
-                    raise WikEdProtocolError(
-                        "declared archive member is not a regular file"
-                    )
-                extracted = archive.extractfile(member)
-                if extracted is None:
-                    raise WikEdProtocolError("declared archive member cannot be read")
-                with io.TextIOWrapper(extracted, encoding="utf-8") as source:
-                    return extract_records(
-                        source,
-                        classifications,
-                        output_root,
-                        repository_root=repository_root,
-                        archive_sha256=archive_sha256,
-                        archive_size_bytes=archive_size,
-                        member_name=member_name,
-                        parameters=parameters or ExtractionParameters(),
-                        authority=authority,
-                    )
+        with tarfile.open(fileobj=io.BytesIO(archive_snapshot), mode="r:gz") as archive:
+            try:
+                member = archive.getmember(member_name)
+            except KeyError as error:
+                raise WikEdProtocolError(
+                    "declared archive member is unavailable"
+                ) from error
+            if not member.isfile() or member.issym() or member.islnk():
+                raise WikEdProtocolError(
+                    "declared archive member is not a regular file"
+                )
+            extracted = archive.extractfile(member)
+            if extracted is None:
+                raise WikEdProtocolError("declared archive member cannot be read")
+            with io.TextIOWrapper(extracted, encoding="utf-8") as source:
+                return extract_records(
+                    source,
+                    classifications,
+                    output_root,
+                    repository_root=repository_root,
+                    archive_sha256=archive_sha256,
+                    archive_size_bytes=archive_size,
+                    member_name=member_name,
+                    parameters=effective_parameters,
+                    authority=authority,
+                )
     except UnicodeDecodeError as error:
         raise WikEdProtocolError("declared archive member is not UTF-8") from error
     except (OSError, tarfile.TarError) as error:
@@ -600,18 +618,30 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _require_cli_repository_root(repository_root: Path) -> Path:
+    actual_root = Path(__file__).resolve().parents[1]
+    try:
+        supplied_root = repository_root.resolve(strict=True)
+    except OSError as error:
+        raise WikEdProtocolError("repository root cannot be verified") from error
+    if supplied_root != actual_root:
+        raise WikEdProtocolError("repository root does not match script repository")
+    return actual_root
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        repository_root = _require_cli_repository_root(args.repository_root)
         result = extract_archive(
             args.archive,
             args.output,
             expected_archive_sha256=args.archive_sha256,
             member_name=args.member,
             classifications=load_classifications(
-                args.classification_map, repository_root=args.repository_root
+                args.classification_map, repository_root=repository_root
             ),
-            repository_root=args.repository_root,
+            repository_root=repository_root,
         )
     except WikEdProtocolError as error:
         print(f"wiked extraction blocked: {error}", file=sys.stderr)
