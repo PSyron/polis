@@ -108,6 +108,8 @@ __all__ = [
     "MorphologyStatus",
     "SuggestionOutcome",
     "SuggestionStatus",
+    "analyze",
+    "correct",
 ]
 
 
@@ -417,6 +419,27 @@ class Analyzer:
             minimum_confidence=self._config.minimum_confidence,
         )
         analysis = await self.analyze_async(text, options=options)
+        return self._correction_result(analysis)
+
+    def _correct_with_options(
+        self, text: str, options: AnalysisOptions
+    ) -> CorrectionResult:
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self._correct_async_with_options(text, options))
+        raise RuntimeError(
+            "Analyzer.correct() cannot be called from a running event loop; "
+            "use 'await Analyzer.correct_async(...)' instead"
+        )
+
+    async def _correct_async_with_options(
+        self, text: str, options: AnalysisOptions
+    ) -> CorrectionResult:
+        analysis = await self.analyze_async(text, options=options)
+        return self._correction_result(analysis)
+
+    def _correction_result(self, analysis: AnalysisResult) -> CorrectionResult:
         selected: list[Finding] = []
         skipped: list[Finding] = []
         for finding in analysis.issues:
@@ -455,6 +478,46 @@ class Analyzer:
                 source_policy_version=SOURCE_POLICY_VERSION,
             )
         )
+
+
+_DEFAULT_ANALYZER_CONFIG: Final = AnalyzerConfig()
+_ANALYZER_CACHE: dict[AnalyzerConfig, Analyzer] = {}
+_ANALYZER_CACHE_LOCK: Final = Lock()
+
+
+def _cached_analyzer(config: AnalyzerConfig | None) -> Analyzer:
+    resolved_config = _DEFAULT_ANALYZER_CONFIG if config is None else config
+    with _ANALYZER_CACHE_LOCK:
+        analyzer = _ANALYZER_CACHE.get(resolved_config)
+        if analyzer is None:
+            analyzer = Analyzer(resolved_config)
+            _ANALYZER_CACHE[resolved_config] = analyzer
+        return analyzer
+
+
+def analyze(
+    text: str,
+    *,
+    config: AnalyzerConfig | None = None,
+    options: AnalysisOptions | None = None,
+) -> AnalysisResult:
+    """Analyze text through a lazily cached analyzer for ``config``."""
+
+    return _cached_analyzer(config).analyze(text, options=options)
+
+
+def correct(
+    text: str,
+    *,
+    config: AnalyzerConfig | None = None,
+    options: AnalysisOptions | None = None,
+) -> CorrectionResult:
+    """Correct text through a lazily cached analyzer for ``config``."""
+
+    analyzer = _cached_analyzer(config)
+    if options is None:
+        return analyzer.correct(text)
+    return analyzer._correct_with_options(text, options)
 
 
 def _make_default_registry(

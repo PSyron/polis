@@ -4,7 +4,7 @@
 wersję schematu zabezpiecza [snapshot API](../tests/fixtures/public_api_snapshot.json).
 
 ```python
-from polis import AnalysisOptions, Analyzer, AnalyzerConfig
+from polis import AnalysisOptions, Analyzer, AnalyzerConfig, analyze, correct
 
 analyzer = Analyzer(AnalyzerConfig())
 result = analyzer.analyze(
@@ -13,6 +13,28 @@ result = analyzer.analyze(
 )
 correction = analyzer.correct("Zeby jutro,powiem o tym.")
 ```
+
+## Funkcje modułowe
+
+`polis.analyze(text, *, config=None, options=None)` i
+`polis.correct(text, *, config=None, options=None)` są skróconą ścieżką dla
+pojedynczych wywołań. Zwracają odpowiednio `AnalysisResult` i
+`CorrectionResult`, tak jak metody analizatora:
+
+```python
+from polis import AnalysisOptions, analyze, correct
+
+analysis = analyze(
+    "Te zdanie zawiera błąd.",
+    options=AnalysisOptions(categories={"agreement"}),
+)
+correction = correct("Zeby jutro,powiem o tym.")
+```
+
+Analizator jest tworzony leniwie i cache'owany według wartości `config`; kolejne
+wywołania z tą samą konfiguracją nie ponoszą kosztu jego ponownej konstrukcji.
+Konfiguracje własne są izolowane od domyślnej i od siebie nawzajem. Przy wielu
+wywołaniach można jawnie utworzyć jeden `Analyzer` i używać go ponownie.
 
 ## Analiza
 
@@ -64,12 +86,16 @@ wyznaczania znalezisk ani polityki bezpiecznej korekty.
 
 ## Korekta
 
-`Analyzer.correct(text)` zwraca `CorrectionResult` z polami:
+`Analyzer.correct(text)` oraz `polis.correct(text, *, config=None, options=None)`
+zwracają `CorrectionResult` z polami:
 
 - `original_text` i `corrected_text`;
 - `applied_findings` i `skipped_findings`;
 - `suggestion_outcomes` (pusta krotka w runtime v1);
 - `source_policy_version`.
+
+`options` w funkcji modułowej określa filtry analizy używanej do wyznaczenia
+korekt; pominięcie go zachowuje filtry z `config`.
 
 Automatycznie stosowane są tylko kwalifikowane, niekolidujące znaleziska
 deterministyczne. `apply_suggestions(finding_ids)` pozwala jawnie dołączyć
