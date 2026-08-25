@@ -54,6 +54,16 @@ w wersji 1. `SourceKind.LLM`, `SuggestionOutcome` i `SuggestionStatus` pozostaj�
 w publicznym schemacie dla zgodności danych linii 0.x, lecz domyślny runtime v1
 nie generuje takich wyników.
 
+## Cykl życia i bezpieczeństwo wątkowe
+
+Instancja `Analyzer` jest bezpieczna wątkowo do współbieżnych wywołań `analyze()`
+i `correct()`. Zbuduj ją raz z niezmienną `AnalyzerConfig` i współdziel między
+wątkami. Konstrukcja tworzy rejestr reguł oraz odczytuje status opcjonalnej
+morfologii; metody analizy tworzą wyniki lokalnie i nie zmieniają tego stanu.
+Nie twórz analizatora dla każdego żądania i nie dodawaj po stronie klienta
+blokady ani puli instancji. `close()` jest zgodnościowym no-opem, ponieważ
+domyślny runtime nie posiada zasobów zewnętrznych.
+
 ## Status opcjonalnej morfologii
 
 `Analyzer.morphology_status` zwraca niemutowalny `MorphologyStatus` zarejestrowany
