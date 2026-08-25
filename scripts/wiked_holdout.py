@@ -6,17 +6,20 @@ import io
 import json
 import os
 import re
+import stat
 import sys
 import tarfile
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 TARGET_CATEGORIES = frozenset({"inflection", "agreement", "rection", "punctuation"})
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _SPLITS = frozenset({"development", "holdout"})
 
 type Classification = tuple[str, str, bool]
+type ExtractionStatus = Literal["blocked_external_authority"]
 
 
 class WikEdProtocolError(ValueError):
@@ -45,12 +48,15 @@ class ExtractionParameters:
 
 @dataclass(frozen=True, slots=True)
 class ExtractionResult:
+    status: ExtractionStatus
     archive_sha256: str
     archive_size_bytes: int
     counts: dict[str, dict[str, int]]
     rejected: dict[str, int]
     development_sha256: str
     holdout_sha256: str
+    development_size_bytes: int
+    holdout_size_bytes: int
 
 
 def load_manifest(path: Path) -> dict[str, object]:
@@ -130,42 +136,50 @@ def extract_archive(
         or ".." in Path(member_name).parts
     ):
         raise WikEdProtocolError("archive member name is unsafe")
+    archive_descriptor = -1
     try:
-        archive_size, archive_sha256 = _file_digest(archive_path)
-    except OSError as error:
-        raise WikEdProtocolError("external WikEd archive is unavailable") from error
-    if archive_sha256 != expected_archive_sha256:
-        raise WikEdProtocolError("external WikEd archive SHA-256 mismatch")
-    try:
-        with tarfile.open(archive_path, mode="r:gz") as archive:
-            try:
-                member = archive.getmember(member_name)
-            except KeyError as error:
-                raise WikEdProtocolError(
-                    "declared archive member is unavailable"
-                ) from error
-            if not member.isfile() or member.issym() or member.islnk():
-                raise WikEdProtocolError(
-                    "declared archive member is not a regular file"
-                )
-            extracted = archive.extractfile(member)
-            if extracted is None:
-                raise WikEdProtocolError("declared archive member cannot be read")
-            with io.TextIOWrapper(extracted, encoding="utf-8") as source:
-                return extract_records(
-                    source,
-                    classifications,
-                    output_root,
-                    repository_root=repository_root,
-                    archive_sha256=archive_sha256,
-                    archive_size_bytes=archive_size,
-                    member_name=member_name,
-                    parameters=parameters or ExtractionParameters(),
-                )
+        try:
+            archive_descriptor = _open_regular_descriptor(archive_path)
+            archive_size, archive_sha256 = _descriptor_digest(archive_descriptor)
+        except OSError as error:
+            raise WikEdProtocolError("external WikEd archive is unavailable") from error
+        if archive_sha256 != expected_archive_sha256:
+            raise WikEdProtocolError("external WikEd archive SHA-256 mismatch")
+        os.lseek(archive_descriptor, 0, os.SEEK_SET)
+        with os.fdopen(archive_descriptor, "rb") as archive_source:
+            archive_descriptor = -1
+            with tarfile.open(fileobj=archive_source, mode="r:gz") as archive:
+                try:
+                    member = archive.getmember(member_name)
+                except KeyError as error:
+                    raise WikEdProtocolError(
+                        "declared archive member is unavailable"
+                    ) from error
+                if not member.isfile() or member.issym() or member.islnk():
+                    raise WikEdProtocolError(
+                        "declared archive member is not a regular file"
+                    )
+                extracted = archive.extractfile(member)
+                if extracted is None:
+                    raise WikEdProtocolError("declared archive member cannot be read")
+                with io.TextIOWrapper(extracted, encoding="utf-8") as source:
+                    return extract_records(
+                        source,
+                        classifications,
+                        output_root,
+                        repository_root=repository_root,
+                        archive_sha256=archive_sha256,
+                        archive_size_bytes=archive_size,
+                        member_name=member_name,
+                        parameters=parameters or ExtractionParameters(),
+                    )
     except UnicodeDecodeError as error:
         raise WikEdProtocolError("declared archive member is not UTF-8") from error
     except (OSError, tarfile.TarError) as error:
         raise WikEdProtocolError("external WikEd archive is invalid") from error
+    finally:
+        if archive_descriptor != -1:
+            os.close(archive_descriptor)
 
 
 def extract_records(
@@ -180,11 +194,10 @@ def extract_records(
     parameters: ExtractionParameters | None = None,
 ) -> ExtractionResult:
     _require_external_path(output_root, repository_root, "output")
-    output_root.mkdir(parents=True, exist_ok=False)
+    output_root.mkdir(mode=0o700, parents=True, exist_ok=False)
     os.chmod(output_root, 0o700)
     output_files = {
-        split: (output_root / f"{split}.jsonl").open("x", encoding="utf-8")
-        for split in _SPLITS
+        split: _open_private_text(output_root / f"{split}.jsonl") for split in _SPLITS
     }
     counts: dict[str, dict[str, int]] = {"development": {}, "holdout": {}}
     rejected: dict[str, int] = {}
@@ -232,20 +245,24 @@ def extract_records(
     finally:
         for output_file in output_files.values():
             output_file.close()
-    output_hashes = {
-        split: _file_digest(output_root / f"{split}.jsonl")[1] for split in _SPLITS
+    output_metadata = {
+        split: _file_digest(output_root / f"{split}.jsonl") for split in _SPLITS
     }
     result = ExtractionResult(
+        "blocked_external_authority",
         archive_sha256,
         archive_size_bytes,
         counts,
         rejected,
-        output_hashes["development"],
-        output_hashes["holdout"],
+        output_metadata["development"][1],
+        output_metadata["holdout"][1],
+        output_metadata["development"][0],
+        output_metadata["holdout"][0],
     )
     manifest = {
         "schema_id": "polis.wiked-pl-extraction-result",
         "schema_version": 1,
+        "status": result.status,
         "archive": {
             "sha256": archive_sha256,
             "size_bytes": archive_size_bytes,
@@ -259,24 +276,39 @@ def extract_records(
         "outputs": {
             "development": {
                 "count": sum(counts["development"].values()),
+                "size_bytes": result.development_size_bytes,
                 "sha256": result.development_sha256,
                 "class_counts": counts["development"],
             },
             "holdout": {
                 "count": sum(counts["holdout"].values()),
+                "size_bytes": result.holdout_size_bytes,
                 "sha256": result.holdout_sha256,
                 "class_counts": counts["holdout"],
             },
         },
         "rejected": rejected,
+        "leakage": {
+            "status": "not_run",
+            "validated": False,
+            "reason": "external_authority_and_existing_corpora_unavailable",
+        },
+        "authorization": {
+            "reservation_contract": "polis.evaluation.holdout_reservation",
+            "status": "not_authorized",
+            "reservation_established": False,
+        },
         "privacy": {"plaintext_in_logs": False, "repository_plaintext": False},
     }
-    (output_root / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n",
-        encoding="utf-8",
+    _write_private_bytes(
+        output_root / "manifest.json",
+        (
+            json.dumps(
+                manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            )
+            + "\n"
+        ).encode("utf-8"),
     )
-    os.chmod(output_root / "manifest.json", 0o600)
     return result
 
 
@@ -285,17 +317,82 @@ def _increment(counts: dict[str, int], key: str) -> None:
 
 
 def _file_digest(path: Path) -> tuple[int, str]:
+    descriptor = _open_regular_descriptor(path)
+    try:
+        return _descriptor_digest(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _descriptor_digest(descriptor: int) -> tuple[int, str]:
     digest = hashlib.sha256()
     size = 0
-    with path.open("rb") as source:
-        while chunk := source.read(1024 * 1024):
-            size += len(chunk)
-            digest.update(chunk)
+    os.lseek(descriptor, 0, os.SEEK_SET)
+    while chunk := os.read(descriptor, 1024 * 1024):
+        size += len(chunk)
+        digest.update(chunk)
     return size, digest.hexdigest()
 
 
+def _open_regular_descriptor(path: Path) -> int:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise OSError("required O_NOFOLLOW support is unavailable")
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        metadata = os.fstat(descriptor)
+        if not stat.S_ISREG(metadata.st_mode):
+            raise OSError("path is not a regular file")
+    except OSError:
+        os.close(descriptor)
+        raise
+    return descriptor
+
+
+def _open_private_text(path: Path) -> io.TextIOWrapper:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise WikEdProtocolError("required O_NOFOLLOW support is unavailable")
+    descriptor = os.open(
+        path,
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+        0o600,
+    )
+    try:
+        return os.fdopen(descriptor, "w", encoding="utf-8")
+    except OSError:
+        os.close(descriptor)
+        raise
+
+
+def _write_private_bytes(path: Path, content: bytes) -> None:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise WikEdProtocolError("required O_NOFOLLOW support is unavailable")
+    descriptor = os.open(
+        path,
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+        0o600,
+    )
+    try:
+        offset = 0
+        while offset < len(content):
+            offset += os.write(descriptor, content[offset:])
+    finally:
+        os.close(descriptor)
+
+
 def _require_external_path(path: Path, repository_root: Path, label: str) -> None:
-    resolved = path.resolve(strict=False)
+    candidate = path if path.is_absolute() else Path.cwd() / path
+    current = Path(candidate.anchor)
+    for component in candidate.parts[1:]:
+        current /= component
+        try:
+            metadata = os.lstat(current)
+        except FileNotFoundError:
+            continue
+        except OSError as error:
+            raise WikEdProtocolError(f"{label} path cannot be inspected") from error
+        if stat.S_ISLNK(metadata.st_mode):
+            raise WikEdProtocolError(f"{label} path cannot contain symlinks")
+    resolved = candidate.resolve(strict=False)
     root = repository_root.resolve(strict=False)
     if resolved == root or root in resolved.parents:
         raise WikEdProtocolError(f"{label} must be outside repository")
@@ -346,12 +443,15 @@ def main(argv: list[str] | None = None) -> int:
     print(
         json.dumps(
             {
+                "status": result.status,
                 "archive_sha256": result.archive_sha256,
                 "archive_size_bytes": result.archive_size_bytes,
                 "counts": result.counts,
                 "rejected": result.rejected,
                 "development_sha256": result.development_sha256,
                 "holdout_sha256": result.holdout_sha256,
+                "development_size_bytes": result.development_size_bytes,
+                "holdout_size_bytes": result.holdout_size_bytes,
             },
             sort_keys=True,
             separators=(",", ":"),

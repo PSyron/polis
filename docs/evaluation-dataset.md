@@ -18,7 +18,18 @@ klasy `inflection`, `agreement`, `rection` i `punctuation`; brak klasy,
 nieprzejrzana decyzja, duplikat pary między splitami albo błąd formatu kończy
 pracę fail-closed. Plaintext może trafić wyłącznie do nowego katalogu staging
 poza repozytorium, z trybem katalogu `0700` i plików `0600`; manifest wyniku
-zawiera tylko rozmiary, skróty, liczności i odrzucone rekordy.
+zawiera rozmiary, skróty, liczności i odrzucone rekordy. `count` oznacza liczbę
+rekordów w danym pliku JSONL, `size_bytes` liczbę jego bajtów, a `sha256` skrót
+tych samych, dokładnych bajtów. Wynik oraz stdout zachowują status
+`blocked_external_authority`; kontrola przecieku ma status `not_run` i
+`validated: false`, dopóki zewnętrzna władza nie dostarczy danych i niezależnych
+dowodów.
+
+Staging nie tworzy markera ani capability z
+`polis.evaluation.holdout_reservation`. Pole `authorization` pozostaje
+`not_authorized`, a jednorazowa rezerwacja odczytu zapieczętowanego holdoutu
+pozostaje osobną granicą wykonania. Sam digest, liczność albo obecność pliku
+`holdout.jsonl` nie jest autoryzacją odczytu.
 
 Przed uznaniem artefaktu za gotowy operator musi niezależnie potwierdzić
 licencję konkretnego wydania, przypiąć rewizję narzędzia, przejrzeć próbkę
