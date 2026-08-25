@@ -892,7 +892,15 @@ def _is_followed_by_nominal_group(
         return True
     prefixes = {tag.partition(":")[0] for _lemma, tag in analyses}
     if "prep" in prefixes:
-        return False
+        if not prefixes & _NOMINAL_COORDINATION_PREFIXES:
+            return False
+        return (
+            re.match(
+                r"[ \t]+[^\W\d_]+",
+                text[position + match.end("next") :],
+            )
+            is None
+        )
     return bool(prefixes & _NOMINAL_COORDINATION_PREFIXES)
 
 

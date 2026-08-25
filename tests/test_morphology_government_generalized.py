@@ -539,6 +539,22 @@ def test_government_abstains_when_next_token_has_mixed_nominal_analyses() -> Non
     assert rule.find("Szukam samochód pilot.", options=AnalysisOptions()) == ()
 
 
+def test_government_abstains_when_sentence_final_preposition_is_ambiguous() -> None:
+    analyses = {
+        "Szukam": _GovernmentBackend().analyses["Szukam"],
+        "samochód": _GovernmentBackend().analyses["samochód"],
+        "od": (
+            (0, 1, ("od", "od", "prep:gen:nwok", [], [])),
+            (0, 1, ("od", "oda", "subst:pl:gen:f", ["nazwa_pospolita"], [])),
+        ),
+    }
+    rule = InflectionGovernmentSzukacKluczRule(
+        _provider(_GovernmentBackend(analyses=analyses))
+    )
+
+    assert rule.find("Szukam samochód od.", options=AnalysisOptions()) == ()
+
+
 def test_negated_widziec_abstains_when_next_token_has_no_morphology() -> None:
     analyses = {"wymyślonytoken": ()}
     rule = InflectionNegatedWidziecRule(
