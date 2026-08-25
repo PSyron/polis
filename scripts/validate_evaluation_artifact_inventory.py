@@ -55,6 +55,17 @@ def _load_json(path: Path, label: str) -> Any:
         raise ValueError(f"cannot load {label}: {path}") from error
 
 
+def _resolve_docs_path(root: Path, value: str) -> Path | None:
+    candidate = Path(value)
+    if candidate.is_absolute():
+        return None
+    docs_root = (root / "docs").resolve()
+    resolved = (root / candidate).resolve(strict=False)
+    if not resolved.is_relative_to(docs_root):
+        return None
+    return resolved
+
+
 def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
     """Load the strict issue-428 artifact inventory."""
 
@@ -84,11 +95,18 @@ def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
     for index, alias in enumerate(aliases):
         if not isinstance(alias, dict) or set(alias) != _ALIAS_KEYS:
             raise ValueError(f"artifact alias {index} has invalid fields")
-        if alias["kind"] not in _KINDS:
+        kind = alias["kind"]
+        if not isinstance(kind, str) or kind not in _KINDS:
             raise ValueError(f"artifact alias {index} has an unknown kind")
         for field in ("canonical", "legacy"):
             value = alias[field]
-            if not isinstance(value, str) or not value.startswith("docs/"):
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"artifact alias {index} has an invalid {field} path")
+            if Path(value).is_absolute():
+                raise ValueError(
+                    f"artifact alias {index} {field} path escapes root/docs: {value}"
+                )
+            if not value.startswith("docs/"):
                 raise ValueError(f"artifact alias {index} has an invalid {field} path")
         digest = alias["legacy_sha256"]
         if (
@@ -117,6 +135,14 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
         kind = alias["kind"]
         canonical = alias["canonical"]
         legacy = alias["legacy"]
+        canonical_path = _resolve_docs_path(root, canonical)
+        legacy_path = _resolve_docs_path(root, legacy)
+        if canonical_path is None:
+            errors.append(f"canonical path escapes root/docs: {canonical}")
+        if legacy_path is None:
+            errors.append(f"legacy path escapes root/docs: {legacy}")
+        if canonical_path is None or legacy_path is None:
+            continue
         if canonical in seen_canonical or legacy in seen_legacy:
             errors.append(f"duplicate artifact alias: {canonical} / {legacy}")
         seen_canonical.add(canonical)
@@ -125,8 +151,6 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
             errors.append(f"canonical artifact has invalid name: {canonical}")
         if not Path(legacy).name.startswith("quality-"):
             errors.append(f"legacy artifact has invalid alias name: {legacy}")
-        canonical_path = root / canonical
-        legacy_path = root / legacy
         if not canonical_path.is_file():
             errors.append(f"missing canonical artifact: {canonical}")
             continue
@@ -157,12 +181,13 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
         if kind == "comparison":
             proposal_path = canonical_payload.get("proposal_path")
             proposal_sha256 = canonical_payload.get("proposal_sha256")
-            if not isinstance(proposal_path, str) or not proposal_path.startswith(
-                "docs/"
-            ):
+            if not isinstance(proposal_path, str) or not proposal_path:
                 errors.append(f"comparison proposal path is invalid: {canonical}")
                 continue
-            proposal_file = root / proposal_path
+            proposal_file = _resolve_docs_path(root, proposal_path)
+            if proposal_file is None:
+                errors.append(f"proposal_path escapes root/docs: {proposal_path}")
+                continue
             if not proposal_file.is_file():
                 errors.append(f"comparison proposal is missing: {proposal_path}")
                 continue

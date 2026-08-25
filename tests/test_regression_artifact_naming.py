@@ -6,6 +6,7 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
 from scripts.validate_evaluation_artifact_inventory import validate_inventory
 
 from polis.evaluation.quality_report import (
@@ -158,6 +159,96 @@ def test_inventory_rejects_mutating_a_historical_alias_pair(tmp_path: Path) -> N
     errors = validate_inventory(tmp_path)
 
     assert any("legacy artifact bytes changed" in error for error in errors)
+
+
+@pytest.mark.parametrize("field", ("canonical", "legacy"))
+@pytest.mark.parametrize("escape_kind", ("traversal", "absolute", "symlink"))
+def test_inventory_rejects_alias_paths_outside_docs(
+    tmp_path: Path, field: str, escape_kind: str
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    inventory_path = (
+        tmp_path / "docs" / "project" / "evaluation-artifact-inventory.json"
+    )
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    alias = inventory["aliases"][0]
+    source_path = ROOT / alias[field]
+    outside_path = tmp_path.parent / f"outside-{field}.json"
+    outside_path.write_bytes(source_path.read_bytes())
+
+    if escape_kind == "traversal":
+        escaped_path = f"docs/../../{outside_path.name}"
+    elif escape_kind == "absolute":
+        escaped_path = str(outside_path)
+    else:
+        link_name = (
+            "regression-baseline-v1-escape.json"
+            if field == "canonical"
+            else "quality-baseline-v1-escape.json"
+        )
+        link_path = tmp_path / "docs" / link_name
+        link_path.symlink_to(outside_path)
+        escaped_path = str(link_path.relative_to(tmp_path))
+    alias[field] = escaped_path
+    inventory_path.write_text(
+        json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+    errors = validate_inventory(tmp_path, inventory_path)
+
+    assert any(f"{field} path escapes root/docs" in error for error in errors)
+
+
+@pytest.mark.parametrize("escape_kind", ("traversal", "absolute", "symlink"))
+def test_inventory_rejects_proposal_paths_outside_docs(
+    tmp_path: Path, escape_kind: str
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    comparison_path = tmp_path / "docs" / "regression-comparison-v4.json"
+    proposal_path = tmp_path / "docs" / "regression-threshold-proposal-v4.json"
+    comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+    outside_path = tmp_path.parent / "outside-proposal.json"
+    outside_path.write_bytes(proposal_path.read_bytes())
+
+    if escape_kind == "traversal":
+        escaped_path = f"docs/../../{outside_path.name}"
+    elif escape_kind == "absolute":
+        escaped_path = str(outside_path)
+    else:
+        link_path = tmp_path / "docs" / "regression-threshold-proposal-v4-escape.json"
+        link_path.symlink_to(outside_path)
+        escaped_path = str(link_path.relative_to(tmp_path))
+    comparison["proposal_path"] = escaped_path
+    comparison["proposal_sha256"] = hashlib.sha256(
+        proposal_path.read_bytes()
+    ).hexdigest()
+    comparison_path.write_text(
+        json.dumps(comparison, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    errors = validate_inventory(tmp_path)
+
+    assert any("proposal_path escapes root/docs" in error for error in errors)
+
+
+@pytest.mark.parametrize("kind", (["baseline"], {"value": "baseline"}))
+def test_inventory_rejects_non_scalar_alias_kind(
+    tmp_path: Path, kind: list[str] | dict[str, str]
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    inventory_path = (
+        tmp_path / "docs" / "project" / "evaluation-artifact-inventory.json"
+    )
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["aliases"][0]["kind"] = kind
+    inventory_path.write_text(
+        json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+    errors = validate_inventory(tmp_path, inventory_path)
+
+    assert any("artifact alias 0 has an unknown kind" in error for error in errors)
 
 
 def _adr_evaluation_exports() -> tuple[str, ...]:
