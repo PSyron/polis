@@ -548,6 +548,14 @@ ten zapis. Zaufane materializowanie obu plików po weryfikacji live przez
 operatora stanowi granicę zaufania; runner podczas wykonania nie używa sieci.
 Prerejestracja celowo nie zapisuje przyszłych wartości tych pól.
 
+Dowód admission jest capability procesu wykonawczego. Chroni granicę przed
+caller-controlled danymi, podmianą plików, innym procesem i ponownym użyciem
+markera, ale nie jest sandboxem dla złośliwego kodu uruchomionego w tym samym
+interpreterze Pythona. Taki kod może introspekować obiekty i pamięć procesu;
+jego izolacja wymaga osobnego procesu lub sandboxa systemowego i pozostaje
+poza zakresem tego runnera. Nie wolno ładować niezaufanych pluginów do procesu,
+który ma dostęp do workspace holdoutu.
+
 Raport surowy dopuszcza jedynie agregaty pomiaru regresji, wydajności, środowiska i
 wyniki per źródło. Raport znormalizowany pomija dane czasowe, RSS i dane hosta,
 dzięki czemu rebuild ma kanoniczne, stabilne bajty. Oba schematy odrzucają pola

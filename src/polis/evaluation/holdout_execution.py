@@ -25,9 +25,6 @@ from polis.evaluation.holdout_report import (
     normalized_report_bytes,
     parse_raw_report,
 )
-from polis.evaluation.holdout_reservation import (
-    reserve_consumption_secure,
-)
 from polis.evaluation.holdout_scoring import production_report
 from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 from polis.evaluation.quality_protocol import peak_rss_bytes
@@ -62,6 +59,7 @@ def _write_results(
         "config_sha256": admission.evidence.config_sha256,
         "dataset_sha256": admission.evidence.dataset_sha256,
         "source_sha256": admission.evidence.source_sha256,
+        "source_tree_sha256": admission.evidence.source_tree_sha256,
         "verification_payload_sha256": admission.evidence.verification_payload_sha256,
         "marker_sha256": hashlib.sha256(workspace.read_output(marker_name)).hexdigest(),
         "raw_report_sha256": hashlib.sha256(raw_bytes).hexdigest(),
@@ -103,6 +101,7 @@ def _run_open_workspace(
     config = parse_holdout_config(config_document)
     manifest = metadata_bytes(workspace.read_manifest(), "dataset.manifest.json")
     parse_dataset_manifest(manifest, config)
+    workspace.bind_approved_dataset_identity()
 
     def load_secure_metadata(path: Path) -> JsonObject:
         return metadata_bytes(workspace.read_evidence(path.name), path.name)
@@ -126,18 +125,9 @@ def _run_open_workspace(
         )
     ):
         raise HoldoutAdmissionError("holdout output already exists")
-    identity: JsonObject = {
-        "experiment_id": config.experiment_id,
-        "config_sha256": admission.evidence.config_sha256,
-        "source_sha256": admission.evidence.source_sha256,
-        "dataset_sha256": admission.evidence.dataset_sha256,
-    }
-    marker = config.paths.marker
-    capability = reserve_consumption_secure(
-        marker,
-        identity,
+    capability = workspace.reserve_dataset(
+        admission,
         reserved_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        write_marker=workspace.create_output,
     )
     try:
         secure_dataset = workspace.read_dataset(capability)
@@ -176,5 +166,5 @@ def _run_open_workspace(
         config, admission, dataset, first_findings, durations, peak_rss_bytes()
     )
     parsed = parse_raw_report(raw)
-    _write_results(workspace, marker.name, config, admission, raw, parsed)
+    _write_results(workspace, config.paths.marker.name, config, admission, raw, parsed)
     return 0

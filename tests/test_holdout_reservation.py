@@ -15,6 +15,8 @@ from tests.holdout_test_helpers import (
     JsonObject,
 )
 
+from polis.evaluation.holdout_reservation import _OperatingSystemFilesystem
+
 
 class _ConsumptionCapability(Protocol):
     @property
@@ -22,9 +24,9 @@ class _ConsumptionCapability(Protocol):
 
 
 class _DurabilityFilesystem(Protocol):
-    def open_exclusive(self, path: Path, content: bytes) -> int: ...
+    def open_exclusive(self, directory: int, name: str, content: bytes) -> int: ...
 
-    def open_directory(self, path: Path) -> int: ...
+    def open_directory(self, path: Path, expected_identity: tuple[int, int]) -> int: ...
 
     def fsync(self, descriptor: int) -> None: ...
 
@@ -62,13 +64,14 @@ class _ReservationApi(Protocol):
 
 @dataclass(frozen=True, slots=True)
 class _RecordingFilesystem:
-    events: list[tuple[str, int | Path]] = field(default_factory=list)
+    events: list[tuple[str, int | Path | str]] = field(default_factory=list)
 
-    def open_exclusive(self, path: Path, _content: bytes) -> int:
-        self.events.append(("open_file", path))
+    def open_exclusive(self, directory: int, name: str, _content: bytes) -> int:
+        self.events.append(("open_file", directory))
+        self.events.append(("open_name", name))
         return 101
 
-    def open_directory(self, path: Path) -> int:
+    def open_directory(self, path: Path, _expected_identity: tuple[int, int]) -> int:
         self.events.append(("open_directory", path))
         return 202
 
@@ -188,7 +191,8 @@ def test_file_and_parent_directory_descriptors_are_each_fsynced(tmp_path: Path) 
         filesystem=filesystem,
     )
 
-    assert ("open_file", marker) in filesystem.events
+    assert ("open_file", 202) in filesystem.events
+    assert ("open_name", marker.name) in filesystem.events
     assert ("open_directory", tmp_path) in filesystem.events
     assert [value for action, value in filesystem.events if action == "fsync"] == [
         101,
@@ -218,3 +222,117 @@ def test_manual_marker_and_forged_capability_cannot_enter_loader(
         _reservation().load_reserved_dataset(_ForgedCapability(marker), loader)
 
     assert loader_calls == 0
+
+
+def test_generic_reservation_rejects_symlinked_parent(tmp_path: Path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    linked_parent = tmp_path / "linked-parent"
+    linked_parent.symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(_reservation().HoldoutAlreadyConsumedError, match="canonical"):
+        _reservation().reserve_consumption(
+            linked_parent / "holdout.started",
+            _identity(),
+            reserved_at="2026-08-25T00:00:00Z",
+        )
+
+    assert not (outside / "holdout.started").exists()
+
+
+def test_generic_reservation_uses_opened_parent_descriptor_after_parent_replacement(
+    tmp_path: Path,
+) -> None:
+    class ReplacingFilesystem:
+        def __init__(self) -> None:
+            self._filesystem: _DurabilityFilesystem = _OperatingSystemFilesystem()
+
+        def open_exclusive(self, directory: int, name: str, content: bytes) -> int:
+            return self._filesystem.open_exclusive(directory, name, content)
+
+        def open_directory(self, path: Path, expected_identity: tuple[int, int]) -> int:
+            descriptor = self._filesystem.open_directory(path, expected_identity)
+            trusted_parent = path.with_name(f"{path.name}.trusted")
+            path.rename(trusted_parent)
+            path.mkdir()
+            return descriptor
+
+        def fsync(self, descriptor: int) -> None:
+            self._filesystem.fsync(descriptor)
+
+        def close(self, descriptor: int) -> None:
+            self._filesystem.close(descriptor)
+
+    parent = tmp_path / "parent"
+    parent.mkdir()
+    marker = parent / "holdout.started"
+
+    _reservation().reserve_consumption(
+        marker,
+        _identity(),
+        reserved_at="2026-08-25T00:00:00Z",
+        filesystem=ReplacingFilesystem(),
+    )
+
+    assert (tmp_path / "parent.trusted/holdout.started").exists()
+    assert not marker.exists()
+
+
+def test_generic_reservation_rejects_parent_replacement_before_descriptor_open(
+    tmp_path: Path,
+) -> None:
+    class ReplacingFilesystem:
+        def __init__(self) -> None:
+            self._filesystem: _DurabilityFilesystem = _OperatingSystemFilesystem()
+
+        def open_exclusive(self, directory: int, name: str, content: bytes) -> int:
+            return self._filesystem.open_exclusive(directory, name, content)
+
+        def open_directory(self, path: Path, expected_identity: tuple[int, int]) -> int:
+            trusted_parent = path.with_name(f"{path.name}.trusted")
+            path.rename(trusted_parent)
+            path.mkdir()
+            return self._filesystem.open_directory(path, expected_identity)
+
+        def fsync(self, descriptor: int) -> None:
+            self._filesystem.fsync(descriptor)
+
+        def close(self, descriptor: int) -> None:
+            self._filesystem.close(descriptor)
+
+    parent = tmp_path / "parent"
+    parent.mkdir()
+    marker = parent / "holdout.started"
+
+    with pytest.raises(_reservation().HoldoutAlreadyConsumedError, match="unavailable"):
+        _reservation().reserve_consumption(
+            marker,
+            _identity(),
+            reserved_at="2026-08-25T00:00:00Z",
+            filesystem=ReplacingFilesystem(),
+        )
+
+    assert not marker.exists()
+    assert not (tmp_path / "parent.trusted/holdout.started").exists()
+
+
+def test_generic_reservation_preserves_symlinked_path_prefix(
+    tmp_path: Path,
+) -> None:
+    from polis.evaluation.holdout_reservation import _OperatingSystemFilesystem
+
+    real_prefix = tmp_path / "real-prefix"
+    real_parent = real_prefix / "parent"
+    real_parent.mkdir(parents=True)
+    linked_prefix = tmp_path / "linked-prefix"
+    linked_prefix.symlink_to(real_prefix, target_is_directory=True)
+    marker = linked_prefix / "parent/holdout.started"
+
+    _reservation().reserve_consumption(
+        marker,
+        _identity(),
+        reserved_at="2026-08-25T00:00:00Z",
+        filesystem=_OperatingSystemFilesystem(),
+    )
+
+    assert (real_parent / "holdout.started").exists()

@@ -13,11 +13,26 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Final, Literal, Protocol
 
 TARGET_CATEGORIES = frozenset({"inflection", "agreement", "rection", "punctuation"})
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _SPLITS = frozenset({"development", "holdout"})
+_EXPECTED_SOURCE: Final = {
+    "name": "WikEd Error Corpus",
+    "archive": "wiked-v1.0.pl.tgz",
+    "url": "http://data.statmt.org/romang/wiked/wiked-v1.0.pl.tgz",
+    "language": "pl",
+    "license": "CC-BY-SA-3.0",
+    "license_status": "pending_artifact_authority_confirmation",
+    "license_basis": "WikEd inherits the license of the source Wikipedia revisions.",
+}
+_EXPECTED_SELECTION: Final = {
+    "target_categories": ["inflection", "agreement", "rection", "punctuation"],
+    "classification_source": "external-human-reviewed-line-map",
+    "review_required": True,
+    "unclassified_action": "reject",
+}
 
 type Classification = tuple[str, str, bool]
 type ExtractionStatus = Literal["blocked_external_authority"]
@@ -79,10 +94,15 @@ class ExtractionResult:
 
 
 def load_manifest(path: Path) -> dict[str, object]:
+    descriptor = -1
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
+        descriptor = _open_regular_descriptor(path)
+        raw = json.loads(_read_descriptor(descriptor).decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise WikEdProtocolError("WikEd manifest is unavailable or invalid") from error
+    finally:
+        if descriptor != -1:
+            os.close(descriptor)
     if not isinstance(raw, dict):
         raise WikEdProtocolError("WikEd manifest must be a JSON object")
     if raw.get("schema_id") != "polis.wiked-pl-holdout-manifest":
@@ -91,7 +111,19 @@ def load_manifest(path: Path) -> dict[str, object]:
         raise WikEdProtocolError("WikEd manifest schema version is invalid")
     if raw.get("status") != "blocked_external_authority":
         raise WikEdProtocolError("WikEd manifest must remain blocked pending authority")
+    _validate_manifest_source(raw)
+    _validate_manifest_selection(raw)
     return raw
+
+
+def _validate_manifest_source(manifest: Mapping[str, object]) -> None:
+    if manifest.get("source") != _EXPECTED_SOURCE:
+        raise WikEdProtocolError("WikEd manifest source contract is invalid")
+
+
+def _validate_manifest_selection(manifest: Mapping[str, object]) -> None:
+    if manifest.get("selection") != _EXPECTED_SELECTION:
+        raise WikEdProtocolError("WikEd manifest selection contract is invalid")
 
 
 def _validate_manifest_extractor(
@@ -100,12 +132,15 @@ def _validate_manifest_extractor(
     extractor = manifest.get("extractor")
     if not isinstance(extractor, dict):
         raise WikEdProtocolError("WikEd manifest extractor is invalid")
-    if extractor.get("tool") != "snukky/wikiedits":
-        raise WikEdProtocolError("WikEd manifest extractor tool is invalid")
-    if extractor.get("wikiedits_version") != "2.0":
-        raise WikEdProtocolError("WikEd manifest extractor version is invalid")
-    if extractor.get("parameters") != parameters.as_dict():
-        raise WikEdProtocolError("WikEd manifest extractor parameters are invalid")
+    expected = {
+        "tool": "snukky/wikiedits",
+        "wikiedits_version": "2.0",
+        "revision": None,
+        "parameters": parameters.as_dict(),
+        "input_format": "UTF-8 tab-separated old/new pairs in a named archive member",
+    }
+    if extractor != expected:
+        raise WikEdProtocolError("WikEd manifest extractor contract is invalid")
 
 
 def load_classifications(

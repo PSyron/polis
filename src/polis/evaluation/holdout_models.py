@@ -139,6 +139,7 @@ class HoldoutConfig:
 class AdmissionEvidence:
     config_sha256: str
     source_sha256: str
+    source_tree_sha256: str
     dataset_sha256: str
     merge_commit: str | None
     verification_verified: bool | None
