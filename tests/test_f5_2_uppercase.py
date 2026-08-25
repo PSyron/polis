@@ -26,7 +26,7 @@ _CASES = (
         "SKLEPU",
         13,
         18,
-        "inflection-government-do-sklep/2.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "inflection-government-do-sklep/3.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
         "replace.governed_form",
     ),
     (

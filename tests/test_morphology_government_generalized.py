@@ -71,6 +71,57 @@ _CASES = (
     ),
 )
 
+_PRONOUN_CASES = (
+    (
+        "Szukam ten samochód.",
+        "rule:inflection.government_szukac_klucz",
+        "ten samochód",
+        "tego samochodu",
+        7,
+        19,
+    ),
+    (
+        "Szukam mojego telefon.",
+        "rule:inflection.government_szukac_klucz",
+        "telefon",
+        "telefonu",
+        14,
+        21,
+    ),
+    (
+        "Używam ten program.",
+        "rule:inflection.government_uzywac_telefon",
+        "ten program",
+        "tego programu",
+        7,
+        18,
+    ),
+    (
+        "Ufam mojemu lekarz.",
+        "rule:inflection.government_ufac_lekarz",
+        "lekarz",
+        "lekarzowi",
+        12,
+        18,
+    ),
+    (
+        "Szukam ta książka.",
+        "rule:inflection.government_szukac_klucz",
+        "ta książka",
+        "tej książki",
+        7,
+        17,
+    ),
+    (
+        "Szukam naszego telefon.",
+        "rule:inflection.government_szukac_klucz",
+        "telefon",
+        "telefonu",
+        15,
+        22,
+    ),
+)
+
 _GENERALIZED_SOURCES: Final = frozenset(
     {
         "rule:inflection.government_szukac_klucz",
@@ -108,7 +159,6 @@ _PUBLIC_HARD_NEGATIVES = (
     "Szukam Warszawa.",
     "Interesuję polska historia.",
     "Ufam się nowy lekarz.",
-    "Szukam ten samochód.",
     "Szukam samochód.txt",
     "Ufam lekarz oraz pielęgniarka.",
     "Ufam lekarzu.",
@@ -124,6 +174,11 @@ _PUBLIC_HARD_NEGATIVES = (
     "Szukam samochód?!",
     "Szukam samochód i znowu szukam samochód.",
     "Szukam samochód i znów szukam samochód.",
+    "Szukam mojego telefonu.",
+    "Używam tego programu.",
+    "Używam nowy program.",
+    "Szukam mojego nowy telefon.",
+    "Szukam jego.",
 )
 
 _NOTICE = "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
@@ -197,6 +252,77 @@ def test_generalized_government_finds_new_complement_lemmas_exactly() -> None:
         assert (finding.original, finding.suggestion) == (original, suggestion)
         assert (finding.start, finding.end) == (start, end)
         assert text[start:end] == original
+
+
+@pytest.mark.parametrize(
+    ("text", "source", "original", "suggestion", "start", "end"),
+    _PRONOUN_CASES,
+)
+def test_generalized_government_accepts_pronoun_nominal_modifiers(
+    text: str,
+    source: str,
+    original: str,
+    suggestion: str,
+    start: int,
+    end: int,
+) -> None:
+    findings = tuple(
+        finding
+        for finding in Analyzer(AnalyzerConfig()).analyze(text).issues
+        if str(finding.source) == source
+    )
+
+    assert len(findings) == 1
+    finding = findings[0]
+    assert (finding.original, finding.suggestion) == (original, suggestion)
+    assert (finding.start, finding.end) == (start, end)
+    assert text[start:end] == original
+
+
+def test_generalized_government_keeps_correct_pronoun_and_only_changes_noun() -> None:
+    text = "Ufam mojemu lekarz."
+    findings = tuple(
+        finding
+        for finding in Analyzer(AnalyzerConfig()).analyze(text).issues
+        if str(finding.source) == "rule:inflection.government_ufac_lekarz"
+    )
+
+    assert len(findings) == 1
+    assert (findings[0].original, findings[0].suggestion) == ("lekarz", "lekarzowi")
+    assert (findings[0].start, findings[0].end) == (12, 18)
+    assert text[findings[0].start : findings[0].end] == findings[0].original
+
+
+def test_generalized_government_abstains_on_ambiguous_pronoun_modifier() -> None:
+    analyses = {
+        "Szukam": _GovernmentBackend().analyses["Szukam"],
+        "mojego": (
+            (
+                0,
+                1,
+                ("mojego", "mój:A", "adj:sg:gen:m1.m2.m3.n:pos", [], []),
+            ),
+            (0, 1, ("mojego", "nasz", "adj:sg:gen:m1.m2.m3.n:pos", [], [])),
+        ),
+        "telefon": (
+            (
+                0,
+                1,
+                ("telefon", "telefon", "subst:sg:nom.acc:m3", ["nazwa_pospolita"], []),
+            ),
+        ),
+    }
+    generated = {
+        "samochód": _GovernmentBackend().generated["samochód"],
+        "telefon": (
+            ("telefonu", "telefon", "subst:sg:gen:m3", ["nazwa_pospolita"], []),
+        ),
+    }
+    rule = InflectionGovernmentSzukacKluczRule(
+        _provider(_GovernmentBackend(analyses=analyses, generated=generated))
+    )
+
+    assert rule.find("Szukam mojego telefon.", options=AnalysisOptions()) == ()
 
 
 def test_generalized_government_remains_review_only_until_explicit_apply() -> None:

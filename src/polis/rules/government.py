@@ -140,7 +140,7 @@ class InflectionGovernmentSzukacKluczRule:
 
     @property
     def behavior_version(self) -> str:
-        return _wave4_behavior("inflection-government-szukac-klucz", 2)
+        return _wave4_behavior("inflection-government-szukac-klucz", 3)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         return _GeneralizedGovernmentRule(self._provider, _GENERALIZED_SPECS[0]).find(
@@ -454,7 +454,7 @@ class _GeneralizedGovernmentRule:
 
     @property
     def behavior_version(self) -> str:
-        return _wave4_behavior(self._spec.behavior_stem, 2)
+        return _wave4_behavior(self._spec.behavior_stem, 3)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
