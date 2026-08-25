@@ -463,13 +463,15 @@ class _QualifiedMorfeusz:
         ):
             return None
         governor_analysis_set = {(item.lemma, item.tag) for item in governor_analyses}
+        governor_tags_for_lemma = _tags_for_lemma(governor_analysis_set, governor_lemma)
         if (
             not _has_one_supported_lemma(
                 governor_analysis_set,
                 lemma=governor_lemma,
                 source_tags=governor_tags,
             )
-            or _tags_for_lemma(governor_analysis_set, governor_lemma) != governor_tags
+            or len(governor_tags_for_lemma) != 1
+            or not governor_tags_for_lemma <= governor_tags
         ):
             return None
         noun_selection = _select_government_noun_analyses(noun_analyses)
@@ -955,11 +957,11 @@ def _has_one_supported_lemma(
 ) -> bool:
     if not analyses or any(tag == "ign" for _, tag in analyses):
         return False
-    source_pos = next(iter(source_tags)).partition(":")[0]
+    source_pos = {tag.partition(":")[0] for tag in source_tags}
     selected = {
         (row_lemma, tag)
         for row_lemma, tag in analyses
-        if tag.partition(":")[0] == source_pos
+        if tag.partition(":")[0] in source_pos
     }
     selected_lemmas = {row_lemma for row_lemma, _ in selected}
     return selected_lemmas == {lemma} and all(tag in source_tags for _, tag in selected)

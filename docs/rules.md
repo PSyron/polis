@@ -25,13 +25,13 @@ kompletności języka.
 | `rule:inflection.negated_lubic_kawe` | `inflection` | opcjonalna zamknięta konstrukcja `Nie lubię kawę.` → `kawy`, wyłącznie do przeglądu (wymaga morfologii) |
 | `rule:inflection.przygladac_sie_nowy_budynek` | `inflection` | opcjonalna zamknięta konstrukcja `Przyglądam się nowy budynek.` → `Przyglądam się nowemu budynkowi.`, wyłącznie do przeglądu |
 | `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`; po morfologicznie zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
-| `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta rekcja `szukać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Szukam samochód.` → `samochodu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta rekcja `szukać` dla pełnego dopuszczalnego paradygmatu finitywnego rządzącego oraz jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Szukam samochód.` → `samochodu`), z abstencją dla bezokolicznika, imiesłowów, gerundium i trybu rozkazującego; po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.government_sluchac_radio` | `inflection` | opcjonalna zamknięta konstrukcja `Słucham radio.` → `radia`, wyłącznie do przeglądu |
-| `rule:inflection.government_uzywac_telefon` | `inflection` | opcjonalna zamknięta rekcja `używać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Używam nowy telefon.` → `nowego telefonu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
-| `rule:inflection.government_interesowac_sie_historia` | `inflection` | opcjonalna zamknięta rekcja `interesować się` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Interesuję się polska historia.` → `polską historią`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_uzywac_telefon` | `inflection` | opcjonalna zamknięta rekcja `używać` dla pełnego dopuszczalnego paradygmatu finitywnego rządzącego oraz jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Używam nowy telefon.` → `nowego telefonu`), z abstencją dla bezokolicznika, imiesłowów, gerundium i trybu rozkazującego; po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_interesowac_sie_historia` | `inflection` | opcjonalna zamknięta rekcja `interesować się` dla pełnego dopuszczalnego paradygmatu finitywnego rządzącego oraz jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Interesuję się polska historia.` → `polską historią`), z abstencją dla bezokolicznika, imiesłowów, gerundium i trybu rozkazującego; po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.government_byc_nauczyciel` | `inflection` | opcjonalna zamknięta konstrukcja `Jestem nauczyciel.` → `nauczycielem`, wyłącznie do przeglądu |
-| `rule:inflection.government_do_sklep` | `inflection` | opcjonalna zamknięta rekcja przyimka `do` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Idę do duży sklep.` → `dużego sklepu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
-| `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta rekcja `ufać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Ufam nowy lekarz.` → `nowemu lekarzowi`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_do_sklep` | `inflection` | opcjonalna zamknięta rekcja przyimka `do` dla jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Idę do duży sklep.` → `dużego sklepu`), po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta rekcja `ufać` dla pełnego dopuszczalnego paradygmatu finitywnego rządzącego oraz jednoznacznego rzeczownika albo grupy `przymiotnik + rzeczownik` (`Ufam nowy lekarz.` → `nowemu lekarzowi`), z abstencją dla bezokolicznika, imiesłowów, gerundium i trybu rozkazującego; po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.numeral_five_genitive_plural` | `inflection` | zamknięta, zakotwiczona konstrukcja `Pięć książki` → `książek`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.czyby` | `spelling` | dokładna forma łączna `czyby` → `czy by`, wyłącznie do przeglądu |
@@ -118,16 +118,15 @@ uprawnienia.
 osobna polityka nie zakwalifikuje jej dokładnego klucza `(source, category,
 operation, behavior_version, source_policy_version)`.
 
-Wybrane źródła rekcji z #387 zachowują swoje dotychczasowe identyfikatory, ale
-mają wersję zachowania `4.0+` i obsługują wyłącznie zamkniętą tabelę `szukać`,
-`używać`, `ufać`, `interesować się` oraz `do`. Provider musi potwierdzić jeden
+Wybrane źródła rekcji z #387 zachowują swoje dotychczasowe identyfikatory. Cztery
+źródła czasownikowe mają wersję zachowania `5.0+` i obsługują pełny dopuszczalny
+paradygmat finitywny `szukać`, `używać`, `ufać` oraz `interesować się`; źródło
+przyimka `do` zachowuje wersję `2.0+` i dotychczasowe zachowanie. Provider musi potwierdzić jeden
 leksem rzeczownika pospolitego i, jeśli występuje, jeden leksem przymiotnika
-albo obsługiwanego zaimka dzierżawczego/wskazującego oraz jednoznaczne cechy
-liczby i rodzaju; nazwa własna, koordynacja, cudzysłów, brak `się`, niepełne
-dane, wieloznaczna analiza modyfikatora lub dryft providera kończą się
-abstencją.
-Sugestia obejmuje tylko zmieniony rzeczownik albo pełną grupę
-`modyfikator + rzeczownik` i nie jest dodana do polityki automatycznej. Po
+oraz jednoznaczne cechy liczby i rodzaju; zaimek, nazwa własna, koordynacja,
+cudzysłów, brak `się`, formy nieosobowe, tryb rozkazujący, niepełne dane lub
+dryft providera kończą się abstencją. Sugestia obejmuje tylko zmieniony rzeczownik albo pełną grupę
+`przymiotnik + rzeczownik` i nie jest dodana do polityki automatycznej. Po
 zamkniętej grupie można zaakceptować dalszy materiał wyłącznie wtedy, gdy
 następny token nie ma morfologicznej analizy nominalnej; brak, niepełność lub
 wieloznaczność danych kończy się abstencją.

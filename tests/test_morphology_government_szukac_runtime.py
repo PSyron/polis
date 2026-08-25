@@ -28,7 +28,7 @@ from polis.rules.government import InflectionGovernmentSzukacKluczRule
 
 _TEXT = "Szukam klucz."
 _BEHAVIOR = (
-    "inflection-government-szukac-klucz/4.0+"
+    "inflection-government-szukac-klucz/5.0+"
     "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-"
     "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393"
 )
