@@ -519,6 +519,26 @@ def test_government_abstains_when_next_token_has_no_morphology() -> None:
     assert rule.find("Szukam samochód wymyślonytoken.", options=AnalysisOptions()) == ()
 
 
+def test_government_abstains_when_next_token_has_mixed_nominal_analyses() -> None:
+    analyses = {
+        "Szukam": _GovernmentBackend().analyses["Szukam"],
+        "samochód": _GovernmentBackend().analyses["samochód"],
+        "pilot": (
+            (
+                0,
+                1,
+                ("pilot", "pilot", "subst:sg:nom.acc:m1", ["nazwa_pospolita"], []),
+            ),
+            (0, 1, ("pilot", "pilot", "v:fin:sg:ter:imperf", [], [])),
+        ),
+    }
+    rule = InflectionGovernmentSzukacKluczRule(
+        _provider(_GovernmentBackend(analyses=analyses))
+    )
+
+    assert rule.find("Szukam samochód pilot.", options=AnalysisOptions()) == ()
+
+
 def test_negated_widziec_abstains_when_next_token_has_no_morphology() -> None:
     analyses = {"wymyślonytoken": ()}
     rule = InflectionNegatedWidziecRule(

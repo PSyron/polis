@@ -891,7 +891,9 @@ def _is_followed_by_nominal_group(
     if not analyses:
         return True
     prefixes = {tag.partition(":")[0] for _lemma, tag in analyses}
-    return bool(prefixes) and prefixes <= _NOMINAL_COORDINATION_PREFIXES
+    if "prep" in prefixes:
+        return False
+    return bool(prefixes & _NOMINAL_COORDINATION_PREFIXES)
 
 
 def _is_initial_do_case_boundary(text: str, match: re.Match[str]) -> bool:
