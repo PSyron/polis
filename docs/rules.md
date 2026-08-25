@@ -119,7 +119,7 @@ osobna polityka nie zakwalifikuje jej dokładnego klucza `(source, category,
 operation, behavior_version, source_policy_version)`.
 
 Wybrane źródła rekcji z #387 zachowują swoje dotychczasowe identyfikatory, ale
-mają wersję zachowania `3.0+` i obsługują wyłącznie zamkniętą tabelę `szukać`,
+mają wersję zachowania `4.0+` i obsługują wyłącznie zamkniętą tabelę `szukać`,
 `używać`, `ufać`, `interesować się` oraz `do`. Provider musi potwierdzić jeden
 leksem rzeczownika pospolitego i, jeśli występuje, jeden leksem przymiotnika
 albo obsługiwanego zaimka dzierżawczego/wskazującego oraz jednoznaczne cechy
