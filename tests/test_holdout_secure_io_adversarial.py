@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import os
 import subprocess
@@ -14,20 +15,16 @@ from typing import Literal, assert_never
 
 import pytest
 from tests.holdout_config_fixture import synthetic_config
+from tests.holdout_test_helpers import load_synthetic_external_admission
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_admission import (
-    ExternalAdmission,
-    _register_external_admission,
-)
+from polis.evaluation.holdout_admission import ExternalAdmission
 from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
 from polis.evaluation.holdout_models import (
-    AdmissionEvidence,
     DatasetIdentity,
     HoldoutAdmissionError,
 )
 from polis.evaluation.holdout_reservation import is_valid_consumption_capability
-from polis.evaluation.holdout_sources import source_sha256
 
 TRUSTED_DATASET = b"trusted-dataset"
 TRUSTED_DATASET += b"\0" * (17370 - len(TRUSTED_DATASET))
@@ -44,9 +41,17 @@ VERIFICATION_PAYLOAD = {
 
 @pytest.fixture(autouse=True)
 def _patch_synthetic_dataset_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    import polis.evaluation.holdout_authorization as authorization
     import polis.evaluation.holdout_config_dataset as config_dataset
 
+    class SyntheticVerifier:
+        def verify(self, _payload: bytes, _signature: bytes) -> bool:
+            return True
+
     monkeypatch.setattr(config_dataset, "DATASET_SHA256", TRUSTED_DATASET_SHA256)
+    monkeypatch.setattr(
+        authorization, "_authorization_verifier", lambda _sha: SyntheticVerifier()
+    )
 
 
 def _layout(root: Path) -> tuple[Path, Path]:
@@ -88,29 +93,12 @@ def _layout(root: Path) -> tuple[Path, Path]:
     return experiment, sealed
 
 
-def _admission() -> ExternalAdmission:
-    config = synthetic_config()
-    dataset = config["dataset"]
-    assert isinstance(dataset, dict)
-    dataset["sha256"] = TRUSTED_DATASET_SHA256
-    dataset["size_bytes"] = len(TRUSTED_DATASET)
-    parsed = parse_holdout_config(config)
-    return _register_external_admission(
-        ExternalAdmission(
-            AdmissionEvidence(
-                canonical_sha256(config),
-                source_sha256(parsed),
-                "b" * 40,
-                TRUSTED_DATASET_SHA256,
-                MERGE_COMMIT,
-                True,
-                "valid",
-                canonical_sha256(VERIFICATION_PAYLOAD),
-            ),
-            "c" * 64,
-            "d" * 64,
-            "e" * 64,
-        ),
+def _admission(root: Path) -> ExternalAdmission:
+    return load_synthetic_external_admission(
+        root,
+        dataset_sha256=TRUSTED_DATASET_SHA256,
+        merge_commit=MERGE_COMMIT,
+        source_tree_sha256="b" * 40,
     )
 
 
@@ -158,7 +146,7 @@ def test_reserve_rejects_forged_complete_admission_identity(
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
-    admission = _admission()
+    admission = _admission(tmp_path)
     forged = replace(
         admission, evidence=replace(admission.evidence, source_sha256="forged")
     )
@@ -180,7 +168,7 @@ def test_reserve_rejects_caller_forged_admission_with_matching_evidence(
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
-    trusted = _admission()
+    trusted = _admission(tmp_path)
     forged = ExternalAdmission(
         trusted.evidence,
         "f" * 64,
@@ -196,6 +184,12 @@ def test_reserve_rejects_caller_forged_admission_with_matching_evidence(
     assert not (tmp_path / "experiments/a-b-one-shot/holdout.started").exists()
 
 
+def test_admission_registry_is_not_an_importable_forge_boundary() -> None:
+    module = importlib.import_module("polis.evaluation.holdout_admission")
+
+    assert not hasattr(module, "_register_external_admission")
+
+
 def test_reservation_marker_binds_source_tree_identity(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -206,7 +200,9 @@ def test_reservation_marker_binds_source_tree_identity(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     try:
         workspace.bind_approved_dataset_identity()
-        workspace.reserve_dataset(_admission(), reserved_at="2026-08-25T00:00:00Z")
+        workspace.reserve_dataset(
+            _admission(tmp_path), reserved_at="2026-08-25T00:00:00Z"
+        )
         marker = json.loads(
             (experiment / "holdout.started").read_text(encoding="utf-8")
         )
@@ -238,7 +234,7 @@ def test_result_manifest_binds_source_tree_identity(
             workspace,
             "holdout.started",
             config,
-            _admission(),
+            _admission(tmp_path),
             raw,
             parse_raw_report(raw),
         )
@@ -288,7 +284,7 @@ def test_workspace_rejects_hardlinked_sensitive_file(
             case "dataset":
                 workspace.bind_approved_dataset_identity()
                 capability = workspace.reserve_dataset(
-                    _admission(),
+                    _admission(tmp_path),
                     reserved_at="2026-08-25T00:00:00Z",
                 )
                 with pytest.raises(HoldoutAdmissionError):
@@ -940,7 +936,7 @@ def test_capability_claims_cannot_be_rewrapped_for_another_workspace(
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     object.__setattr__(capability, "_token", object())
@@ -965,7 +961,7 @@ def test_direct_token_claim_mutation_cannot_redirect_capability(
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -998,7 +994,7 @@ def test_workspace_rejects_dataset_append_before_unbounded_read(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     original_read: Callable[[int, int], bytes] = os.read
@@ -1031,7 +1027,7 @@ def test_secure_boundary_rejects_same_size_dataset_with_forged_digest(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -1053,9 +1049,9 @@ def test_dataset_capability_rejects_identity_not_matching_approved_manifest(
     try:
         with pytest.raises(HoldoutAdmissionError, match="admission evidence"):
             forged = replace(
-                _admission(),
+                _admission(tmp_path),
                 evidence=replace(
-                    _admission().evidence, dataset_sha256="attacker-dataset"
+                    _admission(tmp_path).evidence, dataset_sha256="attacker-dataset"
                 ),
             )
             workspace.reserve_dataset(forged, reserved_at="2026-08-25T00:00:00Z")
@@ -1076,7 +1072,7 @@ def test_close_invalidates_unconsumed_workspace_capability(
     try:
         issuing_workspace.bind_approved_dataset_identity()
         capability = issuing_workspace.reserve_dataset(
-            _admission(),
+            _admission(tmp_path),
             reserved_at="2026-08-25T00:00:00Z",
         )
     finally:

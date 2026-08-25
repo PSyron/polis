@@ -9,14 +9,12 @@ from threading import Barrier, Event
 
 import pytest
 from tests.holdout_config_fixture import synthetic_config
+from tests.holdout_test_helpers import load_synthetic_external_admission
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_admission import (
-    ExternalAdmission,
-    _register_external_admission,
-)
-from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
-from polis.evaluation.holdout_models import AdmissionEvidence, HoldoutAdmissionError
+from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_contract import canonical_sha256
+from polis.evaluation.holdout_models import HoldoutAdmissionError
 from polis.evaluation.holdout_reservation import (
     CANONICAL_MARKER,
     HoldoutAlreadyConsumedError,
@@ -25,7 +23,6 @@ from polis.evaluation.holdout_reservation import (
     consume_consumption_capability,
     reserve_consumption,
 )
-from polis.evaluation.holdout_sources import source_sha256
 
 TRUSTED_DATASET = b"trusted-dataset"
 TRUSTED_DATASET += b"\0" * (17370 - len(TRUSTED_DATASET))
@@ -42,9 +39,17 @@ VERIFICATION_PAYLOAD = {
 
 @pytest.fixture(autouse=True)
 def _patch_synthetic_dataset_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    import polis.evaluation.holdout_authorization as authorization
     import polis.evaluation.holdout_config_dataset as config_dataset
 
+    class SyntheticVerifier:
+        def verify(self, _payload: bytes, _signature: bytes) -> bool:
+            return True
+
     monkeypatch.setattr(config_dataset, "DATASET_SHA256", TRUSTED_DATASET_SHA256)
+    monkeypatch.setattr(
+        authorization, "_authorization_verifier", lambda _sha: SyntheticVerifier()
+    )
 
 
 def _layout(root: Path) -> tuple[Path, Path]:
@@ -84,29 +89,12 @@ def _layout(root: Path) -> tuple[Path, Path]:
     return experiment, sealed
 
 
-def _admission() -> ExternalAdmission:
-    config = synthetic_config()
-    dataset = config["dataset"]
-    assert isinstance(dataset, dict)
-    dataset["sha256"] = TRUSTED_DATASET_SHA256
-    dataset["size_bytes"] = len(TRUSTED_DATASET)
-    parsed = parse_holdout_config(config)
-    return _register_external_admission(
-        ExternalAdmission(
-            AdmissionEvidence(
-                canonical_sha256(config),
-                source_sha256(parsed),
-                "b" * 40,
-                TRUSTED_DATASET_SHA256,
-                MERGE_COMMIT,
-                True,
-                "valid",
-                canonical_sha256(VERIFICATION_PAYLOAD),
-            ),
-            "c" * 64,
-            "d" * 64,
-            "e" * 64,
-        ),
+def _admission(root: Path) -> ExternalAdmission:
+    return load_synthetic_external_admission(
+        root,
+        dataset_sha256=TRUSTED_DATASET_SHA256,
+        merge_commit=MERGE_COMMIT,
+        source_tree_sha256="b" * 40,
     )
 
 
@@ -196,7 +184,7 @@ def test_dataset_capability_is_consumed_before_a_second_read(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -240,7 +228,7 @@ def test_capability_from_another_workspace_cannot_read_canonical_dataset(
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -264,7 +252,7 @@ def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        _admission(),
+        _admission(tmp_path),
         reserved_at="2026-08-25T00:00:00Z",
     )
     barrier = Barrier(2)

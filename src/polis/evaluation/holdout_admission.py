@@ -48,25 +48,6 @@ class ExternalAdmission:
     _proof: object | None = None
 
 
-_verified_admissions: dict[int, tuple[ExternalAdmission, object]] = {}
-
-
-def _register_external_admission(admission: ExternalAdmission) -> ExternalAdmission:
-    proof = object()
-    object.__setattr__(admission, "_proof", proof)
-    _verified_admissions[id(admission)] = (admission, proof)
-    return admission
-
-
-def is_verified_external_admission(admission: ExternalAdmission) -> bool:
-    registered = _verified_admissions.get(id(admission))
-    return (
-        registered is not None
-        and registered[0] is admission
-        and admission._proof is registered[1]
-    )
-
-
 def checkout_identity(kind: str) -> str:
     revision = "HEAD" if kind == "commit" else "HEAD^{tree}"
     result = subprocess.run(
@@ -150,7 +131,7 @@ def _verified_merge(
     return source_sha, source_tree, digest
 
 
-def load_external_admission(
+def _load_external_admission_with_hooks(
     config_document: JsonObject,
     config: HoldoutConfig,
     *,
@@ -200,4 +181,45 @@ def _load_external_admission(
         "valid",
         verification_digest,
     )
-    return _register_external_admission(ExternalAdmission(evidence, wheel, sdist, lock))
+    return ExternalAdmission(evidence, wheel, sdist, lock)
+
+
+@dataclass(frozen=True, slots=True)
+class _AdmissionProof:
+    token: object
+
+
+def _build_public_admission_api() -> tuple[
+    Callable[..., ExternalAdmission], Callable[[ExternalAdmission], bool]
+]:
+    proof_token = object()
+
+    def load(
+        config_document: JsonObject,
+        config: HoldoutConfig,
+        *,
+        checkout_identity: Callable[[str], str] = checkout_identity,
+        verify_commit: Callable[[str], bool] = verify_commit,
+        load_metadata: Callable[[Path], JsonObject] = metadata_object,
+        load_evidence: Callable[[Path], bytes] | None = None,
+    ) -> ExternalAdmission:
+        admission = _load_external_admission_with_hooks(
+            config_document,
+            config,
+            checkout_identity=checkout_identity,
+            verify_commit=verify_commit,
+            load_metadata=load_metadata,
+            load_evidence=load_evidence,
+        )
+        object.__setattr__(admission, "_proof", _AdmissionProof(proof_token))
+        return admission
+
+    def verify(admission: ExternalAdmission) -> bool:
+        return isinstance(admission._proof, _AdmissionProof) and (
+            admission._proof.token is proof_token
+        )
+
+    return load, verify
+
+
+load_external_admission, is_verified_external_admission = _build_public_admission_api()

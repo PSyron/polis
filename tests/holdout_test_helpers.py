@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
+
+from polis.evaluation.holdout_admission import ExternalAdmission
 
 type JsonValue = (
     str | int | float | bool | None | list[JsonValue] | dict[str, JsonValue]
@@ -180,4 +184,88 @@ def approved_admission() -> AdmissionEvidence:
         verification_verified=True,
         verification_reason="valid",
         verification_payload_sha256=VERIFICATION_PAYLOAD_SHA256,
+    )
+
+
+def load_synthetic_external_admission(
+    root: Path,
+    *,
+    dataset_sha256: str,
+    merge_commit: str,
+    source_tree_sha256: str,
+) -> ExternalAdmission:
+    from polis.evaluation.holdout_admission import load_external_admission
+    from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
+
+    config_path = root / "experiments/a-b-one-shot/config.json"
+    config_document = json.loads(config_path.read_bytes())
+    assert isinstance(config_document, dict)
+    dataset = config_document["dataset"]
+    assert isinstance(dataset, dict)
+    dataset["sha256"] = dataset_sha256
+    dataset["size_bytes"] = 17370
+    config = parse_holdout_config(config_document)
+    merge_path = root / ".omo/sealed/a-b-one-shot-v1/merge-verification.json"
+    merge = json.loads(merge_path.read_bytes())
+    assert isinstance(merge, dict)
+    merge["evaluated_source_sha"] = merge_commit
+    merge["evaluated_source_tree_sha256"] = source_tree_sha256
+    merge_path.write_text(json.dumps(merge), encoding="utf-8")
+
+    authorization = {
+        "schema_id": "polis.a-b-one-shot.run-authorization",
+        "schema_version": 1,
+        "run_authorization": "approved",
+        "repository": "PSyron/polis",
+        "issue_number": 243,
+        "comment_id": 5228447542,
+        "comment_url": "https://github.com/PSyron/polis/issues/243#issuecomment-5228447542",
+        "author": "PSyron",
+        "created_at": "2026-08-08T20:20:00Z",
+        "body": "",
+        "evaluated_source_sha": merge_commit,
+        "config_sha256": canonical_sha256(config_document),
+        "dataset_sha256": dataset_sha256,
+        "preflight_completed_at": "2026-08-08T20:10:00Z",
+        "wheel_sha256": "c" * 64,
+        "sdist_sha256": "d" * 64,
+        "lock_sha256": "e" * 64,
+        "ssh_keygen_path": "/usr/bin/ssh-keygen",
+        "ssh_keygen_sha256": "f" * 64,
+    }
+    authorization["body"] = "\n".join(
+        (
+            "run_authorization=approved",
+            f"evaluated_source_sha={merge_commit}",
+            f"config_sha256={authorization['config_sha256']}",
+            f"dataset_sha256={dataset_sha256}",
+            "ssh_keygen_path=/usr/bin/ssh-keygen",
+            f"ssh_keygen_sha256={authorization['ssh_keygen_sha256']}",
+        )
+    )
+    authorization["operator_attestation_sha256"] = canonical_sha256(authorization)
+    authorization_path = root / ".omo/sealed/a-b-one-shot-v1/run-authorization.json"
+    authorization_path.write_bytes(
+        (
+            json.dumps(authorization, sort_keys=True, separators=(",", ":")) + "\n"
+        ).encode()
+    )
+    (authorization_path.with_suffix(".sig")).write_bytes(
+        b"-----BEGIN SSH SIGNATURE-----\nc3ludGhldGlj\n-----END SSH SIGNATURE-----\n"
+    )
+
+    def load_metadata(path: Path) -> JsonObject:
+        value = json.loads((root / path).read_bytes())
+        assert isinstance(value, dict)
+        return value
+
+    return load_external_admission(
+        config_document,
+        config,
+        checkout_identity=lambda kind: (
+            merge_commit if kind == "commit" else source_tree_sha256
+        ),
+        verify_commit=lambda _source_sha: True,
+        load_metadata=load_metadata,
+        load_evidence=lambda path: (root / path).read_bytes(),
     )
