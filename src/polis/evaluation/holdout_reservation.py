@@ -30,14 +30,18 @@ class _CanonicalWorkspaceIdentity:
     pass
 
 
+@dataclass(frozen=True, slots=True)
+class _ReservationClaims:
+    seal: _ReservationSeal
+    workspace_identity: _CanonicalWorkspaceIdentity | None
+    marker_path: Path
+    dataset_identity: str | None
+
+
 class _ReservationToken:
-    __slots__ = (
-        "_seal",
-        "_workspace_identity",
-        "_marker_path",
-        "_dataset_identity",
-        "consumed",
-    )
+    __slots__ = ("_claims", "_consumed")
+    _claims: _ReservationClaims
+    _consumed: bool
 
     def __init__(
         self,
@@ -46,27 +50,38 @@ class _ReservationToken:
         marker_path: Path,
         dataset_identity: str | None,
     ) -> None:
-        self._seal = seal
-        self._workspace_identity = workspace_identity
-        self._marker_path = marker_path
-        self._dataset_identity = dataset_identity
-        self.consumed = False
+        object.__setattr__(
+            self,
+            "_claims",
+            _ReservationClaims(seal, workspace_identity, marker_path, dataset_identity),
+        )
+        object.__setattr__(self, "_consumed", False)
+
+    def __setattr__(self, _name: str, _value: object) -> None:
+        raise AttributeError("reservation token is immutable")
 
     @property
     def seal(self) -> _ReservationSeal:
-        return self._seal
+        return self._claims.seal
 
     @property
     def workspace_identity(self) -> _CanonicalWorkspaceIdentity | None:
-        return self._workspace_identity
+        return self._claims.workspace_identity
 
     @property
     def marker_path(self) -> Path:
-        return self._marker_path
+        return self._claims.marker_path
 
     @property
     def dataset_identity(self) -> str | None:
-        return self._dataset_identity
+        return self._claims.dataset_identity
+
+    @property
+    def consumed(self) -> bool:
+        return self._consumed
+
+    def consume(self) -> None:
+        object.__setattr__(self, "_consumed", True)
 
 
 _RESERVATION_SEAL = _ReservationSeal()
@@ -85,7 +100,13 @@ class _ConsumptionCapability:
 
 class _OperatingSystemFilesystem:
     def open_exclusive(self, path: Path, content: bytes) -> int:
-        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        if not hasattr(os, "O_NOFOLLOW"):
+            raise OSError("O_NOFOLLOW support is unavailable")
+        descriptor = os.open(
+            path,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
+            0o600,
+        )
         try:
             offset = 0
             while offset < len(content):
@@ -96,7 +117,11 @@ class _OperatingSystemFilesystem:
         return descriptor
 
     def open_directory(self, path: Path) -> int:
-        flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+        if not hasattr(os, "O_DIRECTORY") or not hasattr(os, "O_NOFOLLOW"):
+            raise OSError("secure directory flags are unavailable")
+        flags = (
+            os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        )
         return os.open(path, flags)
 
     def fsync(self, descriptor: int) -> None:
@@ -114,22 +139,43 @@ def reserve_consumption(
     filesystem: DurabilityFilesystem | None = None,
 ) -> _ConsumptionCapability:
     fs = filesystem or _OperatingSystemFilesystem()
+    absolute_marker = marker.absolute()
+    try:
+        canonical_marker = absolute_marker.resolve(strict=False)
+    except OSError as error:
+        raise HoldoutAlreadyConsumedError(
+            "reservation marker path is not canonical"
+        ) from error
+    if absolute_marker != canonical_marker:
+        raise HoldoutAlreadyConsumedError("reservation marker path is not canonical")
+    if not marker.parent.is_dir():
+        raise HoldoutAlreadyConsumedError(
+            "reservation marker parent directory is unavailable"
+        )
     payload = {**identity, "reserved_at": reserved_at}
     content = (
         json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         + "\n"
     ).encode()
-    marker.parent.mkdir(parents=True, exist_ok=True)
     try:
-        marker_descriptor = fs.open_exclusive(marker, content)
-    except FileExistsError as error:
-        raise HoldoutAlreadyConsumedError("holdout already consumed") from error
+        directory_descriptor = fs.open_directory(marker.parent)
+    except OSError as error:
+        raise HoldoutAlreadyConsumedError(
+            "reservation marker parent directory is unavailable"
+        ) from error
     try:
-        fs.fsync(marker_descriptor)
-    finally:
-        fs.close(marker_descriptor)
-    directory_descriptor = fs.open_directory(marker.parent)
-    try:
+        try:
+            marker_descriptor = fs.open_exclusive(marker, content)
+        except FileExistsError as error:
+            raise HoldoutAlreadyConsumedError("holdout already consumed") from error
+        except OSError as error:
+            raise HoldoutAlreadyConsumedError(
+                "reservation marker is unavailable"
+            ) from error
+        try:
+            fs.fsync(marker_descriptor)
+        finally:
+            fs.close(marker_descriptor)
         fs.fsync(directory_descriptor)
     finally:
         fs.close(directory_descriptor)
@@ -181,7 +227,7 @@ def invalidate_consumption_capabilities(
         ]
         for token in invalidated:
             _ISSUED_TOKENS.remove(token)
-            token.consumed = True
+            token.consume()
 
 
 def consume_consumption_capability(
@@ -215,7 +261,7 @@ def consume_consumption_capability(
                 )
             raise HoldoutAlreadyConsumedError("reservation capability is invalid")
         _ISSUED_TOKENS.remove(value._token)
-        value._token.consumed = True
+        value._token.consume()
 
 
 def load_reserved_dataset[T](

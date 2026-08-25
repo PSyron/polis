@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -7,7 +9,7 @@ from threading import Barrier, Event
 
 import pytest
 
-from polis.evaluation.holdout_models import DatasetIdentity, HoldoutAdmissionError
+from polis.evaluation.holdout_models import HoldoutAdmissionError
 from polis.evaluation.holdout_reservation import (
     CANONICAL_MARKER,
     HoldoutAlreadyConsumedError,
@@ -17,6 +19,9 @@ from polis.evaluation.holdout_reservation import (
     reserve_consumption,
 )
 
+TRUSTED_DATASET = b"trusted-dataset"
+TRUSTED_DATASET_SHA256 = hashlib.sha256(TRUSTED_DATASET).hexdigest()
+
 
 def _layout(root: Path) -> tuple[Path, Path]:
     experiment = root / "experiments/a-b-one-shot"
@@ -24,26 +29,42 @@ def _layout(root: Path) -> tuple[Path, Path]:
     experiment.mkdir(parents=True)
     sealed.mkdir(parents=True)
     (experiment / "config.json").write_bytes(b"trusted-config")
-    (experiment / "dataset.manifest.json").write_bytes(b"trusted-manifest")
+    manifest = {
+        "schema_id": "polis.a-b-one-shot.dataset-manifest",
+        "schema_version": 1,
+        "dataset_id": "synthetic",
+        "dataset_schema": "polis.a-b-one-shot.dataset/1",
+        "sha256": TRUSTED_DATASET_SHA256,
+        "size_bytes": len(TRUSTED_DATASET),
+        "mode": "0600",
+        "case_count": 0,
+        "source_count": 0,
+        "expected_finding_count": 0,
+        "role_counts": {"error": 0, "correct": 0, "abstain": 0, "conflict": 0},
+        "license": "CC0-1.0",
+        "provenance": "synthetic",
+        "review": {
+            "reviewer_role": "synthetic-reviewer",
+            "verdict": "APPROVE",
+            "reviewed_case_count": 0,
+            "total_case_count": 0,
+            "reviewed_source_count": 0,
+            "review_manifest_sha256": "0" * 64,
+            "review_payload_sha256": "1" * 64,
+            "analyzer_executed": False,
+            "protected_artifacts_used": False,
+        },
+        "plaintext_in_repository": False,
+    }
+    (experiment / "dataset.manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
     (sealed / "merge-verification.json").write_bytes(b"trusted-merge")
     (sealed / "run-authorization.json").write_bytes(b"trusted-authorization")
     (sealed / "run-authorization.sig").write_bytes(b"trusted-signature")
-    (sealed / "cases.json").write_bytes(b"trusted-dataset")
+    (sealed / "cases.json").write_bytes(TRUSTED_DATASET)
+    (sealed / "cases.json").chmod(0o600)
     return experiment, sealed
-
-
-def _synthetic_dataset_identity() -> DatasetIdentity:
-    return DatasetIdentity(
-        "synthetic-dataset",
-        len(b"trusted-dataset"),
-        0,
-        0,
-        "synthetic",
-        "synthetic",
-        "APPROVE",
-        0,
-        "0600",
-    )
 
 
 def _cleanup_capability(
@@ -95,7 +116,7 @@ def test_open_workspace_keeps_evidence_and_dataset_on_verified_directory(
     _experiment, sealed = _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    workspace.bind_approved_dataset_identity()
     original = sealed.with_name("a-b-one-shot-v1.original")
     sealed.rename(original)
     alternate = tmp_path / "alternate-sealed"
@@ -128,9 +149,9 @@ def test_dataset_capability_is_consumed_before_a_second_read(
     _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": "synthetic-dataset"},
+        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -149,7 +170,7 @@ def test_arbitrary_marker_capability_cannot_read_canonical_dataset(
     _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    workspace.bind_approved_dataset_identity()
     capability = reserve_consumption(
         tmp_path / "arbitrary.marker",
         {"experiment_id": "synthetic"},
@@ -171,10 +192,10 @@ def test_capability_from_another_workspace_cannot_read_canonical_dataset(
     monkeypatch.chdir(tmp_path)
     issuing_workspace = SecureHoldoutWorkspace.open(tmp_path)
     reading_workspace = SecureHoldoutWorkspace.open(tmp_path)
-    issuing_workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
-    reading_workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    issuing_workspace.bind_approved_dataset_identity()
+    reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": "synthetic-dataset"},
+        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -198,9 +219,9 @@ def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
     _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    workspace.bind_approved_dataset_identity(_synthetic_dataset_identity())
+    workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": "synthetic-dataset"},
+        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
         reserved_at="2026-08-25T00:00:00Z",
     )
     barrier = Barrier(2)

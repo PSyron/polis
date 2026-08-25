@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import secrets
 import stat
@@ -8,9 +9,12 @@ from pathlib import Path
 from threading import Lock
 from typing import Final
 
+from polis.evaluation.holdout_attestations import metadata_bytes
+from polis.evaluation.holdout_manifest import parse_manifest_dataset_identity
 from polis.evaluation.holdout_models import (
     DatasetIdentity,
     HoldoutAdmissionError,
+    HoldoutContractError,
     JsonObject,
 )
 from polis.evaluation.holdout_reservation import (
@@ -53,6 +57,15 @@ def _open_directory(parent: int, name: str) -> int:
         os.close(descriptor)
         raise HoldoutAdmissionError("secure holdout directory is invalid")
     return descriptor
+
+
+def _fsync_directory(parent: int) -> None:
+    try:
+        os.fsync(parent)
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "exclusive holdout output parent directory sync failed"
+        ) from error
 
 
 @dataclass(frozen=True, slots=True)
@@ -266,8 +279,7 @@ class SecureHoldoutWorkspace:
         "_reservation_workspace",
         "_root",
         "_sealed",
-        "_approved_dataset_sha256",
-        "_approved_dataset_size_bytes",
+        "_approved_dataset_identity",
         "_closed",
         "_lifecycle_lock",
     )
@@ -280,8 +292,7 @@ class SecureHoldoutWorkspace:
         self._sealed = sealed
         self._config = config
         self._reservation_workspace = _CanonicalWorkspaceIdentity()
-        self._approved_dataset_sha256: str | None = None
-        self._approved_dataset_size_bytes: int | None = None
+        self._approved_dataset_identity: DatasetIdentity | None = None
         self._closed = False
         self._lifecycle_lock = Lock()
 
@@ -337,16 +348,29 @@ class SecureHoldoutWorkspace:
                 max_size=_MAX_METADATA_BYTES,
             ).content
 
-    def bind_approved_dataset_identity(self, dataset: DatasetIdentity) -> None:
+    def bind_approved_dataset_identity(self) -> None:
         with self._lifecycle_lock:
             self._require_open()
-            if self._approved_dataset_sha256 is not None and (
-                self._approved_dataset_sha256 != dataset.sha256
-                or self._approved_dataset_size_bytes != dataset.size_bytes
+            try:
+                manifest = metadata_bytes(
+                    _read_file(
+                        self._experiment,
+                        "dataset.manifest.json",
+                        max_size=_MAX_METADATA_BYTES,
+                    ).content,
+                    "dataset.manifest.json",
+                )
+                identity = parse_manifest_dataset_identity(manifest)
+            except (HoldoutContractError, HoldoutAdmissionError) as error:
+                raise HoldoutAdmissionError(
+                    "approved dataset manifest is invalid"
+                ) from error
+            if (
+                self._approved_dataset_identity is not None
+                and self._approved_dataset_identity != identity
             ):
                 raise HoldoutAdmissionError("approved dataset identity changed")
-            self._approved_dataset_sha256 = dataset.sha256
-            self._approved_dataset_size_bytes = dataset.size_bytes
+            self._approved_dataset_identity = identity
 
     def read_evidence(self, name: str) -> bytes:
         with self._lifecycle_lock:
@@ -364,37 +388,45 @@ class SecureHoldoutWorkspace:
     ) -> SecureFile:
         with self._lifecycle_lock:
             self._require_open()
-            if (
-                self._approved_dataset_sha256 is None
-                or self._approved_dataset_size_bytes is None
-            ):
+            identity = self._approved_dataset_identity
+            if identity is None:
                 raise HoldoutAdmissionError("approved dataset identity is unavailable")
             try:
                 consume_consumption_capability(
                     capability,
                     expected_marker=CANONICAL_MARKER,
                     expected_workspace_identity=self._reservation_workspace,
-                    expected_dataset_identity=self._approved_dataset_sha256,
+                    expected_dataset_identity=identity.sha256,
                 )
             except HoldoutAlreadyConsumedError as error:
                 raise HoldoutAdmissionError(
                     "sealed dataset read requires an active reservation authorization"
                 ) from error
-            return _read_file(
+            secure_file = _read_file(
                 self._sealed,
                 "cases.json",
-                max_size=self._approved_dataset_size_bytes,
-                expected_size=self._approved_dataset_size_bytes,
+                max_size=identity.size_bytes,
+                expected_size=identity.size_bytes,
             )
+            if secure_file.mode != identity.mode:
+                raise HoldoutAdmissionError(
+                    "sealed dataset mode does not match approved manifest"
+                )
+            if hashlib.sha256(secure_file.content).hexdigest() != identity.sha256:
+                raise HoldoutAdmissionError(
+                    "sealed dataset digest does not match approved manifest"
+                )
+            return secure_file
 
     def reserve_dataset(
         self, identity: JsonObject, *, reserved_at: str
     ) -> _ConsumptionCapability:
         with self._lifecycle_lock:
             self._require_open()
-            if self._approved_dataset_sha256 is None:
+            approved_identity = self._approved_dataset_identity
+            if approved_identity is None:
                 raise HoldoutAdmissionError("approved dataset identity is unavailable")
-            if identity.get("dataset_sha256") != self._approved_dataset_sha256:
+            if identity.get("dataset_sha256") != approved_identity.sha256:
                 raise HoldoutAdmissionError(
                     "dataset identity does not match approved manifest"
                 )
@@ -404,7 +436,7 @@ class SecureHoldoutWorkspace:
                 reserved_at=reserved_at,
                 write_marker=self._create_output_locked,
                 workspace_identity=self._reservation_workspace,
-                dataset_identity=self._approved_dataset_sha256,
+                dataset_identity=approved_identity.sha256,
             )
 
     def read_output(self, name: str) -> bytes:
@@ -447,7 +479,6 @@ class SecureHoldoutWorkspace:
         temporary_name = f".{name}.{secrets.token_hex(16)}"
         descriptor: int | None = None
         published = False
-        publication_failed = False
         try:
             descriptor = os.open(
                 temporary_name,
@@ -472,6 +503,7 @@ class SecureHoldoutWorkspace:
                 follow_symlinks=False,
             )
             published = True
+            _fsync_directory(self._experiment)
             linked_metadata = os.fstat(descriptor)
             linked_state = (
                 *expected_state[:5],
@@ -487,31 +519,31 @@ class SecureHoldoutWorkspace:
                 2,
                 linked_state,
             )
-            os.fsync(self._experiment)
+            _fsync_directory(self._experiment)
             os.unlink(temporary_name, dir_fd=self._experiment)
             temporary_name = ""
-            os.fsync(self._experiment)
         except FileExistsError:
             raise
         except HoldoutAdmissionError:
             if published:
-                publication_failed = True
                 assert descriptor is not None
                 _restore_published_destination(
                     self._experiment, name, temporary_name, descriptor
                 )
             raise
         except OSError as error:
-            publication_failed = published
             raise HoldoutAdmissionError("exclusive holdout output failed") from error
         finally:
             if descriptor is not None:
                 os.close(descriptor)
-            if temporary_name and not publication_failed:
+            if temporary_name:
                 try:
                     os.unlink(temporary_name, dir_fd=self._experiment)
                 except FileNotFoundError:
                     pass
+                else:
+                    if published:
+                        _fsync_directory(self._experiment)
 
     def close(self) -> None:
         with self._lifecycle_lock:

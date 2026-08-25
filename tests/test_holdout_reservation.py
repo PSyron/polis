@@ -218,3 +218,19 @@ def test_manual_marker_and_forged_capability_cannot_enter_loader(
         _reservation().load_reserved_dataset(_ForgedCapability(marker), loader)
 
     assert loader_calls == 0
+
+
+def test_generic_reservation_rejects_symlinked_parent(tmp_path: Path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    linked_parent = tmp_path / "linked-parent"
+    linked_parent.symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(_reservation().HoldoutAlreadyConsumedError, match="canonical"):
+        _reservation().reserve_consumption(
+            linked_parent / "holdout.started",
+            _identity(),
+            reserved_at="2026-08-25T00:00:00Z",
+        )
+
+    assert not (outside / "holdout.started").exists()

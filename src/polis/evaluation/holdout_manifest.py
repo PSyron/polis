@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from polis.evaluation.holdout_json import integer_value, object_value, string_value
 from polis.evaluation.holdout_models import (
+    DatasetIdentity,
     HoldoutConfig,
     HoldoutContractError,
     JsonObject,
@@ -54,6 +55,87 @@ class DatasetReviewIdentity:
     total_case_count: int
     review_manifest_sha256: str
     review_payload_sha256: str
+
+
+def parse_manifest_dataset_identity(raw: JsonObject) -> DatasetIdentity:
+    root = object_value(raw, _ROOT_FIELDS, "dataset manifest")
+    review = object_value(root["review"], _REVIEW_FIELDS, "independent review")
+    sha256 = string_value(root["sha256"], "dataset manifest sha256")
+    size_bytes = integer_value(root["size_bytes"], "dataset manifest size_bytes")
+    case_count = integer_value(root["case_count"], "dataset manifest case_count")
+    source_count = integer_value(root["source_count"], "dataset manifest source_count")
+    mode = string_value(root["mode"], "dataset manifest mode")
+    license_name = string_value(root["license"], "dataset manifest license")
+    provenance = string_value(root["provenance"], "dataset manifest provenance")
+    reviewer_role = string_value(
+        review["reviewer_role"], "independent review reviewer_role"
+    )
+    verdict = string_value(review["verdict"], "independent review verdict")
+    reviewed_case_count = integer_value(
+        review["reviewed_case_count"], "independent review reviewed_case_count"
+    )
+    total_case_count = integer_value(
+        review["total_case_count"], "independent review total_case_count"
+    )
+    reviewed_source_count = integer_value(
+        review["reviewed_source_count"], "independent review source count"
+    )
+    review_manifest_sha256 = string_value(
+        review["review_manifest_sha256"], "independent review manifest digest"
+    )
+    review_payload_sha256 = string_value(
+        review["review_payload_sha256"], "independent review payload digest"
+    )
+    role_counts = object_value(
+        root["role_counts"], {"error", "correct", "abstain", "conflict"}, "role counts"
+    )
+    role_values = tuple(
+        integer_value(role_counts[name], f"role count {name}")
+        for name in ("error", "correct", "abstain", "conflict")
+    )
+    expected_finding_count = integer_value(
+        root["expected_finding_count"], "dataset manifest expected finding count"
+    )
+    if (
+        string_value(root["schema_id"], "dataset manifest schema_id")
+        != "polis.a-b-one-shot.dataset-manifest"
+        or integer_value(root["schema_version"], "dataset manifest schema_version") != 1
+        or string_value(root["dataset_schema"], "dataset manifest dataset_schema")
+        != "polis.a-b-one-shot.dataset/1"
+        or type(root["plaintext_in_repository"]) is not bool
+        or root["plaintext_in_repository"] is not False
+        or size_bytes < 0
+        or case_count < 0
+        or source_count < 0
+        or expected_finding_count < 0
+        or any(value < 0 for value in role_values)
+        or reviewer_role == ""
+        or verdict != "APPROVE"
+        or reviewed_case_count != case_count
+        or total_case_count != case_count
+        or reviewed_source_count != source_count
+        or _SHA256.fullmatch(sha256) is None
+        or _SHA256.fullmatch(review_manifest_sha256) is None
+        or _SHA256.fullmatch(review_payload_sha256) is None
+    ):
+        raise _review_error()
+    if (
+        review["analyzer_executed"] is not False
+        or review["protected_artifacts_used"] is not False
+    ):
+        raise _review_error()
+    string_value(root["dataset_id"], "dataset manifest dataset_id")
+    return DatasetIdentity(
+        sha256,
+        size_bytes,
+        case_count,
+        source_count,
+        license_name,
+        provenance,
+        verdict,
+        reviewed_case_count,
+        mode,
+    )
 
 
 def parse_dataset_manifest(
