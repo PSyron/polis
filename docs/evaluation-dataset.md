@@ -23,13 +23,23 @@ rekordów w danym pliku JSONL, `size_bytes` liczbę jego bajtów, a `sha256` skr
 tych samych, dokładnych bajtów. Wynik oraz stdout zachowują status
 `blocked_external_authority`; kontrola przecieku ma status `not_run` i
 `validated: false`, dopóki zewnętrzna władza nie dostarczy danych i niezależnych
-dowodów.
+dowodów. Parametry ekstrakcji są wykonywalnym filtrem: minimalna liczba znaków
+i słów obowiązuje dla obu stron pary, `max_words` ogranicza obie strony,
+`length_diff` ogranicza bezwzględną różnicę długości, a `edit_ratio` ogranicza
+zmienione znaki względem dłuższej strony.
 
 Staging nie tworzy markera ani capability z
 `polis.evaluation.holdout_reservation`. Pole `authorization` pozostaje
 `not_authorized`, a jednorazowa rezerwacja odczytu zapieczętowanego holdoutu
 pozostaje osobną granicą wykonania. Sam digest, liczność albo obecność pliku
 `holdout.jsonl` nie jest autoryzacją odczytu.
+
+Jeżeli mapa klasyfikacji zawiera przejrzany rekord holdoutu, funkcja ekstrakcji
+wymaga wstrzykniętego, typowanego `HoldoutAuthority`. Jego hook rezerwacji musi
+zadziałać przed zapisem, a hook kontroli przecieku po zamknięciu plików splitów;
+brak authority kończy się błędem bez utworzenia stagingu. Sam syntetyczny
+provider nie awansuje statusu manifestu: bez zewnętrznych, niezależnych dowodów
+pozostają `not_run`, `not_authorized` i `blocked_external_authority`.
 
 Przed uznaniem artefaktu za gotowy operator musi niezależnie potwierdzić
 licencję konkretnego wydania, przypiąć rewizję narzędzia, przejrzeć próbkę

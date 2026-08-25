@@ -11,8 +11,9 @@ import sys
 import tarfile
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Protocol
 
 TARGET_CATEGORIES = frozenset({"inflection", "agreement", "rection", "punctuation"})
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -24,6 +25,24 @@ type ExtractionStatus = Literal["blocked_external_authority"]
 
 class WikEdProtocolError(ValueError):
     pass
+
+
+@dataclass(frozen=True, slots=True)
+class HoldoutReservationRequest:
+    archive_sha256: str
+    member_name: str
+
+
+@dataclass(frozen=True, slots=True)
+class LeakageCheckRequest:
+    development_path: Path
+    holdout_path: Path
+
+
+class HoldoutAuthority(Protocol):
+    def reserve_holdout(self, request: HoldoutReservationRequest) -> None: ...
+
+    def check_leakage(self, request: LeakageCheckRequest) -> None: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -123,7 +142,10 @@ def extract_archive(
     classifications: Mapping[int, Classification],
     repository_root: Path,
     parameters: ExtractionParameters | None = None,
+    authority: HoldoutAuthority | None = None,
 ) -> ExtractionResult:
+    if _has_reviewed_holdout(classifications) and authority is None:
+        raise WikEdProtocolError("holdout authority is required")
     _require_external_path(archive_path, repository_root, "archive")
     _require_external_path(output_root, repository_root, "output")
     if expected_archive_sha256 is None:
@@ -172,6 +194,7 @@ def extract_archive(
                         archive_size_bytes=archive_size,
                         member_name=member_name,
                         parameters=parameters or ExtractionParameters(),
+                        authority=authority,
                     )
     except UnicodeDecodeError as error:
         raise WikEdProtocolError("declared archive member is not UTF-8") from error
@@ -192,8 +215,17 @@ def extract_records(
     archive_size_bytes: int = 0,
     member_name: str = "synthetic-test-input",
     parameters: ExtractionParameters | None = None,
+    authority: HoldoutAuthority | None = None,
 ) -> ExtractionResult:
     _require_external_path(output_root, repository_root, "output")
+    effective_parameters = parameters or ExtractionParameters()
+    requires_holdout_authority = _has_reviewed_holdout(classifications)
+    if requires_holdout_authority and authority is None:
+        raise WikEdProtocolError("holdout authority is required")
+    if requires_holdout_authority and authority is not None:
+        authority.reserve_holdout(
+            HoldoutReservationRequest(archive_sha256, member_name)
+        )
     output_root.mkdir(mode=0o700, parents=True, exist_ok=False)
     os.chmod(output_root, 0o700)
     output_files = {
@@ -213,6 +245,9 @@ def extract_records(
                 raise WikEdProtocolError(
                     f"parallel input line {line_number} is invalid"
                 )
+            if not _passes_parameters(fields[0], fields[1], effective_parameters):
+                _increment(rejected, "parameters")
+                continue
             decision = classifications.get(line_number)
             if decision is None or not decision[2]:
                 _increment(rejected, "unreviewed")
@@ -248,6 +283,12 @@ def extract_records(
     output_metadata = {
         split: _file_digest(output_root / f"{split}.jsonl") for split in _SPLITS
     }
+    if requires_holdout_authority and authority is not None:
+        authority.check_leakage(
+            LeakageCheckRequest(
+                output_root / "development.jsonl", output_root / "holdout.jsonl"
+            )
+        )
     result = ExtractionResult(
         "blocked_external_authority",
         archive_sha256,
@@ -271,7 +312,7 @@ def extract_records(
         "extractor": {
             "tool": "snukky/wikiedits",
             "wikiedits_version": "2.0",
-            "parameters": (parameters or ExtractionParameters()).as_dict(),
+            "parameters": effective_parameters.as_dict(),
         },
         "outputs": {
             "development": {
@@ -314,6 +355,39 @@ def extract_records(
 
 def _increment(counts: dict[str, int], key: str) -> None:
     counts[key] = counts.get(key, 0) + 1
+
+
+def _has_reviewed_holdout(classifications: Mapping[int, Classification]) -> bool:
+    return any(
+        category in TARGET_CATEGORIES and split == "holdout" and reviewed
+        for category, split, reviewed in classifications.values()
+    )
+
+
+def _passes_parameters(old: str, new: str, parameters: ExtractionParameters) -> bool:
+    old_words = len(old.split())
+    new_words = len(new.split())
+    return (
+        len(old) >= parameters.min_chars
+        and len(new) >= parameters.min_chars
+        and old_words >= parameters.min_words
+        and new_words >= parameters.min_words
+        and old_words <= parameters.max_words
+        and new_words <= parameters.max_words
+        and abs(len(old) - len(new)) <= parameters.length_diff
+        and _edit_ratio(old, new) <= parameters.edit_ratio
+    )
+
+
+def _edit_ratio(old: str, new: str) -> float:
+    changed = sum(
+        max(old_end - old_start, new_end - new_start)
+        for tag, old_start, old_end, new_start, new_end in SequenceMatcher(
+            None, old, new, autojunk=False
+        ).get_opcodes()
+        if tag != "equal"
+    )
+    return changed / max(len(old), len(new), 1)
 
 
 def _file_digest(path: Path) -> tuple[int, str]:

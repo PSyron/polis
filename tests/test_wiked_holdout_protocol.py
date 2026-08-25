@@ -9,6 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+import scripts.wiked_holdout as protocol
 from scripts.wiked_holdout import (
     ExtractionParameters,
     WikEdProtocolError,
@@ -90,7 +91,7 @@ def test_extraction_result_cannot_claim_leakage_or_holdout_authorization(
 ) -> None:
     result = extract_records(
         ["synthetic old\tsynthetic new\n"],
-        {1: ("agreement", "holdout", True)},
+        {1: ("agreement", "development", True)},
         tmp_path / "output",
         repository_root=tmp_path / "repository",
     )
@@ -98,6 +99,109 @@ def test_extraction_result_cannot_claim_leakage_or_holdout_authorization(
     manifest = json.loads((tmp_path / "output" / "manifest.json").read_text())
     assert result.status == "blocked_external_authority"
     assert manifest["status"] == "blocked_external_authority"
+    assert manifest["leakage"] == {
+        "status": "not_run",
+        "validated": False,
+        "reason": "external_authority_and_existing_corpora_unavailable",
+    }
+    assert manifest["authorization"] == {
+        "reservation_contract": "polis.evaluation.holdout_reservation",
+        "status": "not_authorized",
+        "reservation_established": False,
+    }
+
+
+@pytest.mark.parametrize(
+    ("parameters", "line"),
+    [
+        (ExtractionParameters(min_chars=20), "short text\tshort edit\n"),
+        (ExtractionParameters(min_words=3), "two words\ttwo words\n"),
+        (ExtractionParameters(max_words=2), "one two three\tone two three\n"),
+        (
+            ExtractionParameters(length_diff=1),
+            "synthetic words old\tsynthetic words\n",
+        ),
+        (
+            ExtractionParameters(edit_ratio=0.1),
+            "abcdefghij words\tzyxwvutsrq words\n",
+        ),
+    ],
+)
+def test_extraction_applies_each_declared_filter_parameter(
+    parameters: ExtractionParameters, line: str, tmp_path: Path
+) -> None:
+    result = extract_records(
+        [line],
+        {1: ("agreement", "development", True)},
+        tmp_path / "output",
+        repository_root=tmp_path / "repository",
+        parameters=parameters,
+    )
+
+    assert result.counts == {"development": {}, "holdout": {}}
+    assert result.rejected == {"parameters": 1}
+
+
+def test_holdout_extraction_rejects_absent_injected_authority(tmp_path: Path) -> None:
+    with pytest.raises(WikEdProtocolError, match="holdout authority is required"):
+        extract_records(
+            ["synthetic old\tsynthetic new\n"],
+            {1: ("agreement", "holdout", True)},
+            tmp_path / "output",
+            repository_root=tmp_path / "repository",
+        )
+
+    assert not (tmp_path / "output").exists()
+
+
+def test_archive_extraction_rejects_absent_authority_before_archive_open(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(WikEdProtocolError, match="holdout authority is required"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={1: ("agreement", "holdout", True)},
+            repository_root=tmp_path / "repository",
+        )
+
+    assert not (tmp_path / "output").exists()
+
+
+class _SyntheticAuthority:
+    def __init__(self) -> None:
+        self.reservations: list[protocol.HoldoutReservationRequest] = []
+        self.leakage_checks: list[protocol.LeakageCheckRequest] = []
+
+    def reserve_holdout(self, request: protocol.HoldoutReservationRequest) -> None:
+        self.reservations.append(request)
+
+    def check_leakage(self, request: protocol.LeakageCheckRequest) -> None:
+        self.leakage_checks.append(request)
+
+
+def test_holdout_extraction_uses_injected_synthetic_authority(
+    tmp_path: Path,
+) -> None:
+    authority = _SyntheticAuthority()
+    output = tmp_path / "output"
+
+    result = extract_records(
+        ["synthetic old\tsynthetic new\n"],
+        {1: ("agreement", "holdout", True)},
+        output,
+        repository_root=tmp_path / "repository",
+        authority=authority,
+    )
+
+    manifest = json.loads((output / "manifest.json").read_text())
+    assert len(authority.reservations) == 1
+    assert authority.reservations[0].member_name == "synthetic-test-input"
+    assert len(authority.leakage_checks) == 1
+    assert authority.leakage_checks[0].holdout_path == output / "holdout.jsonl"
+    assert result.status == "blocked_external_authority"
     assert manifest["leakage"] == {
         "status": "not_run",
         "validated": False,
@@ -138,6 +242,8 @@ def test_duplicate_pair_is_rejected_across_splits(tmp_path: Path) -> None:
             },
             output,
             repository_root=tmp_path / "repository",
+            parameters=ExtractionParameters(min_chars=1, min_words=1, edit_ratio=1.0),
+            authority=_SyntheticAuthority(),
         )
 
 
@@ -177,8 +283,6 @@ def test_archive_manifest_is_reproducible_for_a_synthetic_external_fixture(
 def test_archive_digest_and_read_use_one_open_file_descriptor(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    import scripts.wiked_holdout as protocol
-
     archive = tmp_path / "synthetic.tgz"
     payload = b"synthetic old\tsynthetic new\n"
     with tarfile.open(archive, "w:gz") as bundle:
