@@ -60,7 +60,10 @@ def _resolve_docs_path(root: Path, value: str) -> Path | None:
         candidate = Path(value)
         if candidate.is_absolute():
             return None
-        docs_root = (root / "docs").resolve()
+        docs_root_path = root / "docs"
+        if docs_root_path.is_symlink():
+            return None
+        docs_root = docs_root_path.resolve()
         resolved = (root / candidate).resolve(strict=False)
         if not resolved.is_relative_to(docs_root):
             return None

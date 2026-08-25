@@ -232,6 +232,16 @@ def test_inventory_rejects_proposal_paths_outside_docs(
     assert any("proposal_path escapes root/docs" in error for error in errors)
 
 
+def test_inventory_rejects_symlinked_docs_root(tmp_path: Path) -> None:
+    external_docs = tmp_path / "external-docs"
+    shutil.copytree(ROOT / "docs", external_docs)
+    (tmp_path / "docs").symlink_to(external_docs, target_is_directory=True)
+
+    errors = validate_inventory(tmp_path)
+
+    assert any("path escapes root/docs" in error for error in errors)
+
+
 @pytest.mark.parametrize("kind", (["baseline"], {"value": "baseline"}))
 def test_inventory_rejects_non_scalar_alias_kind(
     tmp_path: Path, kind: list[str] | dict[str, str]
