@@ -19,19 +19,19 @@ kompletności języka.
 | `rule:agreement.subject_verb_oni_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `Oni czyta książkę.` → `Oni czytają książkę.`, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_my_czyta` | `agreement` | opcjonalna zamknięta konstrukcja `My czyta książkę.` → `My czytamy książkę.`, wyłącznie do przeglądu |
 | `rule:agreement.subject_verb_present` | `agreement` | lokalna zgoda osoby i liczby jawnego zaimka osobowego z jednoznacznym czasownikiem finitywnym czasu teraźniejszego, wyłącznie do przeglądu |
-| `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`, wyłącznie do przeglądu |
+| `rule:inflection.negated_widziec` | `inflection` | zamknięta konstrukcja `Nie widzę samochód.` → `samochodu`; po morfologicznie zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.negated_widziec_nominal_group` | `inflection` | opcjonalna zamknięta konstrukcja `Nie widzę czerwony samochód.` → `czerwonego samochodu`, wyłącznie do przeglądu |
 | `rule:inflection.negated_miec_czas` | `inflection` | zamknięta konstrukcja `Nie mam czas.` → `czasu`, wyłącznie do przeglądu (bez morfologii) |
 | `rule:inflection.negated_lubic_kawe` | `inflection` | opcjonalna zamknięta konstrukcja `Nie lubię kawę.` → `kawy`, wyłącznie do przeglądu (wymaga morfologii) |
 | `rule:inflection.przygladac_sie_nowy_budynek` | `inflection` | opcjonalna zamknięta konstrukcja `Przyglądam się nowy budynek.` → `Przyglądam się nowemu budynkowi.`, wyłącznie do przeglądu |
-| `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`, wyłącznie do przeglądu |
-| `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta rekcja `szukać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Szukam samochód.` → `samochodu`), wyłącznie do przeglądu |
+| `rule:inflection.government_potrzebowac_pomoc` | `inflection` | opcjonalna zamknięta konstrukcja `Potrzebuję pomoc.` → `Potrzebuję pomocy.`; po morfologicznie zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_szukac_klucz` | `inflection` | opcjonalna zamknięta rekcja `szukać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Szukam samochód.` → `samochodu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.government_sluchac_radio` | `inflection` | opcjonalna zamknięta konstrukcja `Słucham radio.` → `radia`, wyłącznie do przeglądu |
-| `rule:inflection.government_uzywac_telefon` | `inflection` | opcjonalna zamknięta rekcja `używać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Używam nowy telefon.` → `nowego telefonu`), wyłącznie do przeglądu |
-| `rule:inflection.government_interesowac_sie_historia` | `inflection` | opcjonalna zamknięta rekcja `interesować się` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Interesuję się polska historia.` → `polską historią`), wyłącznie do przeglądu |
+| `rule:inflection.government_uzywac_telefon` | `inflection` | opcjonalna zamknięta rekcja `używać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Używam nowy telefon.` → `nowego telefonu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_interesowac_sie_historia` | `inflection` | opcjonalna zamknięta rekcja `interesować się` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Interesuję się polska historia.` → `polską historią`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.government_byc_nauczyciel` | `inflection` | opcjonalna zamknięta konstrukcja `Jestem nauczyciel.` → `nauczycielem`, wyłącznie do przeglądu |
-| `rule:inflection.government_do_sklep` | `inflection` | opcjonalna zamknięta rekcja przyimka `do` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Idę do duży sklep.` → `dużego sklepu`), wyłącznie do przeglądu |
-| `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta rekcja `ufać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Ufam nowy lekarz.` → `nowemu lekarzowi`), wyłącznie do przeglądu |
+| `rule:inflection.government_do_sklep` | `inflection` | opcjonalna zamknięta rekcja przyimka `do` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Idę do duży sklep.` → `dużego sklepu`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
+| `rule:inflection.government_ufac_lekarz` | `inflection` | opcjonalna zamknięta rekcja `ufać` dla jednoznacznego rzeczownika albo grupy `modyfikator + rzeczownik`, gdzie modyfikatorem jest jeden przymiotnik lub zaimek dzierżawczy/wskazujący (`Ufam nowy lekarz.` → `nowemu lekarzowi`); po zamkniętej grupie dopuszcza dalszy materiał, wyłącznie do przeglądu |
 | `rule:inflection.numeral_five_genitive_plural` | `inflection` | zamknięta, zakotwiczona konstrukcja `Pięć książki` → `książek`, wyłącznie do przeglądu |
 | `rule:spelling.jestes` | `spelling` | `jestes` → `jesteś` |
 | `rule:spelling.czyby` | `spelling` | dokładna forma łączna `czyby` → `czy by`, wyłącznie do przeglądu |
@@ -103,10 +103,12 @@ również pozostają wyłącznie do przeglądu, dopóki osobne issue nie
 zakwalifikują ich dokładnych kluczy polityki
 `(source, category, operation, behavior_version, source_policy_version)`. Pozostałe źródła mogą zostać zastosowane automatycznie
 tylko po sprawdzeniu pełnej tożsamości przez politykę `1.2`.
-Reguła `rule:inflection.government_potrzebowac_pomoc` ma dokładną tożsamość
-zachowania `inflection-government-potrzebowac-pomoc/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393`
-i nie rozszerza rekcji na negację, przyimek, inne leksemy ani zdanie dłuższe od
-zatwierdzonej konstrukcji.
+Reguła `rule:inflection.government_potrzebowac_pomoc` ma wersję zachowania
+`inflection-government-potrzebowac-pomoc/2.0+` z tą samą kwalifikacją providera.
+Po `pomoc` może wystąpić dalszy materiał, ale tylko gdy następny token nie może
+kontynuować grupy nominalnej. Nieznany, niepełny albo wieloznaczny odczyt
+morfologiczny kończy się abstencją; reguła nie rozszerza rekcji na negację,
+przyimek ani inne leksemy.
 `rule:syntax.duplicate_comma` również pozostaje
 wyłącznie do przeglądu, dopóki osobne issue nie zakwalifikuje dokładnego klucza
 polityki `(rule:syntax.duplicate_comma, punctuation, remove.duplicate_comma,
@@ -125,7 +127,14 @@ liczby i rodzaju; nazwa własna, koordynacja, cudzysłów, brak `się`, niepełn
 dane, wieloznaczna analiza modyfikatora lub dryft providera kończą się
 abstencją.
 Sugestia obejmuje tylko zmieniony rzeczownik albo pełną grupę
-`modyfikator + rzeczownik` i nie jest dodana do polityki automatycznej.
+`modyfikator + rzeczownik` i nie jest dodana do polityki automatycznej. Po
+zamkniętej grupie można zaakceptować dalszy materiał wyłącznie wtedy, gdy
+następny token nie ma morfologicznej analizy nominalnej; brak, niepełność lub
+wieloznaczność danych kończy się abstencją.
+
+`rule:inflection.negated_widziec` ma wersję zachowania `3.0` i po formie
+`samochód` stosuje ten sam fail-closed guard morfologiczny: dalszy materiał jest
+dopuszczony tylko po zamknięciu grupy nominalnej.
 
 `rule:agreement.subject_verb_present` dopuszcza wyłącznie zaimki `Ja`, `Ty`,
 `On`, `Ona`, `Ono`, `My`, `Wy`, `Oni` i `One` oraz jeden jednoznaczny tag

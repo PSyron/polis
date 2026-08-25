@@ -15,6 +15,7 @@ from polis.core import (
 )
 from polis.core.models import Severity
 from polis.rules._morfeusz import _QualifiedMorfeusz
+from polis.rules.government import _is_followed_by_nominal_group
 from polis.segmentation import (
     _iter_sentence_template_matches as iter_sentence_template_matches,
 )
@@ -22,6 +23,10 @@ from polis.segmentation import (
 _PATTERN: Final = re.compile(
     r"(?<!\w)(?:(?:Nie|nie) widzę (?P<lower>samochód)|"
     r"NIE WIDZĘ (?P<upper>SAMOCHÓD))(?!\w)"
+)
+_TRAILING_MATERIAL_PATTERN: Final = re.compile(
+    r"(?<!\w)(?:(?:Nie|nie) widzę (?P<lower>samochód)|"
+    r"NIE WIDZĘ (?P<upper>SAMOCHÓD))(?!\w)(?=[ \t]+[^\W\d_]+)"
 )
 _NEGATED_REPEAT_SEPARATOR: Final = re.compile(r"\s+(?:i znów|I ZNÓW)\s+")
 _NOMINAL_GROUP_PATTERN: Final = re.compile(
@@ -39,8 +44,10 @@ class InflectionNegatedWidziecRule:
 
     _CATEGORY = Category.INFLECTION
 
-    def __init__(self) -> None:
+    def __init__(self, provider: _QualifiedMorfeusz | None = None) -> None:
         self.source = Source(SourceKind.RULE, "inflection.negated_widziec")
+        if provider is not None:
+            self._provider = provider
         self._confidence = Confidence(0.9)
 
     @property
@@ -53,7 +60,7 @@ class InflectionNegatedWidziecRule:
     def behavior_version(self) -> str:
         """Return the review-only implementation behavior version."""
 
-        return "inflection-negated-widziec/2.0"
+        return "inflection-negated-widziec/3.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         """Return the one closed finding when its exact sentence is present."""
@@ -62,13 +69,31 @@ class InflectionNegatedWidziecRule:
             return ()
         if "widzę" not in text and "WIDZĘ" not in text:
             return ()
+        matches = [
+            match
+            for _sentence, match in iter_sentence_template_matches(
+                text,
+                _PATTERN,
+                require_terminal=True,
+                repeat_separator=_NEGATED_REPEAT_SEPARATOR,
+            )
+        ]
+        provider = getattr(self, "_provider", None)
+        if provider is not None:
+            for sentence, match in iter_sentence_template_matches(
+                text, _TRAILING_MATERIAL_PATTERN
+            ):
+                group = "upper" if match.group("upper") is not None else "lower"
+                if (
+                    not _is_followed_by_nominal_group(text, match.end(group), provider)
+                    and text[match.end() : sentence.end]
+                    .strip()
+                    .endswith((".", "!", "?"))
+                    and not text[match.end() : sentence.end].strip().endswith("...")
+                ):
+                    matches.append(match)
         findings: list[Finding] = []
-        for _sentence, match in iter_sentence_template_matches(
-            text,
-            _PATTERN,
-            require_terminal=True,
-            repeat_separator=_NEGATED_REPEAT_SEPARATOR,
-        ):
+        for match in sorted(matches, key=re.Match.start):
             group = "upper" if match.group("upper") is not None else "lower"
             original = match.group(group)
             suggestion = "SAMOCHODU" if group == "upper" else "samochodu"

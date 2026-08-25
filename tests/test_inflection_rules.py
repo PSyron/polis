@@ -116,7 +116,7 @@ def test_registry_exposes_review_only_behavior_metadata() -> None:
     assert behavior == SourceBehavior(
         source=rule.source,
         operation="replace.negated_government_form",
-        behavior_version="inflection-negated-widziec/2.0",
+        behavior_version="inflection-negated-widziec/3.0",
     )
 
 

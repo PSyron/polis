@@ -19,6 +19,7 @@ from polis.rules.government import (
     InflectionGovernmentPotrzebowacPomocRule,
     InflectionGovernmentSzukacKluczRule,
 )
+from polis.rules.inflection import InflectionNegatedWidziecRule
 
 _CASES = (
     (
@@ -159,6 +160,72 @@ _GENERALIZED_SOURCES: Final = frozenset(
         "rule:inflection.government_interesowac_sie_historia",
         "rule:inflection.government_do_sklep",
     }
+)
+
+_TRAILING_MATERIAL_CASES = (
+    (
+        "Szukam telefon.",
+        "Szukam telefon w domu.",
+        "rule:inflection.government_szukac_klucz",
+        "telefon",
+        "telefonu",
+        7,
+        14,
+    ),
+    (
+        "Używam telefon.",
+        "Używam telefon codziennie.",
+        "rule:inflection.government_uzywac_telefon",
+        "telefon",
+        "telefonu",
+        7,
+        14,
+    ),
+    (
+        "Idę do sklep.",
+        "Idę do sklep po mleko.",
+        "rule:inflection.government_do_sklep",
+        "sklep",
+        "sklepu",
+        7,
+        12,
+    ),
+    (
+        "Ufam lekarz.",
+        "Ufam lekarz od lat.",
+        "rule:inflection.government_ufac_lekarz",
+        "lekarz",
+        "lekarzowi",
+        5,
+        11,
+    ),
+    (
+        "Interesuję się historia.",
+        "Interesuję się historia od dawna.",
+        "rule:inflection.government_interesowac_sie_historia",
+        "historia",
+        "historią",
+        15,
+        23,
+    ),
+    (
+        "Potrzebuję pomoc.",
+        "Potrzebuję pomoc teraz.",
+        "rule:inflection.government_potrzebowac_pomoc",
+        "pomoc",
+        "pomocy",
+        11,
+        16,
+    ),
+    (
+        "Nie widzę samochód.",
+        "Nie widzę samochód na ulicy.",
+        "rule:inflection.negated_widziec",
+        "samochód",
+        "samochodu",
+        10,
+        18,
+    ),
 )
 
 _PUBLIC_POSITIVES = (
@@ -377,6 +444,90 @@ def test_generalized_government_abstains_on_ambiguous_pronoun_modifier() -> None
     )
 
     assert rule.find("Szukam mojego telefon.", options=AnalysisOptions()) == ()
+
+
+@pytest.mark.parametrize(
+    (
+        "canonical",
+        "with_trailing_material",
+        "source",
+        "original",
+        "suggestion",
+        "start",
+        "end",
+    ),
+    _TRAILING_MATERIAL_CASES,
+)
+def test_government_closes_nominal_group_before_trailing_material(
+    canonical: str,
+    with_trailing_material: str,
+    source: str,
+    original: str,
+    suggestion: str,
+    start: int,
+    end: int,
+) -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    for text in (canonical, with_trailing_material):
+        findings = tuple(
+            finding
+            for finding in analyzer.analyze(text).issues
+            if str(finding.source) == source
+        )
+
+        assert [
+            (finding.original, finding.suggestion, finding.start, finding.end)
+            for finding in findings
+        ] == [(original, suggestion, start, end)]
+        assert text[start:end] == original
+
+
+@pytest.mark.parametrize(
+    ("text", "source"),
+    (
+        (
+            "Szukam telefon komórkowy.",
+            "rule:inflection.government_szukac_klucz",
+        ),
+        (
+            "Ufam lekarz rodzinny.",
+            "rule:inflection.government_ufac_lekarz",
+        ),
+    ),
+)
+def test_government_abstains_when_next_token_can_continue_group(
+    text: str, source: str
+) -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    assert not any(
+        str(finding.source) == source for finding in analyzer.analyze(text).issues
+    )
+
+
+def test_government_abstains_when_next_token_has_no_morphology() -> None:
+    analyses = {
+        "Szukam": _GovernmentBackend().analyses["Szukam"],
+        "samochód": _GovernmentBackend().analyses["samochód"],
+        "wymyślonytoken": (),
+    }
+    rule = InflectionGovernmentSzukacKluczRule(
+        _provider(_GovernmentBackend(analyses=analyses))
+    )
+
+    assert rule.find("Szukam samochód wymyślonytoken.", options=AnalysisOptions()) == ()
+
+
+def test_negated_widziec_abstains_when_next_token_has_no_morphology() -> None:
+    analyses = {"wymyślonytoken": ()}
+    rule = InflectionNegatedWidziecRule(
+        _provider(_GovernmentBackend(analyses=analyses))
+    )
+
+    assert (
+        rule.find("Nie widzę samochód wymyślonytoken.", options=AnalysisOptions()) == ()
+    )
 
 
 def test_generalized_government_remains_review_only_until_explicit_apply() -> None:
