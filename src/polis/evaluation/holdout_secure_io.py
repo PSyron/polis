@@ -7,10 +7,14 @@ import stat
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Final
+from typing import Final, NoReturn
 
 from polis.evaluation.holdout_attestations import metadata_bytes
-from polis.evaluation.holdout_manifest import parse_manifest_dataset_identity
+from polis.evaluation.holdout_contract import parse_holdout_config
+from polis.evaluation.holdout_manifest import (
+    parse_dataset_manifest,
+    parse_manifest_dataset_identity,
+)
 from polis.evaluation.holdout_models import (
     DatasetIdentity,
     HoldoutAdmissionError,
@@ -35,6 +39,7 @@ _OUTPUT_NAMES: Final = frozenset(
         "result.manifest.json",
     }
 )
+_PERMANENT_FAILURE_NAME: Final = "holdout.publication.failed"
 _MAX_METADATA_BYTES: Final = 1 << 20
 
 
@@ -182,63 +187,137 @@ def _verify_published_destination(
         os.close(destination)
 
 
-def _restore_published_destination(
-    parent: int, name: str, temporary_name: str, source_descriptor: int
-) -> None:
-    destination_exists = False
+def _ensure_no_publication_failure(parent: int) -> None:
     try:
-        os.link(
-            temporary_name,
-            name,
-            src_dir_fd=parent,
-            dst_dir_fd=parent,
-            follow_symlinks=False,
+        descriptor = os.open(
+            _PERMANENT_FAILURE_NAME,
+            _secure_flags(directory=False),
+            dir_fd=parent,
         )
-        return
-    except FileExistsError:
-        destination_exists = True
-    except OSError:
-        return
-    if not destination_exists:
-        return
-    try:
-        destination = os.open(name, _secure_flags(directory=False), dir_fd=parent)
     except FileNotFoundError:
+        return
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "holdout publication failure state is invalid"
+        ) from error
+    try:
+        metadata = os.fstat(descriptor)
+        if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+            raise HoldoutAdmissionError("holdout publication failure state is invalid")
+    finally:
         try:
-            os.link(
-                temporary_name,
-                name,
-                src_dir_fd=parent,
-                dst_dir_fd=parent,
-                follow_symlinks=False,
-            )
-        except OSError:
-            return
-        return
-    except OSError:
-        return
+            os.close(descriptor)
+        except OSError as error:
+            raise HoldoutAdmissionError(
+                "holdout publication failure state could not be closed"
+            ) from error
+    raise HoldoutAdmissionError("holdout publication has permanently failed")
+
+
+def _write_publication_failure(parent: int, name: str) -> None:
+    content = f"publication failed for {name}\n".encode()
+    try:
+        descriptor = os.open(
+            _PERMANENT_FAILURE_NAME,
+            os.O_WRONLY
+            | os.O_CREAT
+            | os.O_EXCL
+            | (_secure_flags(directory=False) & os.O_NOFOLLOW),
+            0o600,
+            dir_fd=parent,
+        )
+    except FileExistsError as error:
+        raise HoldoutAdmissionError(
+            "holdout publication has permanently failed"
+        ) from error
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "holdout publication failure marker is unavailable"
+        ) from error
+    try:
+        offset = 0
+        while offset < len(content):
+            offset += os.write(descriptor, content[offset:])
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    _fsync_directory(parent)
+
+
+def _unlink_owned_temporary(
+    parent: int,
+    temporary_name: str,
+    source_descriptor: int,
+    expected_links_before: int,
+    expected_links_after: int,
+) -> None:
+    try:
+        temporary = os.open(
+            temporary_name,
+            _secure_flags(directory=False),
+            dir_fd=parent,
+        )
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "temporary holdout output ownership is unavailable"
+        ) from error
     try:
         source_metadata = os.fstat(source_descriptor)
-        destination_metadata = os.fstat(destination)
-        same_inode = (source_metadata.st_dev, source_metadata.st_ino) == (
-            destination_metadata.st_dev,
-            destination_metadata.st_ino,
-        )
+        temporary_metadata = os.fstat(temporary)
+        if (
+            (source_metadata.st_dev, source_metadata.st_ino)
+            != (temporary_metadata.st_dev, temporary_metadata.st_ino)
+            or source_metadata.st_nlink != expected_links_before
+            or temporary_metadata.st_nlink != expected_links_before
+        ):
+            raise HoldoutAdmissionError("temporary holdout output ownership changed")
     finally:
-        os.close(destination)
-    if same_inode:
-        return
+        os.close(temporary)
     try:
-        os.unlink(name, dir_fd=parent)
-        os.link(
-            temporary_name,
-            name,
-            src_dir_fd=parent,
-            dst_dir_fd=parent,
-            follow_symlinks=False,
-        )
-    except OSError:
-        return
+        os.unlink(temporary_name, dir_fd=parent)
+    except OSError as error:
+        raise HoldoutAdmissionError(
+            "temporary holdout output cleanup failed"
+        ) from error
+    source_after = os.fstat(source_descriptor)
+    if source_after.st_nlink != expected_links_after:
+        raise HoldoutAdmissionError("temporary holdout output ownership changed")
+    _fsync_directory(parent)
+
+
+def _fail_closed_after_publication(
+    parent: int,
+    name: str,
+    temporary_name: str,
+    source_descriptor: int,
+    original_error: HoldoutAdmissionError,
+) -> NoReturn:
+    cleanup_error: HoldoutAdmissionError | None = None
+    try:
+        if temporary_name:
+            _unlink_owned_temporary(parent, temporary_name, source_descriptor, 2, 1)
+    except HoldoutAdmissionError as error:
+        cleanup_error = error
+    try:
+        _write_publication_failure(parent, name)
+    except HoldoutAdmissionError as marker_error:
+        raise HoldoutAdmissionError(str(original_error)) from marker_error
+    if cleanup_error is not None:
+        raise HoldoutAdmissionError(str(original_error)) from cleanup_error
+    raise original_error
+
+
+def _fail_closed_before_publication(
+    parent: int,
+    temporary_name: str,
+    source_descriptor: int,
+    original_error: HoldoutAdmissionError,
+) -> NoReturn:
+    try:
+        _unlink_owned_temporary(parent, temporary_name, source_descriptor, 1, 0)
+    except HoldoutAdmissionError as failure_error:
+        raise HoldoutAdmissionError(str(original_error)) from failure_error
+    raise original_error
 
 
 def _require_output_name(name: str) -> None:
@@ -352,6 +431,9 @@ class SecureHoldoutWorkspace:
         with self._lifecycle_lock:
             self._require_open()
             try:
+                config = parse_holdout_config(
+                    metadata_bytes(self._config.content, "config.json")
+                )
                 manifest = metadata_bytes(
                     _read_file(
                         self._experiment,
@@ -360,6 +442,7 @@ class SecureHoldoutWorkspace:
                     ).content,
                     "dataset.manifest.json",
                 )
+                parse_dataset_manifest(manifest, config)
                 identity = parse_manifest_dataset_identity(manifest)
             except (HoldoutContractError, HoldoutAdmissionError) as error:
                 raise HoldoutAdmissionError(
@@ -443,6 +526,7 @@ class SecureHoldoutWorkspace:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
+            _ensure_no_publication_failure(self._experiment)
             return _read_file(
                 self._experiment, name, max_size=_MAX_METADATA_BYTES
             ).content
@@ -451,6 +535,7 @@ class SecureHoldoutWorkspace:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
+            _ensure_no_publication_failure(self._experiment)
             try:
                 descriptor = os.open(
                     name, _secure_flags(directory=False), dir_fd=self._experiment
@@ -476,6 +561,7 @@ class SecureHoldoutWorkspace:
 
     def _create_output_locked(self, name: str, content: bytes) -> None:
         _require_output_name(name)
+        _ensure_no_publication_failure(self._experiment)
         temporary_name = f".{name}.{secrets.token_hex(16)}"
         descriptor: int | None = None
         published = False
@@ -519,31 +605,71 @@ class SecureHoldoutWorkspace:
                 2,
                 linked_state,
             )
-            _fsync_directory(self._experiment)
-            os.unlink(temporary_name, dir_fd=self._experiment)
+            assert descriptor is not None
+            _unlink_owned_temporary(self._experiment, temporary_name, descriptor, 2, 1)
             temporary_name = ""
-        except FileExistsError:
+            final_state = _file_publication_state(os.fstat(descriptor))
+            _verify_published_destination(
+                self._experiment,
+                name,
+                descriptor,
+                content,
+                1,
+                final_state,
+            )
+        except FileExistsError as error:
+            if descriptor is not None and not published:
+                try:
+                    _unlink_owned_temporary(
+                        self._experiment, temporary_name, descriptor, 1, 0
+                    )
+                except HoldoutAdmissionError as cleanup_error:
+                    raise cleanup_error from error
             raise
-        except HoldoutAdmissionError:
-            if published:
-                assert descriptor is not None
-                _restore_published_destination(
-                    self._experiment, name, temporary_name, descriptor
+        except HoldoutAdmissionError as error:
+            if descriptor is not None and published:
+                _fail_closed_after_publication(
+                    self._experiment,
+                    name,
+                    temporary_name,
+                    descriptor,
+                    error,
+                )
+            if descriptor is not None:
+                _fail_closed_before_publication(
+                    self._experiment, temporary_name, descriptor, error
                 )
             raise
         except OSError as error:
-            raise HoldoutAdmissionError("exclusive holdout output failed") from error
+            mapped = HoldoutAdmissionError("exclusive holdout output failed")
+            if descriptor is not None and published:
+                _fail_closed_after_publication(
+                    self._experiment,
+                    name,
+                    temporary_name,
+                    descriptor,
+                    mapped,
+                )
+            if descriptor is not None:
+                _fail_closed_before_publication(
+                    self._experiment, temporary_name, descriptor, mapped
+                )
+            raise mapped from error
         finally:
             if descriptor is not None:
-                os.close(descriptor)
-            if temporary_name:
                 try:
-                    os.unlink(temporary_name, dir_fd=self._experiment)
-                except FileNotFoundError:
-                    pass
-                else:
+                    os.close(descriptor)
+                except OSError as error:
                     if published:
-                        _fsync_directory(self._experiment)
+                        try:
+                            _write_publication_failure(self._experiment, name)
+                        except HoldoutAdmissionError as marker_error:
+                            raise HoldoutAdmissionError(
+                                "exclusive holdout output failed"
+                            ) from marker_error
+                    raise HoldoutAdmissionError(
+                        "exclusive holdout output close failed"
+                    ) from error
 
     def close(self) -> None:
         with self._lifecycle_lock:

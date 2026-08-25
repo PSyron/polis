@@ -8,6 +8,8 @@ from pathlib import Path
 from threading import Barrier, Event
 
 import pytest
+from tests.holdout_config_fixture import synthetic_config
+from tests.test_holdout_manifest import synthetic_manifest
 
 from polis.evaluation.holdout_models import HoldoutAdmissionError
 from polis.evaluation.holdout_reservation import (
@@ -20,7 +22,15 @@ from polis.evaluation.holdout_reservation import (
 )
 
 TRUSTED_DATASET = b"trusted-dataset"
+TRUSTED_DATASET += b"\0" * (17370 - len(TRUSTED_DATASET))
 TRUSTED_DATASET_SHA256 = hashlib.sha256(TRUSTED_DATASET).hexdigest()
+
+
+@pytest.fixture(autouse=True)
+def _patch_synthetic_dataset_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    import polis.evaluation.holdout_config_dataset as config_dataset
+
+    monkeypatch.setattr(config_dataset, "DATASET_SHA256", TRUSTED_DATASET_SHA256)
 
 
 def _layout(root: Path) -> tuple[Path, Path]:
@@ -28,34 +38,15 @@ def _layout(root: Path) -> tuple[Path, Path]:
     sealed = root / ".omo/sealed/a-b-one-shot-v1"
     experiment.mkdir(parents=True)
     sealed.mkdir(parents=True)
-    (experiment / "config.json").write_bytes(b"trusted-config")
-    manifest = {
-        "schema_id": "polis.a-b-one-shot.dataset-manifest",
-        "schema_version": 1,
-        "dataset_id": "synthetic",
-        "dataset_schema": "polis.a-b-one-shot.dataset/1",
-        "sha256": TRUSTED_DATASET_SHA256,
-        "size_bytes": len(TRUSTED_DATASET),
-        "mode": "0600",
-        "case_count": 0,
-        "source_count": 0,
-        "expected_finding_count": 0,
-        "role_counts": {"error": 0, "correct": 0, "abstain": 0, "conflict": 0},
-        "license": "CC0-1.0",
-        "provenance": "synthetic",
-        "review": {
-            "reviewer_role": "synthetic-reviewer",
-            "verdict": "APPROVE",
-            "reviewed_case_count": 0,
-            "total_case_count": 0,
-            "reviewed_source_count": 0,
-            "review_manifest_sha256": "0" * 64,
-            "review_payload_sha256": "1" * 64,
-            "analyzer_executed": False,
-            "protected_artifacts_used": False,
-        },
-        "plaintext_in_repository": False,
-    }
+    config = synthetic_config()
+    dataset_config = config["dataset"]
+    assert isinstance(dataset_config, dict)
+    dataset_config["sha256"] = TRUSTED_DATASET_SHA256
+    dataset_config["size_bytes"] = len(TRUSTED_DATASET)
+    (experiment / "config.json").write_text(json.dumps(config), encoding="utf-8")
+    manifest = synthetic_manifest()
+    manifest["sha256"] = TRUSTED_DATASET_SHA256
+    manifest["size_bytes"] = len(TRUSTED_DATASET)
     (experiment / "dataset.manifest.json").write_text(
         json.dumps(manifest), encoding="utf-8"
     )
@@ -87,6 +78,7 @@ def test_open_workspace_keeps_config_and_outputs_on_verified_directory(
     from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 
     experiment, _sealed = _layout(tmp_path)
+    trusted_config = (experiment / "config.json").read_bytes()
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     replacement = tmp_path / "replacement-config"
@@ -99,7 +91,7 @@ def test_open_workspace_keeps_config_and_outputs_on_verified_directory(
     (alternate / "config.json").write_bytes(b"attacker-config")
     experiment.symlink_to(alternate, target_is_directory=True)
     try:
-        assert workspace.read_config() == b"trusted-config"
+        assert workspace.read_config() == trusted_config
         workspace.create_output("holdout.started", b"reserved\n")
     finally:
         workspace.close()
@@ -155,7 +147,7 @@ def test_dataset_capability_is_consumed_before_a_second_read(
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
-        assert workspace.read_dataset(capability).content == b"trusted-dataset"
+        assert workspace.read_dataset(capability).content == TRUSTED_DATASET
         with pytest.raises(HoldoutAdmissionError, match="authorization"):
             workspace.read_dataset(capability)
     finally:
@@ -201,9 +193,7 @@ def test_capability_from_another_workspace_cannot_read_canonical_dataset(
     try:
         with pytest.raises(HoldoutAdmissionError, match="authorization"):
             reading_workspace.read_dataset(capability)
-        assert issuing_workspace.read_dataset(capability).content == (
-            b"trusted-dataset"
-        )
+        assert issuing_workspace.read_dataset(capability).content == (TRUSTED_DATASET)
     finally:
         _cleanup_capability(capability, issuing_workspace._reservation_workspace)
         reading_workspace.close()
