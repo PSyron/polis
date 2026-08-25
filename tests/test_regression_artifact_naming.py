@@ -251,6 +251,46 @@ def test_inventory_rejects_non_scalar_alias_kind(
     assert any("artifact alias 0 has an unknown kind" in error for error in errors)
 
 
+@pytest.mark.parametrize("field", ("canonical", "legacy"))
+@pytest.mark.parametrize(
+    "malformed_path", ("docs/\x00escape.json", "docs/\ud800escape.json")
+)
+def test_inventory_rejects_malformed_alias_paths(
+    tmp_path: Path, field: str, malformed_path: str
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    inventory_path = (
+        tmp_path / "docs" / "project" / "evaluation-artifact-inventory.json"
+    )
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["aliases"][0][field] = malformed_path
+    inventory_path.write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
+
+    errors = validate_inventory(tmp_path, inventory_path)
+
+    assert any(f"{field} path escapes root/docs" in error for error in errors)
+
+
+@pytest.mark.parametrize(
+    "malformed_path", ("docs/\x00escape.json", "docs/\ud800escape.json")
+)
+def test_inventory_rejects_malformed_proposal_paths(
+    tmp_path: Path, malformed_path: str
+) -> None:
+    shutil.copytree(ROOT / "docs", tmp_path / "docs")
+    comparison_path = tmp_path / "docs" / "regression-comparison-v4.json"
+    comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+    comparison["proposal_path"] = malformed_path
+    comparison_path.write_text(
+        json.dumps(comparison, ensure_ascii=True, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    errors = validate_inventory(tmp_path)
+
+    assert any("proposal_path escapes root/docs" in error for error in errors)
+
+
 def _adr_evaluation_exports() -> tuple[str, ...]:
     text = (
         ROOT

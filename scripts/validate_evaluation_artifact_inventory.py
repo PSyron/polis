@@ -56,14 +56,17 @@ def _load_json(path: Path, label: str) -> Any:
 
 
 def _resolve_docs_path(root: Path, value: str) -> Path | None:
-    candidate = Path(value)
-    if candidate.is_absolute():
+    try:
+        candidate = Path(value)
+        if candidate.is_absolute():
+            return None
+        docs_root = (root / "docs").resolve()
+        resolved = (root / candidate).resolve(strict=False)
+        if not resolved.is_relative_to(docs_root):
+            return None
+        return resolved
+    except (OSError, RuntimeError, ValueError):
         return None
-    docs_root = (root / "docs").resolve()
-    resolved = (root / candidate).resolve(strict=False)
-    if not resolved.is_relative_to(docs_root):
-        return None
-    return resolved
 
 
 def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
@@ -104,7 +107,7 @@ def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
                 raise ValueError(f"artifact alias {index} has an invalid {field} path")
             if Path(value).is_absolute():
                 raise ValueError(
-                    f"artifact alias {index} {field} path escapes root/docs: {value}"
+                    f"artifact alias {index} {field} path escapes root/docs"
                 )
             if not value.startswith("docs/"):
                 raise ValueError(f"artifact alias {index} has an invalid {field} path")
@@ -123,6 +126,8 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
 
     try:
         inventory = load_inventory(path)
+    except (OSError, RuntimeError, UnicodeError):
+        return ["evaluation artifact inventory contains an invalid path"]
     except ValueError as error:
         return [str(error)]
 
@@ -138,9 +143,9 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
         canonical_path = _resolve_docs_path(root, canonical)
         legacy_path = _resolve_docs_path(root, legacy)
         if canonical_path is None:
-            errors.append(f"canonical path escapes root/docs: {canonical}")
+            errors.append("canonical path escapes root/docs")
         if legacy_path is None:
-            errors.append(f"legacy path escapes root/docs: {legacy}")
+            errors.append("legacy path escapes root/docs")
         if canonical_path is None or legacy_path is None:
             continue
         if canonical in seen_canonical or legacy in seen_legacy:
@@ -186,7 +191,7 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
                 continue
             proposal_file = _resolve_docs_path(root, proposal_path)
             if proposal_file is None:
-                errors.append(f"proposal_path escapes root/docs: {proposal_path}")
+                errors.append("proposal_path escapes root/docs")
                 continue
             if not proposal_file.is_file():
                 errors.append(f"comparison proposal is missing: {proposal_path}")
