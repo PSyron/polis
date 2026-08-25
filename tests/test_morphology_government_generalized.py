@@ -122,6 +122,35 @@ _PRONOUN_CASES = (
     ),
 )
 
+_PRONOUN_MATRIX = tuple(
+    [
+        ("Szukam", modifier, "telefon", "government_szukac_klucz", "telefonu")
+        for modifier in ("mojego", "swojego", "twojego", "naszego", "waszego", "tego")
+    ]
+    + [
+        ("Używam", modifier, "program", "government_uzywac_telefon", "programu")
+        for modifier in ("mojego", "swojego", "twojego", "naszego", "waszego", "tego")
+    ]
+    + [
+        ("Ufam", modifier, "lekarz", "government_ufac_lekarz", "lekarzowi")
+        for modifier in ("mojemu", "swojemu", "twojemu", "naszemu", "waszemu", "temu")
+    ]
+    + [
+        (
+            "Interesuję się",
+            modifier,
+            "historia",
+            "government_interesowac_sie_historia",
+            "historią",
+        )
+        for modifier in ("moją", "swoją", "twoją", "naszą", "waszą", "tą")
+    ]
+    + [
+        ("Idę do", modifier, "książka", "government_do_sklep", "książki")
+        for modifier in ("mojej", "swojej", "twojej", "naszej", "waszej", "tej")
+    ]
+)
+
 _GENERALIZED_SOURCES: Final = frozenset(
     {
         "rule:inflection.government_szukac_klucz",
@@ -277,6 +306,31 @@ def test_generalized_government_accepts_pronoun_nominal_modifiers(
     assert (finding.original, finding.suggestion) == (original, suggestion)
     assert (finding.start, finding.end) == (start, end)
     assert text[start:end] == original
+
+
+@pytest.mark.parametrize(
+    ("governor", "modifier", "noun", "source_suffix", "suggestion"),
+    _PRONOUN_MATRIX,
+)
+def test_generalized_government_covers_pronouns_across_government_table(
+    governor: str,
+    modifier: str,
+    noun: str,
+    source_suffix: str,
+    suggestion: str,
+) -> None:
+    text = f"{governor} {modifier} {noun}."
+    findings = tuple(
+        finding
+        for finding in Analyzer(AnalyzerConfig()).analyze(text).issues
+        if source_suffix in str(finding.source)
+    )
+
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.original == noun
+    assert finding.suggestion == suggestion
+    assert text[finding.start : finding.end] == noun
 
 
 def test_generalized_government_keeps_correct_pronoun_and_only_changes_noun() -> None:

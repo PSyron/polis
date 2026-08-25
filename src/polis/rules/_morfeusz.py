@@ -80,7 +80,7 @@ _NON_ADJECTIVE_LEMMAS: Final = frozenset(
 _GOVERNMENT_PRONOUN_LEMMAS: Final = frozenset(
     {"mój", "mój:A", "nasz", "swój", "ten", "twój", "twój:A", "wasz"}
 )
-_GOVERNMENT_PRONOUN_PREFERRED_FORM: Final = (
+_GOVERNMENT_PRONOUN_QUALIFIED_AMBIGUITY: Final = (
     "program",
     "sg",
     "gen",
@@ -532,7 +532,7 @@ class _QualifiedMorfeusz:
             noun_replacement is None
             and adjective_lemma in _GOVERNMENT_PRONOUN_LEMMAS
             and (noun_lemma, *target_feature, "programu")
-            == _GOVERNMENT_PRONOUN_PREFERRED_FORM
+            == _GOVERNMENT_PRONOUN_QUALIFIED_AMBIGUITY
             and noun_forms == {"programa", "programu"}
         ):
             noun_replacement = "programu"
