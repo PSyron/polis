@@ -11,7 +11,9 @@ import pytest
 from tests.holdout_config_fixture import synthetic_config
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_models import HoldoutAdmissionError
+from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
+from polis.evaluation.holdout_models import AdmissionEvidence, HoldoutAdmissionError
 from polis.evaluation.holdout_reservation import (
     CANONICAL_MARKER,
     HoldoutAlreadyConsumedError,
@@ -20,10 +22,19 @@ from polis.evaluation.holdout_reservation import (
     consume_consumption_capability,
     reserve_consumption,
 )
+from polis.evaluation.holdout_sources import source_sha256
 
 TRUSTED_DATASET = b"trusted-dataset"
 TRUSTED_DATASET += b"\0" * (17370 - len(TRUSTED_DATASET))
 TRUSTED_DATASET_SHA256 = hashlib.sha256(TRUSTED_DATASET).hexdigest()
+MERGE_COMMIT = "a" * 40
+VERIFICATION_PAYLOAD = {
+    "verified": True,
+    "reason": "valid",
+    "signature": "synthetic-signature",
+    "payload": "synthetic-payload",
+    "verified_at": "2026-08-25T00:00:00Z",
+}
 
 
 @pytest.fixture(autouse=True)
@@ -50,12 +61,47 @@ def _layout(root: Path) -> tuple[Path, Path]:
     (experiment / "dataset.manifest.json").write_text(
         json.dumps(manifest), encoding="utf-8"
     )
-    (sealed / "merge-verification.json").write_bytes(b"trusted-merge")
+    (sealed / "merge-verification.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "polis.a-b-one-shot.merge-verification",
+                "schema_version": 1,
+                "evaluated_source_sha": MERGE_COMMIT,
+                "evaluated_source_tree_sha256": "b" * 40,
+                "github_verification": VERIFICATION_PAYLOAD,
+                "github_verification_sha256": canonical_sha256(VERIFICATION_PAYLOAD),
+            }
+        ),
+        encoding="utf-8",
+    )
     (sealed / "run-authorization.json").write_bytes(b"trusted-authorization")
     (sealed / "run-authorization.sig").write_bytes(b"trusted-signature")
     (sealed / "cases.json").write_bytes(TRUSTED_DATASET)
     (sealed / "cases.json").chmod(0o600)
     return experiment, sealed
+
+
+def _admission() -> ExternalAdmission:
+    config = synthetic_config()
+    dataset = config["dataset"]
+    assert isinstance(dataset, dict)
+    dataset["sha256"] = TRUSTED_DATASET_SHA256
+    dataset["size_bytes"] = len(TRUSTED_DATASET)
+    parsed = parse_holdout_config(config)
+    return ExternalAdmission(
+        AdmissionEvidence(
+            canonical_sha256(config),
+            source_sha256(parsed),
+            TRUSTED_DATASET_SHA256,
+            MERGE_COMMIT,
+            True,
+            "valid",
+            canonical_sha256(VERIFICATION_PAYLOAD),
+        ),
+        "c" * 64,
+        "d" * 64,
+        "e" * 64,
+    )
 
 
 def _cleanup_capability(
@@ -106,6 +152,7 @@ def test_open_workspace_keeps_evidence_and_dataset_on_verified_directory(
     from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 
     _experiment, sealed = _layout(tmp_path)
+    trusted_merge = (sealed / "merge-verification.json").read_bytes()
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
@@ -122,7 +169,7 @@ def test_open_workspace_keeps_evidence_and_dataset_on_verified_directory(
         (alternate / name).write_bytes(b"attacker")
     sealed.symlink_to(alternate, target_is_directory=True)
     try:
-        assert workspace.read_evidence("merge-verification.json") == b"trusted-merge"
+        assert workspace.read_evidence("merge-verification.json") == trusted_merge
         assert workspace.read_evidence("run-authorization.json") == (
             b"trusted-authorization"
         )
@@ -143,7 +190,7 @@ def test_dataset_capability_is_consumed_before_a_second_read(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -187,7 +234,7 @@ def test_capability_from_another_workspace_cannot_read_canonical_dataset(
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -211,7 +258,7 @@ def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     barrier = Barrier(2)

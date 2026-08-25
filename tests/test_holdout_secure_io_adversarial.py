@@ -4,20 +4,37 @@ import hashlib
 import json
 import os
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
+from threading import Event
 from typing import Literal, assert_never
 
 import pytest
 from tests.holdout_config_fixture import synthetic_config
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_models import DatasetIdentity, HoldoutAdmissionError
+from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
+from polis.evaluation.holdout_models import (
+    AdmissionEvidence,
+    DatasetIdentity,
+    HoldoutAdmissionError,
+)
 from polis.evaluation.holdout_reservation import is_valid_consumption_capability
+from polis.evaluation.holdout_sources import source_sha256
 
 TRUSTED_DATASET = b"trusted-dataset"
 TRUSTED_DATASET += b"\0" * (17370 - len(TRUSTED_DATASET))
 TRUSTED_DATASET_SHA256 = hashlib.sha256(TRUSTED_DATASET).hexdigest()
+MERGE_COMMIT = "a" * 40
+VERIFICATION_PAYLOAD = {
+    "verified": True,
+    "reason": "valid",
+    "signature": "synthetic-signature",
+    "payload": "synthetic-payload",
+    "verified_at": "2026-08-25T00:00:00Z",
+}
 
 
 @pytest.fixture(autouse=True)
@@ -46,12 +63,47 @@ def _layout(root: Path) -> tuple[Path, Path]:
     (experiment / "dataset.manifest.json").write_text(
         json.dumps(manifest), encoding="utf-8"
     )
-    (sealed / "merge-verification.json").write_bytes(b"trusted-merge")
+    (sealed / "merge-verification.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "polis.a-b-one-shot.merge-verification",
+                "schema_version": 1,
+                "evaluated_source_sha": MERGE_COMMIT,
+                "evaluated_source_tree_sha256": "b" * 40,
+                "github_verification": VERIFICATION_PAYLOAD,
+                "github_verification_sha256": canonical_sha256(VERIFICATION_PAYLOAD),
+            }
+        ),
+        encoding="utf-8",
+    )
     (sealed / "run-authorization.json").write_bytes(b"trusted-authorization")
     (sealed / "run-authorization.sig").write_bytes(b"trusted-signature")
     (sealed / "cases.json").write_bytes(trusted_dataset)
     (sealed / "cases.json").chmod(0o600)
     return experiment, sealed
+
+
+def _admission() -> ExternalAdmission:
+    config = synthetic_config()
+    dataset = config["dataset"]
+    assert isinstance(dataset, dict)
+    dataset["sha256"] = TRUSTED_DATASET_SHA256
+    dataset["size_bytes"] = len(TRUSTED_DATASET)
+    parsed = parse_holdout_config(config)
+    return ExternalAdmission(
+        AdmissionEvidence(
+            canonical_sha256(config),
+            source_sha256(parsed),
+            TRUSTED_DATASET_SHA256,
+            MERGE_COMMIT,
+            True,
+            "valid",
+            canonical_sha256(VERIFICATION_PAYLOAD),
+        ),
+        "c" * 64,
+        "d" * 64,
+        "e" * 64,
+    )
 
 
 def _synthetic_dataset_identity(
@@ -87,6 +139,28 @@ def test_bind_rejects_manifest_identity_not_bound_to_config(
             workspace.bind_approved_dataset_identity()
     finally:
         workspace.close()
+
+
+def test_reserve_rejects_forged_complete_admission_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    workspace.bind_approved_dataset_identity()
+    admission = _admission()
+    forged = replace(
+        admission, evidence=replace(admission.evidence, source_sha256="forged")
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="admission"):
+            workspace.reserve_dataset(forged, reserved_at="2026-08-25T00:00:00Z")
+    finally:
+        workspace.close()
+
+    assert not (experiment / "holdout.started").exists()
 
 
 @pytest.mark.parametrize("reader", ["output", "evidence", "dataset"])
@@ -127,10 +201,7 @@ def test_workspace_rejects_hardlinked_sensitive_file(
             case "dataset":
                 workspace.bind_approved_dataset_identity()
                 capability = workspace.reserve_dataset(
-                    {
-                        "experiment_id": "synthetic",
-                        "dataset_sha256": TRUSTED_DATASET_SHA256,
-                    },
+                    _admission(),
                     reserved_at="2026-08-25T00:00:00Z",
                 )
                 with pytest.raises(HoldoutAdmissionError):
@@ -218,6 +289,120 @@ def test_create_output_publishes_only_after_complete_file_verification(
 
     assert target_states == [False]
     assert (experiment / "report.json").read_bytes() == b"TRUSTED"
+
+
+def test_read_output_rejects_mutated_output_after_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        workspace.create_output("report.json", b"TRUSTED")
+        (experiment / "report.json").write_bytes(b"ATTACK!")
+        with pytest.raises(HoldoutAdmissionError, match="output"):
+            workspace.read_output("report.json")
+    finally:
+        workspace.close()
+
+
+def test_output_exists_rejects_mutated_output_after_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        workspace.create_output("report.json", b"REPORT")
+        (tmp_path / "experiments/a-b-one-shot/report.json").write_bytes(b"MUTATE")
+        with pytest.raises(HoldoutAdmissionError, match="trusted holdout output"):
+            workspace.output_exists("report.json")
+    finally:
+        workspace.close()
+
+
+def test_read_output_rejects_unregistered_preexisting_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    (experiment / "report.json").write_bytes(b"ATTACKER")
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="unregistered"):
+            workspace.read_output("report.json")
+    finally:
+        workspace.close()
+
+
+def test_publication_failure_blocks_other_workspace_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    first = SecureHoldoutWorkspace.open(tmp_path)
+    second = SecureHoldoutWorkspace.open(tmp_path)
+    first_in_publication = Event()
+    release_first = Event()
+    original_verify = secure_io._verify_published_destination
+
+    def fail_first_publication(
+        parent: int,
+        name: str,
+        source_descriptor: int,
+        expected_content: bytes,
+        expected_links: int,
+        expected_state: tuple[int, ...],
+    ) -> None:
+        if name == "report.json":
+            first_in_publication.set()
+            assert release_first.wait(timeout=2)
+            raise HoldoutAdmissionError("synthetic publication failure")
+        original_verify(
+            parent,
+            name,
+            source_descriptor,
+            expected_content,
+            expected_links,
+            expected_state,
+        )
+
+    monkeypatch.setattr(
+        secure_io, "_verify_published_destination", fail_first_publication
+    )
+
+    def publish_second() -> str:
+        try:
+            second.create_output("normalized-report.json", b"SECOND")
+        except HoldoutAdmissionError as error:
+            return str(error)
+        return "published"
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            first_future = executor.submit(first.create_output, "report.json", b"FIRST")
+            assert first_in_publication.wait(timeout=2)
+            second_future = executor.submit(publish_second)
+            assert not second_future.done()
+            release_first.set()
+            with pytest.raises(HoldoutAdmissionError, match="publication failure"):
+                first_future.result(timeout=2)
+            assert "permanent" in second_future.result(timeout=2)
+    finally:
+        first.close()
+        second.close()
+
+    assert (experiment / "holdout.publication.failed").exists()
+    assert not (experiment / "normalized-report.json").exists()
 
 
 def test_create_output_rejects_destination_removed_after_source_verification(
@@ -531,11 +716,10 @@ def test_capability_claims_cannot_be_rewrapped_for_another_workspace(
     monkeypatch.chdir(tmp_path)
     issuing_workspace = SecureHoldoutWorkspace.open(tmp_path)
     reading_workspace = SecureHoldoutWorkspace.open(tmp_path)
-    identity = _synthetic_dataset_identity()
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": identity.sha256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     object.__setattr__(capability, "_token", object())
@@ -557,11 +741,10 @@ def test_direct_token_claim_mutation_cannot_redirect_capability(
     monkeypatch.chdir(tmp_path)
     issuing_workspace = SecureHoldoutWorkspace.open(tmp_path)
     reading_workspace = SecureHoldoutWorkspace.open(tmp_path)
-    identity = _synthetic_dataset_identity()
     issuing_workspace.bind_approved_dataset_identity()
     reading_workspace.bind_approved_dataset_identity()
     capability = issuing_workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": identity.sha256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -594,7 +777,7 @@ def test_workspace_rejects_dataset_append_before_unbounded_read(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     original_read: Callable[[int, int], bytes] = os.read
@@ -627,7 +810,7 @@ def test_secure_boundary_rejects_same_size_dataset_with_forged_digest(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     capability = workspace.reserve_dataset(
-        {"experiment_id": "synthetic", "dataset_sha256": TRUSTED_DATASET_SHA256},
+        _admission(),
         reserved_at="2026-08-25T00:00:00Z",
     )
     try:
@@ -647,14 +830,14 @@ def test_dataset_capability_rejects_identity_not_matching_approved_manifest(
     workspace = SecureHoldoutWorkspace.open(tmp_path)
     workspace.bind_approved_dataset_identity()
     try:
-        with pytest.raises(HoldoutAdmissionError, match="dataset identity"):
-            workspace.reserve_dataset(
-                {
-                    "experiment_id": "synthetic",
-                    "dataset_sha256": "attacker-dataset",
-                },
-                reserved_at="2026-08-25T00:00:00Z",
+        with pytest.raises(HoldoutAdmissionError, match="admission evidence"):
+            forged = replace(
+                _admission(),
+                evidence=replace(
+                    _admission().evidence, dataset_sha256="attacker-dataset"
+                ),
             )
+            workspace.reserve_dataset(forged, reserved_at="2026-08-25T00:00:00Z")
     finally:
         workspace.close()
 
@@ -672,10 +855,7 @@ def test_close_invalidates_unconsumed_workspace_capability(
     try:
         issuing_workspace.bind_approved_dataset_identity()
         capability = issuing_workspace.reserve_dataset(
-            {
-                "experiment_id": "synthetic",
-                "dataset_sha256": TRUSTED_DATASET_SHA256,
-            },
+            _admission(),
             reserved_at="2026-08-25T00:00:00Z",
         )
     finally:

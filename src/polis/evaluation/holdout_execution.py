@@ -124,14 +124,8 @@ def _run_open_workspace(
         )
     ):
         raise HoldoutAdmissionError("holdout output already exists")
-    identity: JsonObject = {
-        "experiment_id": config.experiment_id,
-        "config_sha256": admission.evidence.config_sha256,
-        "source_sha256": admission.evidence.source_sha256,
-        "dataset_sha256": admission.evidence.dataset_sha256,
-    }
     capability = workspace.reserve_dataset(
-        identity,
+        admission,
         reserved_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     )
     try:

@@ -9,13 +9,15 @@ from pathlib import Path
 from threading import Lock
 from typing import Final, NoReturn
 
-from polis.evaluation.holdout_attestations import metadata_bytes
-from polis.evaluation.holdout_contract import parse_holdout_config
+from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_attestations import exact_fields, metadata_bytes
+from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
 from polis.evaluation.holdout_manifest import (
     parse_dataset_manifest,
     parse_manifest_dataset_identity,
 )
 from polis.evaluation.holdout_models import (
+    AdmissionEvidence,
     DatasetIdentity,
     HoldoutAdmissionError,
     HoldoutContractError,
@@ -30,6 +32,7 @@ from polis.evaluation.holdout_reservation import (
     invalidate_consumption_capabilities,
     reserve_consumption_secure,
 )
+from polis.evaluation.holdout_sources import source_sha256
 
 _OUTPUT_NAMES: Final = frozenset(
     {
@@ -41,6 +44,7 @@ _OUTPUT_NAMES: Final = frozenset(
 )
 _PERMANENT_FAILURE_NAME: Final = "holdout.publication.failed"
 _MAX_METADATA_BYTES: Final = 1 << 20
+_PUBLICATION_LOCK: Final = Lock()
 
 
 def _secure_flags(*, directory: bool) -> int:
@@ -77,6 +81,12 @@ def _fsync_directory(parent: int) -> None:
 class SecureFile:
     content: bytes
     mode: str
+
+
+@dataclass(frozen=True, slots=True)
+class _PublishedOutput:
+    content: bytes
+    digest: str
 
 
 def _file_state(metadata: os.stat_result) -> tuple[int, ...]:
@@ -271,18 +281,18 @@ def _unlink_owned_temporary(
             or temporary_metadata.st_nlink != expected_links_before
         ):
             raise HoldoutAdmissionError("temporary holdout output ownership changed")
+        try:
+            os.unlink(temporary_name, dir_fd=parent)
+        except OSError as error:
+            raise HoldoutAdmissionError(
+                "temporary holdout output cleanup failed"
+            ) from error
+        source_after = os.fstat(source_descriptor)
+        if source_after.st_nlink != expected_links_after:
+            raise HoldoutAdmissionError("temporary holdout output ownership changed")
+        _fsync_directory(parent)
     finally:
         os.close(temporary)
-    try:
-        os.unlink(temporary_name, dir_fd=parent)
-    except OSError as error:
-        raise HoldoutAdmissionError(
-            "temporary holdout output cleanup failed"
-        ) from error
-    source_after = os.fstat(source_descriptor)
-    if source_after.st_nlink != expected_links_after:
-        raise HoldoutAdmissionError("temporary holdout output ownership changed")
-    _fsync_directory(parent)
 
 
 def _fail_closed_after_publication(
@@ -358,7 +368,9 @@ class SecureHoldoutWorkspace:
         "_reservation_workspace",
         "_root",
         "_sealed",
+        "_approved_config",
         "_approved_dataset_identity",
+        "_published_outputs",
         "_closed",
         "_lifecycle_lock",
     )
@@ -371,7 +383,9 @@ class SecureHoldoutWorkspace:
         self._sealed = sealed
         self._config = config
         self._reservation_workspace = _CanonicalWorkspaceIdentity()
+        self._approved_config = None
         self._approved_dataset_identity: DatasetIdentity | None = None
+        self._published_outputs: dict[str, _PublishedOutput] = {}
         self._closed = False
         self._lifecycle_lock = Lock()
 
@@ -453,6 +467,9 @@ class SecureHoldoutWorkspace:
                 and self._approved_dataset_identity != identity
             ):
                 raise HoldoutAdmissionError("approved dataset identity changed")
+            if self._approved_config is not None and self._approved_config != config:
+                raise HoldoutAdmissionError("approved holdout config changed")
+            self._approved_config = config
             self._approved_dataset_identity = identity
 
     def read_evidence(self, name: str) -> bytes:
@@ -501,18 +518,104 @@ class SecureHoldoutWorkspace:
                 )
             return secure_file
 
+    def _admission_evidence_locked(self) -> AdmissionEvidence:
+        config = self._approved_config
+        approved_identity = self._approved_dataset_identity
+        if config is None or approved_identity is None:
+            raise HoldoutAdmissionError("approved admission evidence is unavailable")
+        try:
+            merge = metadata_bytes(
+                _read_file(
+                    self._sealed,
+                    "merge-verification.json",
+                    max_size=_MAX_METADATA_BYTES,
+                ).content,
+                "merge-verification.json",
+            )
+            exact_fields(
+                merge,
+                {
+                    "schema_id",
+                    "schema_version",
+                    "evaluated_source_sha",
+                    "evaluated_source_tree_sha256",
+                    "github_verification",
+                    "github_verification_sha256",
+                },
+                "merge verification",
+            )
+            if (
+                merge.get("schema_id") != "polis.a-b-one-shot.merge-verification"
+                or merge.get("schema_version") != 1
+            ):
+                raise HoldoutAdmissionError("merge verification version is invalid")
+            merge_commit = merge.get("evaluated_source_sha")
+            verification = merge.get("github_verification")
+            if not isinstance(merge_commit, str) or not merge_commit:
+                raise HoldoutAdmissionError("merge verification identity is invalid")
+            if not isinstance(verification, dict):
+                raise HoldoutAdmissionError("merge verification payload is invalid")
+            exact_fields(
+                verification,
+                {"verified", "reason", "signature", "payload", "verified_at"},
+                "GitHub verification payload",
+            )
+            verified = verification.get("verified")
+            reason = verification.get("reason")
+            payload_sha256 = merge.get("github_verification_sha256")
+            if type(verified) is not bool or not isinstance(reason, str):
+                raise HoldoutAdmissionError("merge verification result is invalid")
+            if not isinstance(payload_sha256, str) or not payload_sha256:
+                raise HoldoutAdmissionError("merge verification digest is invalid")
+            if canonical_sha256(verification) != payload_sha256:
+                raise HoldoutAdmissionError("merge verification payload changed")
+            evidence = AdmissionEvidence(
+                config_sha256=canonical_sha256(
+                    metadata_bytes(self._config.content, "config.json")
+                ),
+                source_sha256=source_sha256(config),
+                dataset_sha256=approved_identity.sha256,
+                merge_commit=merge_commit,
+                verification_verified=verified,
+                verification_reason=reason,
+                verification_payload_sha256=payload_sha256,
+            )
+        except (HoldoutAdmissionError, HoldoutContractError) as error:
+            raise HoldoutAdmissionError(
+                "self-bound admission evidence is invalid"
+            ) from error
+        if (
+            evidence.verification_verified is not True
+            or evidence.verification_reason != "valid"
+        ):
+            raise HoldoutAdmissionError("self-bound admission verification is invalid")
+        return evidence
+
     def reserve_dataset(
-        self, identity: JsonObject, *, reserved_at: str
+        self, admission: ExternalAdmission, *, reserved_at: str
     ) -> _ConsumptionCapability:
         with self._lifecycle_lock:
             self._require_open()
             approved_identity = self._approved_dataset_identity
             if approved_identity is None:
                 raise HoldoutAdmissionError("approved dataset identity is unavailable")
-            if identity.get("dataset_sha256") != approved_identity.sha256:
-                raise HoldoutAdmissionError(
-                    "dataset identity does not match approved manifest"
-                )
+            expected_evidence = self._admission_evidence_locked()
+            if admission.evidence != expected_evidence:
+                raise HoldoutAdmissionError("admission evidence identity mismatch")
+            identity: JsonObject = {
+                "experiment_id": self._approved_config.experiment_id
+                if self._approved_config is not None
+                else "",
+                "config_sha256": expected_evidence.config_sha256,
+                "source_sha256": expected_evidence.source_sha256,
+                "dataset_sha256": expected_evidence.dataset_sha256,
+                "merge_commit": expected_evidence.merge_commit,
+                "verification_verified": expected_evidence.verification_verified,
+                "verification_reason": expected_evidence.verification_reason,
+                "verification_payload_sha256": (
+                    expected_evidence.verification_payload_sha256
+                ),
+            }
             return reserve_consumption_secure(
                 CANONICAL_MARKER,
                 identity,
@@ -526,33 +629,54 @@ class SecureHoldoutWorkspace:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
-            _ensure_no_publication_failure(self._experiment)
-            return _read_file(
-                self._experiment, name, max_size=_MAX_METADATA_BYTES
-            ).content
+            with _PUBLICATION_LOCK:
+                _ensure_no_publication_failure(self._experiment)
+                expected = self._published_outputs.get(name)
+                if expected is None:
+                    raise HoldoutAdmissionError("unregistered holdout output")
+                actual = _read_file(
+                    self._experiment, name, max_size=_MAX_METADATA_BYTES
+                ).content
+                if (
+                    actual != expected.content
+                    or hashlib.sha256(actual).hexdigest() != expected.digest
+                ):
+                    raise HoldoutAdmissionError("trusted holdout output changed")
+                return actual
 
     def output_exists(self, name: str) -> bool:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
-            _ensure_no_publication_failure(self._experiment)
-            try:
-                descriptor = os.open(
-                    name, _secure_flags(directory=False), dir_fd=self._experiment
-                )
-            except FileNotFoundError:
-                return False
-            except OSError as error:
-                raise HoldoutAdmissionError(
-                    "holdout output state is invalid"
-                ) from error
-            try:
-                metadata = os.fstat(descriptor)
-                if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
-                    raise HoldoutAdmissionError("holdout output state is invalid")
-            finally:
-                os.close(descriptor)
-            return True
+            with _PUBLICATION_LOCK:
+                _ensure_no_publication_failure(self._experiment)
+                try:
+                    descriptor = os.open(
+                        name, _secure_flags(directory=False), dir_fd=self._experiment
+                    )
+                except FileNotFoundError:
+                    return False
+                except OSError as error:
+                    raise HoldoutAdmissionError(
+                        "holdout output state is invalid"
+                    ) from error
+                try:
+                    metadata = os.fstat(descriptor)
+                    if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+                        raise HoldoutAdmissionError("holdout output state is invalid")
+                finally:
+                    os.close(descriptor)
+                expected = self._published_outputs.get(name)
+                if expected is not None:
+                    actual = _read_file(
+                        self._experiment, name, max_size=_MAX_METADATA_BYTES
+                    ).content
+                    if (
+                        actual != expected.content
+                        or hashlib.sha256(actual).hexdigest() != expected.digest
+                    ):
+                        raise HoldoutAdmissionError("trusted holdout output changed")
+                return True
 
     def create_output(self, name: str, content: bytes) -> None:
         with self._lifecycle_lock:
@@ -560,6 +684,10 @@ class SecureHoldoutWorkspace:
             self._create_output_locked(name, content)
 
     def _create_output_locked(self, name: str, content: bytes) -> None:
+        with _PUBLICATION_LOCK:
+            self._create_output_transaction_locked(name, content)
+
+    def _create_output_transaction_locked(self, name: str, content: bytes) -> None:
         _require_output_name(name)
         _ensure_no_publication_failure(self._experiment)
         temporary_name = f".{name}.{secrets.token_hex(16)}"
@@ -616,6 +744,9 @@ class SecureHoldoutWorkspace:
                 content,
                 1,
                 final_state,
+            )
+            self._published_outputs[name] = _PublishedOutput(
+                content, hashlib.sha256(content).hexdigest()
             )
         except FileExistsError as error:
             if descriptor is not None and not published:

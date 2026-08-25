@@ -17,7 +17,7 @@ class HoldoutAlreadyConsumedError(RuntimeError):
 
 class DurabilityFilesystem(Protocol):
     def open_exclusive(self, directory: int, name: str, content: bytes) -> int: ...
-    def open_directory(self, path: Path) -> int: ...
+    def open_directory(self, path: Path, expected_identity: tuple[int, int]) -> int: ...
     def fsync(self, descriptor: int) -> None: ...
     def close(self, descriptor: int) -> None: ...
 
@@ -96,13 +96,28 @@ class _OperatingSystemFilesystem:
             raise
         return descriptor
 
-    def open_directory(self, path: Path) -> int:
+    def open_directory(self, path: Path, expected_identity: tuple[int, int]) -> int:
         if not hasattr(os, "O_DIRECTORY") or not hasattr(os, "O_NOFOLLOW"):
             raise OSError("secure directory flags are unavailable")
         flags = (
             os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
         )
-        return os.open(path, flags)
+        canonical = path.resolve(strict=True)
+        descriptor: int | None = None
+        try:
+            descriptor = os.open(os.sep, flags)
+            for component in canonical.parts[1:]:
+                next_descriptor = os.open(component, flags, dir_fd=descriptor)
+                os.close(descriptor)
+                descriptor = next_descriptor
+            metadata = os.fstat(descriptor)
+            if (metadata.st_dev, metadata.st_ino) != expected_identity:
+                raise OSError("reservation marker parent changed during open")
+            return descriptor
+        except OSError:
+            if descriptor is not None:
+                os.close(descriptor)
+            raise
 
     def fsync(self, descriptor: int) -> None:
         os.fsync(descriptor)
@@ -127,13 +142,20 @@ def reserve_consumption(
         raise HoldoutAlreadyConsumedError(
             "reservation marker parent directory is unavailable"
         )
+    try:
+        parent_metadata = marker.parent.stat()
+        expected_identity = (parent_metadata.st_dev, parent_metadata.st_ino)
+    except OSError as error:
+        raise HoldoutAlreadyConsumedError(
+            "reservation marker parent directory is unavailable"
+        ) from error
     payload = {**identity, "reserved_at": reserved_at}
     content = (
         json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         + "\n"
     ).encode()
     try:
-        directory_descriptor = fs.open_directory(marker.parent)
+        directory_descriptor = fs.open_directory(marker.parent, expected_identity)
     except OSError as error:
         raise HoldoutAlreadyConsumedError(
             "reservation marker parent directory is unavailable"
