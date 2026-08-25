@@ -5,6 +5,7 @@ import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Protocol
 
 from polis.evaluation.holdout_models import JsonObject
@@ -32,6 +33,7 @@ class _ReservationToken:
 
 
 _RESERVATION_SEAL = _ReservationSeal()
+_RESERVATION_LOCK = Lock()
 _ISSUED_TOKENS: set[_ReservationToken] = set()
 
 
@@ -92,7 +94,8 @@ def reserve_consumption(
     finally:
         fs.close(directory_descriptor)
     token = _ReservationToken(_RESERVATION_SEAL)
-    _ISSUED_TOKENS.add(token)
+    with _RESERVATION_LOCK:
+        _ISSUED_TOKENS.add(token)
     return _ConsumptionCapability(marker, token)
 
 
@@ -113,27 +116,32 @@ def reserve_consumption_secure(
     except FileExistsError as error:
         raise HoldoutAlreadyConsumedError("holdout already consumed") from error
     token = _ReservationToken(_RESERVATION_SEAL)
-    _ISSUED_TOKENS.add(token)
+    with _RESERVATION_LOCK:
+        _ISSUED_TOKENS.add(token)
     return _ConsumptionCapability(marker, token)
+
+
+def consume_consumption_capability(value: _ConsumptionCapability | None) -> None:
+    with _RESERVATION_LOCK:
+        if (
+            not isinstance(value, _ConsumptionCapability)
+            or value._token.seal is not _RESERVATION_SEAL
+            or value._token not in _ISSUED_TOKENS
+        ):
+            if isinstance(value, _ConsumptionCapability) and value._token.consumed:
+                raise HoldoutAlreadyConsumedError(
+                    "reservation capability already consumed"
+                )
+            raise HoldoutAlreadyConsumedError("reservation capability is invalid")
+        _ISSUED_TOKENS.remove(value._token)
+        value._token.consumed = True
 
 
 def load_reserved_dataset[T](
     capability: _ConsumptionCapability,
     loader: Callable[[], T],
 ) -> T:
-    if (
-        not isinstance(capability, _ConsumptionCapability)
-        or capability._token.seal is not _RESERVATION_SEAL
-        or capability._token not in _ISSUED_TOKENS
-    ):
-        if (
-            isinstance(capability, _ConsumptionCapability)
-            and capability._token.consumed
-        ):
-            raise HoldoutAlreadyConsumedError("reservation capability already consumed")
-        raise HoldoutAlreadyConsumedError("reservation capability is invalid")
-    _ISSUED_TOKENS.remove(capability._token)
-    capability._token.consumed = True
+    consume_consumption_capability(capability)
     return loader()
 
 
@@ -146,3 +154,13 @@ def reserve_and_load[T](
 ) -> T:
     capability = reserve_consumption(marker, identity, reserved_at=reserved_at)
     return load_reserved_dataset(capability, loader)
+
+
+def is_valid_consumption_capability(value: object) -> bool:
+    with _RESERVATION_LOCK:
+        return (
+            isinstance(value, _ConsumptionCapability)
+            and value._token.seal is _RESERVATION_SEAL
+            and value._token in _ISSUED_TOKENS
+            and not value._token.consumed
+        )

@@ -1,0 +1,60 @@
+{
+  "schema_id": "polis.wiked-pl-holdout-manifest",
+  "schema_version": 1,
+  "status": "blocked_external_authority",
+  "source": {
+    "name": "WikEd Error Corpus",
+    "archive": "wiked-v1.0.pl.tgz",
+    "url": "http://data.statmt.org/romang/wiked/wiked-v1.0.pl.tgz",
+    "language": "pl",
+    "license": "CC-BY-SA-3.0",
+    "license_status": "pending_artifact_authority_confirmation",
+    "license_basis": "WikEd inherits the license of the source Wikipedia revisions."
+  },
+  "extractor": {
+    "tool": "snukky/wikiedits",
+    "wikiedits_version": "2.0",
+    "revision": null,
+    "parameters": {
+      "language": "polish",
+      "min_chars": 10,
+      "min_words": 2,
+      "max_words": 120,
+      "length_diff": 4,
+      "edit_ratio": 0.3
+    },
+    "input_format": "UTF-8 tab-separated old/new pairs in a named archive member"
+  },
+  "selection": {
+    "target_categories": ["inflection", "agreement", "rection", "punctuation"],
+    "classification_source": "external-human-reviewed-line-map",
+    "review_required": true,
+    "unclassified_action": "reject"
+  },
+  "split": {
+    "method": "external-reviewed-line-map",
+    "development_and_holdout_pair_duplicates": "reject",
+    "development_sha256": null,
+    "holdout_sha256": null,
+    "class_counts": null,
+    "rejected_counts": null
+  },
+  "leakage": {
+    "required": true,
+    "checker": "polis.evaluation.assert_no_cross_corpus_leakage",
+    "scope": ["development", "holdout", "all-existing-evaluation-corpora"],
+    "status": "pending-external-data-and-independent-review"
+  },
+  "privacy": {
+    "plaintext_in_repository": false,
+    "plaintext_in_logs": false,
+    "staging_root": "external-only",
+    "training_use": "forbidden",
+    "holdout_read": "separate-authorization-required"
+  },
+  "limitations": [
+    "The archive, its digest, its exact member names, and the WikEd distribution terms were not accessed in this issue.",
+    "No development or sealed holdout bytes, source text, classification sample, or counts can be published until the external authority supplies and verifies them.",
+    "The extraction result must remain outside the repository; only this metadata manifest and the extractor protocol belong in the repository."
+  ]
+}

@@ -1,5 +1,54 @@
 # Zbiory ewaluacyjne i aktywny protokół jakości
 
+## WikEd PL: protokół zapieczętowanego holdoutu (#427)
+
+Issue #427 rejestruje wyłącznie bezpieczny protokół dla zewnętrznego
+`wiked-v1.0.pl.tgz`. Manifest
+[`docs/project/wiked-pl-holdout-manifest.json`](project/wiked-pl-holdout-manifest.json)
+wiąże nazwę źródła, deklarowaną licencję `CC-BY-SA-3.0`, wersję
+`snukky/wikiedits` 2.0 oraz parametry ekstrakcji. Status pozostaje
+`blocked_external_authority`: w tym issue nie otwierano, nie pobierano ani nie
+odtwarzano archiwum, dlatego jego digest, dokładny człon archiwum, rozkład klas,
+liczby odrzuceń i wynik kontroli przecieku są jawnie nieustalone.
+
+`scripts/wiked_holdout.py` przyjmuje od operatora zweryfikowany SHA-256
+archiwum, nazwę członu z parami `old<TAB>new` oraz zewnętrzną mapę ręcznie
+przejrzanych decyzji `line -> (category, split, reviewed)`. Akceptuje wyłącznie
+klasy `inflection`, `agreement`, `rection` i `punctuation`; brak klasy,
+nieprzejrzana decyzja, duplikat pary między splitami albo błąd formatu kończy
+pracę fail-closed. Plaintext może trafić wyłącznie do nowego katalogu staging
+poza repozytorium, z trybem katalogu `0700` i plików `0600`; manifest wyniku
+zawiera rozmiary, skróty, liczności i odrzucone rekordy. `count` oznacza liczbę
+rekordów w danym pliku JSONL, `size_bytes` liczbę jego bajtów, a `sha256` skrót
+tych samych, dokładnych bajtów. Wynik oraz stdout zachowują status
+`blocked_external_authority`; kontrola przecieku ma status `not_run` i
+`validated: false`, dopóki zewnętrzna władza nie dostarczy danych i niezależnych
+dowodów. Parametry ekstrakcji są wykonywalnym filtrem: minimalna liczba znaków
+i słów obowiązuje dla obu stron pary, `max_words` ogranicza obie strony,
+`length_diff` ogranicza bezwzględną różnicę długości, a `edit_ratio` ogranicza
+zmienione znaki względem dłuższej strony.
+
+Staging nie tworzy markera ani capability z
+`polis.evaluation.holdout_reservation`. Pole `authorization` pozostaje
+`not_authorized`, a jednorazowa rezerwacja odczytu zapieczętowanego holdoutu
+pozostaje osobną granicą wykonania. Sam digest, liczność albo obecność pliku
+`holdout.jsonl` nie jest autoryzacją odczytu.
+
+Jeżeli mapa klasyfikacji zawiera przejrzany rekord holdoutu, funkcja ekstrakcji
+wymaga wstrzykniętego, typowanego `HoldoutAuthority`. Jego hook rezerwacji musi
+zadziałać przed zapisem, a hook kontroli przecieku po zamknięciu plików splitów;
+brak authority kończy się błędem bez utworzenia stagingu. Sam syntetyczny
+provider nie awansuje statusu manifestu: bez zewnętrznych, niezależnych dowodów
+pozostają `not_run`, `not_authorized` i `blocked_external_authority`.
+
+Przed uznaniem artefaktu za gotowy operator musi niezależnie potwierdzić
+licencję konkretnego wydania, przypiąć rewizję narzędzia, przejrzeć próbkę
+klasyfikacji, uruchomić `assert_no_cross_corpus_leakage` między rozwojem,
+holdoutem i istniejącymi korpusami oraz przeprowadzić osobną autoryzację
+jednorazowego odczytu. Logowanie treści, trening i umieszczanie plaintextu w
+repozytorium są zabronione. Bez tych dowodów nie wolno ustawiać statusu
+manifestu na `sealed` ani używać holdoutu.
+
 Polis rozdziela trzy zbiory o różnych rolach. Nie wolno ich łączyć ani
 reinterpretować jako kolejnych wersji jednego korpusu.
 

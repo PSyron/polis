@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier, Event
 
 import pytest
 
 from polis.evaluation.holdout_models import HoldoutAdmissionError
+from polis.evaluation.holdout_reservation import reserve_consumption
 
 
 def _layout(root: Path) -> tuple[Path, Path]:
@@ -75,9 +78,79 @@ def test_open_workspace_keeps_evidence_and_dataset_on_verified_directory(
             b"trusted-authorization"
         )
         assert workspace.read_evidence("run-authorization.sig") == b"trusted-signature"
-        assert workspace.read_dataset().content == b"trusted-dataset"
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            workspace.read_dataset()
     finally:
         workspace.close()
+
+
+def test_dataset_capability_is_consumed_before_a_second_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    capability = reserve_consumption(
+        tmp_path / "holdout.started",
+        {"experiment_id": "synthetic"},
+        reserved_at="2026-08-25T00:00:00Z",
+    )
+    try:
+        assert workspace.read_dataset(capability).content == b"trusted-dataset"
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            workspace.read_dataset(capability)
+    finally:
+        workspace.close()
+
+
+def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureFile, SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    capability = reserve_consumption(
+        tmp_path / "holdout.started",
+        {"experiment_id": "synthetic"},
+        reserved_at="2026-08-25T00:00:00Z",
+    )
+    barrier = Barrier(2)
+    read_started = Event()
+    release_read = Event()
+    original_read_file = secure_io._read_file
+
+    def blocked_read(parent: int, name: str) -> SecureFile:
+        if name == "cases.json":
+            read_started.set()
+            if not release_read.wait(timeout=2):
+                raise AssertionError("synthetic dataset read was not released")
+        return original_read_file(parent, name)
+
+    monkeypatch.setattr(secure_io, "_read_file", blocked_read)
+
+    def read_dataset() -> tuple[str, bytes | str]:
+        barrier.wait(timeout=2)
+        try:
+            return "read", workspace.read_dataset(capability).content
+        except HoldoutAdmissionError as error:
+            return "denied", str(error)
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [executor.submit(read_dataset) for _ in range(2)]
+            assert read_started.wait(timeout=2)
+            release_read.set()
+            results = [future.result(timeout=2) for future in futures]
+    finally:
+        workspace.close()
+
+    assert [result[0] for result in results].count("read") == 1
+    assert [result[0] for result in results].count("denied") == 1
 
 
 def test_workspace_rejects_symlinked_sensitive_file(

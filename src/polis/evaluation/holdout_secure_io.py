@@ -6,6 +6,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from polis.evaluation.holdout_models import HoldoutAdmissionError
+from polis.evaluation.holdout_reservation import (
+    HoldoutAlreadyConsumedError,
+    _ConsumptionCapability,
+    consume_consumption_capability,
+)
 
 
 def _secure_flags(*, directory: bool) -> int:
@@ -121,7 +126,15 @@ class SecureHoldoutWorkspace:
             raise HoldoutAdmissionError("unregistered evidence file")
         return _read_file(self._sealed, name).content
 
-    def read_dataset(self) -> SecureFile:
+    def read_dataset(
+        self, capability: _ConsumptionCapability | None = None
+    ) -> SecureFile:
+        try:
+            consume_consumption_capability(capability)
+        except HoldoutAlreadyConsumedError as error:
+            raise HoldoutAdmissionError(
+                "sealed dataset read requires an active reservation authorization"
+            ) from error
         return _read_file(self._sealed, "cases.json")
 
     def read_output(self, name: str) -> bytes:
