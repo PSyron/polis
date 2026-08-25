@@ -4,6 +4,7 @@ import os
 import stat
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 from polis.evaluation.holdout_models import HoldoutAdmissionError, JsonObject
 from polis.evaluation.holdout_reservation import (
@@ -13,6 +14,15 @@ from polis.evaluation.holdout_reservation import (
     _ConsumptionCapability,
     consume_consumption_capability,
     reserve_consumption_secure,
+)
+
+_OUTPUT_NAMES: Final = frozenset(
+    {
+        "holdout.started",
+        "report.json",
+        "normalized-report.json",
+        "result.manifest.json",
+    }
 )
 
 
@@ -63,6 +73,11 @@ def _read_file(parent: int, name: str) -> SecureFile:
         raise HoldoutAdmissionError("secure holdout file read failed") from error
     finally:
         os.close(descriptor)
+
+
+def _require_output_name(name: str) -> None:
+    if name not in _OUTPUT_NAMES:
+        raise HoldoutAdmissionError("unregistered holdout output")
 
 
 class SecureHoldoutWorkspace:
@@ -163,9 +178,11 @@ class SecureHoldoutWorkspace:
         )
 
     def read_output(self, name: str) -> bytes:
+        _require_output_name(name)
         return _read_file(self._experiment, name).content
 
     def output_exists(self, name: str) -> bool:
+        _require_output_name(name)
         try:
             descriptor = os.open(
                 name, _secure_flags(directory=False), dir_fd=self._experiment
@@ -178,13 +195,7 @@ class SecureHoldoutWorkspace:
         return True
 
     def create_output(self, name: str, content: bytes) -> None:
-        if name not in {
-            "holdout.started",
-            "report.json",
-            "normalized-report.json",
-            "result.manifest.json",
-        }:
-            raise HoldoutAdmissionError("unregistered holdout output")
+        _require_output_name(name)
         try:
             descriptor = os.open(
                 name,

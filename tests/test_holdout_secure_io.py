@@ -209,6 +209,30 @@ def test_workspace_rejects_symlinked_sensitive_file(
 
 
 @pytest.mark.parametrize(
+    "name",
+    [
+        "../../.omo/sealed/a-b-one-shot-v1/cases.json",
+        "nested/report.json",
+    ],
+)
+def test_workspace_rejects_output_path_traversal_for_output_access(
+    name: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="unregistered holdout output"):
+            workspace.read_output(name)
+        with pytest.raises(HoldoutAdmissionError, match="unregistered holdout output"):
+            workspace.output_exists(name)
+    finally:
+        workspace.close()
+
+
+@pytest.mark.parametrize(
     ("name", "reader"),
     [
         ("merge-verification.json", "evidence"),
