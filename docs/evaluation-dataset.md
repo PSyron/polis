@@ -1,4 +1,4 @@
-# Zbiory ewaluacyjne i aktywny protokół jakości
+# Zbiory ewaluacyjne i aktywny protokół regresyjny
 
 ## WikEd PL: protokół zapieczętowanego holdoutu (#427)
 
@@ -52,6 +52,17 @@ manifestu na `sealed` ani używać holdoutu.
 Polis rozdziela trzy zbiory o różnych rolach. Nie wolno ich łączyć ani
 reinterpretować jako kolejnych wersji jednego korpusu.
 
+Wyniki F1 liczone na projektowych zbiorach deweloperskich opisują pokrycie
+regresyjne, a nie jakość produktu. Reguły mogą być rozwijane na tych
+przypadkach, dlatego F1 z tych artefaktów nie jest niezależnym pomiarem.
+Przyszłe pomiary jakości produktu muszą używać osobnego, niezależnego zbioru.
+
+Kanoniczne artefakty pomiarów deweloperskich mają prefiks `regression-`.
+Dotychczasowe pliki `quality-*` pozostają niezmienionymi aliasami historycznymi
+i są akceptowane wyłącznie dla zgodności wstecznej.
+Inwentarz przypina każdy taki alias jego SHA-256, a validator wymaga także
+identycznych wartości liczbowych w parze z artefaktem `regression-*`.
+
 ## Niezmienne granice zgodności
 
 `src/polis/evaluation/datasets/v1/cases.json` jest historycznym,
@@ -72,7 +83,7 @@ niezmienne. Ich lokalizacje opisuje
 [manifest archiwum v2](project/v2-research-archive-manifest.md). Nie uruchamiaj
 ponownie zużytych holdoutów i nie dostrajaj na podstawie zamrożonych dowodów.
 
-## Kandydat do aktywnego zbioru jakości
+## Kandydat do aktywnej suity regresyjnej
 
 Issue #229 wprowadziło osobny, edytowalny zbiór przypadków autorskich na
 licencji `CC0-1.0`:
@@ -105,7 +116,7 @@ i jest zapisany jednocześnie w danych i manifeście.
 Rejestracja baseline'u może teraz rozpocząć się dla tego niezmienionego
 zbioru.
 
-## Zbiór deweloperski jakości v2
+## Zbiór deweloperski regresyjny v2
 
 Issue #303 dodaje odrębny, nadal edytowalny zbiór CC0 służący wyłącznie do
 rozwoju ośmiu planowanych źródeł:
@@ -128,7 +139,7 @@ tożsamością źródła, kohortą `polis-runtime-source-cohort-28-v1`, ADR-0025
 stanem `review-only`. Nie jest to holdout, kwalifikacja automatyczna ani dowód,
 że planowane źródła są już obecne w runtime.
 
-## Zbiór deweloperski jakości v3
+## Zbiór deweloperski regresyjny v3
 
 Issue #339 (F1.2) dodaje odrębny, nadal edytowalny zbiór CC0 służący wyłącznie do
 rozwoju 31 planowanych źródeł Umbrella F zatwierdzonych w ADR-0026:
@@ -156,14 +167,14 @@ obecne w runtime.
 Dualne baseline'y pre-change z zainstalowanego wheel (profile `default` i
 `morphology`) zapisuje F1.2 w:
 
-- `docs/quality-baseline-v3-default.json`;
-- `docs/quality-baseline-v3-morphology.json`.
+- `docs/regression-baseline-v3-default.json`;
+- `docs/regression-baseline-v3-morphology.json`.
 
 Progi porównawcze v3 zatwierdza osobny slice F1.3 na podstawie pomiaru Wave 0
-z #338 (`docs/quality-result-wave0-*.json`), a nie na podstawie progów v2.
+z #338 (`docs/regression-result-wave0-*.json`), a nie na podstawie progów v2.
 Artefakt propozycji:
 
-- `docs/quality-threshold-proposal-v3.json` — floors jakości z baseline'ów v3,
+- `docs/regression-threshold-proposal-v3.json` — progi regresyjne z baseline'ów v3,
   progi wydajności z wave0; `enforced: false`, status
   `pending_maintainer_approval`.
 
@@ -171,16 +182,16 @@ Issue #353 publikuje zamykającą weryfikację zainstalowanego runtime'u po
 Umbrella F oraz korektę dwóch wadliwych przypadków `unicode_casing_offset`
 dla reguł case-lowering:
 
-- `docs/quality-result-v3-default.json`
-- `docs/quality-result-v3-morphology.json`
-- `docs/quality-comparison-v3.json`
+- `docs/regression-result-v3-default.json`
+- `docs/regression-result-v3-morphology.json`
+- `docs/regression-comparison-v3.json`
 
-Floors jakości w propozycji v3 zostały ponownie związane z re-pomierzonymi
+Progi regresyjne w propozycji v3 zostały ponownie związane z re-pomierzonymi
 baseline'ami v3 po korekcie datasetu. Absolutne capy wydajności z wave0
 **nie** zostały ponownie wyprowadzone; porównanie zapisuje ich wynik
 fail-closed.
 
-## Zbiór deweloperski jakości v4
+## Zbiór deweloperski regresyjny v4
 
 Issue #366 wprowadziło niezależny, projektowy zbiór CC0 `v4`:
 
@@ -205,11 +216,12 @@ kandydatów pod istniejące źródło runtime. Canonical digest v4 to
 manifestu to `120247819ff38ec45341b0ad44ea72d3a1015c19d48f7d0b8ab298a9329382bf`.
 
 #367 opublikowało dualne baseline'y i wyniki v4, cztery izolowane artefakty
-wydajności, zatwierdzoną propozycję `docs/quality-threshold-proposal-v4.json`
-oraz `docs/quality-comparison-v4.json`. Comparison ma `aggregate_verdict: pass`;
+wydajności, zatwierdzoną propozycję `docs/regression-threshold-proposal-v4.json`
+oraz `docs/regression-comparison-v4.json`. Comparison ma `aggregate_verdict: pass`;
 oba profile zachowują precision/recall/F1 `1.0`, zero false alarmów i zero
-naruszeń kontroli. Te artefakty są wejściem do kwalifikacji luk w #368, ale nie
-stanowią zgody na automatyczną korektę ani zmianę goldów.
+naruszeń kontroli. To F1 opisuje pokrycie regresyjne na jawnych przypadkach,
+nie jakość produktu. Te artefakty są wejściem do kwalifikacji luk w #368, ale
+nie stanowią zgody na automatyczną korektę ani zmianę goldów.
 
 ## Definicje pomiarów
 
@@ -332,7 +344,7 @@ ADR-0025 nadal jest nieobecnych. Ich brak nie może zostać policzony jako
 fikcyjny `true_positive`.
 
 Raport v2 zapisuje SHA źródła, SHA koła, profil i ewentualną dokładną tożsamość
-dostawcy, środowisko, hashe datasetu i manifestu, agregaty jakości, wydajność,
+dostawcy, środowisko, hashe datasetu i manifestu, agregaty pomiaru regresji, wydajność,
 RSS oraz pięć stabilnych hashy powtórzeń. Nie przechowuje tekstów przypadków,
 goldów, oryginałów, sugestii, danych osobowych ani prywatnych ścieżek. Progi i
 reguły porównania należą dopiero do #304.
@@ -363,7 +375,7 @@ Aktualny baseline z issue #242 zachowuje niezmienione 28 przypadków i ich hashe
 mierzy 140 przypadków po jednym rozgrzewkowym i pięciu mierzonych przebiegach
 oraz uzyskuje 10 TP, 4 FN i 0 FP. Precyzja i accuracy korekty wynoszą `1.0`,
 recall oraz span accuracy `0.7142857142857143`, a F1 `0.8333333333333334`.
-Oczekująca propozycja w `docs/quality-threshold-proposal-v1.json` pozostaje
+Oczekująca propozycja w `docs/regression-threshold-proposal-v1.json` pozostaje
 związana byte-for-byte z tym baseline'em, ma
 `status: pending_maintainer_approval` i `enforced: false`; nie jest bramką
 jakości ani dowodem zatwierdzenia przypadków.
@@ -372,13 +384,15 @@ jakości ani dowodem zatwierdzenia przypadków.
 
 Issue #317 zapisuje post-change pomiary zainstalowanego wheel w:
 
-- `docs/quality-result-v2-default.json`
-- `docs/quality-result-v2-morphology.json`
-- `docs/quality-comparison-v2.json`
+- `docs/regression-result-v2-default.json`
+- `docs/regression-result-v2-morphology.json`
+- `docs/regression-comparison-v2.json`
 
-Schematy `polis.quality-result` i `polis.quality-comparison` są repozytorium-only.
-Pre-change baseline'y v2 oraz propozycja progów pozostają byte-identyczne.
-Porównanie jakości względem zatwierdzonych floorów v2 przechodzi; absolutne
+Schematy `polis.regression-result` i `polis.regression-comparison` są
+repozytorium-only; stare identyfikatory `polis.quality-*` pozostają aliasami
+zgodności. Pre-change baseline'y v2 oraz propozycja progów pozostają
+byte-identyczne.
+Porównanie regresyjne względem zatwierdzonych progów v2 przechodzi; absolutne
 limity performance z propozycji (zero-tolerance względem pre-change baseline)
 pozostają fail-closed przy regresie p95/throughput po dodaniu ośmiu źródeł.
 
@@ -387,11 +401,11 @@ pozostają fail-closed przy regresie p95/throughput po dodaniu ośmiu źródeł.
 Issue #353 zapisuje post-change pomiary zainstalowanego wheel po kohorcie
 `exact-ordered-59` w:
 
-- `docs/quality-result-v3-default.json`
-- `docs/quality-result-v3-morphology.json`
-- `docs/quality-comparison-v3.json`
+- `docs/regression-result-v3-default.json`
+- `docs/regression-result-v3-morphology.json`
+- `docs/regression-comparison-v3.json`
 
-Jakość względem floorów v3 (po re-pomiarze baseline'ów i korekcie dwóch
+Pokrycie regresyjne względem floorów v3 (po re-pomiarze baseline'ów i korekcie dwóch
 case'ów) przechodzi w obu profilach z precyzją `1.0` i FAR `0`. Absolutne
 capy performance z propozycji v3 (wave0) pozostają fail-closed; issue nie
 poszerza capów i wskazuje osobny tor na dispatch-performance.
@@ -399,11 +413,12 @@ poszerza capów i wskazuje osobny tor na dispatch-performance.
 Issue #355 zapisuje re-pomiar po optymalizacji dispatchu (pattern-first
 government + cache form morfologii + LRU segmentacji zdań). Capów v3 nie
 zmieniono; morph p95/throughput przechodzą, RSS i default latency/throughput
-pozostają fail-closed w `docs/quality-comparison-v3.json`.
+pozostają fail-closed w `docs/regression-comparison-v3.json`; nie jest to
+niezależna miara jakości produktu.
 
 ### Oczekująca propozycja progów v2
 
-Issue #304 zapisuje w `docs/quality-threshold-proposal-v2.json` schemat w
+Issue #304 zapisuje w `docs/regression-threshold-proposal-v2.json` schemat w
 wersji `2`, ponieważ jedna propozycja wiąże dwa niezależnie oceniane profile.
 Oba baseline'y pochodzą z tego samego koła o SHA-256
 `51e865182de68914584a2214d3d1db4a869ed3aeb7f1b273082ae3006dc47ad3`
@@ -533,7 +548,7 @@ ten zapis. Zaufane materializowanie obu plików po weryfikacji live przez
 operatora stanowi granicę zaufania; runner podczas wykonania nie używa sieci.
 Prerejestracja celowo nie zapisuje przyszłych wartości tych pól.
 
-Raport surowy dopuszcza jedynie agregaty jakości, wydajności, środowiska i
+Raport surowy dopuszcza jedynie agregaty pomiaru regresji, wydajności, środowiska i
 wyniki per źródło. Raport znormalizowany pomija dane czasowe, RSS i dane hosta,
 dzięki czemu rebuild ma kanoniczne, stabilne bajty. Oba schematy odrzucają pola
 z tekstem przypadku, goldem, sugestią lub prywatną ścieżką.

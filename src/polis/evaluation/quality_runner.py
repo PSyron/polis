@@ -698,7 +698,7 @@ def _pending_v4_proposal(args: argparse.Namespace) -> None:
         }
 
     payload = {
-        "schema_id": "polis.quality-threshold-proposal",
+        "schema_id": "polis.regression-threshold-proposal",
         "schema_version": 4,
         "effective_schema_version": 4,
         "dataset_sha256": default.dataset_sha256,

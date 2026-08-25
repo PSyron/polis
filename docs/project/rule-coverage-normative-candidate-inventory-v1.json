@@ -29,7 +29,7 @@
     },
     {
       "id": "public-v3-quality-artifacts",
-      "path": "docs/quality-comparison-v3.json and versioned public quality manifests",
+      "path": "docs/regression-comparison-v3.json and versioned development regression artifacts",
       "role": "candidate-evidence",
       "boundary": "Public v3 artifacts measure the recorded cases and identities; they do not create a normative rule or broaden a capability claim."
     }

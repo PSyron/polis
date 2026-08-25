@@ -140,10 +140,10 @@ def parse_threshold_proposal_v4(root: JsonObject) -> ThresholdProposalV4:
         },
         "threshold proposal",
     )
-    if (
-        _string(root, "schema_id", "threshold proposal")
-        != "polis.quality-threshold-proposal"
-    ):
+    if _string(root, "schema_id", "threshold proposal") not in {
+        "polis.regression-threshold-proposal",
+        "polis.quality-threshold-proposal",
+    }:
         raise QualityReportError("threshold proposal schema_id mismatch")
     if _integer(root, "schema_version", "threshold proposal") != 4:
         raise QualityReportError("threshold proposal schema_version must be 4")

@@ -1,0 +1,2353 @@
+{
+  "analyzer": "Analyzer(AnalyzerConfig())",
+  "artifact": {
+    "sha256": "7b8df55e83df14cfadf1cff974131a3030912346672e33bf3f4e0b0e6662e091"
+  },
+  "dataset": {
+    "cases": 124,
+    "id": "polis_v4_quality_development",
+    "manifest": {
+      "schema_id": "polis.quality-development-manifest",
+      "schema_version": 4,
+      "sha256": "c7080b7609e83533d81bef97526536078ccf566178808c394338e339bc042422"
+    },
+    "schema_id": "polis.quality-development-dataset",
+    "schema_version": 4,
+    "sha256": "0a767850af7f5d37ccb8f4b63544dad91a7bd11744fe02b9652ebf33f644af5c",
+    "source": "quality:polis_v4_quality_development@4"
+  },
+  "diagnostics": {
+    "aggregate": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 80,
+      "correct_sentence_false_alarm_rate": 0.0,
+      "correction_matches": 45,
+      "exact_edit_f1": 1.0,
+      "exact_edit_precision": 1.0,
+      "exact_edit_recall": 1.0,
+      "expected_findings": 45,
+      "false_discovery_proportion": 0.0,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "predicted_findings": 45,
+      "span_accuracy": 1.0,
+      "span_matches": 45,
+      "suggestion_accuracy": 1.0,
+      "true_positives": 45
+    },
+    "category": {
+      "agreement": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 16,
+        "correct_sentence_false_alarm_rate": 0.0,
+        "correction_matches": 9,
+        "exact_edit_f1": 1.0,
+        "exact_edit_precision": 1.0,
+        "exact_edit_recall": 1.0,
+        "expected_findings": 9,
+        "false_discovery_proportion": 0.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 9,
+        "span_accuracy": 1.0,
+        "span_matches": 9,
+        "suggestion_accuracy": 1.0,
+        "true_positives": 9
+      },
+      "inflection": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 16,
+        "correct_sentence_false_alarm_rate": 0.0,
+        "correction_matches": 9,
+        "exact_edit_f1": 1.0,
+        "exact_edit_precision": 1.0,
+        "exact_edit_recall": 1.0,
+        "expected_findings": 9,
+        "false_discovery_proportion": 0.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 9,
+        "span_accuracy": 1.0,
+        "span_matches": 9,
+        "suggestion_accuracy": 1.0,
+        "true_positives": 9
+      },
+      "punctuation": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 16,
+        "correct_sentence_false_alarm_rate": 0.0,
+        "correction_matches": 9,
+        "exact_edit_f1": 1.0,
+        "exact_edit_precision": 1.0,
+        "exact_edit_recall": 1.0,
+        "expected_findings": 9,
+        "false_discovery_proportion": 0.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 9,
+        "span_accuracy": 1.0,
+        "span_matches": 9,
+        "suggestion_accuracy": 1.0,
+        "true_positives": 9
+      },
+      "spelling": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 16,
+        "correct_sentence_false_alarm_rate": 0.0,
+        "correction_matches": 9,
+        "exact_edit_f1": 1.0,
+        "exact_edit_precision": 1.0,
+        "exact_edit_recall": 1.0,
+        "expected_findings": 9,
+        "false_discovery_proportion": 0.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 9,
+        "span_accuracy": 1.0,
+        "span_matches": 9,
+        "suggestion_accuracy": 1.0,
+        "true_positives": 9
+      },
+      "syntax": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 16,
+        "correct_sentence_false_alarm_rate": 0.0,
+        "correction_matches": 9,
+        "exact_edit_f1": 1.0,
+        "exact_edit_precision": 1.0,
+        "exact_edit_recall": 1.0,
+        "expected_findings": 9,
+        "false_discovery_proportion": 0.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "predicted_findings": 9,
+        "span_accuracy": 1.0,
+        "span_matches": 9,
+        "suggestion_accuracy": 1.0,
+        "true_positives": 9
+      }
+    },
+    "category_cases": {
+      "agreement": {
+        "cases": 24,
+        "eligible_cases": 24,
+        "excluded_cases": 0
+      },
+      "inflection": {
+        "cases": 24,
+        "eligible_cases": 24,
+        "excluded_cases": 0
+      },
+      "punctuation": {
+        "cases": 24,
+        "eligible_cases": 24,
+        "excluded_cases": 0
+      },
+      "spelling": {
+        "cases": 24,
+        "eligible_cases": 24,
+        "excluded_cases": 0
+      },
+      "syntax": {
+        "cases": 24,
+        "eligible_cases": 24,
+        "excluded_cases": 0
+      }
+    },
+    "controls": {
+      "abstention": {
+        "case_count": 3,
+        "case_ids": [
+          "v4_control_abstain_01",
+          "v4_control_abstain_02",
+          "v4_control_abstain_03"
+        ],
+        "predicted_findings": 0,
+        "violation_case_ids": [],
+        "violations": 0
+      },
+      "conflict": {
+        "case_count": 1,
+        "case_ids": [
+          "v4_control_conflict_punctuation"
+        ],
+        "predicted_findings": 0,
+        "violation_case_ids": [],
+        "violations": 0
+      }
+    },
+    "shape_strata": {
+      "agreement": {
+        "conflict-or-abstention": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "multi-sentence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "quotation-or-literal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "repeated-occurrence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "sentence-internal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "simple-local": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "unicode-and-case": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        }
+      },
+      "inflection": {
+        "conflict-or-abstention": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "multi-sentence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "quotation-or-literal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "repeated-occurrence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "sentence-internal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "simple-local": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "unicode-and-case": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        }
+      },
+      "punctuation": {
+        "conflict-or-abstention": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "multi-sentence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "quotation-or-literal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "repeated-occurrence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "sentence-internal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "simple-local": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "unicode-and-case": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        }
+      },
+      "spelling": {
+        "conflict-or-abstention": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "multi-sentence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "quotation-or-literal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "repeated-occurrence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "sentence-internal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "simple-local": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "unicode-and-case": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        }
+      },
+      "syntax": {
+        "conflict-or-abstention": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "multi-sentence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "quotation-or-literal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "repeated-occurrence": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 3,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "sentence-internal": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        },
+        "simple-local": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 2,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 2,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 2,
+          "span_accuracy": 1.0,
+          "span_matches": 2,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 2
+        },
+        "unicode-and-case": {
+          "alarmed_correct_cases": 0,
+          "correct_cases": 2,
+          "correct_sentence_false_alarm_rate": 0.0,
+          "correction_matches": 1,
+          "exact_edit_f1": 1.0,
+          "exact_edit_precision": 1.0,
+          "exact_edit_recall": 1.0,
+          "expected_findings": 1,
+          "false_discovery_proportion": 0.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "predicted_findings": 1,
+          "span_accuracy": 1.0,
+          "span_matches": 1,
+          "suggestion_accuracy": 1.0,
+          "true_positives": 1
+        }
+      }
+    },
+    "source": [
+      {
+        "behavior_version": "agreement-copula/1.0",
+        "case_ids": [],
+        "category": "agreement",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.copula_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:agreement.copula",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "agreement-copula-ja/1.0",
+        "case_ids": [],
+        "category": "agreement",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.copula_person",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:agreement.copula_ja",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "agreement-te-zdanie/1.0",
+        "case_ids": [
+          "v4_agreement_positive_01",
+          "v4_agreement_positive_04",
+          "v4_agreement_positive_06",
+          "v4_agreement_negative_01",
+          "v4_agreement_negative_02",
+          "v4_agreement_negative_03",
+          "v4_agreement_negative_04",
+          "v4_agreement_negative_05",
+          "v4_agreement_negative_06",
+          "v4_agreement_negative_07",
+          "v4_agreement_negative_08",
+          "v4_agreement_negative_10",
+          "v4_agreement_negative_11",
+          "v4_agreement_negative_12",
+          "v4_agreement_negative_14",
+          "v4_agreement_negative_15",
+          "v4_agreement_negative_16",
+          "v4_control_abstain_01",
+          "v4_control_abstain_02",
+          "v4_control_abstain_03"
+        ],
+        "category": "agreement",
+        "exact_match_count": 4,
+        "expected_count": 4,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.demonstrative_neuter_phrase",
+        "predicted_count": 4,
+        "profile": "morphology",
+        "source": "rule:agreement.te_zdanie",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "agreement-te-neuter-noun/2.0",
+        "case_ids": [
+          "v4_agreement_positive_02",
+          "v4_agreement_positive_03"
+        ],
+        "category": "agreement",
+        "exact_match_count": 2,
+        "expected_count": 2,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.pronoun_gender",
+        "predicted_count": 2,
+        "profile": "morphology",
+        "source": "rule:agreement.te_neuter_noun",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "agreement-nominal-group-te-duze-okno/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_agreement_positive_08"
+        ],
+        "category": "agreement",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.demonstrative_neuter_form",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:agreement.nominal_group_te_duze_okno",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_agreement_positive_05",
+          "v4_agreement_negative_09"
+        ],
+        "category": "agreement",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.adjective_gender",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:agreement.nominal_group_ta_nowy_ksiazka",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_agreement_positive_07",
+          "v4_agreement_negative_13"
+        ],
+        "category": "agreement",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.subject_verb_number",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:agreement.subject_verb_oni_czyta",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "agreement-subject-verb-my-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "agreement",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.subject_verb_number",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:agreement.subject_verb_my_czyta",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-negated-widziec/2.0",
+        "case_ids": [
+          "v4_inflection_positive_01",
+          "v4_inflection_positive_04",
+          "v4_inflection_positive_06",
+          "v4_inflection_negative_01",
+          "v4_inflection_negative_02",
+          "v4_inflection_negative_03",
+          "v4_inflection_negative_04",
+          "v4_inflection_negative_05",
+          "v4_inflection_negative_06",
+          "v4_inflection_negative_07",
+          "v4_inflection_negative_08",
+          "v4_inflection_negative_10",
+          "v4_inflection_negative_11",
+          "v4_inflection_negative_12",
+          "v4_inflection_negative_14",
+          "v4_inflection_negative_15",
+          "v4_inflection_negative_16"
+        ],
+        "category": "inflection",
+        "exact_match_count": 4,
+        "expected_count": 4,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.negated_government_form",
+        "predicted_count": 4,
+        "profile": "morphology",
+        "source": "rule:inflection.negated_widziec",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "inflection-negated-widziec-nominal-group/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.negated_government_nominal_group",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.negated_widziec_nominal_group",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-negated-miec-czas/1.0",
+        "case_ids": [
+          "v4_inflection_positive_03",
+          "v4_inflection_positive_07",
+          "v4_inflection_negative_13"
+        ],
+        "category": "inflection",
+        "exact_match_count": 2,
+        "expected_count": 2,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 2,
+        "profile": "morphology",
+        "source": "rule:inflection.negated_miec_czas",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "inflection-negated-lubic-kawe/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_inflection_positive_05",
+          "v4_inflection_negative_09"
+        ],
+        "category": "inflection",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:inflection.negated_lubic_kawe",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "inflection-przygladac-sie-nowy-budynek/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_inflection_positive_02"
+        ],
+        "category": "inflection",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_nominal_group",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:inflection.przygladac_sie_nowy_budynek",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "inflection-government-potrzebowac-pomoc/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_potrzebowac_pomoc",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-szukac-klucz/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [
+          "v4_inflection_positive_08"
+        ],
+        "category": "inflection",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:inflection.government_szukac_klucz",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "inflection-government-sluchac-radio/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_sluchac_radio",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-uzywac-telefon/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_uzywac_telefon",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-interesowac-sie-historia/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_interesowac_sie_historia",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-byc-nauczyciel/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_byc_nauczyciel",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-do-sklep/2.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_do_sklep",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-government-ufac-lekarz/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.government_ufac_lekarz",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "inflection-numeral-five-genitive-plural/1.0",
+        "case_ids": [],
+        "category": "inflection",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.governed_form",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:inflection.numeral_five_genitive_plural",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-jestes/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.jestes",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-napewno/1.0",
+        "case_ids": [
+          "v4_spelling_positive_01",
+          "v4_spelling_positive_04",
+          "v4_spelling_positive_06",
+          "v4_spelling_positive_07",
+          "v4_spelling_negative_01",
+          "v4_spelling_negative_03",
+          "v4_spelling_negative_04",
+          "v4_spelling_negative_05",
+          "v4_spelling_negative_07",
+          "v4_spelling_negative_10",
+          "v4_spelling_negative_11",
+          "v4_spelling_negative_12",
+          "v4_spelling_negative_13",
+          "v4_spelling_negative_14",
+          "v4_spelling_negative_15",
+          "v4_spelling_negative_16"
+        ],
+        "category": "spelling",
+        "exact_match_count": 5,
+        "expected_count": 5,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 5,
+        "profile": "morphology",
+        "source": "rule:spelling.napewno",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "spelling-wlasnie/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.wlasnie",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-zeby/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.zeby",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-wogole/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.wogole",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-wogole-diacritic/1.0",
+        "case_ids": [
+          "v4_spelling_positive_02",
+          "v4_spelling_negative_02",
+          "v4_spelling_negative_06",
+          "v4_spelling_negative_08"
+        ],
+        "category": "spelling",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:spelling.wogole_diacritic",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "spelling-narazie/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.narazie",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-wziasc/1.0",
+        "case_ids": [
+          "v4_spelling_positive_03",
+          "v4_spelling_positive_08"
+        ],
+        "category": "spelling",
+        "exact_match_count": 2,
+        "expected_count": 2,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 2,
+        "profile": "morphology",
+        "source": "rule:spelling.wziasc",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "spelling-wziasc-diacritic/1.0",
+        "case_ids": [
+          "v4_spelling_positive_05",
+          "v4_spelling_negative_09"
+        ],
+        "category": "spelling",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:spelling.wziasc_diacritic",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "spelling-conajmniej/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.conajmniej",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-poprostu/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.poprostu",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-pozatym/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.pozatym",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-przedewszystkim/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.przedewszystkim",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-wkoncu/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.wkoncu",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-spowrotem/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.spowrotem",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-tymbardziej/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.tymbardziej",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-naprawde/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.naprawde",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-nie-byc-joint/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.nie_byc_joint",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-poszlem/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.poszlem",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-wlanczac/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.common_typo",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.wlanczac",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-month-weekday-lowercase/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.case",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.month_weekday_lowercase",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-proper-adjective-lowercase/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.case",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.proper_adjective_lowercase",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "spelling-sentence-initial-capital/1.0",
+        "case_ids": [],
+        "category": "spelling",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "replace.case",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:spelling.sentence_initial_capital",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "syntax-comma-space/1.0",
+        "case_ids": [
+          "v4_punctuation_positive_01",
+          "v4_punctuation_positive_05",
+          "v4_punctuation_positive_07",
+          "v4_punctuation_negative_01",
+          "v4_punctuation_negative_02",
+          "v4_punctuation_negative_03",
+          "v4_punctuation_negative_04",
+          "v4_punctuation_negative_05",
+          "v4_punctuation_negative_06",
+          "v4_punctuation_negative_07",
+          "v4_punctuation_negative_08",
+          "v4_punctuation_negative_09",
+          "v4_punctuation_negative_10",
+          "v4_punctuation_negative_12",
+          "v4_punctuation_negative_13",
+          "v4_punctuation_negative_14",
+          "v4_punctuation_negative_15",
+          "v4_punctuation_negative_16"
+        ],
+        "category": "punctuation",
+        "exact_match_count": 3,
+        "expected_count": 3,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "normalize.comma_spacing",
+        "predicted_count": 3,
+        "profile": "morphology",
+        "source": "rule:syntax.comma_space",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-duplicate-comma/1.0",
+        "case_ids": [
+          "v4_punctuation_positive_02"
+        ],
+        "category": "punctuation",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "remove.duplicate_comma",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.duplicate_comma",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-initial-conditional-comma/1.0",
+        "case_ids": [
+          "v4_syntax_positive_01",
+          "v4_syntax_negative_01",
+          "v4_syntax_negative_02",
+          "v4_syntax_negative_03",
+          "v4_syntax_negative_04",
+          "v4_syntax_negative_05",
+          "v4_syntax_negative_06",
+          "v4_syntax_negative_07",
+          "v4_syntax_negative_08",
+          "v4_syntax_negative_10",
+          "v4_syntax_negative_12",
+          "v4_syntax_negative_14",
+          "v4_syntax_negative_15",
+          "v4_syntax_negative_16"
+        ],
+        "category": "syntax",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.conditional_clause_comma",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.initial_conditional_comma",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-initial-temporal-comma/1.0",
+        "case_ids": [],
+        "category": "syntax",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.temporal_clause_comma",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:syntax.initial_temporal_comma",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "syntax-comma-before-ze-reporting/1.0",
+        "case_ids": [
+          "v4_syntax_positive_03",
+          "v4_syntax_positive_04",
+          "v4_syntax_positive_05",
+          "v4_syntax_negative_09"
+        ],
+        "category": "syntax",
+        "exact_match_count": 4,
+        "expected_count": 4,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.reporting_clause_comma",
+        "predicted_count": 4,
+        "profile": "morphology",
+        "source": "rule:syntax.comma_before_ze_reporting",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-comma-before-zeby-purpose/1.0",
+        "case_ids": [
+          "v4_syntax_positive_02"
+        ],
+        "category": "syntax",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.purpose_clause_comma",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.comma_before_zeby_purpose",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-comma-before-bo/3.0",
+        "case_ids": [
+          "v4_syntax_positive_08"
+        ],
+        "category": "syntax",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.causal_clause_comma",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.comma_before_bo",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-list-space/1.0",
+        "case_ids": [],
+        "category": "syntax",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "normalize.list_marker_spacing",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:syntax.list_space",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "syntax-missing-correlative/1.0",
+        "case_ids": [],
+        "category": "syntax",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.correlative",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:syntax.missing_correlative",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "syntax-missing-destination-preposition/1.0",
+        "case_ids": [
+          "v4_syntax_positive_07",
+          "v4_syntax_negative_13"
+        ],
+        "category": "syntax",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.destination_preposition",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.missing_destination_preposition",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-missing-reflexive/1.0",
+        "case_ids": [
+          "v4_syntax_positive_06",
+          "v4_syntax_negative_11"
+        ],
+        "category": "syntax",
+        "exact_match_count": 1,
+        "expected_count": 1,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.reflexive_pronoun",
+        "predicted_count": 1,
+        "profile": "morphology",
+        "source": "rule:syntax.missing_reflexive",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "syntax-quote-space/1.0",
+        "case_ids": [],
+        "category": "punctuation",
+        "exact_match_count": 0,
+        "expected_count": 0,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "normalize.quote_spacing",
+        "predicted_count": 0,
+        "profile": "morphology",
+        "source": "rule:syntax.quote_space",
+        "status": "unmeasured"
+      },
+      {
+        "behavior_version": "syntax-sentence-space/1.0",
+        "case_ids": [
+          "v4_punctuation_positive_03",
+          "v4_punctuation_positive_06",
+          "v4_punctuation_negative_11"
+        ],
+        "category": "punctuation",
+        "exact_match_count": 2,
+        "expected_count": 2,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "normalize.sentence_spacing",
+        "predicted_count": 2,
+        "profile": "morphology",
+        "source": "rule:syntax.sentence_space",
+        "status": "measured"
+      },
+      {
+        "behavior_version": "punctuation-abbreviation-dot/1.0",
+        "case_ids": [
+          "v4_punctuation_positive_04",
+          "v4_punctuation_positive_08"
+        ],
+        "category": "punctuation",
+        "exact_match_count": 3,
+        "expected_count": 3,
+        "false_negative_count": 0,
+        "false_positive_count": 0,
+        "operation": "insert.abbreviation_dot",
+        "predicted_count": 3,
+        "profile": "morphology",
+        "source": "rule:punctuation.abbreviation_dot",
+        "status": "measured"
+      }
+    ],
+    "stratum_cases": {
+      "agreement": {
+        "conflict-or-abstention": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "multi-sentence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "quotation-or-literal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "repeated-occurrence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "sentence-internal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "simple-local": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "unicode-and-case": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        }
+      },
+      "inflection": {
+        "conflict-or-abstention": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "multi-sentence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "quotation-or-literal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "repeated-occurrence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "sentence-internal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "simple-local": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "unicode-and-case": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        }
+      },
+      "punctuation": {
+        "conflict-or-abstention": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "multi-sentence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "quotation-or-literal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "repeated-occurrence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "sentence-internal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "simple-local": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "unicode-and-case": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        }
+      },
+      "spelling": {
+        "conflict-or-abstention": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "multi-sentence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "quotation-or-literal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "repeated-occurrence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "sentence-internal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "simple-local": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "unicode-and-case": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        }
+      },
+      "syntax": {
+        "conflict-or-abstention": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "multi-sentence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "quotation-or-literal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "repeated-occurrence": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "sentence-internal": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        },
+        "simple-local": {
+          "cases": 4,
+          "eligible_cases": 4,
+          "excluded_cases": 0
+        },
+        "unicode-and-case": {
+          "cases": 3,
+          "eligible_cases": 3,
+          "excluded_cases": 0
+        }
+      }
+    }
+  },
+  "environment": {
+    "package_version": "0.2.0",
+    "platform_machine": "arm64",
+    "platform_release": "24.3.0",
+    "platform_system": "Darwin",
+    "python_version": "3.13.12"
+  },
+  "performance": {
+    "latency_ns": {
+      "max": 42833,
+      "mean": 22037,
+      "min": 13875,
+      "p50": 21208,
+      "p95": 32125,
+      "sample_count": 620
+    },
+    "peak_rss_bytes": 79642624,
+    "throughput": {
+      "cases_per_second": 45376.4473988903,
+      "code_points_per_second": 1374833.1683679908,
+      "measured_cases": 620,
+      "measured_code_points": 18785,
+      "total_duration_ns": 13663476
+    }
+  },
+  "profile": {
+    "id": "morphology",
+    "morphology_provider": {
+      "dictionary_id": "pl.sgjp.sgjp-2026.06.01",
+      "dictionary_notice_sha256": "84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "package_version": "1.99.15",
+      "provider": "morfeusz2"
+    },
+    "planned_morphology_source_semantics": "qualified-provider-exercised-sources-not-implemented",
+    "planned_non_morphology_source_semantics": "sources-not-implemented"
+  },
+  "quality": {
+    "correction_accuracy": 1.0,
+    "counts": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 80,
+      "correction_matches": 45,
+      "expected_findings": 45,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "predicted_findings": 45,
+      "span_matches": 45,
+      "true_positives": 45
+    },
+    "f1": 1.0,
+    "false_alarm_rate": 0.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "span_accuracy": 1.0
+  },
+  "reproducibility": {
+    "measured_repetitions": 5,
+    "repetition_hashes": [
+      "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+      "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+      "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+      "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848",
+      "7b6432bd35fd36a033e0ebe64e45d10a88db8697a32b56be7cab30af45a8b848"
+    ],
+    "stable_repetitions": 5,
+    "warmup_repetitions": 1
+  },
+  "schema_id": "polis.regression-baseline",
+  "schema_version": 4,
+  "source": {
+    "git_sha": "07cd485d9778c56d195f93da899917035a808a39"
+  },
+  "source_snapshot": [
+    {
+      "behavior_version": "agreement-copula/1.0",
+      "operation": "replace.copula_form",
+      "source": "rule:agreement.copula"
+    },
+    {
+      "behavior_version": "agreement-copula-ja/1.0",
+      "operation": "replace.copula_person",
+      "source": "rule:agreement.copula_ja"
+    },
+    {
+      "behavior_version": "agreement-te-zdanie/1.0",
+      "operation": "replace.demonstrative_neuter_phrase",
+      "source": "rule:agreement.te_zdanie"
+    },
+    {
+      "behavior_version": "agreement-te-neuter-noun/2.0",
+      "operation": "replace.pronoun_gender",
+      "source": "rule:agreement.te_neuter_noun"
+    },
+    {
+      "behavior_version": "agreement-nominal-group-te-duze-okno/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.demonstrative_neuter_form",
+      "source": "rule:agreement.nominal_group_te_duze_okno"
+    },
+    {
+      "behavior_version": "agreement-nominal-group-ta-nowy-ksiazka/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.adjective_gender",
+      "source": "rule:agreement.nominal_group_ta_nowy_ksiazka"
+    },
+    {
+      "behavior_version": "agreement-subject-verb-oni-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.subject_verb_number",
+      "source": "rule:agreement.subject_verb_oni_czyta"
+    },
+    {
+      "behavior_version": "agreement-subject-verb-my-czyta/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.subject_verb_number",
+      "source": "rule:agreement.subject_verb_my_czyta"
+    },
+    {
+      "behavior_version": "inflection-negated-widziec/2.0",
+      "operation": "replace.negated_government_form",
+      "source": "rule:inflection.negated_widziec"
+    },
+    {
+      "behavior_version": "inflection-negated-widziec-nominal-group/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.negated_government_nominal_group",
+      "source": "rule:inflection.negated_widziec_nominal_group"
+    },
+    {
+      "behavior_version": "inflection-negated-miec-czas/1.0",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.negated_miec_czas"
+    },
+    {
+      "behavior_version": "inflection-negated-lubic-kawe/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.negated_lubic_kawe"
+    },
+    {
+      "behavior_version": "inflection-przygladac-sie-nowy-budynek/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_nominal_group",
+      "source": "rule:inflection.przygladac_sie_nowy_budynek"
+    },
+    {
+      "behavior_version": "inflection-government-potrzebowac-pomoc/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_potrzebowac_pomoc"
+    },
+    {
+      "behavior_version": "inflection-government-szukac-klucz/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_szukac_klucz"
+    },
+    {
+      "behavior_version": "inflection-government-sluchac-radio/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_sluchac_radio"
+    },
+    {
+      "behavior_version": "inflection-government-uzywac-telefon/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_uzywac_telefon"
+    },
+    {
+      "behavior_version": "inflection-government-interesowac-sie-historia/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_interesowac_sie_historia"
+    },
+    {
+      "behavior_version": "inflection-government-byc-nauczyciel/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_byc_nauczyciel"
+    },
+    {
+      "behavior_version": "inflection-government-do-sklep/2.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_do_sklep"
+    },
+    {
+      "behavior_version": "inflection-government-ufac-lekarz/1.0+morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-84a51ba8ad5f8b3e4571762bbd59aa48efb78d5dc551bd93cec9f9f708049393",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.government_ufac_lekarz"
+    },
+    {
+      "behavior_version": "inflection-numeral-five-genitive-plural/1.0",
+      "operation": "replace.governed_form",
+      "source": "rule:inflection.numeral_five_genitive_plural"
+    },
+    {
+      "behavior_version": "spelling-jestes/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.jestes"
+    },
+    {
+      "behavior_version": "spelling-napewno/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.napewno"
+    },
+    {
+      "behavior_version": "spelling-wlasnie/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wlasnie"
+    },
+    {
+      "behavior_version": "spelling-zeby/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.zeby"
+    },
+    {
+      "behavior_version": "spelling-wogole/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wogole"
+    },
+    {
+      "behavior_version": "spelling-wogole-diacritic/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wogole_diacritic"
+    },
+    {
+      "behavior_version": "spelling-narazie/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.narazie"
+    },
+    {
+      "behavior_version": "spelling-wziasc/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wziasc"
+    },
+    {
+      "behavior_version": "spelling-wziasc-diacritic/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wziasc_diacritic"
+    },
+    {
+      "behavior_version": "spelling-conajmniej/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.conajmniej"
+    },
+    {
+      "behavior_version": "spelling-poprostu/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.poprostu"
+    },
+    {
+      "behavior_version": "spelling-pozatym/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.pozatym"
+    },
+    {
+      "behavior_version": "spelling-przedewszystkim/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.przedewszystkim"
+    },
+    {
+      "behavior_version": "spelling-wkoncu/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wkoncu"
+    },
+    {
+      "behavior_version": "spelling-spowrotem/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.spowrotem"
+    },
+    {
+      "behavior_version": "spelling-tymbardziej/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.tymbardziej"
+    },
+    {
+      "behavior_version": "spelling-naprawde/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.naprawde"
+    },
+    {
+      "behavior_version": "spelling-nie-byc-joint/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.nie_byc_joint"
+    },
+    {
+      "behavior_version": "spelling-poszlem/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.poszlem"
+    },
+    {
+      "behavior_version": "spelling-wlanczac/1.0",
+      "operation": "replace.common_typo",
+      "source": "rule:spelling.wlanczac"
+    },
+    {
+      "behavior_version": "spelling-month-weekday-lowercase/1.0",
+      "operation": "replace.case",
+      "source": "rule:spelling.month_weekday_lowercase"
+    },
+    {
+      "behavior_version": "spelling-proper-adjective-lowercase/1.0",
+      "operation": "replace.case",
+      "source": "rule:spelling.proper_adjective_lowercase"
+    },
+    {
+      "behavior_version": "spelling-sentence-initial-capital/1.0",
+      "operation": "replace.case",
+      "source": "rule:spelling.sentence_initial_capital"
+    },
+    {
+      "behavior_version": "syntax-comma-space/1.0",
+      "operation": "normalize.comma_spacing",
+      "source": "rule:syntax.comma_space"
+    },
+    {
+      "behavior_version": "syntax-duplicate-comma/1.0",
+      "operation": "remove.duplicate_comma",
+      "source": "rule:syntax.duplicate_comma"
+    },
+    {
+      "behavior_version": "syntax-initial-conditional-comma/1.0",
+      "operation": "insert.conditional_clause_comma",
+      "source": "rule:syntax.initial_conditional_comma"
+    },
+    {
+      "behavior_version": "syntax-initial-temporal-comma/1.0",
+      "operation": "insert.temporal_clause_comma",
+      "source": "rule:syntax.initial_temporal_comma"
+    },
+    {
+      "behavior_version": "syntax-comma-before-ze-reporting/1.0",
+      "operation": "insert.reporting_clause_comma",
+      "source": "rule:syntax.comma_before_ze_reporting"
+    },
+    {
+      "behavior_version": "syntax-comma-before-zeby-purpose/1.0",
+      "operation": "insert.purpose_clause_comma",
+      "source": "rule:syntax.comma_before_zeby_purpose"
+    },
+    {
+      "behavior_version": "syntax-comma-before-bo/3.0",
+      "operation": "insert.causal_clause_comma",
+      "source": "rule:syntax.comma_before_bo"
+    },
+    {
+      "behavior_version": "syntax-list-space/1.0",
+      "operation": "normalize.list_marker_spacing",
+      "source": "rule:syntax.list_space"
+    },
+    {
+      "behavior_version": "syntax-missing-correlative/1.0",
+      "operation": "insert.correlative",
+      "source": "rule:syntax.missing_correlative"
+    },
+    {
+      "behavior_version": "syntax-missing-destination-preposition/1.0",
+      "operation": "insert.destination_preposition",
+      "source": "rule:syntax.missing_destination_preposition"
+    },
+    {
+      "behavior_version": "syntax-missing-reflexive/1.0",
+      "operation": "insert.reflexive_pronoun",
+      "source": "rule:syntax.missing_reflexive"
+    },
+    {
+      "behavior_version": "syntax-quote-space/1.0",
+      "operation": "normalize.quote_spacing",
+      "source": "rule:syntax.quote_space"
+    },
+    {
+      "behavior_version": "syntax-sentence-space/1.0",
+      "operation": "normalize.sentence_spacing",
+      "source": "rule:syntax.sentence_space"
+    },
+    {
+      "behavior_version": "punctuation-abbreviation-dot/1.0",
+      "operation": "insert.abbreviation_dot",
+      "source": "rule:punctuation.abbreviation_dot"
+    }
+  ]
+}

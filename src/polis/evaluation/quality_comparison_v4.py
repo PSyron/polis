@@ -183,8 +183,22 @@ def compare_quality_v4(
             },
             "verdict": verdict,
         }
+    canonical_inputs = all(
+        path.name.startswith("regression-")
+        for path in (
+            baseline_default,
+            baseline_morphology,
+            result_default,
+            result_morphology,
+            proposal,
+        )
+    )
     root: dict[str, Any] = {
-        "schema_id": "polis.quality-comparison",
+        "schema_id": (
+            "polis.regression-comparison"
+            if canonical_inputs
+            else "polis.quality-comparison"
+        ),
         "schema_version": 4,
         "proposal_path": str(proposal),
         "proposal_sha256": baseline_file_sha256(proposal),

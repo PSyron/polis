@@ -499,11 +499,11 @@ def test_rule_coverage_contract_rejects_quality_source_sha_drift(
     contract = load_rule_coverage_contract()
     for relative in (
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):
@@ -511,14 +511,14 @@ def test_rule_coverage_contract_rejects_quality_source_sha_drift(
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, destination)
 
-    result_path = tmp_path / "docs/quality-result-v3-default.json"
+    result_path = tmp_path / "docs/regression-result-v3-default.json"
     result = json.loads(result_path.read_text(encoding="utf-8"))
     result["source"]["git_sha"] = "0" * 40
     result_path.write_text(
         json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
-    comparison_path = tmp_path / "docs/quality-comparison-v3.json"
+    comparison_path = tmp_path / "docs/regression-comparison-v3.json"
     comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
     comparison["profiles"]["default"]["result_sha256"] = hashlib.sha256(
         result_path.read_bytes()
@@ -537,11 +537,11 @@ def test_rule_coverage_contract_rejects_inventory_category_or_scope_drift(
     contract = load_rule_coverage_contract()
     for relative in (
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):
@@ -571,11 +571,11 @@ def test_rule_coverage_contract_rejects_malformed_inventory_row(
     contract = load_rule_coverage_contract()
     for relative in (
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):
@@ -644,11 +644,11 @@ def test_rule_coverage_contract_rejects_quality_comparison_metadata_drift(
     contract = load_rule_coverage_contract()
     for relative in (
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):
@@ -656,7 +656,7 @@ def test_rule_coverage_contract_rejects_quality_comparison_metadata_drift(
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, destination)
 
-    comparison_path = tmp_path / "docs/quality-comparison-v3.json"
+    comparison_path = tmp_path / "docs/regression-comparison-v3.json"
     comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
     comparison["aggregate_verdict"] = "pass"
     comparison_path.write_text(
@@ -673,11 +673,11 @@ def test_rule_coverage_contract_cli_validates_and_fails_closed(
     for relative in (
         "docs/project/rule-coverage-contract-v1.json",
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):
@@ -720,6 +720,18 @@ def test_rule_coverage_contract_cli_refreshes_and_validates_digest_fields(
         capture_output=True,
         text=True,
     )
+    for relative in (
+        "docs/project/rule-coverage-contract-v1.json",
+        "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
+    ):
+        destination = repository / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
     runtime_path = repository / "src/polis/rules/spelling.py"
     runtime_source = runtime_path.read_text(encoding="utf-8")
     old_behavior_version = 'return "spelling-co-niemiara/1.0"'
@@ -894,6 +906,11 @@ def test_rule_coverage_contract_cli_uses_target_correction_policy(
         capture_output=True,
         text=True,
     )
+    for relative in (
+        "docs/project/rule-coverage-contract-v1.json",
+        "docs/regression-comparison-v3.json",
+    ):
+        shutil.copy2(ROOT / relative, repository / relative)
     policy_path = repository / "src/polis/correction/policy.py"
     policy_source = policy_path.read_text(encoding="utf-8")
     assert 'SOURCE_POLICY_VERSION: Final[str] = "1.2"' in policy_source
@@ -1218,11 +1235,11 @@ def test_rule_coverage_contract_cli_validates_without_refresh(
     for relative in (
         "docs/project/rule-coverage-contract-v1.json",
         "docs/rules.md",
-        "docs/quality-comparison-v3.json",
-        "docs/quality-baseline-v3-default.json",
-        "docs/quality-baseline-v3-morphology.json",
-        "docs/quality-result-v3-default.json",
-        "docs/quality-result-v3-morphology.json",
+        "docs/regression-comparison-v3.json",
+        "docs/regression-baseline-v3-default.json",
+        "docs/regression-baseline-v3-morphology.json",
+        "docs/regression-result-v3-default.json",
+        "docs/regression-result-v3-morphology.json",
         "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
         "docs/project/rule-coverage-normative-candidate-inventory-v1.json",
     ):

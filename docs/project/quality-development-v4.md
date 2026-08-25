@@ -1,9 +1,11 @@
-# Publiczny zbiór jakości v4
+# Publiczna suita regresyjna v4
 
 Zbiór `polis_v4_quality_development` jest publicznym, projektowym zbiorem
-rozwojowym dla konserwatywnych reguł v1. Nie jest korpusem kalibracyjnym,
-holdoutem ani raportem wyników. Etykiety i oczekiwane sugestie zostały opisane
-przez autora projektu niezależnie od analizatora, modelu, sieci i Javy.
+rozwojowym dla konserwatywnych reguł v1. Jest suitą regresyjną, a nie
+niezależnym pomiarem jakości produktu: przypadki są jawne i mogą wpływać na
+rozwój reguł. Nie jest korpusem kalibracyjnym, holdoutem ani raportem wyników.
+Etykiety i oczekiwane sugestie zostały opisane przez autora projektu niezależnie
+od analizatora, modelu, sieci i Javy.
 
 ## Zakres
 
@@ -85,17 +87,18 @@ zaakceptowaną tożsamość słownika.
 
 Kanoniczne artefakty znajdują się w:
 
-- `docs/quality-baseline-v4-default.json` i
-  `docs/quality-baseline-v4-morphology.json`;
-- `docs/quality-result-v4-default.json` i
-  `docs/quality-result-v4-morphology.json`;
+- `docs/regression-baseline-v4-default.json` i
+  `docs/regression-baseline-v4-morphology.json`;
+- `docs/regression-result-v4-default.json` i
+  `docs/regression-result-v4-morphology.json`;
 - `docs/runtime-performance-v2-v4-{reference,current}-{default,morphology}.json`;
-- `docs/quality-threshold-proposal-v4.json`;
-- `docs/quality-comparison-v4.json`.
+- `docs/regression-threshold-proposal-v4.json`;
+- `docs/regression-comparison-v4.json`.
 
 W obu profilach precision, recall, F1, dokładność zakresu i dokładność sugestii
 wynoszą `1.0`; false-alarm rate, naruszenia konfliktu i naruszenia abstencji
-wynoszą `0`. Pięć mierzonych powtórzeń jest deterministycznych. Maintainer
+wynoszą `0`. To wynik pokrycia regresyjnego, nie niezależna miara jakości
+produktu. Pięć mierzonych powtórzeń jest deterministycznych. Maintainer
 zatwierdził proposal 2026-08-19 bez dodatkowego marginesu stabilności.
 
 Gate'y izolowanej wydajności zachowują pełną precyzję surowego pomiaru; wartości

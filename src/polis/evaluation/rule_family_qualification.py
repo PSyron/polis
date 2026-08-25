@@ -202,10 +202,10 @@ def _v4_gap_inputs(repo: Path) -> list[dict[str, Any]]:
     """
 
     paths = (
-        "docs/quality-baseline-v4-default.json",
-        "docs/quality-baseline-v4-morphology.json",
-        "docs/quality-result-v4-default.json",
-        "docs/quality-result-v4-morphology.json",
+        "docs/regression-baseline-v4-default.json",
+        "docs/regression-baseline-v4-morphology.json",
+        "docs/regression-result-v4-default.json",
+        "docs/regression-result-v4-morphology.json",
     )
     gaps: list[dict[str, Any]] = []
     seen: set[str] = set()

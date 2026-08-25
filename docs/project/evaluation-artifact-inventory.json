@@ -1,0 +1,153 @@
+{
+  "schema_id": "polis.evaluation-artifact-inventory",
+  "schema_version": 2,
+  "issue": 428,
+  "purpose": "Canonical names for development regression measurements; product-quality measurements use a separate namespace and an independent dataset.",
+  "legacy_alias_policy": "The quality-* paths remain immutable compatibility aliases for historical evidence. New measurements must use the regression-* paths. Numeric JSON values must be identical across each alias pair, and each legacy path is pinned by its recorded SHA-256.",
+  "schema_ids": {
+    "baseline": "polis.regression-baseline",
+    "result": "polis.regression-result",
+    "comparison": "polis.regression-comparison",
+    "threshold": "polis.regression-threshold-proposal"
+  },
+  "legacy_schema_ids": {
+    "baseline": "polis.quality-baseline",
+    "result": "polis.quality-result",
+    "comparison": "polis.quality-comparison",
+    "threshold": "polis.quality-threshold-proposal"
+  },
+  "aliases": [
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v1.json",
+      "legacy": "docs/quality-baseline-v1.json",
+      "legacy_sha256": "65e1f03f53fdb6452248bf7e93a9948ffdfa4e0f9f143fc40a54e40cf4a0d20f"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v2-default.json",
+      "legacy": "docs/quality-baseline-v2-default.json",
+      "legacy_sha256": "c1d0c19d6b0a5f7dbec1c36df28917b908b3d0a78dba32285f45e990e64f8b95"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v2-morphology.json",
+      "legacy": "docs/quality-baseline-v2-morphology.json",
+      "legacy_sha256": "6ee2fea48983d8c29346a9e8eebf3859cfc1d6e12d9c48e05a3ef399af4415a7"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v3-default.json",
+      "legacy": "docs/quality-baseline-v3-default.json",
+      "legacy_sha256": "b8283fdeb2105d46bf0cb11b70161d454776c963694cc929d40fbde93b94c2f3"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v3-morphology.json",
+      "legacy": "docs/quality-baseline-v3-morphology.json",
+      "legacy_sha256": "30d7d05479e18ee54d492fd67f57f401b9bdf5d6afcb2e688dd56f1909ebe454"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v4-default.json",
+      "legacy": "docs/quality-baseline-v4-default.json",
+      "legacy_sha256": "b197f841dcbb9929e0b518475ddd19289393a3cba66e3d7f05c5def70e2f1aa8"
+    },
+    {
+      "kind": "baseline",
+      "canonical": "docs/regression-baseline-v4-morphology.json",
+      "legacy": "docs/quality-baseline-v4-morphology.json",
+      "legacy_sha256": "0172aed6caa6e2772f18db2b01106a93d5c520fed1f9a2f39e3d15bfab24b1ea"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v2-default.json",
+      "legacy": "docs/quality-result-v2-default.json",
+      "legacy_sha256": "6d1c96f0922644d12f91d80a3a922d20f00877a40e54c1965ab505d1c65c0c20"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v2-morphology.json",
+      "legacy": "docs/quality-result-v2-morphology.json",
+      "legacy_sha256": "3cf8f60838c1cfe79306cec816457f5f2102cd12199f181cb9a88311fcee6880"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v3-default.json",
+      "legacy": "docs/quality-result-v3-default.json",
+      "legacy_sha256": "b061484af2a0a2d25571f7f2c2b066e91c8f5d8cbefdfeea379650a4f3177a19"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v3-morphology.json",
+      "legacy": "docs/quality-result-v3-morphology.json",
+      "legacy_sha256": "9233abaa5726875c908d8a54719320e931796451bb5f74b8d772fac2f7962328"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v4-default.json",
+      "legacy": "docs/quality-result-v4-default.json",
+      "legacy_sha256": "0741f4b47652a31d60f963d639222ae66c1ca4f870113915f568319e826653d9"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-v4-morphology.json",
+      "legacy": "docs/quality-result-v4-morphology.json",
+      "legacy_sha256": "4d388ba3b8ed0c9727b20a1dceb107319f6d002cd8609a4012c6ad75dd42d182"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-wave0-default.json",
+      "legacy": "docs/quality-result-wave0-default.json",
+      "legacy_sha256": "801116bcc5da9889528c3def9a8e30d8e559e2fab1180c2328f79f9ab743e953"
+    },
+    {
+      "kind": "result",
+      "canonical": "docs/regression-result-wave0-morphology.json",
+      "legacy": "docs/quality-result-wave0-morphology.json",
+      "legacy_sha256": "02d7a40636b330e7a2e6a63096d59424d50844d962fb5df0398c7d3b3de36fc7"
+    },
+    {
+      "kind": "comparison",
+      "canonical": "docs/regression-comparison-v2.json",
+      "legacy": "docs/quality-comparison-v2.json",
+      "legacy_sha256": "fe357e42d8a55bb356d31551c4ae4b9fb452c891c94135070395eb7effa64086"
+    },
+    {
+      "kind": "comparison",
+      "canonical": "docs/regression-comparison-v3.json",
+      "legacy": "docs/quality-comparison-v3.json",
+      "legacy_sha256": "b16ce0a44d46d06ed0b61a49a7153797338c93a616fff5c634c7c676ebe87c16"
+    },
+    {
+      "kind": "comparison",
+      "canonical": "docs/regression-comparison-v4.json",
+      "legacy": "docs/quality-comparison-v4.json",
+      "legacy_sha256": "b59a4fe78d5fa69fc18e00301809e52036f3f6ed343352eda5005fdefaaeb190"
+    },
+    {
+      "kind": "threshold",
+      "canonical": "docs/regression-threshold-proposal-v1.json",
+      "legacy": "docs/quality-threshold-proposal-v1.json",
+      "legacy_sha256": "25dbbdbc2dda1ca654e402962b74f097aa8429d675cc8fd90a6f74fb815a7ba6"
+    },
+    {
+      "kind": "threshold",
+      "canonical": "docs/regression-threshold-proposal-v2.json",
+      "legacy": "docs/quality-threshold-proposal-v2.json",
+      "legacy_sha256": "982a4c91809d71ccd90fc3575ea5ae812c92126e964515f2a5f183be95ed3875"
+    },
+    {
+      "kind": "threshold",
+      "canonical": "docs/regression-threshold-proposal-v3.json",
+      "legacy": "docs/quality-threshold-proposal-v3.json",
+      "legacy_sha256": "c747365bec66b2f3642d617ba53cd234da4098e6405b9ba5cbf79ff3ead28b6a"
+    },
+    {
+      "kind": "threshold",
+      "canonical": "docs/regression-threshold-proposal-v4.json",
+      "legacy": "docs/quality-threshold-proposal-v4.json",
+      "legacy_sha256": "24e83bb6013934184c87f3e27ad90f2f3e773b8ad5f2a6eb54dc15f0279166e7"
+    }
+  ]
+}

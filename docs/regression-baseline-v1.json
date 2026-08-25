@@ -1,0 +1,77 @@
+{
+  "analyzer": "Analyzer(AnalyzerConfig())",
+  "artifact": {
+    "sha256": "1189c7071ec505dd3a5c252866d6a284fb16fe1d5fb98734ff955ad72a68abba"
+  },
+  "dataset": {
+    "cases": 28,
+    "id": "polis_v1_quality_development",
+    "manifest": {
+      "schema_id": "polis.quality-development-manifest",
+      "schema_version": 1,
+      "sha256": "eeaf54b0ff921748873b3d186afb67dbdccbda21b6e938b788d10d6147f8c606"
+    },
+    "schema_id": "polis.quality-development-dataset",
+    "schema_version": 1,
+    "sha256": "152f7e23e5e56f299fc35e5acbb515515a855ee5925664e6b0a5179380984a2e",
+    "source": "quality:polis_v1_quality_development@1"
+  },
+  "environment": {
+    "package_version": "0.2.0",
+    "platform_machine": "arm64",
+    "platform_release": "25.5.0",
+    "platform_system": "Darwin",
+    "python_version": "3.14.3"
+  },
+  "performance": {
+    "latency_ns": {
+      "max": 370458,
+      "mean": 45130,
+      "min": 10583,
+      "p50": 21792,
+      "p95": 186584,
+      "sample_count": 140
+    },
+    "peak_rss_bytes": 65929216,
+    "throughput": {
+      "cases_per_second": 22158.1850673775,
+      "code_points_per_second": 576904.1755042213,
+      "measured_cases": 140,
+      "measured_code_points": 3645,
+      "total_duration_ns": 6318207
+    }
+  },
+  "quality": {
+    "correction_accuracy": 1.0,
+    "counts": {
+      "alarmed_correct_cases": 0,
+      "correct_cases": 15,
+      "correction_matches": 10,
+      "expected_findings": 14,
+      "false_negatives": 4,
+      "false_positives": 0,
+      "predicted_findings": 10,
+      "span_matches": 10,
+      "true_positives": 10
+    },
+    "f1": 0.8333333333333334,
+    "false_alarm_rate": 0.0,
+    "precision": 1.0,
+    "recall": 0.7142857142857143,
+    "span_accuracy": 0.7142857142857143
+  },
+  "reproducibility": {
+    "measured_repetitions": 5,
+    "repetition_hashes": [
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd",
+      "9ace0b4de7f79f9ce97f5679922dbbbdef2b581a7bd78ebd586eefa070e00bfd"
+    ],
+    "stable_repetitions": 5,
+    "warmup_repetitions": 1
+  },
+  "schema_id": "polis.regression-baseline",
+  "schema_version": 1
+}

@@ -21,11 +21,12 @@ skanerze literałów (F0.3). Wynik jest wejściem do zatwierdzenia progów v3 w
 
 | Plik | Schema | Profil |
 | --- | --- | --- |
-| `docs/quality-result-wave0-default.json` | `polis.quality-result` v1 | default |
-| `docs/quality-result-wave0-morphology.json` | `polis.quality-result` v1 | morphology |
+| `docs/regression-result-wave0-default.json` | `polis.regression-result` v1 | default |
+| `docs/regression-result-wave0-morphology.json` | `polis.regression-result` v1 | morphology |
 
-Zamrożone `docs/quality-result-v2-*.json` oraz `docs/quality-comparison-v2.json`
-z #317 pozostają bez zmian (porównanie względem pre-change baseline'ów v2).
+Zamrożone aliasy `docs/quality-result-v2-*.json` oraz
+`docs/quality-comparison-v2.json` z #317 pozostają bez zmian (porównanie
+względem pre-change baseline'ów v2).
 
 ## Wynik jakości
 
@@ -53,4 +54,4 @@ a nie do cichego poluzowania v2.
 ## Użycie w #339
 
 F1.3 ma wyprowadzić progi wydajności v3 z tych artefaktów wave0 (oraz z
-baseline'ów v3 po F1.2), a nie z `quality-threshold-proposal-v2.json`.
+baseline'ów v3 po F1.2), a nie z `regression-threshold-proposal-v2.json`.

@@ -24,7 +24,7 @@ CONTRACT_PATH: Final = (
 CONTRACT_SCHEMA_ID: Final = "polis.rule-coverage-contract"
 CONTRACT_SCHEMA_VERSION: Final = 1
 CONTRACT_CANONICAL_SHA256: Final = (
-    "4bd7c5bd2eebd60a279277b7ef8f1ce6bc819a9510c851cf3fa2e7fa8ee33a08"
+    "1095ce6262ce1ce7503743c42662939730f9b119df344de457a4e6b32738c488"
 )
 SOURCE_PRECEDENCE: Final = (
     "issue-and-accepted-maintainer-clarifications",
@@ -950,9 +950,11 @@ def _validate_quality_artifact_parity(
     contract: RuleCoverageContract,
     root: Path,
 ) -> None:
-    comparison_path = root / "docs/quality-comparison-v3.json"
+    comparison_path = root / "docs/regression-comparison-v3.json"
     comparison = _load_json_object(comparison_path, "quality comparison")
-    _literal(comparison, "schema_id", "polis.quality-comparison", "quality comparison")
+    _literal(
+        comparison, "schema_id", "polis.regression-comparison", "quality comparison"
+    )
     source_governance = _object_field(contract.data, "source_governance", "contract")
     quality_governance = _object_field(
         source_governance, "quality_artifacts", "source governance"
@@ -2024,7 +2026,7 @@ def _validate_source_governance(governance: dict[str, JsonValue]) -> None:
                 ("complete exact policy key", "unknown status", "fails"),
             ),
             "quality_artifacts": (
-                ("docs/quality-comparison-v3.json",),
+                ("docs/regression-comparison-v3.json",),
                 (
                     "published source SHA",
                     "dataset identity",

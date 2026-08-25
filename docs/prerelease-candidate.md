@@ -45,8 +45,10 @@ runtime'u. Ścieżka wydania runtime'u nie wymaga modelu, procesu Java, usługi
 sieciowej, korpusu badawczego ani zużytego holdoutu. Szczegóły zawiera
 [weryfikacja dystrybucji](distribution-verification.md).
 
-Plik `quality-threshold-proposal-v1.json` pozostaje odroczoną, niewymuszoną
-propozycją, niezależną od `0.3.0` i oczekującą na odrębną decyzję maintainera.
+Plik `docs/regression-threshold-proposal-v1.json` pozostaje odroczoną,
+niewymuszoną propozycją, niezależną od `0.3.0` i oczekującą na odrębną decyzję
+maintainera. Historyczny `quality-threshold-proposal-v1.json` jest wyłącznie
+niezmiennym aliasem zgodności.
 Nie kwalifikuje żadnego zachowania review-only do automatycznej korekty. Także
 opcjonalna kwalifikacja morfologii, praca modelowa, kalibracja i holdouty nie
 wchodzą do krytycznej ścieżki tego wydania.

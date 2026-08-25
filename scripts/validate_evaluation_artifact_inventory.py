@@ -1,0 +1,286 @@
+#!/usr/bin/env python3
+"""Validate canonical regression-artifact names and legacy numeric parity."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+from typing import Any, Final
+
+try:
+    from scripts.evaluation_artifact_inventory_contract import (
+        ALIAS_KEYS,
+        CANONICAL_SCHEMA_IDS,
+        EXPECTED_ALIAS_UNIVERSE,
+        INVENTORY_KEYS,
+        KINDS,
+        LEGACY_SCHEMA_IDS,
+    )
+except ModuleNotFoundError:
+    from evaluation_artifact_inventory_contract import (
+        ALIAS_KEYS,
+        CANONICAL_SCHEMA_IDS,
+        EXPECTED_ALIAS_UNIVERSE,
+        INVENTORY_KEYS,
+        KINDS,
+        LEGACY_SCHEMA_IDS,
+    )
+
+ROOT: Final[Path] = Path(__file__).resolve().parents[1]
+_INVENTORY_RELATIVE: Final[Path] = Path(
+    "docs/project/evaluation-artifact-inventory.json"
+)
+DEFAULT_INVENTORY: Final[Path] = ROOT / _INVENTORY_RELATIVE
+
+
+def _numeric_values(value: Any) -> tuple[tuple[str, int | float], ...]:
+    if isinstance(value, bool):
+        return ()
+    if isinstance(value, int | float):
+        return ((type(value).__name__, value),)
+    if isinstance(value, dict):
+        return tuple(
+            item for key in sorted(value) for item in _numeric_values(value[key])
+        )
+    if isinstance(value, list):
+        return tuple(item for child in value for item in _numeric_values(child))
+    return ()
+
+
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def _has_expected_alias_universe(
+    alias_universe: list[tuple[str, str, str]],
+) -> bool:
+    return (
+        len(alias_universe) == len(EXPECTED_ALIAS_UNIVERSE)
+        and frozenset(alias_universe) == EXPECTED_ALIAS_UNIVERSE
+    )
+
+
+def _load_json(path: Path, label: str) -> Any:
+    try:
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError(f"cannot load {label}: {path}") from error
+
+
+def _resolve_docs_path(root: Path, value: str) -> Path | None:
+    try:
+        candidate = Path(value)
+        if candidate.is_absolute():
+            return None
+        docs_root_path = root / "docs"
+        if docs_root_path.is_symlink():
+            return None
+        docs_root = docs_root_path.resolve()
+        resolved = (root / candidate).resolve(strict=False)
+        if not resolved.is_relative_to(docs_root):
+            return None
+        return resolved
+    except (OSError, RuntimeError, ValueError):
+        return None
+
+
+def load_inventory(
+    path: Path = DEFAULT_INVENTORY, *, enforce_alias_universe: bool = True
+) -> dict[str, Any]:
+    """Load the strict issue-428 artifact inventory."""
+
+    raw = _load_json(path, "evaluation artifact inventory")
+    if not isinstance(raw, dict) or set(raw) != INVENTORY_KEYS:
+        raise ValueError("evaluation artifact inventory has invalid top-level keys")
+    if raw["schema_id"] != "polis.evaluation-artifact-inventory":
+        raise ValueError("evaluation artifact inventory schema_id is invalid")
+    if raw["schema_version"] != 2 or raw["issue"] != 428:
+        raise ValueError("evaluation artifact inventory version or issue is invalid")
+    if not isinstance(raw["purpose"], str) or not raw["purpose"].strip():
+        raise ValueError("evaluation artifact inventory purpose is blank")
+    if (
+        not isinstance(raw["legacy_alias_policy"], str)
+        or not raw["legacy_alias_policy"].strip()
+    ):
+        raise ValueError("evaluation artifact inventory alias policy is blank")
+    expected_schema_ids = {
+        "schema_ids": CANONICAL_SCHEMA_IDS,
+        "legacy_schema_ids": LEGACY_SCHEMA_IDS,
+    }
+    for field in ("schema_ids", "legacy_schema_ids"):
+        values = raw[field]
+        if not isinstance(values, dict) or set(values) != KINDS:
+            raise ValueError(f"evaluation artifact inventory {field} is incomplete")
+        if any(not isinstance(value, str) or not value for value in values.values()):
+            raise ValueError(f"evaluation artifact inventory {field} has blank ids")
+        if frozenset(values.items()) != expected_schema_ids[field]:
+            raise ValueError(f"evaluation artifact inventory {field} is invalid")
+    aliases = raw["aliases"]
+    if not isinstance(aliases, list) or not aliases:
+        raise ValueError("evaluation artifact inventory aliases are missing")
+    alias_universe: list[tuple[str, str, str]] = []
+    for index, alias in enumerate(aliases):
+        if not isinstance(alias, dict) or set(alias) != ALIAS_KEYS:
+            raise ValueError(f"artifact alias {index} has invalid fields")
+        kind = alias["kind"]
+        if not isinstance(kind, str) or kind not in KINDS:
+            raise ValueError(f"artifact alias {index} has an unknown kind")
+        for field in ("canonical", "legacy"):
+            value = alias[field]
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"artifact alias {index} has an invalid {field} path")
+            if Path(value).is_absolute():
+                raise ValueError(
+                    f"artifact alias {index} {field} path escapes root/docs"
+                )
+            if not value.startswith("docs/"):
+                raise ValueError(f"artifact alias {index} has an invalid {field} path")
+        alias_universe.append((kind, alias["canonical"], alias["legacy"]))
+        digest = alias["legacy_sha256"]
+        if (
+            not isinstance(digest, str)
+            or len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)
+        ):
+            raise ValueError(f"artifact alias {index} has an invalid legacy SHA-256")
+    if enforce_alias_universe and not _has_expected_alias_universe(alias_universe):
+        raise ValueError("evaluation artifact inventory aliases are incomplete")
+    return raw
+
+
+def validate_inventory(root: Path = ROOT, path: Path | None = None) -> list[str]:
+    """Return all naming and numeric-parity errors for the inventory."""
+
+    inventory_path = path if path is not None else root / _INVENTORY_RELATIVE
+    try:
+        inventory = load_inventory(inventory_path, enforce_alias_universe=False)
+    except (OSError, RuntimeError, UnicodeError):
+        return ["evaluation artifact inventory contains an invalid path"]
+    except ValueError as error:
+        return [str(error)]
+
+    errors: list[str] = []
+    canonical_ids = inventory["schema_ids"]
+    legacy_ids = inventory["legacy_schema_ids"]
+    seen_canonical: set[Path] = set()
+    seen_legacy: set[Path] = set()
+    alias_universe = [
+        (alias["kind"], alias["canonical"], alias["legacy"])
+        for alias in inventory["aliases"]
+    ]
+    if not _has_expected_alias_universe(alias_universe):
+        errors.append("evaluation artifact inventory aliases are incomplete")
+    for alias in inventory["aliases"]:
+        kind = alias["kind"]
+        canonical = alias["canonical"]
+        legacy = alias["legacy"]
+        canonical_path = _resolve_docs_path(root, canonical)
+        legacy_path = _resolve_docs_path(root, legacy)
+        if canonical_path is None:
+            errors.append("canonical path escapes root/docs")
+        if legacy_path is None:
+            errors.append("legacy path escapes root/docs")
+        if canonical_path is None or legacy_path is None:
+            continue
+        if canonical_path in seen_canonical or legacy_path in seen_legacy:
+            errors.append(f"duplicate artifact alias: {canonical} / {legacy}")
+        seen_canonical.add(canonical_path)
+        seen_legacy.add(legacy_path)
+        if not Path(canonical).name.startswith(f"regression-{kind}-"):
+            errors.append(f"canonical artifact has invalid name: {canonical}")
+        if not Path(legacy).name.startswith("quality-"):
+            errors.append(f"legacy artifact has invalid alias name: {legacy}")
+        if not canonical_path.is_file():
+            errors.append(f"missing canonical artifact: {canonical}")
+            continue
+        if not legacy_path.is_file():
+            errors.append(f"missing legacy artifact: {legacy}")
+            continue
+        legacy_digest = hashlib.sha256(legacy_path.read_bytes()).hexdigest()
+        if legacy_digest != alias["legacy_sha256"]:
+            errors.append(f"legacy artifact bytes changed: {legacy}")
+            continue
+        try:
+            canonical_payload = _load_json(canonical_path, "canonical artifact")
+            legacy_payload = _load_json(legacy_path, "legacy artifact")
+        except ValueError as error:
+            errors.append(str(error))
+            continue
+        if not isinstance(canonical_payload, dict) or not isinstance(
+            legacy_payload, dict
+        ):
+            errors.append(f"artifact is not a JSON object: {canonical}")
+            continue
+        if canonical_payload.get("schema_id") != canonical_ids[kind]:
+            errors.append(f"canonical schema id drifted: {canonical}")
+        if legacy_payload.get("schema_id") != legacy_ids[kind]:
+            errors.append(f"legacy schema id drifted: {legacy}")
+        if _numeric_values(canonical_payload) != _numeric_values(legacy_payload):
+            errors.append(f"numeric parity drifted: {canonical} / {legacy}")
+        if kind == "comparison":
+            proposal_path = canonical_payload.get("proposal_path")
+            proposal_sha256 = canonical_payload.get("proposal_sha256")
+            if not isinstance(proposal_path, str) or not proposal_path:
+                errors.append(f"comparison proposal path is invalid: {canonical}")
+                continue
+            proposal_file = _resolve_docs_path(root, proposal_path)
+            if proposal_file is None:
+                errors.append("proposal_path escapes root/docs")
+                continue
+            if not proposal_file.is_file():
+                errors.append(f"comparison proposal is missing: {proposal_path}")
+                continue
+            try:
+                proposal_payload = _load_json(proposal_file, "comparison proposal")
+                serialized = (
+                    json.dumps(
+                        proposal_payload,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        indent=2,
+                    )
+                    + "\n"
+                ).encode("utf-8")
+            except (TypeError, ValueError):
+                errors.append(f"comparison proposal is not canonical JSON: {canonical}")
+                continue
+            expected_sha256 = hashlib.sha256(serialized).hexdigest()
+            if proposal_sha256 != expected_sha256:
+                errors.append(f"canonical proposal SHA-256 mismatch: {canonical}")
+    return errors
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Validate issue-428 regression artifact naming and parity."
+    )
+    parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--inventory", type=Path)
+    args = parser.parse_args(argv)
+    root = args.root.resolve()
+    inventory = (
+        args.inventory.resolve()
+        if args.inventory is not None
+        else root / _INVENTORY_RELATIVE
+    )
+    errors = validate_inventory(root, inventory)
+    if errors:
+        print("\n".join(errors), file=sys.stderr)
+        return 1
+    print("evaluation artifact inventory is complete")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

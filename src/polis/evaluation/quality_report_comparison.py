@@ -18,7 +18,8 @@ from polis.evaluation.quality_report_validation import (
     _string,
 )
 
-_SCHEMA_ID: Final = "polis.quality-comparison"
+_SCHEMA_ID: Final = "polis.regression-comparison"
+_LEGACY_SCHEMA_ID: Final = "polis.quality-comparison"
 _SCHEMA_VERSION: Final = 1
 _SOURCE_SHA: Final = re.compile(r"[0-9a-f]{40}")
 _SNAPSHOT_SHA: Final = re.compile(r"[0-9a-f]{64}")
@@ -92,7 +93,10 @@ def load_quality_comparison(path: Path) -> QualityComparison:
     if schema_version == 4:
         expected_fields.update({"manifest_sha256"})
     _exact(root, expected_fields, "quality comparison")
-    if _string(root, "schema_id", "quality comparison") != _SCHEMA_ID:
+    if _string(root, "schema_id", "quality comparison") not in {
+        _SCHEMA_ID,
+        _LEGACY_SCHEMA_ID,
+    }:
         raise QualityReportError("quality comparison schema_id mismatch")
     if schema_version not in {_SCHEMA_VERSION, 4}:
         raise QualityReportError("quality comparison schema_version must be 1 or 4")

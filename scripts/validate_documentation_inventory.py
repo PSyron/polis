@@ -349,6 +349,20 @@ def main(argv: list[str] | None = None) -> int:
         classifications, errors = classify_inventory(root, inventory)
         errors.extend(protected_rule_errors(inventory))
         errors.extend(required_protected_artifact_errors(root, inventory))
+        artifact_inventory_path = (
+            root / "docs" / "project" / "evaluation-artifact-inventory.json"
+        )
+        if artifact_inventory_path.is_file():
+            if __package__:
+                from scripts.validate_evaluation_artifact_inventory import (
+                    validate_inventory as validate_artifact_inventory,
+                )
+            else:
+                from validate_evaluation_artifact_inventory import (
+                    validate_inventory as validate_artifact_inventory,
+                )
+
+            errors.extend(validate_artifact_inventory(root, artifact_inventory_path))
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1

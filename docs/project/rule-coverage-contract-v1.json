@@ -207,11 +207,11 @@
       ]
     },
     "quality_artifacts": {
-      "path": "docs/quality-comparison-v3.json and versioned public quality manifests",
+      "path": "docs/regression-comparison-v3.json and versioned development regression artifacts",
       "parity_rule": "Artifacts bind their published source SHA, dataset identity, profile, and provider identity where applicable; historical source SHAs are paired with the durable offline provenance manifest, while the runtime snapshot and behavior versions are checked independently because the historical v3 artifacts do not publish those fields.",
       "comparison_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
       "comparison_source_snapshot_sha256": null,
-      "comparison_sha256": "b16ce0a44d46d06ed0b61a49a7153797338c93a616fff5c634c7c676ebe87c16",
+      "comparison_sha256": "5f588ff1e22729b2b4edbcf5929fc624bbc92b4c2be7b64dc889a528b64acb42",
       "baseline_source_git_sha": "87765eae902f610ab948796f19e258c9f1dbc0a5",
       "result_source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a",
       "provenance_manifest_path": "docs/project/rule-coverage-quality-artifact-provenance-v1.json",
@@ -222,7 +222,7 @@
       "parity_rule": "The inventory separates normative authorities from candidate sources, maps every supported category, and fails closed on missing, extra, duplicate, reordered, or unmapped source identities.",
       "schema_id": "polis.rule-normative-candidate-inventory",
       "schema_version": 1,
-      "sha256": "79e24a783d0aae59e73225dcd5c2ef5e874a010eeb6dffbfd9c7ce0e5fecfe3e"
+      "sha256": "1b3ce8b2fa89bc682098d230f349ef3df84f898e2f5a1369e70cc6afb813a791"
     },
     "parity_failure": "Missing, extra, duplicate, reordered, or mismatched source, operation, behavior, policy, normative/candidate inventory, or artifact identity drift fails closed."
   },

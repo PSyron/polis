@@ -37,12 +37,12 @@ from polis.evaluation.quality_report_validation import (
     _load_json_object,
     _nested,
     _ratio,
-    _schema,
     _sha,
     _string,
 )
 
-_PROPOSAL_SCHEMA_ID: Final = "polis.quality-threshold-proposal"
+_PROPOSAL_SCHEMA_ID: Final = "polis.regression-threshold-proposal"
+_LEGACY_PROPOSAL_SCHEMA_ID: Final = "polis.quality-threshold-proposal"
 _PENDING_STATUS: Final = "pending_maintainer_approval"
 
 
@@ -55,15 +55,24 @@ def load_threshold_proposal(path: Path) -> ThresholdProposalArtifact:
         case 1:
             return _load_threshold_proposal_v1(root)
         case 2:
-            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+            if _string(root, "schema_id", "threshold proposal") not in {
+                _PROPOSAL_SCHEMA_ID,
+                _LEGACY_PROPOSAL_SCHEMA_ID,
+            }:
                 raise QualityReportError("threshold proposal schema_id mismatch")
             return parse_threshold_proposal_v2(root)
         case 3:
-            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+            if _string(root, "schema_id", "threshold proposal") not in {
+                _PROPOSAL_SCHEMA_ID,
+                _LEGACY_PROPOSAL_SCHEMA_ID,
+            }:
                 raise QualityReportError("threshold proposal schema_id mismatch")
             return parse_threshold_proposal_v3(root)
         case 4:
-            if _string(root, "schema_id", "threshold proposal") != _PROPOSAL_SCHEMA_ID:
+            if _string(root, "schema_id", "threshold proposal") not in {
+                _PROPOSAL_SCHEMA_ID,
+                _LEGACY_PROPOSAL_SCHEMA_ID,
+            }:
                 raise QualityReportError("threshold proposal schema_id mismatch")
             return parse_threshold_proposal_v4(root)
         case _:
@@ -87,7 +96,11 @@ def _load_threshold_proposal_v1(root: JsonObject) -> ThresholdProposal:
         },
         "threshold proposal",
     )
-    _schema(root, _PROPOSAL_SCHEMA_ID, "threshold proposal")
+    if _string(root, "schema_id", "threshold proposal") not in {
+        _PROPOSAL_SCHEMA_ID,
+        _LEGACY_PROPOSAL_SCHEMA_ID,
+    }:
+        raise QualityReportError("threshold proposal schema_id mismatch")
     values = _nested(
         root,
         "proposed_thresholds",
