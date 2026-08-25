@@ -1,16 +1,26 @@
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import os
 import secrets
 import stat
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
 from typing import Final, NoReturn
 
-from polis.evaluation.holdout_admission import ExternalAdmission
-from polis.evaluation.holdout_attestations import exact_fields, metadata_bytes
+from polis.evaluation.holdout_admission import (
+    ExternalAdmission,
+    is_verified_external_admission,
+)
+from polis.evaluation.holdout_attestations import (
+    exact_fields,
+    metadata_bytes,
+    required_string,
+)
 from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
 from polis.evaluation.holdout_manifest import (
     parse_dataset_manifest,
@@ -43,8 +53,34 @@ _OUTPUT_NAMES: Final = frozenset(
     }
 )
 _PERMANENT_FAILURE_NAME: Final = "holdout.publication.failed"
+_PUBLICATION_LOCK_NAME: Final = ".holdout.publication.lock"
 _MAX_METADATA_BYTES: Final = 1 << 20
 _PUBLICATION_LOCK: Final = Lock()
+
+
+@contextmanager
+def _publication_lock(parent: int) -> Iterator[None]:
+    with _PUBLICATION_LOCK:
+        try:
+            descriptor = os.open(
+                _PUBLICATION_LOCK_NAME,
+                os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW,
+                0o600,
+                dir_fd=parent,
+            )
+            metadata = os.fstat(descriptor)
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+                raise HoldoutAdmissionError("publication lock is invalid")
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+        except OSError as error:
+            raise HoldoutAdmissionError("publication lock is unavailable") from error
+        try:
+            yield
+        finally:
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+            finally:
+                os.close(descriptor)
 
 
 def _secure_flags(*, directory: bool) -> int:
@@ -87,6 +123,7 @@ class SecureFile:
 class _PublishedOutput:
     content: bytes
     digest: str
+    state: tuple[int, ...]
 
 
 def _file_state(metadata: os.stat_result) -> tuple[int, ...]:
@@ -296,7 +333,8 @@ def _unlink_owned_temporary(
 
 
 def _fail_closed_after_publication(
-    parent: int,
+    cleanup_parent: int,
+    marker_parent: int,
     name: str,
     temporary_name: str,
     source_descriptor: int,
@@ -305,11 +343,13 @@ def _fail_closed_after_publication(
     cleanup_error: HoldoutAdmissionError | None = None
     try:
         if temporary_name:
-            _unlink_owned_temporary(parent, temporary_name, source_descriptor, 2, 1)
+            _unlink_owned_temporary(
+                cleanup_parent, temporary_name, source_descriptor, 2, 1
+            )
     except HoldoutAdmissionError as error:
         cleanup_error = error
     try:
-        _write_publication_failure(parent, name)
+        _write_publication_failure(marker_parent, name)
     except HoldoutAdmissionError as marker_error:
         raise HoldoutAdmissionError(str(original_error)) from marker_error
     if cleanup_error is not None:
@@ -574,6 +614,9 @@ class SecureHoldoutWorkspace:
                     metadata_bytes(self._config.content, "config.json")
                 ),
                 source_sha256=source_sha256(config),
+                source_tree_sha256=required_string(
+                    merge, "evaluated_source_tree_sha256", "merge verification"
+                ),
                 dataset_sha256=approved_identity.sha256,
                 merge_commit=merge_commit,
                 verification_verified=verified,
@@ -602,6 +645,8 @@ class SecureHoldoutWorkspace:
             expected_evidence = self._admission_evidence_locked()
             if admission.evidence != expected_evidence:
                 raise HoldoutAdmissionError("admission evidence identity mismatch")
+            if not is_verified_external_admission(admission):
+                raise HoldoutAdmissionError("admission proof is not verified")
             identity: JsonObject = {
                 "experiment_id": self._approved_config.experiment_id
                 if self._approved_config is not None
@@ -629,26 +674,30 @@ class SecureHoldoutWorkspace:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
-            with _PUBLICATION_LOCK:
+            with _publication_lock(self._experiment):
                 _ensure_no_publication_failure(self._experiment)
                 expected = self._published_outputs.get(name)
                 if expected is None:
                     raise HoldoutAdmissionError("unregistered holdout output")
-                actual = _read_file(
-                    self._experiment, name, max_size=_MAX_METADATA_BYTES
-                ).content
-                if (
-                    actual != expected.content
-                    or hashlib.sha256(actual).hexdigest() != expected.digest
-                ):
-                    raise HoldoutAdmissionError("trusted holdout output changed")
-                return actual
+                try:
+                    descriptor = os.open(
+                        name, _secure_flags(directory=False), dir_fd=self._experiment
+                    )
+                except OSError as error:
+                    raise HoldoutAdmissionError(
+                        "trusted holdout output changed"
+                    ) from error
+                try:
+                    _verify_output(descriptor, expected.content, 1, expected.state)
+                finally:
+                    os.close(descriptor)
+                return expected.content
 
     def output_exists(self, name: str) -> bool:
         with self._lifecycle_lock:
             self._require_open()
             _require_output_name(name)
-            with _PUBLICATION_LOCK:
+            with _publication_lock(self._experiment):
                 _ensure_no_publication_failure(self._experiment)
                 try:
                     descriptor = os.open(
@@ -664,18 +713,18 @@ class SecureHoldoutWorkspace:
                     metadata = os.fstat(descriptor)
                     if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
                         raise HoldoutAdmissionError("holdout output state is invalid")
+                    expected = self._published_outputs.get(name)
+                    if expected is not None:
+                        try:
+                            _verify_output(
+                                descriptor, expected.content, 1, expected.state
+                            )
+                        except HoldoutAdmissionError as error:
+                            raise HoldoutAdmissionError(
+                                "trusted holdout output changed"
+                            ) from error
                 finally:
                     os.close(descriptor)
-                expected = self._published_outputs.get(name)
-                if expected is not None:
-                    actual = _read_file(
-                        self._experiment, name, max_size=_MAX_METADATA_BYTES
-                    ).content
-                    if (
-                        actual != expected.content
-                        or hashlib.sha256(actual).hexdigest() != expected.digest
-                    ):
-                        raise HoldoutAdmissionError("trusted holdout output changed")
                 return True
 
     def create_output(self, name: str, content: bytes) -> None:
@@ -684,16 +733,20 @@ class SecureHoldoutWorkspace:
             self._create_output_locked(name, content)
 
     def _create_output_locked(self, name: str, content: bytes) -> None:
-        with _PUBLICATION_LOCK:
+        with _publication_lock(self._experiment):
             self._create_output_transaction_locked(name, content)
 
     def _create_output_transaction_locked(self, name: str, content: bytes) -> None:
         _require_output_name(name)
         _ensure_no_publication_failure(self._experiment)
+        staging_name = f".holdout-staging.{secrets.token_hex(16)}"
         temporary_name = f".{name}.{secrets.token_hex(16)}"
+        staging: int | None = None
         descriptor: int | None = None
         published = False
         try:
+            os.mkdir(staging_name, 0o700, dir_fd=self._experiment)
+            staging = _open_directory(self._experiment, staging_name)
             descriptor = os.open(
                 temporary_name,
                 os.O_RDWR
@@ -701,7 +754,7 @@ class SecureHoldoutWorkspace:
                 | os.O_EXCL
                 | (_secure_flags(directory=False) & os.O_NOFOLLOW),
                 0o600,
-                dir_fd=self._experiment,
+                dir_fd=staging,
             )
             offset = 0
             while offset < len(content):
@@ -712,7 +765,7 @@ class SecureHoldoutWorkspace:
             os.link(
                 temporary_name,
                 name,
-                src_dir_fd=self._experiment,
+                src_dir_fd=staging,
                 dst_dir_fd=self._experiment,
                 follow_symlinks=False,
             )
@@ -734,7 +787,7 @@ class SecureHoldoutWorkspace:
                 linked_state,
             )
             assert descriptor is not None
-            _unlink_owned_temporary(self._experiment, temporary_name, descriptor, 2, 1)
+            _unlink_owned_temporary(staging, temporary_name, descriptor, 2, 1)
             temporary_name = ""
             final_state = _file_publication_state(os.fstat(descriptor))
             _verify_published_destination(
@@ -746,13 +799,25 @@ class SecureHoldoutWorkspace:
                 final_state,
             )
             self._published_outputs[name] = _PublishedOutput(
-                content, hashlib.sha256(content).hexdigest()
+                content, hashlib.sha256(content).hexdigest(), final_state
+            )
+            _verify_published_destination(
+                self._experiment,
+                name,
+                descriptor,
+                content,
+                1,
+                final_state,
             )
         except FileExistsError as error:
             if descriptor is not None and not published:
                 try:
                     _unlink_owned_temporary(
-                        self._experiment, temporary_name, descriptor, 1, 0
+                        staging if staging is not None else self._experiment,
+                        temporary_name,
+                        descriptor,
+                        1,
+                        0,
                     )
                 except HoldoutAdmissionError as cleanup_error:
                     raise cleanup_error from error
@@ -760,6 +825,7 @@ class SecureHoldoutWorkspace:
         except HoldoutAdmissionError as error:
             if descriptor is not None and published:
                 _fail_closed_after_publication(
+                    staging if staging is not None else self._experiment,
                     self._experiment,
                     name,
                     temporary_name,
@@ -768,13 +834,17 @@ class SecureHoldoutWorkspace:
                 )
             if descriptor is not None:
                 _fail_closed_before_publication(
-                    self._experiment, temporary_name, descriptor, error
+                    staging if staging is not None else self._experiment,
+                    temporary_name,
+                    descriptor,
+                    error,
                 )
             raise
         except OSError as error:
             mapped = HoldoutAdmissionError("exclusive holdout output failed")
             if descriptor is not None and published:
                 _fail_closed_after_publication(
+                    staging if staging is not None else self._experiment,
                     self._experiment,
                     name,
                     temporary_name,
@@ -783,7 +853,10 @@ class SecureHoldoutWorkspace:
                 )
             if descriptor is not None:
                 _fail_closed_before_publication(
-                    self._experiment, temporary_name, descriptor, mapped
+                    staging if staging is not None else self._experiment,
+                    temporary_name,
+                    descriptor,
+                    mapped,
                 )
             raise mapped from error
         finally:
@@ -801,6 +874,13 @@ class SecureHoldoutWorkspace:
                     raise HoldoutAdmissionError(
                         "exclusive holdout output close failed"
                     ) from error
+            if staging is not None:
+                try:
+                    os.close(staging)
+                    os.rmdir(staging_name, dir_fd=self._experiment)
+                    _fsync_directory(self._experiment)
+                except OSError:
+                    pass
 
     def close(self) -> None:
         with self._lifecycle_lock:

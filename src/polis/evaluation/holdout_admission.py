@@ -45,6 +45,26 @@ class ExternalAdmission:
     wheel_sha256: str
     sdist_sha256: str
     lock_sha256: str
+    _proof: object | None = None
+
+
+_verified_admissions: dict[int, tuple[ExternalAdmission, object]] = {}
+
+
+def _register_external_admission(admission: ExternalAdmission) -> ExternalAdmission:
+    proof = object()
+    object.__setattr__(admission, "_proof", proof)
+    _verified_admissions[id(admission)] = (admission, proof)
+    return admission
+
+
+def is_verified_external_admission(admission: ExternalAdmission) -> bool:
+    registered = _verified_admissions.get(id(admission))
+    return (
+        registered is not None
+        and registered[0] is admission
+        and admission._proof is registered[1]
+    )
 
 
 def checkout_identity(kind: str) -> str:
@@ -77,7 +97,7 @@ def _verified_merge(
     identify: Callable[[str], str],
     verify: Callable[[str], bool],
     load_metadata: Callable[[Path], JsonObject],
-) -> tuple[str, str]:
+) -> tuple[str, str, str]:
     merge = load_metadata(config.paths.merge_verification)
     exact_fields(
         merge,
@@ -127,7 +147,7 @@ def _verified_merge(
         )
     if not verify(source_sha):
         raise HoldoutAdmissionError("local commit signature verification failed")
-    return source_sha, digest
+    return source_sha, source_tree, digest
 
 
 def load_external_admission(
@@ -158,7 +178,7 @@ def _load_external_admission(
     load_metadata: Callable[[Path], JsonObject] = metadata_object,
     load_evidence: Callable[[Path], bytes] | None = None,
 ) -> ExternalAdmission:
-    source_sha, verification_digest = _verified_merge(
+    source_sha, source_tree, verification_digest = _verified_merge(
         config,
         identify=checkout_identity,
         verify=verify_commit,
@@ -173,10 +193,11 @@ def _load_external_admission(
     evidence = AdmissionEvidence(
         canonical_sha256(config_document),
         source_sha256(config),
+        source_tree,
         config.dataset.sha256,
         source_sha,
         True,
         "valid",
         verification_digest,
     )
-    return ExternalAdmission(evidence, wheel, sdist, lock)
+    return _register_external_admission(ExternalAdmission(evidence, wheel, sdist, lock))

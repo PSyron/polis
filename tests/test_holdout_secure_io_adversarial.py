@@ -14,7 +14,10 @@ import pytest
 from tests.holdout_config_fixture import synthetic_config
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_admission import (
+    ExternalAdmission,
+    _register_external_admission,
+)
 from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
 from polis.evaluation.holdout_models import (
     AdmissionEvidence,
@@ -90,19 +93,22 @@ def _admission() -> ExternalAdmission:
     dataset["sha256"] = TRUSTED_DATASET_SHA256
     dataset["size_bytes"] = len(TRUSTED_DATASET)
     parsed = parse_holdout_config(config)
-    return ExternalAdmission(
-        AdmissionEvidence(
-            canonical_sha256(config),
-            source_sha256(parsed),
-            TRUSTED_DATASET_SHA256,
-            MERGE_COMMIT,
-            True,
-            "valid",
-            canonical_sha256(VERIFICATION_PAYLOAD),
+    return _register_external_admission(
+        ExternalAdmission(
+            AdmissionEvidence(
+                canonical_sha256(config),
+                source_sha256(parsed),
+                "b" * 40,
+                TRUSTED_DATASET_SHA256,
+                MERGE_COMMIT,
+                True,
+                "valid",
+                canonical_sha256(VERIFICATION_PAYLOAD),
+            ),
+            "c" * 64,
+            "d" * 64,
+            "e" * 64,
         ),
-        "c" * 64,
-        "d" * 64,
-        "e" * 64,
     )
 
 
@@ -161,6 +167,31 @@ def test_reserve_rejects_forged_complete_admission_identity(
         workspace.close()
 
     assert not (experiment / "holdout.started").exists()
+
+
+def test_reserve_rejects_caller_forged_admission_with_matching_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    workspace.bind_approved_dataset_identity()
+    trusted = _admission()
+    forged = ExternalAdmission(
+        trusted.evidence,
+        "f" * 64,
+        "f" * 64,
+        "f" * 64,
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="proof"):
+            workspace.reserve_dataset(forged, reserved_at="2026-08-25T00:00:00Z")
+    finally:
+        workspace.close()
+
+    assert not (tmp_path / "experiments/a-b-one-shot/holdout.started").exists()
 
 
 @pytest.mark.parametrize("reader", ["output", "evidence", "dataset"])

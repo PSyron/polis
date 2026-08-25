@@ -11,7 +11,10 @@ import pytest
 from tests.holdout_config_fixture import synthetic_config
 from tests.test_holdout_manifest import synthetic_manifest
 
-from polis.evaluation.holdout_admission import ExternalAdmission
+from polis.evaluation.holdout_admission import (
+    ExternalAdmission,
+    _register_external_admission,
+)
 from polis.evaluation.holdout_contract import canonical_sha256, parse_holdout_config
 from polis.evaluation.holdout_models import AdmissionEvidence, HoldoutAdmissionError
 from polis.evaluation.holdout_reservation import (
@@ -88,19 +91,22 @@ def _admission() -> ExternalAdmission:
     dataset["sha256"] = TRUSTED_DATASET_SHA256
     dataset["size_bytes"] = len(TRUSTED_DATASET)
     parsed = parse_holdout_config(config)
-    return ExternalAdmission(
-        AdmissionEvidence(
-            canonical_sha256(config),
-            source_sha256(parsed),
-            TRUSTED_DATASET_SHA256,
-            MERGE_COMMIT,
-            True,
-            "valid",
-            canonical_sha256(VERIFICATION_PAYLOAD),
+    return _register_external_admission(
+        ExternalAdmission(
+            AdmissionEvidence(
+                canonical_sha256(config),
+                source_sha256(parsed),
+                "b" * 40,
+                TRUSTED_DATASET_SHA256,
+                MERGE_COMMIT,
+                True,
+                "valid",
+                canonical_sha256(VERIFICATION_PAYLOAD),
+            ),
+            "c" * 64,
+            "d" * 64,
+            "e" * 64,
         ),
-        "c" * 64,
-        "d" * 64,
-        "e" * 64,
     )
 
 
