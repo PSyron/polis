@@ -26,7 +26,6 @@ from polis.evaluation.holdout_report import (
     parse_raw_report,
 )
 from polis.evaluation.holdout_reservation import (
-    load_reserved_dataset,
     reserve_consumption_secure,
 )
 from polis.evaluation.holdout_scoring import production_report
@@ -142,11 +141,8 @@ def _run_open_workspace(
     )
     try:
         secure_dataset = workspace.read_dataset(capability)
-        dataset = load_reserved_dataset(
-            capability,
-            lambda: load_holdout_dataset_bytes(
-                secure_dataset.content, secure_dataset.mode, config
-            ),
+        dataset = load_holdout_dataset_bytes(
+            secure_dataset.content, secure_dataset.mode, config
         )
     except HoldoutDatasetError as error:
         raise HoldoutAdmissionError(str(error)) from error
