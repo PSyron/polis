@@ -15,7 +15,9 @@ from polis.evaluation.quality_report_validation import (
     _string,
 )
 
-_RESULT_SCHEMA_ID: Final = "polis.quality-result"
+_RESULT_SCHEMA_ID: Final = "polis.regression-result"
+_LEGACY_RESULT_SCHEMA_ID: Final = "polis.quality-result"
+_BASELINE_SCHEMA_ID: Final = "polis.regression-baseline"
 _RESULT_SCHEMA_VERSION: Final = 1
 
 
@@ -24,7 +26,7 @@ def load_quality_result(path: Path) -> QualityReport:
 
     root = _load_json_object(path, "quality result")
     schema_id = _string(root, "schema_id", "quality result")
-    if schema_id != _RESULT_SCHEMA_ID:
+    if schema_id not in {_RESULT_SCHEMA_ID, _LEGACY_RESULT_SCHEMA_ID}:
         raise QualityReportError("quality result schema_id mismatch")
     schema_version = root.get("schema_version")
     if schema_version != _RESULT_SCHEMA_VERSION:
@@ -43,7 +45,7 @@ def load_quality_result(path: Path) -> QualityReport:
     # same dataset schema generation (v2, v3, or v4). A result must retain its
     # explicit result identity and cannot be silently accepted as a baseline.
     rewritten = dict(root)
-    rewritten["schema_id"] = "polis.quality-baseline"
+    rewritten["schema_id"] = _BASELINE_SCHEMA_ID
     rewritten["schema_version"] = dataset_schema_version
     with tempfile.NamedTemporaryFile(
         mode="w",

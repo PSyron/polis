@@ -1,0 +1,402 @@
+{
+  "aggregate_verdict": "fail",
+  "artifacts": {
+    "sdist_filename": "polis_nlp-0.2.0.tar.gz",
+    "sdist_sha256": "50b4674b46b8666a385004fa42000175e9451b0e43542ca3ef6e6406ef23a4d1",
+    "wheel_filename": "polis_nlp-0.2.0-py3-none-any.whl",
+    "wheel_sha256": "ca297f732af584018f31a22ac11ed730df3230562299b9b35baff4f2d14791b8"
+  },
+  "dataset_sha256": "8f6dec8379af6330f2fb8330421f6a6581f6c9e39ad98fe304322b4a9abb6276",
+  "environment_baseline": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "environment_result": {
+    "default": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    },
+    "morphology": {
+      "package_version": "0.2.0",
+      "platform_machine": "arm64",
+      "platform_release": "24.3.0",
+      "platform_system": "Darwin",
+      "python_version": "3.13.12"
+    }
+  },
+  "notes": [
+    "Post-#355 dispatch optimization re-measure from clean installed wheel (Python 3.13.12).",
+    "Quality floors remain green; v3 performance_comparison caps are byte-identical to #353/#339 F1.3 and were not re-derived.",
+    "Morphology p95 and throughput now pass absolute caps; peak RSS still fails.",
+    "Default p95/throughput/RSS remain fail-closed despite latency/throughput improvement vs #353.",
+    "Optimizations: Wave4 government pattern-first + morphology form cache; syntax sentence-segmentation LRU."
+  ],
+  "profiles": {
+    "default": {
+      "baseline_path": "docs/regression-baseline-v3-default.json",
+      "baseline_sha256": "3455c865296e2c7322719e58c4de182b35a5f0af603897b679d859ce8754a35c",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.7900355871886121 floor=0.7900355871886121",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.6529411764705882 floor=0.6529411764705882",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=62459 max=39167",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": false
+        },
+        {
+          "detail": "tput=24070.960739158603 min=33979.186566343364",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": false
+        },
+        {
+          "detail": "rss=37339136 max=30572544",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": false
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.6529411764705882,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.6529411764705882
+        },
+        {
+          "baseline": 0.7900355871886121,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.7900355871886121
+        },
+        {
+          "baseline": 0.6529411764705882,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.6529411764705882
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 76917,
+          "delta": -14458,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 62459
+        },
+        {
+          "baseline": 17450.74005098408,
+          "delta": 6620.220688174522,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 24070.960739158603
+        },
+        {
+          "baseline": 32555008,
+          "delta": 4784128,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 37339136
+        },
+        {
+          "baseline": 111,
+          "delta": 0,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 111
+        },
+        {
+          "baseline": 59,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 59
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "default",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 111,
+        "expected_findings": 170,
+        "false_negatives": 59,
+        "false_positives": 0,
+        "predicted_findings": 111,
+        "span_matches": 111,
+        "true_positives": 111
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 111,
+        "expected_findings": 170,
+        "false_negatives": 59,
+        "false_positives": 0,
+        "predicted_findings": 111,
+        "span_matches": 111,
+        "true_positives": 111
+      },
+      "result_path": "docs/regression-result-v3-default.json",
+      "result_sha256": "b1238cda6f9d1fd4defe4b55cfb6c9de37e9c22500b6695a9e61d620d3145d34",
+      "verdict": "fail"
+    },
+    "morphology": {
+      "baseline_path": "docs/regression-baseline-v3-morphology.json",
+      "baseline_sha256": "6014c9749aa6c9ac740a40201934d11b0aaa4c7ef8d455323b939534d5fa8cbc",
+      "gates": [
+        {
+          "detail": "precision=1.0 floor=1.0",
+          "gate": "quality.minimum_precision",
+          "pass": true
+        },
+        {
+          "detail": "recall=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_recall",
+          "pass": true
+        },
+        {
+          "detail": "f1=0.940809968847352 floor=0.940809968847352",
+          "gate": "quality.minimum_f1",
+          "pass": true
+        },
+        {
+          "detail": "span_accuracy=0.888235294117647 floor=0.888235294117647",
+          "gate": "quality.minimum_exact_span_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "correction_accuracy=1.0 floor=1.0",
+          "gate": "quality.minimum_exact_correction_accuracy",
+          "pass": true
+        },
+        {
+          "detail": "false_alarm_rate=0.0 ceiling=0.0",
+          "gate": "quality.maximum_false_alarm_rate",
+          "pass": true
+        },
+        {
+          "detail": "python_version: baseline=3.13.12 result=3.13.12 match=True; platform_system: baseline=Darwin result=Darwin match=True; platform_release: baseline=24.3.0 result=24.3.0 match=True; platform_machine: baseline=arm64 result=arm64 match=True",
+          "gate": "performance.environment_match",
+          "pass": true
+        },
+        {
+          "detail": "warmup=1 measured=5 identical_hashes=True",
+          "gate": "performance.reproducibility",
+          "pass": true
+        },
+        {
+          "detail": "p95=73583 max=197625",
+          "gate": "performance.maximum_p95_latency_ns",
+          "pass": true
+        },
+        {
+          "detail": "tput=18690.122756066612 min=18262.21596348732",
+          "gate": "performance.minimum_throughput_cases_per_second",
+          "pass": true
+        },
+        {
+          "detail": "rss=82296832 max=74366976",
+          "gate": "performance.maximum_peak_rss_bytes",
+          "pass": false
+        }
+      ],
+      "metric_deltas": [
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "precision",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.888235294117647,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "recall",
+          "result": 0.888235294117647
+        },
+        {
+          "baseline": 0.940809968847352,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "f1",
+          "result": 0.940809968847352
+        },
+        {
+          "baseline": 0.888235294117647,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "span_accuracy",
+          "result": 0.888235294117647
+        },
+        {
+          "baseline": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "metric": "correction_accuracy",
+          "result": 1.0
+        },
+        {
+          "baseline": 0.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "metric": "false_alarm_rate",
+          "result": 0.0
+        },
+        {
+          "baseline": 403042,
+          "delta": -329459,
+          "higher_is_better": false,
+          "metric": "p95_latency_ns",
+          "result": 73583
+        },
+        {
+          "baseline": 2727.262293671418,
+          "delta": 15962.860462395194,
+          "higher_is_better": true,
+          "metric": "throughput_cases_per_second",
+          "result": 18690.122756066612
+        },
+        {
+          "baseline": 81674240,
+          "delta": 622592,
+          "higher_is_better": false,
+          "metric": "peak_rss_bytes",
+          "result": 82296832
+        },
+        {
+          "baseline": 151,
+          "delta": 0,
+          "higher_is_better": true,
+          "metric": "true_positives",
+          "result": 151
+        },
+        {
+          "baseline": 19,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_negatives",
+          "result": 19
+        },
+        {
+          "baseline": 0,
+          "delta": 0,
+          "higher_is_better": false,
+          "metric": "false_positives",
+          "result": 0
+        }
+      ],
+      "profile_id": "morphology",
+      "quality_counts_baseline": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 151,
+        "expected_findings": 170,
+        "false_negatives": 19,
+        "false_positives": 0,
+        "predicted_findings": 151,
+        "span_matches": 151,
+        "true_positives": 151
+      },
+      "quality_counts_result": {
+        "alarmed_correct_cases": 0,
+        "correct_cases": 210,
+        "correction_matches": 151,
+        "expected_findings": 170,
+        "false_negatives": 19,
+        "false_positives": 0,
+        "predicted_findings": 151,
+        "span_matches": 151,
+        "true_positives": 151
+      },
+      "result_path": "docs/regression-result-v3-morphology.json",
+      "result_sha256": "fdf0035380b143a05b4a980a94dc4daf1acf61a8a8f95eed8271871e90e4f500",
+      "verdict": "fail"
+    }
+  },
+  "proposal_path": "docs/regression-threshold-proposal-v3.json",
+  "proposal_sha256": "dd88e505705af51115af41279ad9dd82f0a01ee607f27d24ebf907ef0df0eb40",
+  "schema_id": "polis.regression-comparison",
+  "schema_version": 1,
+  "source_git_sha": "f24ade2fc49ffca2b7f564a7ad8dd1b87e62058a"
+}

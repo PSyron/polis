@@ -1,4 +1,8 @@
-# Quality Baseline (M3-02)
+# Development Regression Baseline (M3-02)
+
+This development regression suite is not a product-quality measurement. Its
+rules were written against the reviewed cases, so its scores describe
+regression coverage and must not be presented as product quality.
 
 Baseline run date: `2026-07-20`.
 
@@ -39,7 +43,10 @@ A metric with a zero denominator is reported as `N/A`, never as a perfect
 score. `N/A` fails both minimum and maximum release gates, so an empty analyzer
 or a dataset without the required negative cases cannot qualify vacuously.
 
-## Aggregate quality
+## Aggregate regression coverage
+
+The F1 value below describes regression coverage on the reviewed development
+cases; it is not a product-quality measurement.
 
 | Metric | Value |
 | --- | ---: |

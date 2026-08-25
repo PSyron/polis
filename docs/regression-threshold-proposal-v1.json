@@ -1,0 +1,17 @@
+{
+  "baseline_path": "docs/regression-baseline-v1.json",
+  "baseline_sha256": "a0f8af92b6b714dc215564b02ddd698f71de60cb0ec9a62a278587439028af72",
+  "dataset_sha256": "152f7e23e5e56f299fc35e5acbb515515a855ee5925664e6b0a5179380984a2e",
+  "enforced": false,
+  "proposed_thresholds": {
+    "maximum_false_alarm_rate": 0.0,
+    "minimum_correction_accuracy": 1.0,
+    "minimum_f1": 0.8333333333333334,
+    "minimum_precision": 1.0,
+    "minimum_recall": 0.7142857142857143,
+    "minimum_span_accuracy": 0.7142857142857143
+  },
+  "schema_id": "polis.regression-threshold-proposal",
+  "schema_version": 1,
+  "status": "pending_maintainer_approval"
+}

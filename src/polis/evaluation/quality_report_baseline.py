@@ -47,7 +47,9 @@ from polis.evaluation.quality_report_validation import (
     validate_quality_report_measurements,
 )
 
-_REPORT_SCHEMA_ID: Final = "polis.quality-baseline"
+_REPORT_SCHEMA_ID: Final = "polis.regression-baseline"
+_LEGACY_REPORT_SCHEMA_ID: Final = "polis.quality-baseline"
+_RESULT_SCHEMA_ID: Final = "polis.regression-result"
 _ANALYZER: Final = "Analyzer(AnalyzerConfig())"
 _SOURCE_SHA: Final = re.compile(r"[0-9a-f]{40}")
 
@@ -143,7 +145,10 @@ def load_quality_report(path: Path) -> QualityReport:
         root_fields,
         "quality report",
     )
-    if _string(root, "schema_id", "quality report") != _REPORT_SCHEMA_ID:
+    if _string(root, "schema_id", "quality report") not in {
+        _REPORT_SCHEMA_ID,
+        _LEGACY_REPORT_SCHEMA_ID,
+    }:
         raise QualityReportError("quality report schema_id mismatch")
     analyzer = _string(root, "analyzer", "quality report")
     if analyzer != _ANALYZER:
@@ -310,7 +315,7 @@ def _report_payload(
             "v2/v3 quality report requires source and profile identity"
         )
     payload: JsonObject = {
-        "schema_id": "polis.quality-result" if result_schema else _REPORT_SCHEMA_ID,
+        "schema_id": _RESULT_SCHEMA_ID if result_schema else _REPORT_SCHEMA_ID,
         "schema_version": 1
         if result_schema
         else (identity.dataset_schema_version if uses_profile else 1),

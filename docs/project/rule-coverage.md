@@ -69,9 +69,16 @@ Pominięcie bez powodu nie jest dowodem pokrycia.
 
 Ordered snapshot pochodzi z publicznego
 `Analyzer(AnalyzerConfig()).source_identity_snapshot`. `docs/rules.md`, wersje
-zachowania, polityka korekty i artefakty jakości muszą zachować parity z tym
+zachowania, polityka korekty i artefakty suity regresyjnej muszą zachować parity z tym
 snapshotem. Nowa rodzina zaczyna jako `review-only`; automatic correction wymaga
 osobnego, dokładnego klucza polityki i osobnej akceptacji.
+
+Wyniki F1 z projektowego zbioru deweloperskiego są dowodem pokrycia regresji,
+nie miarą jakości produktu. Przyszłe pomiary jakości wymagają osobnego zbioru,
+którego reguły nie były pisane pod oceniane przypadki. Kanoniczne artefakty tej
+suity używają prefiksu `regression-`; pliki `quality-*` są zachowanymi,
+niezmienionymi aliasami historycznymi, a ich wartości liczbowe muszą pozostać
+identyczne.
 
 `planning_baseline` jest parą dokładnego, rozwiązywalnego SHA źródła oraz digestu
 snapshotu. Validator odrzuca baseline, którego audytowane ścieżki runtime'u nie
