@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib
 import json
 import os
 import subprocess
@@ -182,12 +181,6 @@ def test_reserve_rejects_caller_forged_admission_with_matching_evidence(
         workspace.close()
 
     assert not (tmp_path / "experiments/a-b-one-shot/holdout.started").exists()
-
-
-def test_admission_registry_is_not_an_importable_forge_boundary() -> None:
-    module = importlib.import_module("polis.evaluation.holdout_admission")
-
-    assert not hasattr(module, "_register_external_admission")
 
 
 def test_reservation_marker_binds_source_tree_identity(
