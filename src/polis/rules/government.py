@@ -166,7 +166,7 @@ class InflectionGovernmentSzukacKluczRule:
 
     @property
     def behavior_version(self) -> str:
-        return _wave4_behavior("inflection-government-szukac-klucz", 4)
+        return _wave4_behavior("inflection-government-szukac-klucz", 5)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         return _GeneralizedGovernmentRule(self._provider, _GENERALIZED_SPECS[0]).find(
@@ -371,7 +371,21 @@ _GOVERNMENT_TARGET: Final = (
     r"|(?P<material>(?![ \t]+(?:i|oraz|albo|lub|ani)\b)"
     r"(?=[ \t]+[^\W\d_]+)))"
 )
-_GOVERNMENT_GOVERNOR_TAGS: Final = frozenset({"fin:sg:pri:imperf"})
+_GOVERNMENT_GOVERNOR_TAGS: Final = frozenset(
+    {
+        "fin:pl:pri:imperf",
+        "fin:pl:sec:imperf",
+        "fin:pl:ter:imperf",
+        "fin:sg:pri:imperf",
+        "fin:sg:sec:imperf",
+        "fin:sg:ter:imperf",
+        "praet:pl:m1:imperf",
+        "praet:pl:m2.m3.f.n:imperf",
+        "praet:sg:f:imperf",
+        "praet:sg:m1.m2.m3:imperf",
+        "praet:sg:n:imperf",
+    }
+)
 _NOMINAL_COORDINATION_PREFIXES: Final = frozenset(
     {
         "adj",
@@ -400,6 +414,7 @@ class _GeneralizedGovernmentSpec:
     governor_label: str
     target_case: str
     target_case_label: str
+    behavior_major: int = 4
 
 
 def _generalized_pattern(prefix: str, suffix: str = "") -> re.Pattern[str]:
@@ -416,42 +431,46 @@ _GENERALIZED_SPECS: Final = (
     _GeneralizedGovernmentSpec(
         source_name="inflection.government_szukac_klucz",
         behavior_stem="inflection-government-szukac-klucz",
-        pattern=_generalized_pattern("szukam"),
+        pattern=_generalized_pattern(rf"szuk{_GOVERNMENT_WORD}"),
         governor_lemma="szukać",
         governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
         governor_label="„szukać”",
         target_case="gen",
         target_case_label="dopełniacza",
+        behavior_major=5,
     ),
     _GeneralizedGovernmentSpec(
         source_name="inflection.government_uzywac_telefon",
         behavior_stem="inflection-government-uzywac-telefon",
-        pattern=_generalized_pattern("używam"),
+        pattern=_generalized_pattern(rf"używ{_GOVERNMENT_WORD}"),
         governor_lemma="używać",
         governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
         governor_label="„używać”",
         target_case="gen",
         target_case_label="dopełniacza",
+        behavior_major=5,
     ),
     _GeneralizedGovernmentSpec(
         source_name="inflection.government_ufac_lekarz",
         behavior_stem="inflection-government-ufac-lekarz",
-        pattern=_generalized_pattern("ufam"),
+        pattern=_generalized_pattern(rf"uf{_GOVERNMENT_WORD}"),
         governor_lemma="ufać",
         governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
         governor_label="„ufać”",
         target_case="dat",
         target_case_label="celownika",
+        behavior_major=5,
     ),
     _GeneralizedGovernmentSpec(
         source_name="inflection.government_interesowac_sie_historia",
         behavior_stem="inflection-government-interesowac-sie-historia",
-        pattern=_generalized_pattern("interesuję", r"[ \t]+się"),
+        pattern=_generalized_pattern(rf"interes{_GOVERNMENT_WORD}", r"[ \t]+się"),
         governor_lemma="interesować",
         governor_tags=_GOVERNMENT_GOVERNOR_TAGS,
         governor_label="„interesować się”",
         target_case="inst",
         target_case_label="narzędnika",
+        behavior_major=5,
     ),
     _GeneralizedGovernmentSpec(
         source_name="inflection.government_do_sklep",
@@ -483,7 +502,7 @@ class _GeneralizedGovernmentRule:
 
     @property
     def behavior_version(self) -> str:
-        return _wave4_behavior(self._spec.behavior_stem, 4)
+        return _wave4_behavior(self._spec.behavior_stem, self._spec.behavior_major)
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
