@@ -77,6 +77,16 @@ _PRZYGLADAC_NOUN_TARGET_TAG: Final = "subst:sg:dat:m3"
 _NON_ADJECTIVE_LEMMAS: Final = frozenset(
     {"jaki", "który", "mój", "nasz", "taki", "ten", "twój", "wasz", "żaden"}
 )
+_GOVERNMENT_PRONOUN_LEMMAS: Final = frozenset(
+    {"mój", "mój:A", "nasz", "swój", "ten", "twój", "twój:A", "wasz"}
+)
+_GOVERNMENT_PRONOUN_QUALIFIED_AMBIGUITY: Final = (
+    "program",
+    "sg",
+    "gen",
+    "m3",
+    "programu",
+)
 _VERB_TAG_PREFIXES: Final = frozenset(
     {"fin", "ger", "impt", "imps", "inf", "pant", "pcon", "praet"}
 )
@@ -486,7 +496,10 @@ class _QualifiedMorfeusz:
             compatible_shapes = noun_shapes & adjective_shapes
             if len(compatible_shapes) != 1:
                 return None
-            if adjective_lemma in _NON_ADJECTIVE_LEMMAS:
+            if (
+                adjective_lemma in _NON_ADJECTIVE_LEMMAS
+                and adjective_lemma not in _GOVERNMENT_PRONOUN_LEMMAS
+            ):
                 return None
 
         try:
@@ -514,10 +527,19 @@ class _QualifiedMorfeusz:
             prefix="subst",
             feature=target_feature,
         )
-        if len(noun_forms) != 1:
+        noun_replacement = next(iter(noun_forms)) if len(noun_forms) == 1 else None
+        if (
+            noun_replacement is None
+            and adjective_lemma in _GOVERNMENT_PRONOUN_LEMMAS
+            and (noun_lemma, *target_feature, "programu")
+            == _GOVERNMENT_PRONOUN_QUALIFIED_AMBIGUITY
+            and noun_forms == {"programa", "programu"}
+        ):
+            noun_replacement = "programu"
+        if noun_replacement is None:
             return None
         if adjective_lemma is None:
-            return None, next(iter(noun_forms))
+            return None, noun_replacement
 
         adjective_forms = _government_forms_for_feature(
             adjective_rows or (),
@@ -525,9 +547,14 @@ class _QualifiedMorfeusz:
             prefix="adj",
             feature=target_feature,
         )
-        if len(adjective_forms) != 1:
+        if len(adjective_forms) == 1:
+            adjective_replacement = next(iter(adjective_forms))
+        elif adjective_input is not None and adjective_input in adjective_forms:
+            assert adjective is not None
+            adjective_replacement = adjective
+        else:
             return None
-        return next(iter(adjective_forms)), next(iter(noun_forms))
+        return adjective_replacement, noun_replacement
 
     @lru_cache(maxsize=8)  # noqa: B019 - bounded provider lifecycle cache
     def przygladac_sie_nowy_budynek_replacement(self) -> str | None:
