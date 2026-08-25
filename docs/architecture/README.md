@@ -30,6 +30,7 @@ późniejszy ADR.
 | [ADR-0021](decisions/0021-rule-catalog-ownership.md) | Zaakceptowany | `polis.rules` posiada kuratorowany katalog standardowych źródeł reguł |
 | [ADR-0022](decisions/0022-conservative-v1-product-scope.md) | Zaakceptowany | Konserwatywny zakres v1 i dokładna powłoka dowodowa zastępują szerszy plan runtime'u |
 | [ADR-0023](decisions/0023-evaluation-namespace-1-0.md) | Zaakceptowany | Pełna obecna przestrzeń `polis.evaluation` pozostaje zgodna przez 1.0 |
+| [ADR-0031](decisions/0031-polis-evaluation-distribution-through-1-0.md) | Zaakceptowany | Potwierdza pozostawienie `polis.evaluation` w artefakcie przez 1.0 |
 | [ADR-0024](decisions/0024-automatic-review-abstention-quality-contract.md) | Zaakceptowany | Kontrakt automatycznej korekty, przeglądu i abstencji dla jakości v1 |
 | [ADR-0025](decisions/0025-runtime-source-cohort-evolution.md) | Zaakceptowany | Niezmienna kohorta kwalifikacji i historyczny cel runtime 28 (cel runtime supersedowany przez ADR-0026) |
 | [ADR-0026](decisions/0026-runtime-source-cohort-umbrella-f.md) | Zaakceptowany | Docelowa kohorta runtime'u Umbrella F (`exact-ordered-59`) |
