@@ -784,7 +784,10 @@ def test_staging_cleanup_and_marker_failure_latch_process(
     ) -> int:
         if path == "holdout.publication.failed" and flags & os.O_CREAT:
             raise OSError("synthetic marker failure")
-        return original_open(path, flags, *args, dir_fd=dir_fd)
+        opened = original_open(path, flags, *args, dir_fd=dir_fd)
+        if not isinstance(opened, int):
+            raise TypeError("synthetic open returned a non-descriptor")
+        return opened
 
     def fail_staging_cleanup(path: str, *, dir_fd: int | None = None) -> None:
         if path.startswith(".holdout-staging."):
@@ -846,25 +849,27 @@ try:
 finally:
     workspace.close()
 """
-    process = subprocess.Popen(
-        [
-            sys.executable,
-            "-c",
-            script,
-            str(tmp_path),
-            str(experiment),
-        ],
-        stdout=subprocess.PIPE,
-        stdin=subprocess.PIPE,
-        text=True,
-        cwd=tmp_path,
-    )
+    process: subprocess.Popen[str] | None = None
     try:
         with secure_io._publication_lock(parent):
+            process = subprocess.Popen(
+                [
+                    sys.executable,
+                    "-c",
+                    script,
+                    str(tmp_path),
+                    str(experiment),
+                ],
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                text=True,
+                cwd=tmp_path,
+            )
             assert process.stdout is not None
             assert process.stdout.readline().strip() == "started"
             assert process.stdout.readline().strip() == "blocked"
             assert not (experiment / "normalized-report.json").exists()
+        assert process is not None
         assert process.stdout is not None
         assert process.stdout.readline().strip() == "ready"
         assert process.stdin is not None
@@ -872,7 +877,7 @@ finally:
         process.stdin.flush()
         assert process.wait(timeout=2) == 0
     finally:
-        if process.poll() is None:
+        if process is not None and process.poll() is None:
             process.terminate()
             process.wait(timeout=2)
         os.close(parent)
