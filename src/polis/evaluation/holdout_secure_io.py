@@ -57,6 +57,12 @@ _PERMANENT_FAILURE_NAME: Final = "holdout.publication.failed"
 _PUBLICATION_LOCK_NAME: Final = ".holdout.publication.lock"
 _MAX_METADATA_BYTES: Final = 1 << 20
 _PUBLICATION_LOCK: Final = Lock()
+_PUBLICATION_FAILURES: Final[set[tuple[int, int]]] = set()
+
+
+def _directory_identity(parent: int) -> tuple[int, int]:
+    metadata = os.fstat(parent)
+    return metadata.st_dev, metadata.st_ino
 
 
 @contextmanager
@@ -236,6 +242,8 @@ def _verify_published_destination(
 
 
 def _ensure_no_publication_failure(parent: int) -> None:
+    if _directory_identity(parent) in _PUBLICATION_FAILURES:
+        raise HoldoutAdmissionError("holdout publication has permanently failed")
     try:
         descriptor = os.open(
             _PERMANENT_FAILURE_NAME,
@@ -263,6 +271,7 @@ def _ensure_no_publication_failure(parent: int) -> None:
 
 
 def _write_publication_failure(parent: int, name: str) -> None:
+    _PUBLICATION_FAILURES.add(_directory_identity(parent))
     content = f"publication failed for {name}\n".encode()
     try:
         descriptor = os.open(

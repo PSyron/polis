@@ -768,6 +768,47 @@ def test_staging_cleanup_failure_is_permanent(
         workspace.close()
 
 
+def test_staging_cleanup_and_marker_failure_latch_process(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    original_open = secure_io.os.open
+    original_rmdir = secure_io.os.rmdir
+
+    def fail_marker_open(
+        path: str, flags: int, *args: object, dir_fd: int | None = None
+    ) -> int:
+        if path == "holdout.publication.failed" and flags & os.O_CREAT:
+            raise OSError("synthetic marker failure")
+        return original_open(path, flags, *args, dir_fd=dir_fd)
+
+    def fail_staging_cleanup(path: str, *, dir_fd: int | None = None) -> None:
+        if path.startswith(".holdout-staging."):
+            raise OSError("synthetic staging cleanup failure")
+        original_rmdir(path, dir_fd=dir_fd)
+
+    monkeypatch.setattr(secure_io.os, "open", fail_marker_open)
+    monkeypatch.setattr(secure_io.os, "rmdir", fail_staging_cleanup)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="staging cleanup"):
+            workspace.create_output("report.json", b"REPORT")
+    finally:
+        workspace.close()
+
+    second = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="permanent"):
+            second.create_output("normalized-report.json", b"BLOCKED")
+    finally:
+        second.close()
+    assert not (experiment / "normalized-report.json").exists()
+
+
 def test_publication_lock_serializes_processes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -777,6 +818,8 @@ def test_publication_lock_serializes_processes(
     monkeypatch.chdir(tmp_path)
     parent = os.open(experiment, os.O_RDONLY | os.O_DIRECTORY)
     script = """
+import fcntl
+import os
 import sys
 from pathlib import Path
 from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
@@ -784,6 +827,19 @@ from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 print("started", flush=True)
 workspace = SecureHoldoutWorkspace.open(Path(sys.argv[1]))
 try:
+    lock = os.open(
+        Path(sys.argv[2]) / ".holdout.publication.lock",
+        os.O_RDWR | os.O_NOFOLLOW,
+    )
+    try:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print("blocked", flush=True)
+        else:
+            print("not-blocked", flush=True)
+    finally:
+        os.close(lock)
     workspace.create_output("normalized-report.json", b"CHILD")
     print("ready", flush=True)
     input()
@@ -796,6 +852,7 @@ finally:
             "-c",
             script,
             str(tmp_path),
+            str(experiment),
         ],
         stdout=subprocess.PIPE,
         stdin=subprocess.PIPE,
@@ -806,6 +863,7 @@ finally:
         with secure_io._publication_lock(parent):
             assert process.stdout is not None
             assert process.stdout.readline().strip() == "started"
+            assert process.stdout.readline().strip() == "blocked"
             assert not (experiment / "normalized-report.json").exists()
         assert process.stdout is not None
         assert process.stdout.readline().strip() == "ready"
