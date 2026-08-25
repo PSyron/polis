@@ -53,6 +53,20 @@ class SecureFile:
     mode: str
 
 
+def _file_state(metadata: os.stat_result) -> tuple[int, ...]:
+    return (
+        *_file_identity(metadata),
+        metadata.st_mode,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+    )
+
+
+def _file_identity(metadata: os.stat_result) -> tuple[int, ...]:
+    return (metadata.st_dev, metadata.st_ino, metadata.st_nlink, metadata.st_mode)
+
+
 def _read_file(parent: int, name: str) -> SecureFile:
     try:
         descriptor = os.open(name, _secure_flags(directory=False), dir_fd=parent)
@@ -62,12 +76,15 @@ def _read_file(parent: int, name: str) -> SecureFile:
         before = os.fstat(descriptor)
         if not stat.S_ISREG(before.st_mode):
             raise HoldoutAdmissionError("secure holdout file is invalid")
+        if before.st_nlink != 1:
+            raise HoldoutAdmissionError("secure holdout file has multiple links")
+        before_state = _file_state(before)
         chunks: list[bytes] = []
         while chunk := os.read(descriptor, 65536):
             chunks.append(chunk)
         after = os.fstat(descriptor)
-        if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
-            raise HoldoutAdmissionError("secure holdout file identity changed")
+        if _file_state(after) != before_state:
+            raise HoldoutAdmissionError("secure holdout file changed during read")
         return SecureFile(b"".join(chunks), f"{stat.S_IMODE(before.st_mode):04o}")
     except OSError as error:
         raise HoldoutAdmissionError("secure holdout file read failed") from error
@@ -191,7 +208,12 @@ class SecureHoldoutWorkspace:
             return False
         except OSError as error:
             raise HoldoutAdmissionError("holdout output state is invalid") from error
-        os.close(descriptor)
+        try:
+            metadata = os.fstat(descriptor)
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+                raise HoldoutAdmissionError("holdout output state is invalid")
+        finally:
+            os.close(descriptor)
         return True
 
     def create_output(self, name: str, content: bytes) -> None:
@@ -206,10 +228,15 @@ class SecureHoldoutWorkspace:
                 0o600,
                 dir_fd=self._experiment,
             )
+            metadata = os.fstat(descriptor)
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1:
+                raise HoldoutAdmissionError("exclusive holdout output failed")
             offset = 0
             while offset < len(content):
                 offset += os.write(descriptor, content[offset:])
             os.fsync(descriptor)
+            if _file_identity(os.fstat(descriptor)) != _file_identity(metadata):
+                raise HoldoutAdmissionError("exclusive holdout output changed")
             os.fsync(self._experiment)
         except FileExistsError:
             raise

@@ -8,7 +8,14 @@ from threading import Barrier, Event
 import pytest
 
 from polis.evaluation.holdout_models import HoldoutAdmissionError
-from polis.evaluation.holdout_reservation import reserve_consumption
+from polis.evaluation.holdout_reservation import (
+    CANONICAL_MARKER,
+    HoldoutAlreadyConsumedError,
+    _CanonicalWorkspaceIdentity,
+    _ConsumptionCapability,
+    consume_consumption_capability,
+    reserve_consumption,
+)
 
 
 def _layout(root: Path) -> tuple[Path, Path]:
@@ -23,6 +30,20 @@ def _layout(root: Path) -> tuple[Path, Path]:
     (sealed / "run-authorization.sig").write_bytes(b"trusted-signature")
     (sealed / "cases.json").write_bytes(b"trusted-dataset")
     return experiment, sealed
+
+
+def _cleanup_capability(
+    capability: _ConsumptionCapability,
+    workspace_identity: _CanonicalWorkspaceIdentity,
+) -> None:
+    try:
+        consume_consumption_capability(
+            capability,
+            expected_marker=CANONICAL_MARKER,
+            expected_workspace_identity=workspace_identity,
+        )
+    except HoldoutAlreadyConsumedError:
+        return
 
 
 def test_open_workspace_keeps_config_and_outputs_on_verified_directory(
@@ -142,6 +163,7 @@ def test_capability_from_another_workspace_cannot_read_canonical_dataset(
             b"trusted-dataset"
         )
     finally:
+        _cleanup_capability(capability, issuing_workspace._reservation_workspace)
         reading_workspace.close()
         issuing_workspace.close()
 
