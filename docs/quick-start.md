@@ -50,6 +50,19 @@ konstrukcję `Analyzer`, 1,0 ms na pierwszą analizę oraz 0,047 ms na ciepłą 
 Wartości zależą od sprzętu i środowiska, ale konstrukcja ładuje stan dostawcy
 morfologii, a kolejne analizy korzystają z już zbudowanego rejestru reguł.
 
+Pomiar można odtworzyć z katalogu głównego repozytorium poleceniem poniżej:
+
+```shell
+uv run --locked --extra dev python -c 'import time; started = time.perf_counter(); import polis; imported = time.perf_counter(); from polis import Analyzer, AnalyzerConfig; construction_started = time.perf_counter(); analyzer = Analyzer(AnalyzerConfig()); constructed = time.perf_counter(); analyzer.analyze("Ona jestem tutaj."); first = time.perf_counter(); analyzer.analyze("Ona jestem tutaj."); warm = time.perf_counter(); print({"python_import_ms": round((imported - started) * 1000, 3), "analyzer_construction_ms": round((constructed - construction_started) * 1000, 3), "first_analysis_ms": round((first - constructed) * 1000, 3), "warm_analysis_ms": round((warm - first) * 1000, 3)})'
+```
+
+Metoda używa `time.perf_counter()` wewnątrz procesu: mierzy import, pierwszą
+konstrukcję po imporcie, pierwszą analizę i analizę ciepłą. Nie obejmuje startu
+interpretera ani przygotowania środowiska przez `uv`. Liczby referencyjne wyżej
+pochodzą z commit `bb842fe`, na macOS z CPython 3.13.12 i zainstalowanym
+`--extra dev`; wynik zależy od sprzętu, wersji Pythona oraz dostępności
+opcjonalnej morfologii.
+
 ```python
 from polis import Analyzer, AnalyzerConfig
 
