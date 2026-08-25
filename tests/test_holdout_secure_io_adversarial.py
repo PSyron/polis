@@ -5,7 +5,6 @@ import json
 import os
 import subprocess
 import sys
-import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
@@ -212,6 +211,41 @@ def test_reservation_marker_binds_source_tree_identity(
             (experiment / "holdout.started").read_text(encoding="utf-8")
         )
         assert marker["source_tree_sha256"] == "b" * 40
+    finally:
+        workspace.close()
+
+
+def test_result_manifest_binds_source_tree_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests.holdout_report_fixture import raw_report
+
+    from polis.evaluation.holdout_execution import _write_results
+    from polis.evaluation.holdout_report import parse_raw_report
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    config_document = json.loads(
+        (experiment / "config.json").read_text(encoding="utf-8")
+    )
+    config = parse_holdout_config(config_document)
+    raw = raw_report()
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        workspace.create_output("holdout.started", b"reserved\n")
+        _write_results(
+            workspace,
+            "holdout.started",
+            config,
+            _admission(),
+            raw,
+            parse_raw_report(raw),
+        )
+        result = json.loads(
+            workspace.read_output("result.manifest.json").decode("utf-8")
+        )
+        assert result["source_tree_sha256"] == "b" * 40
     finally:
         workspace.close()
 
@@ -742,19 +776,16 @@ def test_publication_lock_serializes_processes(
     experiment, _sealed = _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     parent = os.open(experiment, os.O_RDONLY | os.O_DIRECTORY)
-    ready = tmp_path / "publication-lock-ready"
-    started = tmp_path / "publication-lock-started"
     script = """
-import os
 import sys
 from pathlib import Path
 from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 
-Path(sys.argv[2]).write_text("started", encoding="utf-8")
+print("started", flush=True)
 workspace = SecureHoldoutWorkspace.open(Path(sys.argv[1]))
 try:
     workspace.create_output("normalized-report.json", b"CHILD")
-    Path(sys.argv[3]).write_text("ready", encoding="utf-8")
+    print("ready", flush=True)
     input()
 finally:
     workspace.close()
@@ -765,24 +796,19 @@ finally:
             "-c",
             script,
             str(tmp_path),
-            str(started),
-            str(ready),
         ],
+        stdout=subprocess.PIPE,
         stdin=subprocess.PIPE,
         text=True,
         cwd=tmp_path,
     )
     try:
         with secure_io._publication_lock(parent):
-            deadline = time.monotonic() + 2
-            while not started.exists() and time.monotonic() < deadline:
-                time.sleep(0.05)
-            assert started.exists()
-            assert not ready.exists()
-        deadline = time.monotonic() + 2
-        while not ready.exists() and time.monotonic() < deadline:
-            time.sleep(0.05)
-        assert ready.exists()
+            assert process.stdout is not None
+            assert process.stdout.readline().strip() == "started"
+            assert not (experiment / "normalized-report.json").exists()
+        assert process.stdout is not None
+        assert process.stdout.readline().strip() == "ready"
         assert process.stdin is not None
         process.stdin.write("\n")
         process.stdin.flush()
