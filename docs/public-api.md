@@ -109,8 +109,16 @@ korekt; pominięcie go zachowuje filtry z `config`.
 
 Automatycznie stosowane są tylko kwalifikowane, niekolidujące znaleziska
 deterministyczne. `apply_suggestions(finding_ids)` pozwala jawnie dołączyć
-wybrane pominięte znaleziska. Brak lokalnego uzasadnienia, konflikt lub ryzyko
-zmiany znaczenia oznaczają wstrzymanie korekty.
+wybrane pominięte znaleziska. `CorrectionResult.apply_all()` stosuje wszystkie
+znaleziska `skipped_findings`, korzystając z tej samej ścieżki walidacji i
+rozwiązywania kolizji co `apply_suggestions`; gdy nie ma pominiętych znalezisk,
+zwraca istniejące `corrected_text`. Brak lokalnego uzasadnienia, konflikt lub
+ryzyko zmiany znaczenia oznaczają wstrzymanie korekty.
+
+Znaleziska `review-only` nie są zakwalifikowane do automatyzacji. `apply_all()`
+jest świadomą decyzją konsumenta i stosuje takie sugestie na jego własną
+odpowiedzialność; konflikt nadal zgłasza ten sam kontrolowany błąd co jawny
+wybór.
 
 `Analyzer.correct(text)` jest metodą synchroniczną i należy ją wywoływać poza
 działającą pętlą zdarzeń. W kodzie asynchronicznym należy użyć

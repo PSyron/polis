@@ -145,6 +145,42 @@ def test_fixture_captures_exact_runtime_findings_and_safe_application() -> None:
                 result.apply(tuple(issue.id for issue in result.issues))
 
 
+def test_apply_all_corrects_the_canonical_review_only_sentence() -> None:
+    result = Analyzer(AnalyzerConfig()).correct(
+        "Napewno przyjdę conajmniej na godzinę."
+    )
+
+    assert result.corrected_text == result.original_text
+    assert result.apply_all() == "Na pewno przyjdę co najmniej na godzinę."
+
+
+def test_apply_all_matches_explicit_selection_across_conservative_corpus() -> None:
+    analyzer = Analyzer(AnalyzerConfig())
+
+    for case in _load_cases():
+        result = analyzer.correct(case["input"])
+        selected_ids = tuple(finding.id for finding in result.skipped_findings)
+
+        if case.get("overlap"):
+            with pytest.raises(CorrectionConflictError) as explicit_error:
+                result.apply_suggestions(selected_ids)
+            with pytest.raises(CorrectionConflictError) as apply_all_error:
+                result.apply_all()
+            assert apply_all_error.value.code == explicit_error.value.code
+            assert apply_all_error.value.context == explicit_error.value.context
+        else:
+            assert result.apply_all() == result.apply_suggestions(selected_ids)
+
+
+def test_apply_all_returns_existing_corrected_text_when_no_findings_are_skipped() -> (
+    None
+):
+    result = Analyzer(AnalyzerConfig()).correct("To jest poprawne zdanie.")
+
+    assert result.skipped_findings == ()
+    assert result.apply_all() == result.corrected_text
+
+
 def test_fixture_contains_required_conservative_abstentions() -> None:
     abstentions = {
         case["input"]: case for case in _load_cases() if case["kind"] == "abstain"

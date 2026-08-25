@@ -331,6 +331,13 @@ class CorrectionResult:
             ),
         )
 
+    def apply_all(self) -> str:
+        """Apply all skipped review-only suggestions with automatic findings."""
+
+        if not self.skipped_findings:
+            return self.corrected_text
+        return self.apply_suggestions(finding.id for finding in self.skipped_findings)
+
 
 class Analyzer:
     """Thin runtime analyzer composed only from conservative v1 rules."""

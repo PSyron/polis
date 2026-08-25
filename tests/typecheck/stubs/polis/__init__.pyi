@@ -51,6 +51,7 @@ class CorrectionResult:
     suggestion_outcomes: tuple[SuggestionOutcome, ...]
     source_policy_version: str
     def apply_suggestions(self, finding_ids: Iterable[str]) -> str: ...
+    def apply_all(self) -> str: ...
 
 SuggestionStatus = Literal["complete", "unavailable", "timed_out", "invalid_response"]
 

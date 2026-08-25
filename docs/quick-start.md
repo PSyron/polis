@@ -13,12 +13,11 @@ assert correction.corrected_text == "Żeby jutro, powiem o tym."
 `analysis.issues` zawiera `Finding` z kategorią, opisem, minimalną sugestią,
 źródłem, pewnością oraz zakresem `[start, end)`. `correct()` zwraca
 `CorrectionResult`; korekta automatyczna obejmuje tylko niekolidujące,
-zakwalifikowane zachowania. Wybór pozostałej sugestii jest jawny:
+zakwalifikowane zachowania. Wszystkie pominięte sugestie można zastosować
+świadomie jednym wywołaniem:
 
 ```python
-reviewed = correction.apply_suggestions(
-    [finding.id for finding in correction.skipped_findings]
-)
+reviewed = correction.apply_all()
 ```
 
 Funkcje modułowe są wygodne dla pojedynczych wywołań i pamiętają analizator
@@ -32,6 +31,10 @@ analyzer = Analyzer(AnalyzerConfig())
 analysis = analyzer.analyze("Ona jestem tutaj.")
 correction = analyzer.correct("Zeby jutro,powiem o tym.")
 ```
+
+`apply_all()` obejmuje także znaleziska `review-only`, które nie są
+zakwalifikowane do automatycznej korekty. Stosuj je na własną odpowiedzialność;
+aby wybrać tylko część sugestii, użyj `apply_suggestions(finding_ids)`.
 
 Konfiguracja z pliku jest lokalna:
 
