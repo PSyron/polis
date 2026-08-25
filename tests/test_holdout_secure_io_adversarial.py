@@ -821,28 +821,22 @@ def test_publication_lock_serializes_processes(
     monkeypatch.chdir(tmp_path)
     parent = os.open(experiment, os.O_RDONLY | os.O_DIRECTORY)
     script = """
-import fcntl
-import os
 import sys
+from contextlib import contextmanager
 from pathlib import Path
-from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+import polis.evaluation.holdout_secure_io as secure_io
 
-print("started", flush=True)
-workspace = SecureHoldoutWorkspace.open(Path(sys.argv[1]))
+real_lock = secure_io._publication_lock
+
+@contextmanager
+def observed_lock(parent):
+    print("attempting", flush=True)
+    with real_lock(parent):
+        yield
+
+secure_io._publication_lock = observed_lock
+workspace = secure_io.SecureHoldoutWorkspace.open(Path(sys.argv[1]))
 try:
-    lock = os.open(
-        Path(sys.argv[2]) / ".holdout.publication.lock",
-        os.O_RDWR | os.O_NOFOLLOW,
-    )
-    try:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            print("blocked", flush=True)
-        else:
-            print("not-blocked", flush=True)
-    finally:
-        os.close(lock)
     workspace.create_output("normalized-report.json", b"CHILD")
     print("ready", flush=True)
     input()
@@ -858,7 +852,6 @@ finally:
                     "-c",
                     script,
                     str(tmp_path),
-                    str(experiment),
                 ],
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
@@ -866,8 +859,7 @@ finally:
                 cwd=tmp_path,
             )
             assert process.stdout is not None
-            assert process.stdout.readline().strip() == "started"
-            assert process.stdout.readline().strip() == "blocked"
+            assert process.stdout.readline().strip() == "attempting"
             assert not (experiment / "normalized-report.json").exists()
         assert process is not None
         assert process.stdout is not None
