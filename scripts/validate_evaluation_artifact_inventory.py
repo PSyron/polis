@@ -224,9 +224,15 @@ def main(argv: list[str] | None = None) -> int:
         description="Validate issue-428 regression artifact naming and parity."
     )
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
+    parser.add_argument("--inventory", type=Path)
     args = parser.parse_args(argv)
-    errors = validate_inventory(args.root.resolve(), args.inventory.resolve())
+    root = args.root.resolve()
+    inventory = (
+        args.inventory.resolve()
+        if args.inventory is not None
+        else root / DEFAULT_INVENTORY.relative_to(ROOT)
+    )
+    errors = validate_inventory(root, inventory)
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
