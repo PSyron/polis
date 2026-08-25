@@ -35,6 +35,7 @@ def _write_manifest(
     *,
     extractor_overrides: dict[str, object] | None = None,
     source_overrides: dict[str, object] | None = None,
+    selection_overrides: dict[str, object] | None = None,
 ) -> None:
     source: dict[str, object] = {
         "name": "WikEd Error Corpus",
@@ -49,10 +50,25 @@ def _write_manifest(
     }
     if source_overrides is not None:
         source.update(source_overrides)
+    selection: dict[str, object] = {
+        "target_categories": [
+            "inflection",
+            "agreement",
+            "rection",
+            "punctuation",
+        ],
+        "classification_source": "external-human-reviewed-line-map",
+        "review_required": True,
+        "unclassified_action": "reject",
+    }
+    if selection_overrides is not None:
+        selection.update(selection_overrides)
     extractor: dict[str, object] = {
         "tool": "snukky/wikiedits",
         "wikiedits_version": "2.0",
+        "revision": None,
         "parameters": ExtractionParameters().as_dict(),
+        "input_format": "UTF-8 tab-separated old/new pairs in a named archive member",
     }
     if extractor_overrides is not None:
         extractor.update(extractor_overrides)
@@ -66,6 +82,7 @@ def _write_manifest(
                 "status": "blocked_external_authority",
                 "source": source,
                 "extractor": extractor,
+                "selection": selection,
             }
         ),
         encoding="utf-8",
@@ -415,6 +432,8 @@ def test_archive_parent_race_requires_descriptor_relative_open(
         ("tool", "untrusted/wikiedits"),
         ("wikiedits_version", "different"),
         ("parameters", {"language": "not-polish"}),
+        ("revision", "attacker-revision"),
+        ("input_format", "attacker-format"),
     ],
 )
 def test_archive_extraction_rejects_manifest_extractor_drift(
@@ -459,6 +478,32 @@ def test_archive_extraction_rejects_manifest_source_drift(
         )
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("target_categories", ["style"]),
+        ("classification_source", "unreviewed-input"),
+        ("review_required", False),
+        ("unclassified_action", "accept"),
+    ],
+)
+def test_archive_extraction_rejects_manifest_selection_drift(
+    field: str, value: object, tmp_path: Path
+) -> None:
+    repository = tmp_path / "repository"
+    _write_manifest(repository, selection_overrides={field: value})
+
+    with pytest.raises(WikEdProtocolError, match="manifest selection"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={},
+            repository_root=repository,
+        )
+
+
 def test_manifest_symlink_is_rejected_before_archive_open(tmp_path: Path) -> None:
     repository = tmp_path / "repository"
     _write_manifest(repository)
@@ -467,6 +512,26 @@ def test_manifest_symlink_is_rejected_before_archive_open(tmp_path: Path) -> Non
     replacement.write_bytes(manifest_path.read_bytes())
     manifest_path.unlink()
     manifest_path.symlink_to(replacement)
+
+    with pytest.raises(WikEdProtocolError, match="manifest is unavailable"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={},
+            repository_root=repository,
+        )
+
+
+def test_manifest_symlinked_parent_is_rejected_before_archive_open(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    _write_manifest(repository)
+    real_docs = tmp_path / "real-docs"
+    (repository / "docs").rename(real_docs)
+    (repository / "docs").symlink_to(real_docs, target_is_directory=True)
 
     with pytest.raises(WikEdProtocolError, match="manifest is unavailable"):
         extract_archive(
@@ -542,32 +607,25 @@ def test_archive_hash_and_parse_use_the_same_immutable_snapshot(
             mutate_in_place()
         return snapshot
 
-    original_digest = protocol._descriptor_digest
-    digest_calls = 0
-
-    def digest_then_mutate(descriptor: int) -> tuple[int, str]:
-        nonlocal digest_calls
-        result = cast(tuple[int, str], original_digest(descriptor))
-        if digest_calls == 0:
-            mutate_in_place()
-        digest_calls += 1
-        return result
-
     monkeypatch.setattr(protocol, "_read_descriptor", read_snapshot_then_mutate)
-    monkeypatch.setattr(protocol, "_descriptor_digest", digest_then_mutate)
+    authority = _SyntheticAuthority()
     result = extract_archive(
         archive,
         tmp_path / "output",
         expected_archive_sha256=digest,
         member_name="pairs.tsv",
-        classifications={1: ("agreement", "development", True)},
+        classifications={1: ("agreement", "holdout", True)},
         repository_root=repository,
+        authority=authority,
     )
 
-    development = (tmp_path / "output" / "development.jsonl").read_text()
+    holdout = (tmp_path / "output" / "holdout.jsonl").read_text()
     assert result.archive_sha256 == digest
-    assert '"old":"synthetic old"' in development
-    assert "replacement old" not in development
+    assert '"old":"synthetic old"' in holdout
+    assert "replacement old" not in holdout
+    assert authority.reservations == [
+        protocol.HoldoutReservationRequest(digest, "pairs.tsv")
+    ]
 
 
 def test_archive_parent_replacement_is_rejected_before_pathname_escape(
