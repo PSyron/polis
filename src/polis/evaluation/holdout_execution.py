@@ -59,6 +59,7 @@ def _write_results(
         "config_sha256": admission.evidence.config_sha256,
         "dataset_sha256": admission.evidence.dataset_sha256,
         "source_sha256": admission.evidence.source_sha256,
+        "source_tree_sha256": admission.evidence.source_tree_sha256,
         "verification_payload_sha256": admission.evidence.verification_payload_sha256,
         "marker_sha256": hashlib.sha256(workspace.read_output(marker_name)).hexdigest(),
         "raw_report_sha256": hashlib.sha256(raw_bytes).hexdigest(),

@@ -3,6 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
+import sys
+import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
@@ -683,6 +686,84 @@ def test_post_publication_failure_removes_temporary_hardlink_and_syncs_parent(
     assert marker.stat().st_nlink == 1
     assert not list(experiment.glob(".holdout.started.*"))
     assert parent_syncs
+
+
+def test_staging_cleanup_failure_is_permanent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    original_rmdir = secure_io.os.rmdir
+
+    def fail_staging_cleanup(path: str, *, dir_fd: int | None = None) -> None:
+        if path.startswith(".holdout-staging."):
+            raise OSError("synthetic staging cleanup failure")
+        original_rmdir(path, dir_fd=dir_fd)
+
+    monkeypatch.setattr(secure_io.os, "rmdir", fail_staging_cleanup)
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="staging cleanup"):
+            workspace.create_output("report.json", b"REPORT")
+        assert (experiment / "holdout.publication.failed").exists()
+        with pytest.raises(HoldoutAdmissionError, match="permanent"):
+            workspace.create_output("normalized-report.json", b"BLOCKED")
+    finally:
+        workspace.close()
+
+
+def test_publication_lock_serializes_processes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import polis.evaluation.holdout_secure_io as secure_io
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    parent = os.open(experiment, os.O_RDONLY | os.O_DIRECTORY)
+    ready = tmp_path / "publication-lock-ready"
+    script = """
+import os
+import sys
+from pathlib import Path
+from polis.evaluation.holdout_secure_io import _publication_lock
+
+parent = os.open(sys.argv[1], os.O_RDONLY | os.O_DIRECTORY)
+with _publication_lock(parent):
+    Path(sys.argv[2]).write_text("ready", encoding="utf-8")
+    input()
+os.close(parent)
+"""
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            script,
+            str(experiment),
+            str(ready),
+        ],
+        stdin=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        with secure_io._publication_lock(parent):
+            time.sleep(0.2)
+            assert not ready.exists()
+        deadline = time.monotonic() + 2
+        while not ready.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert ready.exists()
+        assert process.stdin is not None
+        process.stdin.write("\n")
+        process.stdin.flush()
+        assert process.wait(timeout=2) == 0
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            process.wait(timeout=2)
+        os.close(parent)
 
 
 def test_create_output_keeps_published_marker_after_post_publication_fsync_failure(

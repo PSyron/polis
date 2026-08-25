@@ -5,6 +5,7 @@ import hashlib
 import os
 import secrets
 import stat
+import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -653,6 +654,7 @@ class SecureHoldoutWorkspace:
                 else "",
                 "config_sha256": expected_evidence.config_sha256,
                 "source_sha256": expected_evidence.source_sha256,
+                "source_tree_sha256": expected_evidence.source_tree_sha256,
                 "dataset_sha256": expected_evidence.dataset_sha256,
                 "merge_commit": expected_evidence.merge_commit,
                 "verification_verified": expected_evidence.verification_verified,
@@ -875,12 +877,23 @@ class SecureHoldoutWorkspace:
                         "exclusive holdout output close failed"
                     ) from error
             if staging is not None:
+                active_error = sys.exc_info()[1]
                 try:
                     os.close(staging)
                     os.rmdir(staging_name, dir_fd=self._experiment)
                     _fsync_directory(self._experiment)
-                except OSError:
-                    pass
+                except OSError as error:
+                    try:
+                        _write_publication_failure(self._experiment, name)
+                    except HoldoutAdmissionError as marker_error:
+                        if active_error is None:
+                            raise HoldoutAdmissionError(
+                                "holdout staging cleanup failed"
+                            ) from marker_error
+                    if active_error is None:
+                        raise HoldoutAdmissionError(
+                            "holdout staging cleanup failed"
+                        ) from error
 
     def close(self) -> None:
         with self._lifecycle_lock:
