@@ -197,6 +197,25 @@ def test_reserve_rejects_caller_forged_admission_with_matching_evidence(
     assert not (tmp_path / "experiments/a-b-one-shot/holdout.started").exists()
 
 
+def test_reservation_marker_binds_source_tree_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    experiment, _sealed = _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    try:
+        workspace.bind_approved_dataset_identity()
+        workspace.reserve_dataset(_admission(), reserved_at="2026-08-25T00:00:00Z")
+        marker = json.loads(
+            (experiment / "holdout.started").read_text(encoding="utf-8")
+        )
+        assert marker["source_tree_sha256"] == "b" * 40
+    finally:
+        workspace.close()
+
+
 @pytest.mark.parametrize("reader", ["output", "evidence", "dataset"])
 def test_workspace_rejects_hardlinked_sensitive_file(
     reader: Literal["output", "evidence", "dataset"],
@@ -724,32 +743,41 @@ def test_publication_lock_serializes_processes(
     monkeypatch.chdir(tmp_path)
     parent = os.open(experiment, os.O_RDONLY | os.O_DIRECTORY)
     ready = tmp_path / "publication-lock-ready"
+    started = tmp_path / "publication-lock-started"
     script = """
 import os
 import sys
 from pathlib import Path
-from polis.evaluation.holdout_secure_io import _publication_lock
+from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 
-parent = os.open(sys.argv[1], os.O_RDONLY | os.O_DIRECTORY)
-with _publication_lock(parent):
-    Path(sys.argv[2]).write_text("ready", encoding="utf-8")
+Path(sys.argv[2]).write_text("started", encoding="utf-8")
+workspace = SecureHoldoutWorkspace.open(Path(sys.argv[1]))
+try:
+    workspace.create_output("normalized-report.json", b"CHILD")
+    Path(sys.argv[3]).write_text("ready", encoding="utf-8")
     input()
-os.close(parent)
+finally:
+    workspace.close()
 """
     process = subprocess.Popen(
         [
             sys.executable,
             "-c",
             script,
-            str(experiment),
+            str(tmp_path),
+            str(started),
             str(ready),
         ],
         stdin=subprocess.PIPE,
         text=True,
+        cwd=tmp_path,
     )
     try:
         with secure_io._publication_lock(parent):
-            time.sleep(0.2)
+            deadline = time.monotonic() + 2
+            while not started.exists() and time.monotonic() < deadline:
+                time.sleep(0.05)
+            assert started.exists()
             assert not ready.exists()
         deadline = time.monotonic() + 2
         while not ready.exists() and time.monotonic() < deadline:
