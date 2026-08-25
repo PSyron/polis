@@ -52,6 +52,12 @@ def module_level_correct() -> str:
     return polis.correct("Zeby zacząć, przyjdź jutro.").corrected_text
 
 
+def correction_result_applies_all_review_only_findings(
+    result: polis.CorrectionResult,
+) -> str:
+    return result.apply_all()
+
+
 def correction_result_exposes_active_policy_identity(
     result: polis.CorrectionResult,
 ) -> bool:

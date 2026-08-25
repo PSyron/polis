@@ -167,6 +167,25 @@ def test_analyzer_result_is_explicitly_compatible_with_public_result_type() -> N
         assert signature in examples
 
 
+def test_correction_result_contract_covers_review_only_opt_in() -> None:
+    stub_tree = ast.parse(API_STUB.read_text(encoding="utf-8"))
+    correction_result = next(
+        node
+        for node in stub_tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "CorrectionResult"
+    )
+
+    assert any(
+        isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "apply_all"
+        for node in correction_result.body
+    )
+
+    examples = EXAMPLES.read_text(encoding="utf-8")
+    assert "def correction_result_applies_all_review_only_findings(" in examples
+    assert "return result.apply_all()" in examples
+
+
 def test_adr_uses_the_portable_type_contract_command() -> None:
     adr = ADR.read_text(encoding="utf-8")
 
