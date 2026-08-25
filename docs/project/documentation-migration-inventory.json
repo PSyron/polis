@@ -248,7 +248,8 @@
         "docs/architecture/decisions/0027-isolated-runtime-performance-protocol.md",
         "docs/architecture/decisions/0028-conservative-v1-rule-coverage-contract.md",
         "docs/architecture/decisions/0029-rule-coverage-contract-validator-hardening.md",
-        "docs/architecture/decisions/0030-rule-coverage-authority-and-applicability-clarification.md"
+        "docs/architecture/decisions/0030-rule-coverage-authority-and-applicability-clarification.md",
+        "docs/architecture/decisions/0031-analyzer-legacy-process-counter-removal.md"
       ],
       "prefixes": []
     },

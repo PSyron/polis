@@ -82,9 +82,11 @@ Deterministyczne wykonanie bez opcjonalnego backendu zwraca pustą krotkę
 wyników. Ewentualne usunięcie tych członków może nastąpić dopiero w 1.0 wraz z
 jawnymi release notes i przykładem migracji.
 
-Publiczne członki cyklu życia `Analyzer.close()`, `Analyzer.__enter__()` i
-`Analyzer.__exit__()` pozostają przez całą linię 0.x. Po usunięciu posiadanego
-procesu ich bezpieczne zachowanie jest no-op. `Analyzer.analyze_async()`,
+Publiczne członki cyklu życia `Analyzer.close()`, `Analyzer.__enter__()`,
+`Analyzer.__exit__()` i `Analyzer.language_tool_process_start_count` pozostają
+przez całą linię 0.x. Po usunięciu posiadanego procesu ich bezpieczne zachowanie
+jest no-op, a licznik zwraca `0`. Usunięcie może nastąpić dopiero w 1.0 wraz z
+jawnymi release notes i migracją. `Analyzer.analyze_async()`,
 `Analyzer.correct_async()` i `Analyzer.from_config()` pozostają zwykłymi
 publicznymi punktami wejścia.
 

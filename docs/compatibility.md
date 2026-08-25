@@ -96,3 +96,6 @@ nie tworzy takich znalezisk ani wywołań.
 
 Obecną granicę produktu przyjmuje
 [ADR-0022](architecture/decisions/0022-conservative-v1-product-scope.md).
+Usunięcie historycznego licznika procesu z publicznego `Analyzer` opisuje
+[ADR-0031](architecture/decisions/0031-analyzer-legacy-process-counter-removal.md);
+ADR-0022 pozostaje niezmienionym zapisem historycznej decyzji.

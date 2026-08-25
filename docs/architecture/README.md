@@ -37,6 +37,7 @@ późniejszy ADR.
 | [ADR-0028](decisions/0028-conservative-v1-rule-coverage-contract.md) | Zaakceptowany | Kontrakt pokrycia reguł konserwatywnego runtime'u v1 |
 | [ADR-0029](decisions/0029-rule-coverage-contract-validator-hardening.md) | Zaakceptowany | Utwardzenie validatora kontraktu pokrycia reguł |
 | [ADR-0030](decisions/0030-rule-coverage-authority-and-applicability-clarification.md) | Zaakceptowany | Podstawy normatywne, kandydackie i aplikowalność stratum pokrycia reguł |
+| [ADR-0031](decisions/0031-analyzer-legacy-process-counter-removal.md) | Zaakceptowany | Usunięcie historycznego licznika procesu z publicznego `Analyzer` |
 
 [Granica protokołów runtime'u v1](protocols.md) opisuje punkty rozdziału
 implementacji zgodne z zaakceptowanym kontraktem publicznego API.
@@ -50,3 +51,5 @@ pomiar wydajności runtime'u).
 Kontrakt pokrycia kategorii i dowodów opisuje ADR-0028.
 Wykonywanie i fail-closed validatora tego kontraktu doprecyzowuje ADR-0029.
 Podstawy normatywne i kandydackie oraz maszynową aplikowalność stratum doprecyzowuje ADR-0030.
+Usunięcie historycznego licznika procesu z publicznego `Analyzer` opisuje ADR-0031;
+ADR-0022 pozostaje niezmienionym zapisem szerszego zakresu produktu v1.
