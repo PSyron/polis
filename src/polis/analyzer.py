@@ -348,12 +348,6 @@ class Analyzer:
         return cls(AnalyzerConfig.from_config(path))
 
     @property
-    def language_tool_process_start_count(self) -> int:
-        """Return zero because the conservative v1 analyzer owns no process."""
-
-        return 0
-
-    @property
     def morphology_status(self) -> MorphologyStatus:
         """Return the immutable morphology-provider state observed at construction."""
 

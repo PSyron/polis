@@ -89,11 +89,10 @@ utrzymuje dokładną, uporządkowaną 18-elementową listę
 korpusów i funkcje kontroli izolacji korpusów. To zobowiązanie importowe nie
 zmienia aktywnej bramki jakości: runtime v1 pozostaje przy konserwatywnym
 korpusie dziesięciu reguł, bliskich negatywach i trzech wstrzymaniach.
-`Analyzer.close()`, menedżer kontekstu i
-`language_tool_process_start_count` pozostają dla zgodności 0.x; runtime v1 nie
-posiada procesu, więc licznik zwraca `0`, a zamknięcie jest no-op. Dane
-historycznego schematu zachowują `SourceKind.LLM` oraz typy wyników sugestii,
-ale wspierany runtime v1 nie tworzy takich znalezisk ani wywołań.
+`Analyzer.close()` i menedżer kontekstu pozostają dla zgodności 0.x; runtime v1
+nie posiada procesu, więc zamknięcie jest no-op. Dane historycznego schematu
+zachowują `SourceKind.LLM` oraz typy wyników sugestii, ale wspierany runtime v1
+nie tworzy takich znalezisk ani wywołań.
 
 Obecną granicę produktu przyjmuje
 [ADR-0022](architecture/decisions/0022-conservative-v1-product-scope.md).

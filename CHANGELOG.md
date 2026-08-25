@@ -30,6 +30,12 @@
   workflow, zainstalowane moduły publiczne, instalację offline i wykluczenie
   materiałów dostępnych wyłącznie w repozytorium.
 
+### Zmiany łamiące
+
+- Usunięto `Analyzer.language_tool_process_start_count` z publicznego API;
+  runtime v1 nie uruchamia procesu LanguageTool i nie udostępnia już tego
+  historycznego licznika.
+
 ### Decyzja o wydaniu
 
 - Następnym zamierzonym wydaniem runtime'u jest `0.3.0`. Przyrost minor zapisuje

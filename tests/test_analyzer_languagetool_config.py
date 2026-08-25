@@ -78,7 +78,6 @@ def test_analyzer_no_longer_accepts_injected_optional_routes(argument: str) -> N
 def test_default_analyzer_owns_no_process_and_lifecycle_is_a_no_op() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
-    assert analyzer.language_tool_process_start_count == 0
     analyzer.close()
     analyzer.close()
 

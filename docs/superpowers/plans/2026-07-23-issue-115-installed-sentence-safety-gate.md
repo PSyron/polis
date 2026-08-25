@@ -190,7 +190,7 @@ git commit --amend --no-edit
 
 **Interfaces:**
 - Consumes: public `Analyzer`, `CorrectionResult`, and source-policy version `1.1`.
-- Produces: persistent request schema `1`, response schema `1`, and `Analyzer.language_tool_process_start_count: int`.
+- Produces: persistent request schema `1` and response schema `1`.
 
 - [ ] **Step 1: Write failing analyzer and runner tests**
 
@@ -206,9 +206,7 @@ def test_analyzer_exposes_only_owned_process_start_count(
         )
     )
 
-    assert analyzer.language_tool_process_start_count == 0
     session.process_start_count = 1
-    assert analyzer.language_tool_process_start_count == 1
 
 
 def test_runner_rejects_more_than_one_sentence() -> None:
@@ -236,19 +234,10 @@ uv run pytest tests/test_analyzer_languagetool_config.py \
 
 Expected: analyzer property and runner module are missing.
 
-- [ ] **Step 3: Restore the minimal read-only analyzer diagnostic**
-
-```python
-@property
-def language_tool_process_start_count(self) -> int:
-    """Return starts of the analyzer-owned vendored LanguageTool process."""
-
-    session = self._owned_language_tool_session
-    return 0 if session is None else session.process_start_count
-```
+- [ ] **Step 3: Keep process diagnostics internal**
 
 Do not expose child PID, commands, paths, analyzed text, or mutable session
-state.
+state through the public analyzer API.
 
 - [ ] **Step 4: Selectively port and rename the installed runner**
 
