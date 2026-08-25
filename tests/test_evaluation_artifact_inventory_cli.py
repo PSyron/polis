@@ -15,7 +15,7 @@ def test_cli_uses_inventory_under_custom_root(tmp_path: Path) -> None:
         tmp_path / "docs" / "project" / "evaluation-artifact-inventory.json"
     )
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-    inventory["aliases"][0]["canonical"] = "docs/../../outside.json"
+    inventory["aliases"][0]["legacy_sha256"] = "0" * 64
     inventory_path.write_text(
         json.dumps(inventory, ensure_ascii=True, indent=2) + "\n", encoding="utf-8"
     )
@@ -32,4 +32,4 @@ def test_cli_uses_inventory_under_custom_root(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 1
-    assert "canonical path escapes root/docs" in result.stderr
+    assert "legacy artifact bytes changed" in result.stderr

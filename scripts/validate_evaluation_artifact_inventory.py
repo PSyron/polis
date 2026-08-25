@@ -10,28 +10,30 @@ import sys
 from pathlib import Path
 from typing import Any, Final
 
+try:
+    from scripts.evaluation_artifact_inventory_contract import (
+        ALIAS_KEYS,
+        CANONICAL_SCHEMA_IDS,
+        EXPECTED_ALIAS_UNIVERSE,
+        INVENTORY_KEYS,
+        KINDS,
+        LEGACY_SCHEMA_IDS,
+    )
+except ModuleNotFoundError:
+    from evaluation_artifact_inventory_contract import (
+        ALIAS_KEYS,
+        CANONICAL_SCHEMA_IDS,
+        EXPECTED_ALIAS_UNIVERSE,
+        INVENTORY_KEYS,
+        KINDS,
+        LEGACY_SCHEMA_IDS,
+    )
+
 ROOT: Final[Path] = Path(__file__).resolve().parents[1]
-DEFAULT_INVENTORY: Final[Path] = (
-    ROOT / "docs" / "project" / "evaluation-artifact-inventory.json"
+_INVENTORY_RELATIVE: Final[Path] = Path(
+    "docs/project/evaluation-artifact-inventory.json"
 )
-_INVENTORY_KEYS: Final[frozenset[str]] = frozenset(
-    {
-        "schema_id",
-        "schema_version",
-        "issue",
-        "purpose",
-        "legacy_alias_policy",
-        "schema_ids",
-        "legacy_schema_ids",
-        "aliases",
-    }
-)
-_ALIAS_KEYS: Final[frozenset[str]] = frozenset(
-    {"kind", "canonical", "legacy", "legacy_sha256"}
-)
-_KINDS: Final[frozenset[str]] = frozenset(
-    {"baseline", "result", "comparison", "threshold"}
-)
+DEFAULT_INVENTORY: Final[Path] = ROOT / _INVENTORY_RELATIVE
 
 
 def _numeric_values(value: Any) -> tuple[tuple[str, int | float], ...]:
@@ -48,9 +50,30 @@ def _numeric_values(value: Any) -> tuple[tuple[str, int | float], ...]:
     return ()
 
 
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def _has_expected_alias_universe(
+    alias_universe: list[tuple[str, str, str]],
+) -> bool:
+    return (
+        len(alias_universe) == len(EXPECTED_ALIAS_UNIVERSE)
+        and frozenset(alias_universe) == EXPECTED_ALIAS_UNIVERSE
+    )
+
+
 def _load_json(path: Path, label: str) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
     except (OSError, json.JSONDecodeError) as error:
         raise ValueError(f"cannot load {label}: {path}") from error
 
@@ -72,11 +95,13 @@ def _resolve_docs_path(root: Path, value: str) -> Path | None:
         return None
 
 
-def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
+def load_inventory(
+    path: Path = DEFAULT_INVENTORY, *, enforce_alias_universe: bool = True
+) -> dict[str, Any]:
     """Load the strict issue-428 artifact inventory."""
 
     raw = _load_json(path, "evaluation artifact inventory")
-    if not isinstance(raw, dict) or set(raw) != _INVENTORY_KEYS:
+    if not isinstance(raw, dict) or set(raw) != INVENTORY_KEYS:
         raise ValueError("evaluation artifact inventory has invalid top-level keys")
     if raw["schema_id"] != "polis.evaluation-artifact-inventory":
         raise ValueError("evaluation artifact inventory schema_id is invalid")
@@ -89,20 +114,27 @@ def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
         or not raw["legacy_alias_policy"].strip()
     ):
         raise ValueError("evaluation artifact inventory alias policy is blank")
+    expected_schema_ids = {
+        "schema_ids": CANONICAL_SCHEMA_IDS,
+        "legacy_schema_ids": LEGACY_SCHEMA_IDS,
+    }
     for field in ("schema_ids", "legacy_schema_ids"):
         values = raw[field]
-        if not isinstance(values, dict) or set(values) != _KINDS:
+        if not isinstance(values, dict) or set(values) != KINDS:
             raise ValueError(f"evaluation artifact inventory {field} is incomplete")
         if any(not isinstance(value, str) or not value for value in values.values()):
             raise ValueError(f"evaluation artifact inventory {field} has blank ids")
+        if frozenset(values.items()) != expected_schema_ids[field]:
+            raise ValueError(f"evaluation artifact inventory {field} is invalid")
     aliases = raw["aliases"]
     if not isinstance(aliases, list) or not aliases:
         raise ValueError("evaluation artifact inventory aliases are missing")
+    alias_universe: list[tuple[str, str, str]] = []
     for index, alias in enumerate(aliases):
-        if not isinstance(alias, dict) or set(alias) != _ALIAS_KEYS:
+        if not isinstance(alias, dict) or set(alias) != ALIAS_KEYS:
             raise ValueError(f"artifact alias {index} has invalid fields")
         kind = alias["kind"]
-        if not isinstance(kind, str) or kind not in _KINDS:
+        if not isinstance(kind, str) or kind not in KINDS:
             raise ValueError(f"artifact alias {index} has an unknown kind")
         for field in ("canonical", "legacy"):
             value = alias[field]
@@ -114,6 +146,7 @@ def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
                 )
             if not value.startswith("docs/"):
                 raise ValueError(f"artifact alias {index} has an invalid {field} path")
+        alias_universe.append((kind, alias["canonical"], alias["legacy"]))
         digest = alias["legacy_sha256"]
         if (
             not isinstance(digest, str)
@@ -121,14 +154,17 @@ def load_inventory(path: Path = DEFAULT_INVENTORY) -> dict[str, Any]:
             or any(character not in "0123456789abcdef" for character in digest)
         ):
             raise ValueError(f"artifact alias {index} has an invalid legacy SHA-256")
+    if enforce_alias_universe and not _has_expected_alias_universe(alias_universe):
+        raise ValueError("evaluation artifact inventory aliases are incomplete")
     return raw
 
 
-def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> list[str]:
+def validate_inventory(root: Path = ROOT, path: Path | None = None) -> list[str]:
     """Return all naming and numeric-parity errors for the inventory."""
 
+    inventory_path = path if path is not None else root / _INVENTORY_RELATIVE
     try:
-        inventory = load_inventory(path)
+        inventory = load_inventory(inventory_path, enforce_alias_universe=False)
     except (OSError, RuntimeError, UnicodeError):
         return ["evaluation artifact inventory contains an invalid path"]
     except ValueError as error:
@@ -137,8 +173,14 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
     errors: list[str] = []
     canonical_ids = inventory["schema_ids"]
     legacy_ids = inventory["legacy_schema_ids"]
-    seen_canonical: set[str] = set()
-    seen_legacy: set[str] = set()
+    seen_canonical: set[Path] = set()
+    seen_legacy: set[Path] = set()
+    alias_universe = [
+        (alias["kind"], alias["canonical"], alias["legacy"])
+        for alias in inventory["aliases"]
+    ]
+    if not _has_expected_alias_universe(alias_universe):
+        errors.append("evaluation artifact inventory aliases are incomplete")
     for alias in inventory["aliases"]:
         kind = alias["kind"]
         canonical = alias["canonical"]
@@ -151,10 +193,10 @@ def validate_inventory(root: Path = ROOT, path: Path = DEFAULT_INVENTORY) -> lis
             errors.append("legacy path escapes root/docs")
         if canonical_path is None or legacy_path is None:
             continue
-        if canonical in seen_canonical or legacy in seen_legacy:
+        if canonical_path in seen_canonical or legacy_path in seen_legacy:
             errors.append(f"duplicate artifact alias: {canonical} / {legacy}")
-        seen_canonical.add(canonical)
-        seen_legacy.add(legacy)
+        seen_canonical.add(canonical_path)
+        seen_legacy.add(legacy_path)
         if not Path(canonical).name.startswith(f"regression-{kind}-"):
             errors.append(f"canonical artifact has invalid name: {canonical}")
         if not Path(legacy).name.startswith("quality-"):
@@ -230,7 +272,7 @@ def main(argv: list[str] | None = None) -> int:
     inventory = (
         args.inventory.resolve()
         if args.inventory is not None
-        else root / DEFAULT_INVENTORY.relative_to(ROOT)
+        else root / _INVENTORY_RELATIVE
     )
     errors = validate_inventory(root, inventory)
     if errors:
