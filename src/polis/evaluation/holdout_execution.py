@@ -25,9 +25,6 @@ from polis.evaluation.holdout_report import (
     normalized_report_bytes,
     parse_raw_report,
 )
-from polis.evaluation.holdout_reservation import (
-    reserve_consumption_secure,
-)
 from polis.evaluation.holdout_scoring import production_report
 from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
 from polis.evaluation.quality_protocol import peak_rss_bytes
@@ -132,12 +129,9 @@ def _run_open_workspace(
         "source_sha256": admission.evidence.source_sha256,
         "dataset_sha256": admission.evidence.dataset_sha256,
     }
-    marker = config.paths.marker
-    capability = reserve_consumption_secure(
-        marker,
+    capability = workspace.reserve_dataset(
         identity,
         reserved_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        write_marker=workspace.create_output,
     )
     try:
         secure_dataset = workspace.read_dataset(capability)
@@ -176,5 +170,5 @@ def _run_open_workspace(
         config, admission, dataset, first_findings, durations, peak_rss_bytes()
     )
     parsed = parse_raw_report(raw)
-    _write_results(workspace, marker.name, config, admission, raw, parsed)
+    _write_results(workspace, config.paths.marker.name, config, admission, raw, parsed)
     return 0

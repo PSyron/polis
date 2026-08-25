@@ -5,11 +5,14 @@ import stat
 from dataclasses import dataclass
 from pathlib import Path
 
-from polis.evaluation.holdout_models import HoldoutAdmissionError
+from polis.evaluation.holdout_models import HoldoutAdmissionError, JsonObject
 from polis.evaluation.holdout_reservation import (
+    CANONICAL_MARKER,
     HoldoutAlreadyConsumedError,
+    _CanonicalWorkspaceIdentity,
     _ConsumptionCapability,
     consume_consumption_capability,
+    reserve_consumption_secure,
 )
 
 
@@ -63,7 +66,13 @@ def _read_file(parent: int, name: str) -> SecureFile:
 
 
 class SecureHoldoutWorkspace:
-    __slots__ = ("_config", "_experiment", "_root", "_sealed")
+    __slots__ = (
+        "_config",
+        "_experiment",
+        "_reservation_workspace",
+        "_root",
+        "_sealed",
+    )
 
     def __init__(
         self, root: int, experiment: int, sealed: int, config: SecureFile
@@ -72,6 +81,7 @@ class SecureHoldoutWorkspace:
         self._experiment = experiment
         self._sealed = sealed
         self._config = config
+        self._reservation_workspace = _CanonicalWorkspaceIdentity()
 
     @classmethod
     def open(cls, repository_root: Path) -> SecureHoldoutWorkspace:
@@ -130,12 +140,27 @@ class SecureHoldoutWorkspace:
         self, capability: _ConsumptionCapability | None = None
     ) -> SecureFile:
         try:
-            consume_consumption_capability(capability)
+            consume_consumption_capability(
+                capability,
+                expected_marker=CANONICAL_MARKER,
+                expected_workspace_identity=self._reservation_workspace,
+            )
         except HoldoutAlreadyConsumedError as error:
             raise HoldoutAdmissionError(
                 "sealed dataset read requires an active reservation authorization"
             ) from error
         return _read_file(self._sealed, "cases.json")
+
+    def reserve_dataset(
+        self, identity: JsonObject, *, reserved_at: str
+    ) -> _ConsumptionCapability:
+        return reserve_consumption_secure(
+            CANONICAL_MARKER,
+            identity,
+            reserved_at=reserved_at,
+            write_marker=self.create_output,
+            workspace_identity=self._reservation_workspace,
+        )
 
     def read_output(self, name: str) -> bytes:
         return _read_file(self._experiment, name).content

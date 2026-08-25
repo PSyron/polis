@@ -92,10 +92,8 @@ def test_dataset_capability_is_consumed_before_a_second_read(
     _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    capability = reserve_consumption(
-        tmp_path / "holdout.started",
-        {"experiment_id": "synthetic"},
-        reserved_at="2026-08-25T00:00:00Z",
+    capability = workspace.reserve_dataset(
+        {"experiment_id": "synthetic"}, reserved_at="2026-08-25T00:00:00Z"
     )
     try:
         assert workspace.read_dataset(capability).content == b"trusted-dataset"
@@ -103,6 +101,49 @@ def test_dataset_capability_is_consumed_before_a_second_read(
             workspace.read_dataset(capability)
     finally:
         workspace.close()
+
+
+def test_arbitrary_marker_capability_cannot_read_canonical_dataset(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    workspace = SecureHoldoutWorkspace.open(tmp_path)
+    capability = reserve_consumption(
+        tmp_path / "arbitrary.marker",
+        {"experiment_id": "synthetic"},
+        reserved_at="2026-08-25T00:00:00Z",
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            workspace.read_dataset(capability)
+    finally:
+        workspace.close()
+
+
+def test_capability_from_another_workspace_cannot_read_canonical_dataset(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from polis.evaluation.holdout_secure_io import SecureHoldoutWorkspace
+
+    _layout(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    issuing_workspace = SecureHoldoutWorkspace.open(tmp_path)
+    reading_workspace = SecureHoldoutWorkspace.open(tmp_path)
+    capability = issuing_workspace.reserve_dataset(
+        {"experiment_id": "synthetic"}, reserved_at="2026-08-25T00:00:00Z"
+    )
+    try:
+        with pytest.raises(HoldoutAdmissionError, match="authorization"):
+            reading_workspace.read_dataset(capability)
+        assert issuing_workspace.read_dataset(capability).content == (
+            b"trusted-dataset"
+        )
+    finally:
+        reading_workspace.close()
+        issuing_workspace.close()
 
 
 def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
@@ -114,10 +155,8 @@ def test_concurrent_dataset_reads_allow_only_one_secure_file_access(
     _layout(tmp_path)
     monkeypatch.chdir(tmp_path)
     workspace = SecureHoldoutWorkspace.open(tmp_path)
-    capability = reserve_consumption(
-        tmp_path / "holdout.started",
-        {"experiment_id": "synthetic"},
-        reserved_at="2026-08-25T00:00:00Z",
+    capability = workspace.reserve_dataset(
+        {"experiment_id": "synthetic"}, reserved_at="2026-08-25T00:00:00Z"
     )
     barrier = Barrier(2)
     read_started = Event()

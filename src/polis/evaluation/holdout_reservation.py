@@ -26,6 +26,10 @@ class _ReservationSeal:
     pass
 
 
+class _CanonicalWorkspaceIdentity:
+    pass
+
+
 class _ReservationToken:
     def __init__(self, seal: _ReservationSeal) -> None:
         self.seal = seal
@@ -33,6 +37,7 @@ class _ReservationToken:
 
 
 _RESERVATION_SEAL = _ReservationSeal()
+CANONICAL_MARKER = Path("holdout.started")
 _RESERVATION_LOCK = Lock()
 _ISSUED_TOKENS: set[_ReservationToken] = set()
 
@@ -40,6 +45,7 @@ _ISSUED_TOKENS: set[_ReservationToken] = set()
 @dataclass(frozen=True, slots=True)
 class _ConsumptionCapability:
     marker_path: Path
+    _workspace_identity: _CanonicalWorkspaceIdentity | None
     _token: _ReservationToken
 
 
@@ -96,7 +102,7 @@ def reserve_consumption(
     token = _ReservationToken(_RESERVATION_SEAL)
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
-    return _ConsumptionCapability(marker, token)
+    return _ConsumptionCapability(marker, None, token)
 
 
 def reserve_consumption_secure(
@@ -105,7 +111,10 @@ def reserve_consumption_secure(
     *,
     reserved_at: str,
     write_marker: Callable[[str, bytes], None],
+    workspace_identity: _CanonicalWorkspaceIdentity,
 ) -> _ConsumptionCapability:
+    if marker != CANONICAL_MARKER:
+        raise HoldoutAlreadyConsumedError("reservation marker is not canonical")
     payload = {**identity, "reserved_at": reserved_at}
     content = (
         json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -118,15 +127,25 @@ def reserve_consumption_secure(
     token = _ReservationToken(_RESERVATION_SEAL)
     with _RESERVATION_LOCK:
         _ISSUED_TOKENS.add(token)
-    return _ConsumptionCapability(marker, token)
+    return _ConsumptionCapability(marker, workspace_identity, token)
 
 
-def consume_consumption_capability(value: _ConsumptionCapability | None) -> None:
+def consume_consumption_capability(
+    value: _ConsumptionCapability | None,
+    *,
+    expected_marker: Path | None = None,
+    expected_workspace_identity: _CanonicalWorkspaceIdentity | None = None,
+) -> None:
     with _RESERVATION_LOCK:
         if (
             not isinstance(value, _ConsumptionCapability)
             or value._token.seal is not _RESERVATION_SEAL
             or value._token not in _ISSUED_TOKENS
+            or (expected_marker is not None and value.marker_path != expected_marker)
+            or (
+                expected_workspace_identity is not None
+                and value._workspace_identity is not expected_workspace_identity
+            )
         ):
             if isinstance(value, _ConsumptionCapability) and value._token.consumed:
                 raise HoldoutAlreadyConsumedError(

@@ -34,7 +34,21 @@ def _write_manifest(
     repository_root: Path,
     *,
     extractor_overrides: dict[str, object] | None = None,
+    source_overrides: dict[str, object] | None = None,
 ) -> None:
+    source: dict[str, object] = {
+        "name": "WikEd Error Corpus",
+        "archive": "wiked-v1.0.pl.tgz",
+        "url": "http://data.statmt.org/romang/wiked/wiked-v1.0.pl.tgz",
+        "language": "pl",
+        "license": "CC-BY-SA-3.0",
+        "license_status": "pending_artifact_authority_confirmation",
+        "license_basis": (
+            "WikEd inherits the license of the source Wikipedia revisions."
+        ),
+    }
+    if source_overrides is not None:
+        source.update(source_overrides)
     extractor: dict[str, object] = {
         "tool": "snukky/wikiedits",
         "wikiedits_version": "2.0",
@@ -50,6 +64,7 @@ def _write_manifest(
                 "schema_id": "polis.wiked-pl-holdout-manifest",
                 "schema_version": 1,
                 "status": "blocked_external_authority",
+                "source": source,
                 "extractor": extractor,
             }
         ),
@@ -419,6 +434,51 @@ def test_archive_extraction_rejects_manifest_extractor_drift(
         )
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("archive", "attacker.tgz"),
+        ("url", "https://attacker.invalid/wiked.tgz"),
+        ("license", "MIT"),
+    ],
+)
+def test_archive_extraction_rejects_manifest_source_drift(
+    field: str, value: object, tmp_path: Path
+) -> None:
+    repository = tmp_path / "repository"
+    _write_manifest(repository, source_overrides={field: value})
+
+    with pytest.raises(WikEdProtocolError, match="manifest source"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={},
+            repository_root=repository,
+        )
+
+
+def test_manifest_symlink_is_rejected_before_archive_open(tmp_path: Path) -> None:
+    repository = tmp_path / "repository"
+    _write_manifest(repository)
+    manifest_path = repository / "docs/project/wiked-pl-holdout-manifest.json"
+    replacement = tmp_path / "replacement-manifest.json"
+    replacement.write_bytes(manifest_path.read_bytes())
+    manifest_path.unlink()
+    manifest_path.symlink_to(replacement)
+
+    with pytest.raises(WikEdProtocolError, match="manifest is unavailable"):
+        extract_archive(
+            tmp_path / "unopened.tgz",
+            tmp_path / "output",
+            expected_archive_sha256="0" * 64,
+            member_name="pairs.tsv",
+            classifications={},
+            repository_root=repository,
+        )
+
+
 def test_cli_rejects_repository_root_that_is_not_the_script_repository(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -472,10 +532,14 @@ def test_archive_hash_and_parse_use_the_same_immutable_snapshot(
             target.write(source.read())
 
     original_read = protocol._read_descriptor
+    read_calls = 0
 
     def read_snapshot_then_mutate(descriptor: int) -> bytes:
+        nonlocal read_calls
         snapshot = cast(bytes, original_read(descriptor))
-        mutate_in_place()
+        read_calls += 1
+        if read_calls == 2:
+            mutate_in_place()
         return snapshot
 
     original_digest = protocol._descriptor_digest
