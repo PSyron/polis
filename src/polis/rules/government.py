@@ -414,7 +414,7 @@ class _GeneralizedGovernmentSpec:
     governor_label: str
     target_case: str
     target_case_label: str
-    behavior_major: int = 2
+    behavior_major: int = 4
 
 
 def _generalized_pattern(prefix: str, suffix: str = "") -> re.Pattern[str]:

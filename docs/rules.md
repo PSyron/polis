@@ -121,7 +121,7 @@ operation, behavior_version, source_policy_version)`.
 Wybrane źródła rekcji z #387 zachowują swoje dotychczasowe identyfikatory. Cztery
 źródła czasownikowe mają wersję zachowania `5.0+` i obsługują pełny dopuszczalny
 paradygmat finitywny `szukać`, `używać`, `ufać` oraz `interesować się`; źródło
-przyimka `do` zachowuje wersję `2.0+` i dotychczasowe zachowanie. Provider musi potwierdzić jeden
+przyimka `do` zachowuje wersję `4.0+` i dotychczasowe zachowanie. Provider musi potwierdzić jeden
 leksem rzeczownika pospolitego i, jeśli występuje, jeden leksem przymiotnika
 oraz jednoznaczne cechy liczby i rodzaju; zaimek, nazwa własna, koordynacja,
 cudzysłów, brak `się`, formy nieosobowe, tryb rozkazujący, niepełne dane lub

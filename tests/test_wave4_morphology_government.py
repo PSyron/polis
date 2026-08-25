@@ -30,7 +30,7 @@ def _behavior_version(source: str, stem: str) -> str:
             "rule:inflection.government_interesowac_sie_historia",
             "rule:inflection.government_ufac_lekarz",
         }
-        else 2
+        else 4
         if source == "rule:inflection.government_do_sklep"
         else 1
     )
