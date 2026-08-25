@@ -23,6 +23,60 @@ niezmienne. Ich lokalizacje opisuje
 [manifest archiwum v2](project/v2-research-archive-manifest.md). Nie uruchamiaj
 ponownie zużytych holdoutów i nie dostrajaj na podstawie zamrożonych dowodów.
 
+## Syntetyczny korpus psucia z issue #426
+
+Generator `src/polis/evaluation/synthetic_corpus.py` jest narzędziem
+checkout-only dla rozwoju. Nie jest importowany przez runtime, nie jest
+zależnością domyślnej instalacji, a `pyproject.toml` wyklucza go z wheel i
+sdist. Nie należy jego wyników traktować jako holdoutu ani uruchamiać na
+zużytych, zamrożonych zbiorach.
+
+Generator przyjmuje lokalny, czysty tekst o jawnej licencji i pochodzeniu oraz
+tworzy pary z czterema klasami kontrolowanej zmiany:
+
+- forma rzeczownika w innym przypadku, wyłącznie z form zwróconych przez
+  `morfeusz2.generate()` dla tego samego lematu;
+- niezgodna liczba albo rodzaj w już zgodnej grupie nominalnej;
+- usunięty przecinek;
+- usunięty znak diakrytyczny.
+
+Każda para przechowuje tekst źródłowy, jego zepsutą wersję, edycję z zakresem
+`[start, end)` względem tego tekstu, offset wystąpienia w źródle oraz formy
+wygenerowane przez Morfeusza, gdy dotyczy to morfologii. Generator używa
+lokalnego ziarna i kanonicznego JSON-u. Manifest zapisuje między innymi wersję
+generatora,
+parametry, rozkład klas, licencję i notę proweniencji, SHA-256 źródła oraz
+SHA-256 dokładnych bajtów korpusu.
+
+Przykładowe odtworzenie z legalnego pliku źródłowego w checkout:
+
+```console
+uv run --locked --extra dev python -m polis.evaluation.synthetic_corpus \
+  path/to/clean-polish.txt \
+  --corpus build/synthetic/corpus.json \
+  --manifest build/synthetic/manifest.json \
+  --seed 426 \
+  --pairs 5000 \
+  --source-name "local-source.txt" \
+  --source-license "CC0-1.0" \
+  --source-notes "Jawnie redystrybuowalne źródło; opis pochodzenia."
+```
+
+Polecenie kończy się błędem, gdy źródło nie ma bezpiecznego kandydata w każdej
+klasie albo nie dostarcza żądanej liczby unikalnych mutacji. To zachowanie jest
+celowo fail-closed: generator nie powiela kandydatów ponad wystąpienia i formy
+obecne w źródle, nie konstruuje form morfologicznych ręcznie i nie fabrykuje
+brakującego korpusu. W bieżącym
+checkout nie ma dużego, redystrybuowalnego podkorpusu czystego tekstu; istnieją
+jedynie małe autorskie zbiory deweloperskie i fixture'y. Dlatego issue #426
+dostarcza protokół oraz testy, ale nie dodaje do repozytorium 5000 rekordów ani
+nie używa żadnego holdoutu. Po otrzymaniu legalnego źródła o wystarczającym
+pokryciu ta sama komenda może odtworzyć co najmniej 5000 par bitowo
+identycznie dla tego samego ziarna.
+
+Issue-specific boundary i dowody kontraktu są zebrane w
+[`docs/development/issue-426-synthetic-corruption.md`](development/issue-426-synthetic-corruption.md).
+
 ## Kandydat do aktywnego zbioru jakości
 
 Issue #229 wprowadziło osobny, edytowalny zbiór przypadków autorskich na
