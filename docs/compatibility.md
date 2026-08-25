@@ -97,3 +97,11 @@ ale wspierany runtime v1 nie tworzy takich znalezisk ani wywołań.
 
 Obecną granicę produktu przyjmuje
 [ADR-0022](architecture/decisions/0022-conservative-v1-product-scope.md).
+
+### `polis.evaluation` przez 1.0
+
+Issue #432 potwierdziło decyzję z [ADR-0023](architecture/decisions/0023-evaluation-namespace-1-0.md):
+namespace pozostaje w wheel i sdist bez zmian do wydania 1.0 włącznie. Pomiar
+rozmiaru, domknięty graf 18 eksportów oraz bramki instalacji są zapisane w
+[ADR-0031](architecture/decisions/0031-polis-evaluation-distribution-through-1-0.md).
+Usunięcie albo wydzielenie wymaga nowego ADR-u i jawnej migracji.
