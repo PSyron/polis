@@ -14,10 +14,13 @@
   `szukać`, `używać`, `ufać`, `interesować się` i `do`; nie stanowi ogólnej
   obsługi polskiej fleksji, zgody ani rekcji. Rekcja przyjmuje tylko jednoznaczny
   rzeczownik pospolity albo grupę `modyfikator + rzeczownik`, w której występuje
-  najwyżej jeden przymiotnik lub obsługiwany zaimek dzierżawczy/wskazujący.
-  Abstynuje dla nazw własnych, wołacza, koordynacji, elipsy (`...` i `…`),
-  niezgodnej liczby lub rodzaju, wieloznacznej analizy modyfikatora, niepełnych
-  danych oraz dryftu providera. Morfeusz2 1.99.15 nie ma
+  najwyżej jeden przymiotnik lub obsługiwany zaimek dzierżawczy/wskazujący. Po
+  zamkniętej morfologicznie grupie może rozpoznać dalszy materiał, lecz tylko gdy
+  następny token nie może być kolejnym składnikiem grupy; nieznany, niepełny lub
+  wieloznaczny odczyt powoduje abstencję. Abstynuje dla nazw własnych, wołacza,
+  koordynacji, elipsy (`...` i `…`), niezgodnej liczby lub rodzaju,
+  wieloznacznej analizy modyfikatora, niepełnych danych oraz dryftu providera.
+  Morfeusz2 1.99.15 nie ma
   opublikowanego sdistu ani kół Linux arm64/musl; jego koła obejmują macOS
   universal2, manylinux 2.28 x86_64 oraz Windows amd64.
 - Dryft tożsamości opcjonalnego providera jest obserwowalny przez

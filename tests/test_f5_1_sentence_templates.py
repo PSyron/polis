@@ -249,7 +249,7 @@ def test_negated_widziec_behavior_version_bump_remains_review_only() -> None:
     finding = _findings("Nie widzę samochód. Potem wrócę.", str(rule.source))[0]
     behavior = analyzer._registry.source_behavior(finding.source)
 
-    assert rule.behavior_version == "inflection-negated-widziec/2.0"
+    assert rule.behavior_version == "inflection-negated-widziec/3.0"
     assert behavior is not None
     assert behavior.behavior_version == rule.behavior_version
     assert not is_automatic_correction_eligible(finding, behavior)

@@ -543,7 +543,7 @@ def _make_default_registry(
             RuleRegistration(rule=AgreementSubjectVerbOniCzytaRule(morphology)),
             RuleRegistration(rule=AgreementSubjectVerbMyCzytaRule(morphology)),
             RuleRegistration(rule=AgreementSubjectVerbPresentRule(morphology)),
-            RuleRegistration(rule=InflectionNegatedWidziecRule()),
+            RuleRegistration(rule=InflectionNegatedWidziecRule(morphology)),
             RuleRegistration(rule=InflectionNegatedWidziecNominalGroupRule(morphology)),
             RuleRegistration(rule=InflectionNegatedMiecCzasRule()),
             RuleRegistration(rule=InflectionNegatedLubicKaweRule(morphology)),
