@@ -22,7 +22,7 @@ _PROVIDER_SUFFIX = "morfeusz2-1.99.15.pl-sgjp-sgjp-2026.06.01.notice-" + _NOTICE
 
 def _behavior_version(source: str, stem: str) -> str:
     major = (
-        3
+        4
         if source
         in {
             "rule:inflection.government_szukac_klucz",
