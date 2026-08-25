@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import stat
 import tarfile
 from collections.abc import Callable
@@ -13,11 +14,19 @@ import scripts.wiked_holdout as protocol
 from scripts.wiked_holdout import (
     ExtractionParameters,
     WikEdProtocolError,
-    _file_digest,
     extract_archive,
     extract_records,
     load_manifest,
 )
+
+
+def _synthetic_archive(path: Path) -> str:
+    payload = b"synthetic old\tsynthetic new\n"
+    with tarfile.open(path, "w:gz") as bundle:
+        info = tarfile.TarInfo("pairs.tsv")
+        info.size = len(payload)
+        bundle.addfile(info, io.BytesIO(payload))
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def test_pending_manifest_records_the_external_authority_limitation() -> None:
@@ -284,21 +293,18 @@ def test_archive_digest_and_read_use_one_open_file_descriptor(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     archive = tmp_path / "synthetic.tgz"
-    payload = b"synthetic old\tsynthetic new\n"
-    with tarfile.open(archive, "w:gz") as bundle:
-        info = tarfile.TarInfo("pairs.tsv")
-        info.size = len(payload)
-        bundle.addfile(info, io.BytesIO(payload))
-    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
-    original_digest: Callable[[Path], tuple[int, str]] = _file_digest
+    digest = _synthetic_archive(archive)
+    original_open: Callable[..., int] = protocol._open_regular_descriptor
 
-    def digest_then_replace(path: Path) -> tuple[int, str]:
-        result = original_digest(path)
+    def open_then_replace(path: Path, **kwargs: int | None) -> int:
+        descriptor = original_open(path, **kwargs)
         if path == archive:
-            path.write_bytes(b"archive replaced after digest")
-        return result
+            replacement = path.with_name("archive-replacement")
+            replacement.write_bytes(b"archive replaced after digest")
+            os.replace(replacement, path)
+        return descriptor
 
-    monkeypatch.setattr(protocol, "_file_digest", digest_then_replace)
+    monkeypatch.setattr(protocol, "_open_regular_descriptor", open_then_replace)
     result = extract_archive(
         archive,
         tmp_path / "output",
@@ -309,6 +315,174 @@ def test_archive_digest_and_read_use_one_open_file_descriptor(
     )
 
     assert result.archive_sha256 == digest
+
+
+def test_archive_parent_race_requires_descriptor_relative_open(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "repository"
+    sealed = repository / ".omo" / "sealed"
+    sealed.mkdir(parents=True)
+    real_parent = tmp_path / "external"
+    real_parent.mkdir()
+    safe_archive = real_parent / "synthetic.tgz"
+    digest = _synthetic_archive(safe_archive)
+    (sealed / safe_archive.name).write_bytes(safe_archive.read_bytes())
+    archive = safe_archive
+    moved_parent = tmp_path / "external-moved"
+    original_open: Callable[..., int] = protocol.os.open
+    pathname_race_triggered = False
+
+    def race_open(
+        path: str | os.PathLike[str],
+        flags: int,
+        mode: int = 0o777,
+        *,
+        dir_fd: int | None = None,
+    ) -> int:
+        nonlocal pathname_race_triggered
+        if dir_fd is None and Path(path) == archive:
+            pathname_race_triggered = True
+            real_parent.rename(moved_parent)
+            real_parent.symlink_to(sealed, target_is_directory=True)
+        return original_open(path, flags, mode, dir_fd=dir_fd)
+
+    monkeypatch.setattr(protocol.os, "open", race_open)
+    result = extract_archive(
+        archive,
+        tmp_path / "output",
+        expected_archive_sha256=digest,
+        member_name="pairs.tsv",
+        classifications={1: ("agreement", "development", True)},
+        repository_root=repository,
+    )
+
+    assert result.archive_sha256 == digest
+    assert not pathname_race_triggered
+
+
+def test_archive_parent_replacement_is_rejected_before_pathname_escape(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "repository"
+    sealed = repository / ".omo" / "sealed"
+    sealed.mkdir(parents=True)
+    real_parent = tmp_path / "external"
+    real_parent.mkdir()
+    alias = tmp_path / "external-alias"
+    alias.symlink_to(real_parent, target_is_directory=True)
+    safe_archive = tmp_path / "safe.tgz"
+    digest = _synthetic_archive(safe_archive)
+    (sealed / "synthetic.tgz").write_bytes(safe_archive.read_bytes())
+    archive = alias / "synthetic.tgz"
+
+    original_require = protocol._require_external_path
+    swapped = False
+
+    def require_then_swap(path: Path, root: Path, label: str) -> None:
+        nonlocal swapped
+        original_require(path, root, label)
+        if label == "archive" and not swapped:
+            alias.unlink()
+            alias.symlink_to(sealed, target_is_directory=True)
+            swapped = True
+
+    monkeypatch.setattr(protocol, "_require_external_path", require_then_swap)
+    with pytest.raises(WikEdProtocolError, match="path cannot contain symlinks"):
+        extract_archive(
+            archive,
+            tmp_path / "output",
+            expected_archive_sha256=digest,
+            member_name="pairs.tsv",
+            classifications={1: ("agreement", "development", True)},
+            repository_root=repository,
+        )
+
+
+def test_output_parent_replacement_is_rejected_before_staging_escape(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "repository"
+    sealed = repository / ".omo" / "sealed"
+    sealed.mkdir(parents=True)
+    real_parent = tmp_path / "external"
+    real_parent.mkdir()
+    alias = tmp_path / "external-alias"
+    alias.symlink_to(real_parent, target_is_directory=True)
+    output = alias / "staging"
+
+    original_require = protocol._require_external_path
+    swapped = False
+
+    def require_then_swap(path: Path, root: Path, label: str) -> None:
+        nonlocal swapped
+        original_require(path, root, label)
+        if label == "output" and not swapped:
+            alias.unlink()
+            alias.symlink_to(sealed, target_is_directory=True)
+            swapped = True
+
+    monkeypatch.setattr(protocol, "_require_external_path", require_then_swap)
+    with pytest.raises(WikEdProtocolError, match="path cannot contain symlinks"):
+        extract_records(
+            ["synthetic old\tsynthetic new\n"],
+            {1: ("agreement", "development", True)},
+            output,
+            repository_root=repository,
+        )
+
+    assert not (sealed / "staging").exists()
+
+
+def test_classification_parent_replacement_is_rejected_before_pathname_escape(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repository = tmp_path / "repository"
+    sealed = repository / ".omo" / "sealed"
+    sealed.mkdir(parents=True)
+    real_parent = tmp_path / "external"
+    real_parent.mkdir()
+    alias = tmp_path / "external-alias"
+    alias.symlink_to(real_parent, target_is_directory=True)
+    classification = alias / "classification.jsonl"
+    safe_classification = (
+        '{"line":1,"category":"agreement","split":"development","reviewed":true}\n'
+    )
+    (sealed / "classification.jsonl").write_text(safe_classification, encoding="utf-8")
+    archive = tmp_path / "synthetic.tgz"
+    digest = _synthetic_archive(archive)
+
+    original_require = protocol._require_external_path
+    swapped = False
+
+    def require_then_swap(path: Path, root: Path, label: str) -> None:
+        nonlocal swapped
+        original_require(path, root, label)
+        if label == "classification" and not swapped:
+            alias.unlink()
+            alias.symlink_to(sealed, target_is_directory=True)
+            swapped = True
+
+    monkeypatch.setattr(protocol, "_require_external_path", require_then_swap)
+    result = protocol.main(
+        [
+            "--archive",
+            str(archive),
+            "--archive-sha256",
+            digest,
+            "--member",
+            "pairs.tsv",
+            "--classification-map",
+            str(classification),
+            "--output",
+            str(tmp_path / "output"),
+            "--repository-root",
+            str(repository),
+        ]
+    )
+    capsys.readouterr()
+
+    assert result == 2
 
 
 def test_external_paths_reject_existing_symlink_parents_before_resolution(

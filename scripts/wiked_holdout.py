@@ -94,12 +94,22 @@ def load_manifest(path: Path) -> dict[str, object]:
     return raw
 
 
-def load_classifications(path: Path) -> dict[int, Classification]:
+def load_classifications(
+    path: Path, *, repository_root: Path | None = None
+) -> dict[int, Classification]:
     classifications: dict[int, Classification] = {}
+    if repository_root is not None:
+        _require_external_path(path, repository_root, "classification")
+    descriptor = -1
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
+        descriptor = _open_regular_descriptor(path)
+        content = _read_descriptor(descriptor)
+        lines = content.decode("utf-8").splitlines()
     except (OSError, UnicodeDecodeError) as error:
         raise WikEdProtocolError("classification map is unavailable") from error
+    finally:
+        if descriptor != -1:
+            os.close(descriptor)
     for row_number, line in enumerate(lines, start=1):
         if not line:
             continue
@@ -226,131 +236,141 @@ def extract_records(
         authority.reserve_holdout(
             HoldoutReservationRequest(archive_sha256, member_name)
         )
-    output_root.mkdir(mode=0o700, parents=True, exist_ok=False)
-    os.chmod(output_root, 0o700)
-    output_files = {
-        split: _open_private_text(output_root / f"{split}.jsonl") for split in _SPLITS
-    }
-    counts: dict[str, dict[str, int]] = {"development": {}, "holdout": {}}
-    rejected: dict[str, int] = {}
-    seen_pairs: set[str] = set()
+    output_descriptor = _open_output_directory(output_root)
     try:
-        for line_number, raw_line in enumerate(lines, start=1):
-            line = raw_line.rstrip("\r\n")
-            if not line:
-                _increment(rejected, "blank")
-                continue
-            fields = line.split("\t")
-            if len(fields) != 2 or not fields[0].strip() or not fields[1].strip():
-                raise WikEdProtocolError(
-                    f"parallel input line {line_number} is invalid"
+        output_files = {
+            split: _open_private_text(Path(f"{split}.jsonl"), dir_fd=output_descriptor)
+            for split in _SPLITS
+        }
+        counts: dict[str, dict[str, int]] = {"development": {}, "holdout": {}}
+        rejected: dict[str, int] = {}
+        seen_pairs: set[str] = set()
+        try:
+            for line_number, raw_line in enumerate(lines, start=1):
+                line = raw_line.rstrip("\r\n")
+                if not line:
+                    _increment(rejected, "blank")
+                    continue
+                fields = line.split("\t")
+                if len(fields) != 2 or not fields[0].strip() or not fields[1].strip():
+                    raise WikEdProtocolError(
+                        f"parallel input line {line_number} is invalid"
+                    )
+                if not _passes_parameters(fields[0], fields[1], effective_parameters):
+                    _increment(rejected, "parameters")
+                    continue
+                decision = classifications.get(line_number)
+                if decision is None or not decision[2]:
+                    _increment(rejected, "unreviewed")
+                    continue
+                category, split, reviewed = decision
+                if category not in TARGET_CATEGORIES:
+                    _increment(rejected, "out_of_scope")
+                    continue
+                if split not in _SPLITS or not reviewed:
+                    raise WikEdProtocolError(
+                        "classification map contains an invalid split"
+                    )
+                pair_digest = hashlib.sha256(
+                    (fields[0] + "\0" + fields[1]).encode("utf-8")
+                ).hexdigest()
+                if pair_digest in seen_pairs:
+                    raise WikEdProtocolError("cross-split duplicate pair")
+                seen_pairs.add(pair_digest)
+                record = {
+                    "category": category,
+                    "line": line_number,
+                    "old": fields[0],
+                    "new": fields[1],
+                }
+                output_files[split].write(
+                    json.dumps(
+                        record,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
+                    + "\n"
                 )
-            if not _passes_parameters(fields[0], fields[1], effective_parameters):
-                _increment(rejected, "parameters")
-                continue
-            decision = classifications.get(line_number)
-            if decision is None or not decision[2]:
-                _increment(rejected, "unreviewed")
-                continue
-            category, split, reviewed = decision
-            if category not in TARGET_CATEGORIES:
-                _increment(rejected, "out_of_scope")
-                continue
-            if split not in _SPLITS or not reviewed:
-                raise WikEdProtocolError("classification map contains an invalid split")
-            pair_digest = hashlib.sha256(
-                (fields[0] + "\0" + fields[1]).encode("utf-8")
-            ).hexdigest()
-            if pair_digest in seen_pairs:
-                raise WikEdProtocolError("cross-split duplicate pair")
-            seen_pairs.add(pair_digest)
-            record = {
-                "category": category,
-                "line": line_number,
-                "old": fields[0],
-                "new": fields[1],
-            }
-            output_files[split].write(
+                counts[split][category] = counts[split].get(category, 0) + 1
+        finally:
+            for output_file in output_files.values():
+                output_file.close()
+        output_metadata = {
+            split: _file_digest(Path(f"{split}.jsonl"), dir_fd=output_descriptor)
+            for split in _SPLITS
+        }
+        if requires_holdout_authority and authority is not None:
+            authority.check_leakage(
+                LeakageCheckRequest(
+                    output_root / "development.jsonl", output_root / "holdout.jsonl"
+                )
+            )
+        result = ExtractionResult(
+            "blocked_external_authority",
+            archive_sha256,
+            archive_size_bytes,
+            counts,
+            rejected,
+            output_metadata["development"][1],
+            output_metadata["holdout"][1],
+            output_metadata["development"][0],
+            output_metadata["holdout"][0],
+        )
+        manifest = {
+            "schema_id": "polis.wiked-pl-extraction-result",
+            "schema_version": 1,
+            "status": result.status,
+            "archive": {
+                "sha256": archive_sha256,
+                "size_bytes": archive_size_bytes,
+                "member": member_name,
+            },
+            "extractor": {
+                "tool": "snukky/wikiedits",
+                "wikiedits_version": "2.0",
+                "parameters": effective_parameters.as_dict(),
+            },
+            "outputs": {
+                "development": {
+                    "count": sum(counts["development"].values()),
+                    "size_bytes": result.development_size_bytes,
+                    "sha256": result.development_sha256,
+                    "class_counts": counts["development"],
+                },
+                "holdout": {
+                    "count": sum(counts["holdout"].values()),
+                    "size_bytes": result.holdout_size_bytes,
+                    "sha256": result.holdout_sha256,
+                    "class_counts": counts["holdout"],
+                },
+            },
+            "rejected": rejected,
+            "leakage": {
+                "status": "not_run",
+                "validated": False,
+                "reason": "external_authority_and_existing_corpora_unavailable",
+            },
+            "authorization": {
+                "reservation_contract": "polis.evaluation.holdout_reservation",
+                "status": "not_authorized",
+                "reservation_established": False,
+            },
+            "privacy": {"plaintext_in_logs": False, "repository_plaintext": False},
+        }
+        _write_private_bytes(
+            Path("manifest.json"),
+            (
                 json.dumps(
-                    record, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                    manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")
                 )
                 + "\n"
-            )
-            counts[split][category] = counts[split].get(category, 0) + 1
-    finally:
-        for output_file in output_files.values():
-            output_file.close()
-    output_metadata = {
-        split: _file_digest(output_root / f"{split}.jsonl") for split in _SPLITS
-    }
-    if requires_holdout_authority and authority is not None:
-        authority.check_leakage(
-            LeakageCheckRequest(
-                output_root / "development.jsonl", output_root / "holdout.jsonl"
-            )
+            ).encode("utf-8"),
+            dir_fd=output_descriptor,
         )
-    result = ExtractionResult(
-        "blocked_external_authority",
-        archive_sha256,
-        archive_size_bytes,
-        counts,
-        rejected,
-        output_metadata["development"][1],
-        output_metadata["holdout"][1],
-        output_metadata["development"][0],
-        output_metadata["holdout"][0],
-    )
-    manifest = {
-        "schema_id": "polis.wiked-pl-extraction-result",
-        "schema_version": 1,
-        "status": result.status,
-        "archive": {
-            "sha256": archive_sha256,
-            "size_bytes": archive_size_bytes,
-            "member": member_name,
-        },
-        "extractor": {
-            "tool": "snukky/wikiedits",
-            "wikiedits_version": "2.0",
-            "parameters": effective_parameters.as_dict(),
-        },
-        "outputs": {
-            "development": {
-                "count": sum(counts["development"].values()),
-                "size_bytes": result.development_size_bytes,
-                "sha256": result.development_sha256,
-                "class_counts": counts["development"],
-            },
-            "holdout": {
-                "count": sum(counts["holdout"].values()),
-                "size_bytes": result.holdout_size_bytes,
-                "sha256": result.holdout_sha256,
-                "class_counts": counts["holdout"],
-            },
-        },
-        "rejected": rejected,
-        "leakage": {
-            "status": "not_run",
-            "validated": False,
-            "reason": "external_authority_and_existing_corpora_unavailable",
-        },
-        "authorization": {
-            "reservation_contract": "polis.evaluation.holdout_reservation",
-            "status": "not_authorized",
-            "reservation_established": False,
-        },
-        "privacy": {"plaintext_in_logs": False, "repository_plaintext": False},
-    }
-    _write_private_bytes(
-        output_root / "manifest.json",
-        (
-            json.dumps(
-                manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-            )
-            + "\n"
-        ).encode("utf-8"),
-    )
-    return result
+        return result
+    finally:
+        os.close(output_descriptor)
 
 
 def _increment(counts: dict[str, int], key: str) -> None:
@@ -390,8 +410,8 @@ def _edit_ratio(old: str, new: str) -> float:
     return changed / max(len(old), len(new), 1)
 
 
-def _file_digest(path: Path) -> tuple[int, str]:
-    descriptor = _open_regular_descriptor(path)
+def _file_digest(path: Path, *, dir_fd: int) -> tuple[int, str]:
+    descriptor = _open_regular_descriptor(path, dir_fd=dir_fd)
     try:
         return _descriptor_digest(descriptor)
     finally:
@@ -408,27 +428,109 @@ def _descriptor_digest(descriptor: int) -> tuple[int, str]:
     return size, digest.hexdigest()
 
 
-def _open_regular_descriptor(path: Path) -> int:
+def _read_descriptor(descriptor: int) -> bytes:
+    chunks: list[bytes] = []
+    while chunk := os.read(descriptor, 1024 * 1024):
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _secure_directory_flags() -> int:
+    if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+        raise OSError("required O_NOFOLLOW and O_DIRECTORY support is unavailable")
+    return os.O_RDONLY | os.O_NOFOLLOW | os.O_DIRECTORY
+
+
+def _open_directory_path(path: Path, *, create_missing: bool) -> int:
+    absolute = Path(os.path.abspath(path))
+    descriptor = os.open(absolute.anchor, _secure_directory_flags())
+    completed = False
+    try:
+        for component in absolute.parts[1:]:
+            try:
+                next_descriptor = os.open(
+                    component,
+                    _secure_directory_flags(),
+                    dir_fd=descriptor,
+                )
+            except FileNotFoundError:
+                if not create_missing:
+                    raise
+                os.mkdir(component, 0o700, dir_fd=descriptor)
+                next_descriptor = os.open(
+                    component,
+                    _secure_directory_flags(),
+                    dir_fd=descriptor,
+                )
+            os.close(descriptor)
+            descriptor = next_descriptor
+        completed = True
+    finally:
+        if not completed:
+            os.close(descriptor)
+    return descriptor
+
+
+def _open_output_directory(path: Path) -> int:
+    parent = _open_directory_path(path.parent, create_missing=True)
+    try:
+        if not path.name or path.name in {".", ".."}:
+            raise WikEdProtocolError("output directory name is invalid")
+        os.mkdir(path.name, 0o700, dir_fd=parent)
+        descriptor = os.open(
+            path.name,
+            _secure_directory_flags(),
+            dir_fd=parent,
+        )
+        os.fchmod(descriptor, 0o700)
+        return descriptor
+    except FileExistsError as error:
+        raise WikEdProtocolError("output directory already exists") from error
+    except OSError as error:
+        raise WikEdProtocolError("output directory is unavailable") from error
+    finally:
+        os.close(parent)
+
+
+def _open_regular_descriptor(path: Path, *, dir_fd: int | None = None) -> int:
     if not hasattr(os, "O_NOFOLLOW"):
         raise OSError("required O_NOFOLLOW support is unavailable")
-    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    parent_descriptor = -1
+    if dir_fd is None:
+        parent_descriptor = _open_directory_path(path.parent, create_missing=False)
+        open_path: str | Path = path.name
+        open_dir_fd: int | None = parent_descriptor
+    else:
+        open_path = path
+        open_dir_fd = dir_fd
+    descriptor = -1
     try:
+        descriptor = os.open(
+            open_path,
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=open_dir_fd,
+        )
         metadata = os.fstat(descriptor)
         if not stat.S_ISREG(metadata.st_mode):
             raise OSError("path is not a regular file")
     except OSError:
-        os.close(descriptor)
+        if descriptor != -1:
+            os.close(descriptor)
         raise
+    finally:
+        if parent_descriptor != -1:
+            os.close(parent_descriptor)
     return descriptor
 
 
-def _open_private_text(path: Path) -> io.TextIOWrapper:
+def _open_private_text(path: Path, *, dir_fd: int) -> io.TextIOWrapper:
     if not hasattr(os, "O_NOFOLLOW"):
         raise WikEdProtocolError("required O_NOFOLLOW support is unavailable")
     descriptor = os.open(
         path,
         os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
         0o600,
+        dir_fd=dir_fd,
     )
     try:
         return os.fdopen(descriptor, "w", encoding="utf-8")
@@ -437,13 +539,14 @@ def _open_private_text(path: Path) -> io.TextIOWrapper:
         raise
 
 
-def _write_private_bytes(path: Path, content: bytes) -> None:
+def _write_private_bytes(path: Path, content: bytes, *, dir_fd: int) -> None:
     if not hasattr(os, "O_NOFOLLOW"):
         raise WikEdProtocolError("required O_NOFOLLOW support is unavailable")
     descriptor = os.open(
         path,
         os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
         0o600,
+        dir_fd=dir_fd,
     )
     try:
         offset = 0
@@ -500,15 +603,14 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        _require_external_path(
-            args.classification_map, args.repository_root, "classification"
-        )
         result = extract_archive(
             args.archive,
             args.output,
             expected_archive_sha256=args.archive_sha256,
             member_name=args.member,
-            classifications=load_classifications(args.classification_map),
+            classifications=load_classifications(
+                args.classification_map, repository_root=args.repository_root
+            ),
             repository_root=args.repository_root,
         )
     except WikEdProtocolError as error:
