@@ -51,6 +51,13 @@ def initial_subordinate_comma_position(
     ):
         return None
     try:
+        text.encode("utf-8")
+    except UnicodeEncodeError:
+        return None
+    surfaces = text.split(maxsplit=1)
+    if not surfaces or surfaces[0].casefold() not in conjunctions:
+        return None
+    try:
         tokens = _parse_provider_tokens(text, provider.backend.analyse(text))
     except (KeyError, OSError, RuntimeError, TypeError, ValueError):
         return None

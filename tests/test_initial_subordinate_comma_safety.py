@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import subprocess
+import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
@@ -22,9 +25,7 @@ from polis.rules.syntax import (
 
 type _ProviderRow = _AnalysisRow
 
-
-class _UnexpectedProviderCallError(RuntimeError):
-    pass
+ROOT = Path(__file__).resolve().parents[1]
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,7 +42,7 @@ class _RowsBackend:
 @dataclass(frozen=True, slots=True)
 class _ExplodingBackend:
     def analyse(self, text: str) -> Sequence[_ProviderRow]:
-        raise _UnexpectedProviderCallError
+        raise AssertionError("provider must not be called")
 
     def generate(self, lemma: str) -> Sequence[_ProviderRow]:
         return ()
@@ -157,6 +158,42 @@ def test_category_filter_excludes_provider_before_analysis() -> None:
         "Jeśli pada wracam.",
         options=AnalysisOptions(categories={Category.SPELLING}),
     )
+
+    # Then
+    assert findings == ()
+
+
+def test_analyzer_abstains_from_lone_surrogate_without_crashing() -> None:
+    # Given
+    program = (
+        "from polis import Analyzer, AnalyzerConfig\n"
+        "text = 'Jeśli ' + chr(0xD800)\n"
+        "result = Analyzer(AnalyzerConfig()).analyze(text)\n"
+        "print(len(result.issues))\n"
+    )
+
+    # When
+    completed = subprocess.run(
+        [sys.executable, "-c", program],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    # Then
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout == "0\n"
+
+
+def test_non_target_initial_text_skips_provider_analysis() -> None:
+    # Given
+    rule = SyntaxInitialConditionalCommaRule(
+        _QualifiedMorfeusz(_ExplodingBackend(), _qualified_identity())
+    )
+
+    # When
+    findings = rule.find("Chociaż pada wracam.", options=AnalysisOptions())
 
     # Then
     assert findings == ()
