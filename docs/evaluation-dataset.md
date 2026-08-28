@@ -46,6 +46,53 @@ niezależnego, jednorazowego pomiaru jakości. Zewnętrzny korpus
 WikEd PL z #427 pozostaje zablokowany przez brak dostarczonej władzy/licencji i
 nie jest używany ani fabrykowany w ramach #426.
 
+## Walidowany profil benchmarkowy (#452)
+
+Profil `validated` jest osobną, wersjonowaną ścieżką dla benchmarku hybrydowego.
+Nie tworzy nowych błędów przez zgadywanie formy z samego lematu. Wybiera tylko
+pary `error -> correct` z jawnym `pair_id`, pojedynczym findingiem i dokładną
+rekonstrukcją tekstu po zastosowaniu findingu. Dzięki temu niespójne pary,
+przypadki wielofindingowe oraz klasy bez wystarczającego kontekstu pozostają
+odrzucone.
+
+Profil dodatkowo:
+
+- chroni zakresy w cytatach, backtickach i innych literalach oraz wyklucza
+  straty `quotation-or-literal`, `conflict-or-abstention` i jawne abstencje;
+- przy zgodzie dopuszcza zmianę dokładnie jednego tokenu, przy fleksji tylko
+  ręcznie sparowane kategorie `inflection`/`rection`;
+- przy interpunkcji wymaga `rule_family` z rodziny `rule:syntax.*` albo
+  `rule:punctuation.*` i zmiany ograniczonej do znaków interpunkcyjnych;
+- przy diakrytyce dopuszcza jedną zmianę znaku przy zachowanej bazie Unicode.
+
+Uruchomienie profilu nie wymaga Morfeusza ani połączenia z Qwenem:
+
+```shell
+uv run --locked --extra dev python -m polis.evaluation.synthetic_corpus \
+  --profile validated \
+  --output /tmp/polis-synthetic-validated.jsonl \
+  --manifest /tmp/polis-synthetic-validated-manifest.json \
+  --seed 426
+```
+
+Manifest zapisuje `profile: "validated"` i wersję
+`polis-synthetic-corpus-v2-validated`; nadal obowiązuje `holdout: false`.
+Liczność jest pochodną zaakceptowanych par i nie jest progiem jakości produktu.
+Sekcja `coverage` rozdziela liczności zjawisk (`phenomenon_counts`), strat
+(`shape_strata_counts`) i poprawnych źródeł bez kontrolowanej pary
+(`hard_negative_count`). `rejected_counts` pokazuje, dlaczego pozostałe źródła
+nie weszły do profilu, zamiast ukrywać tę nierównowagę; nie jest to wynik F1 ani
+niezależna miara jakości.
+Domyślna ścieżka legacy zachowuje bajty korpusu dla `seed=426, count=5000`
+(`sha256=d1cd75a9289b12d6913ff4f9912d27f83936ce29bb743a5c13e23796b7d7b1d0`).
+
+Do podziału rozwojowego i testowego należy używać deterministycznego helpera
+`split_source_disjoint`. Łączy on rekordy z tym samym `source_case_id` albo
+tekstem poprawnym, więc jeden przypadek nie trafia do obu splitów. Ocena
+pojedynczej sugestii korzysta z deklarowanego zakresu `[start, end)` i sprawdza
+rekonstrukcję prefiksu oraz sufiksu; podobne podciągi wewnątrz dwóch form nie są
+już mylone z wieloma edycjami.
+
 ## WikEd PL: protokół zapieczętowanego holdoutu (#427)
 
 Issue #427 rejestruje wyłącznie bezpieczny protokół dla zewnętrznego

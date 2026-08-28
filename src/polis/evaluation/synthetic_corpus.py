@@ -9,23 +9,28 @@ from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from hashlib import sha256
 from pathlib import Path
-from typing import Final, TypedDict, cast
+from typing import Final, Literal, NotRequired, TypedDict, cast
 
 from polis.evaluation._synthetic_corpus_candidates import (
     Candidate,
     ErrorClass,
     MorphologyBackend,
+    _validated_rejection_reason,
     build_candidates,
+    build_validated_candidates,
 )
 from polis.evaluation._synthetic_corpus_sources import (
     SourceMetadata,
+    SourceText,
     provided_source_texts,
     source_texts,
 )
 
 GENERATOR_VERSION: Final = "polis-synthetic-corpus-v1"
+VALIDATED_GENERATOR_VERSION: Final = "polis-synthetic-corpus-v2-validated"
 DEFAULT_SEED: Final = 426
 DEFAULT_COUNT: Final = 5000
+type SyntheticProfile = Literal["legacy", "validated"]
 ERROR_CLASSES: Final[tuple[ErrorClass, ...]] = (
     "case",
     "agreement",
@@ -55,6 +60,8 @@ class SyntheticCorpus:
     seed: int
     pairs: tuple[SyntheticPair, ...]
     sources: tuple[SourceMetadata, ...]
+    profile: SyntheticProfile = "legacy"
+    coverage: CoverageReport | None = None
 
     @property
     def class_counts(self) -> dict[ErrorClass, int]:
@@ -74,9 +81,17 @@ class SourceManifest(TypedDict):
     clean_case_count: int
 
 
+class CoverageReport(TypedDict):
+    phenomenon_counts: dict[str, int]
+    shape_strata_counts: dict[str, int]
+    hard_negative_count: int
+    rejected_counts: dict[str, int]
+
+
 class Manifest(TypedDict):
     schema_id: str
     schema_version: int
+    profile: NotRequired[SyntheticProfile]
     generator_version: str
     seed: int
     requested_count: int
@@ -88,6 +103,7 @@ class Manifest(TypedDict):
     purpose: str
     holdout: bool
     sources: list[SourceManifest]
+    coverage: NotRequired[CoverageReport]
 
 
 def generate(
@@ -96,13 +112,16 @@ def generate(
     source_license: str | None = None,
     source_origin: str | None = None,
     seed: int = DEFAULT_SEED,
-    count: int = DEFAULT_COUNT,
+    count: int | None = None,
     root: Path | None = None,
     backend: MorphologyBackend | None = None,
+    profile: SyntheticProfile = "legacy",
 ) -> SyntheticCorpus:
+    if profile not in {"legacy", "validated"}:
+        raise ValueError("profile must be legacy or validated")
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValueError("seed must be a non-negative integer")
-    if (
+    if count is not None and (
         isinstance(count, bool)
         or not isinstance(count, int)
         or count < len(ERROR_CLASSES)
@@ -123,17 +142,34 @@ def generate(
             license_name=source_license,
             source_name=source_origin,
         )
-    morphology = backend or _load_morfeusz()
-    candidates = build_candidates(sources, morphology)
-    selected = _select_candidates(candidates, count, seed)
+    if profile == "legacy":
+        morphology = backend or _load_morfeusz()
+        candidates = build_candidates(sources, morphology)
+    else:
+        candidates = build_validated_candidates(sources)
+    if count is None:
+        requested_count = DEFAULT_COUNT if profile == "legacy" else len(candidates)
+    else:
+        requested_count = count
+    selected = _select_candidates(candidates, requested_count, seed)
+    pair_prefix = (
+        "synthetic_426" if profile == "legacy" else f"synthetic_{profile}_{seed}"
+    )
     pairs = tuple(
-        SyntheticPair(id=f"synthetic_426_{index:05d}", **asdict(candidate))
+        SyntheticPair(id=f"{pair_prefix}_{index:05d}", **asdict(candidate))
         for index, candidate in enumerate(selected, start=1)
     )
     metadata = tuple(
         sorted({source.metadata for source in sources}, key=lambda item: item.path)
     )
-    return SyntheticCorpus(seed=seed, pairs=pairs, sources=metadata)
+    coverage = _coverage_report(sources, selected) if profile == "validated" else None
+    return SyntheticCorpus(
+        seed=seed,
+        pairs=pairs,
+        sources=metadata,
+        profile=profile,
+        coverage=coverage,
+    )
 
 
 def serialize_corpus(corpus: SyntheticCorpus) -> bytes:
@@ -152,7 +188,7 @@ def serialize_corpus(corpus: SyntheticCorpus) -> bytes:
 def build_manifest(corpus: SyntheticCorpus, *, artifact_sha256: str) -> Manifest:
     licenses = {source.license for source in corpus.sources}
     sources = {source.source for source in corpus.sources}
-    return Manifest(
+    manifest = Manifest(
         schema_id="polis.synthetic-corpus-manifest",
         schema_version=1,
         generator_version=GENERATOR_VERSION,
@@ -167,6 +203,13 @@ def build_manifest(corpus: SyntheticCorpus, *, artifact_sha256: str) -> Manifest
         holdout=False,
         sources=[_source_manifest(source) for source in corpus.sources],
     )
+    if corpus.profile == "validated":
+        if corpus.coverage is None:
+            raise ValueError("validated corpus is missing coverage report")
+        manifest["profile"] = corpus.profile
+        manifest["generator_version"] = VALIDATED_GENERATOR_VERSION
+        manifest["coverage"] = corpus.coverage
+    return manifest
 
 
 def write_artifacts(
@@ -262,6 +305,35 @@ def _source_manifest(source: SourceMetadata) -> SourceManifest:
     )
 
 
+def _coverage_report(
+    sources: Sequence[SourceText], selected: Sequence[Candidate]
+) -> CoverageReport:
+    source_by_key = {
+        (source.metadata.dataset_id, source.case_id): source for source in sources
+    }
+    selected_sources = [
+        source_by_key[(candidate.source_dataset, candidate.source_case_id)]
+        for candidate in selected
+    ]
+    phenomena = Counter(source.phenomenon or "unknown" for source in selected_sources)
+    strata = Counter(
+        shape
+        for source in selected_sources
+        for shape in (source.shape_strata or frozenset({"unstratified"}))
+    )
+    rejected = Counter(
+        reason
+        for source in sources
+        if (reason := _validated_rejection_reason(source)) is not None
+    )
+    return CoverageReport(
+        phenomenon_counts=dict(sorted(phenomena.items())),
+        shape_strata_counts=dict(sorted(strata.items())),
+        hard_negative_count=rejected.get("no_controlled_pair", 0),
+        rejected_counts=dict(sorted(rejected.items())),
+    )
+
+
 def _load_morfeusz() -> MorphologyBackend:
     try:
         module = importlib.import_module("morfeusz2")
@@ -280,9 +352,14 @@ def _main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
-    parser.add_argument("--count", type=int, default=DEFAULT_COUNT)
+    parser.add_argument("--count", type=int, default=None)
+    parser.add_argument("--profile", choices=("legacy", "validated"), default="legacy")
     args = parser.parse_args()
-    corpus = generate(seed=args.seed, count=args.count)
+    corpus = generate(
+        seed=args.seed,
+        count=args.count,
+        profile=cast(SyntheticProfile, args.profile),
+    )
     manifest = write_artifacts(corpus, args.output, args.manifest)
     print(json.dumps(manifest, ensure_ascii=False, sort_keys=True))
     return 0

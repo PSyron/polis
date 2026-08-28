@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
-from typing import Final, cast
+from typing import Final, Literal, cast
 
 _SOURCE_PATHS: Final = (
     "quality/v1/cases.json",
@@ -13,6 +13,9 @@ _SOURCE_PATHS: Final = (
     "quality/v3/cases.json",
     "quality/v4/cases.json",
 )
+
+type CaseKind = Literal["error", "correct", "conflict", "abstain"]
+type ProtectedSpanKind = Literal["quote", "code"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,10 +30,50 @@ class SourceMetadata:
 
 
 @dataclass(frozen=True, slots=True)
+class SourceFinding:
+    category: str
+    start: int
+    end: int
+    original: str
+    suggestion: str
+    rule_family: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SourceError:
+    case_id: str
+    kind: CaseKind
+    phenomenon: str | None
+    category: str | None
+    features: frozenset[str]
+    shape_strata: frozenset[str]
+    pair_id: str | None
+    text: str
+    findings: tuple[SourceFinding, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class SourceText:
     metadata: SourceMetadata
     case_id: str
     text: str
+    kind: CaseKind = "correct"
+    phenomenon: str | None = None
+    category: str | None = None
+    features: frozenset[str] = frozenset()
+    shape_strata: frozenset[str] = frozenset()
+    pair_id: str | None = None
+    paired_error: SourceError | None = None
+    controlled_error: SourceError | None = None
+    expected_findings: tuple[SourceFinding, ...] = ()
+    protected_spans: tuple[ProtectedSpan, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ProtectedSpan:
+    start: int
+    end: int
+    kind: ProtectedSpanKind
 
 
 def source_texts(root: Path) -> tuple[SourceText, ...]:
@@ -46,6 +89,11 @@ def source_texts(root: Path) -> tuple[SourceText, ...]:
         raw_cases = raw.get("cases")
         if not isinstance(raw_cases, list) or not raw_cases:
             raise ValueError(f"synthetic source has no cases: {path}")
+        parsed_cases = tuple(_parse_case(item) for item in raw_cases)
+        errors_by_pair: dict[str, list[SourceError]] = {}
+        for case in parsed_cases:
+            if case.kind == "error" and case.pair_id is not None:
+                errors_by_pair.setdefault(case.pair_id, []).append(_source_error(case))
         metadata = SourceMetadata(
             dataset_id=dataset_id,
             dataset_version=version,
@@ -53,21 +101,29 @@ def source_texts(root: Path) -> tuple[SourceText, ...]:
             sha256=sha256(raw_bytes).hexdigest(),
             license="CC0-1.0",
             source="project-authored",
-            clean_case_count=sum(
-                1
-                for item in raw_cases
-                if isinstance(item, dict) and item.get("kind") == "correct"
-            ),
+            clean_case_count=sum(case.kind == "correct" for case in parsed_cases),
         )
-        for item in raw_cases:
-            case = _json_object(item, "dataset case")
-            if case.get("kind") != "correct":
+        for case in parsed_cases:
+            if case.kind != "correct":
                 continue
+            paired_errors = tuple(errors_by_pair.get(case.pair_id or "", ()))
             texts.append(
                 SourceText(
                     metadata=metadata,
-                    case_id=_string(case.get("id"), "case id"),
-                    text=_string(case.get("text"), "case text"),
+                    case_id=case.case_id,
+                    text=case.text,
+                    kind=case.kind,
+                    phenomenon=case.phenomenon,
+                    category=case.category,
+                    features=case.features,
+                    shape_strata=case.shape_strata,
+                    pair_id=case.pair_id,
+                    paired_error=(
+                        paired_errors[0] if len(paired_errors) == 1 else None
+                    ),
+                    controlled_error=_controlled_error(case, paired_errors),
+                    expected_findings=case.findings,
+                    protected_spans=protected_spans(case.text),
                 )
             )
     unique: dict[tuple[str, str], SourceText] = {}
@@ -107,9 +163,163 @@ def provided_source_texts(
         clean_case_count=len(texts),
     )
     return tuple(
-        SourceText(metadata=metadata, case_id=f"provided_{index:05d}", text=text)
+        SourceText(
+            metadata=metadata,
+            case_id=f"provided_{index:05d}",
+            text=text,
+            protected_spans=protected_spans(text),
+        )
         for index, text in enumerate(texts, start=1)
     )
+
+
+def protected_spans(text: str) -> tuple[ProtectedSpan, ...]:
+    spans: set[tuple[int, int, ProtectedSpanKind]] = set()
+    delimiters: tuple[tuple[str, str, ProtectedSpanKind], ...] = (
+        ("„", "”", "quote"),
+        ("“", "”", "quote"),
+        ("«", "»", "quote"),
+        ('"', '"', "quote"),
+        ("'", "'", "quote"),
+        ("`", "`", "code"),
+    )
+    for opener, closer, kind in delimiters:
+        start = text.find(opener)
+        while start >= 0:
+            end = text.find(closer, start + len(opener))
+            if end < 0:
+                spans.add((start, len(text), kind))
+                break
+            spans.add((start, end + len(closer), kind))
+            start = text.find(opener, end + len(closer))
+    return tuple(
+        ProtectedSpan(start=start, end=end, kind=kind)
+        for start, end, kind in sorted(spans)
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class _ParsedCase:
+    case_id: str
+    kind: CaseKind
+    phenomenon: str | None
+    category: str | None
+    features: frozenset[str]
+    shape_strata: frozenset[str]
+    pair_id: str | None
+    text: str
+    findings: tuple[SourceFinding, ...]
+
+
+def _parse_case(raw: object) -> _ParsedCase:
+    case = _json_object(raw, "dataset case")
+    kind = _case_kind(case.get("kind"))
+    findings = _findings(case.get("expected_findings"))
+    return _ParsedCase(
+        case_id=_string(case.get("id"), "case id"),
+        kind=kind,
+        phenomenon=_optional_string(case.get("phenomenon"), "case phenomenon"),
+        category=_optional_string(case.get("category"), "case category"),
+        features=_string_set(case.get("features"), "case features"),
+        shape_strata=_string_set(case.get("shape_strata"), "case shape strata"),
+        pair_id=_optional_string(case.get("pair_id"), "case pair id"),
+        text=_string(case.get("text"), "case text"),
+        findings=findings,
+    )
+
+
+def _case_kind(value: object) -> CaseKind:
+    if not isinstance(value, str) or value not in {
+        "error",
+        "correct",
+        "conflict",
+        "abstain",
+    }:
+        raise ValueError("case kind must be error, correct, conflict, or abstain")
+    return cast(CaseKind, value)
+
+
+def _findings(value: object) -> tuple[SourceFinding, ...]:
+    if not isinstance(value, list):
+        raise ValueError("case expected_findings must be a list")
+    return tuple(_finding(item) for item in value)
+
+
+def _finding(value: object) -> SourceFinding:
+    finding = _json_object(value, "expected finding")
+    start = _offset(finding.get("start"), "finding start")
+    end = _offset(finding.get("end"), "finding end")
+    if end < start:
+        raise ValueError("finding end must not precede start")
+    return SourceFinding(
+        category=_string(finding.get("category"), "finding category"),
+        start=start,
+        end=end,
+        original=_text(finding.get("original"), "finding original"),
+        suggestion=_text(finding.get("suggestion"), "finding suggestion"),
+        rule_family=_optional_string(finding.get("rule_family"), "finding rule family"),
+    )
+
+
+def _controlled_error(
+    case: _ParsedCase, errors: tuple[SourceError, ...]
+) -> SourceError | None:
+    if case.pair_id is None or len(errors) != 1:
+        return None
+    error = errors[0]
+    if len(error.findings) != 1:
+        return None
+    finding = error.findings[0]
+    if (
+        finding.start > len(error.text)
+        or finding.end > len(error.text)
+        or error.text[finding.start : finding.end] != finding.original
+    ):
+        return None
+    reconstructed = (
+        error.text[: finding.start] + finding.suggestion + error.text[finding.end :]
+    )
+    return error if reconstructed == case.text else None
+
+
+def _source_error(case: _ParsedCase) -> SourceError:
+    return SourceError(
+        case_id=case.case_id,
+        kind=case.kind,
+        phenomenon=case.phenomenon,
+        category=case.category,
+        features=case.features,
+        shape_strata=case.shape_strata,
+        pair_id=case.pair_id,
+        text=case.text,
+        findings=case.findings,
+    )
+
+
+def _string_set(value: object, label: str) -> frozenset[str]:
+    if value is None:
+        return frozenset()
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        raise ValueError(f"{label} must be a list of strings")
+    return frozenset(value)
+
+
+def _optional_string(value: object, label: str) -> str | None:
+    if value is None:
+        return None
+    return _string(value, label)
+
+
+def _text(value: object, label: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{label} must be a string")
+    return value
+
+
+def _offset(value: object, label: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise ValueError(f"{label} must be a non-negative integer")
+    return value
 
 
 def _json_object(value: object, label: str) -> dict[str, object]:
