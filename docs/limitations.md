@@ -11,7 +11,13 @@
   instalacji dodatkowych usług.
 - Opcjonalne extra `morphology` rozszerza wąsko ograniczone rodziny review-only,
   w tym lokalną zgodę przymiotnika z rzeczownikiem oraz zamkniętą tabelę rekcji
-  `szukać`, `używać`, `ufać`, `interesować się` i `do`; nie stanowi ogólnej
+  `szukać`, `używać`, `ufać`, `interesować się` i `do`. Rozpoznaje również
+  brak przecinka po początkowym zdaniu podrzędnym tylko dla zamkniętego zbioru
+  `jeśli`, `jeżeli`, `gdy`, `kiedy`, `gdyby`: pierwsze dwa jednoznaczne
+  orzeczenia finitywne wyznaczają granicę przed zdaniem nadrzędnym. Obecny
+  przecinek, korelat `to`, cytat lub wzmianka, koordynacja przy granicy,
+  niepełny albo niejednoznaczny wynik i brak drugiego orzeczenia powodują
+  abstencję. Mechanizm nie stanowi ogólnej
   obsługi polskiej fleksji, zgody ani rekcji. Rekcja przyjmuje tylko jednoznaczny
   rzeczownik pospolity albo grupę `modyfikator + rzeczownik`, w której występuje
   najwyżej jeden przymiotnik lub obsługiwany zaimek dzierżawczy/wskazujący. Po

@@ -14,6 +14,8 @@ from polis.core import (
     SourceKind,
 )
 from polis.core.models import Severity
+from polis.rules._morfeusz import _QualifiedMorfeusz
+from polis.rules._subordinate_comma import initial_subordinate_comma_position
 from polis.segmentation import (
     Sentence,
 )
@@ -41,15 +43,8 @@ _DESTINATION_PREPOSITION_PATTERN: Final = re.compile(
     r"(?:(?:Pojechałem|pojechałem) (?P<lower>Warszawy)|"
     r"POJECHAŁEM (?P<upper>WARSZAWY))\.\Z"
 )
-_INITIAL_CONDITIONAL_COMMA_PATTERN: Final = re.compile(
-    r"(?:(?P<title>Jeśli pada) zostaję w domu|"
-    r"(?P<lower>jeśli pada) zostaję w domu|"
-    r"(?P<upper>JEŚLI PADA) ZOSTAJĘ W DOMU)\.\Z"
-)
-_INITIAL_TEMPORAL_COMMA_PATTERN: Final = re.compile(
-    r"(?<!\w)(?P<head>Gdy pada|Kiedy pada|Kiedy wieje|Kiedy wrócisz) (?=\S)",
-    re.IGNORECASE,
-)
+_INITIAL_CONDITIONAL_CONJUNCTIONS: Final = frozenset({"gdyby", "jeśli", "jeżeli"})
+_INITIAL_TEMPORAL_CONJUNCTIONS: Final = frozenset({"gdy", "kiedy"})
 
 
 class SyntaxCommaSpacingRule:
@@ -445,12 +440,13 @@ class SyntaxMissingDestinationPrepositionRule:
 
 
 class SyntaxInitialConditionalCommaRule:
-    """Insert one comma in a reviewed initial conditional sentence only."""
+    """Insert a comma at a qualified initial conditional-clause boundary."""
 
     _CATEGORY = Category.SYNTAX
 
-    def __init__(self) -> None:
+    def __init__(self, provider: _QualifiedMorfeusz | None = None) -> None:
         self.source = Source(SourceKind.RULE, "syntax.initial_conditional_comma")
+        self._provider = provider
 
     @property
     def operation(self) -> str:
@@ -462,19 +458,20 @@ class SyntaxInitialConditionalCommaRule:
     def behavior_version(self) -> str:
         """Return the review-only implementation behavior version."""
 
-        return "syntax-initial-conditional-comma/1.0"
+        return "syntax-initial-conditional-comma/2.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
-        """Return the reviewed insertion for an exact allowed sentence."""
+        """Return one morphology-qualified review-only insertion."""
 
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
-        match = _INITIAL_CONDITIONAL_COMMA_PATTERN.fullmatch(text)
-        if match is None:
+        if not is_single_sentence(text):
             return ()
-        group = "title" if match.group("title") is not None else "lower"
-        group = group if match.group(group) is not None else "upper"
-        start = match.end(group)
+        start = initial_subordinate_comma_position(
+            text, self._provider, _INITIAL_CONDITIONAL_CONJUNCTIONS
+        )
+        if start is None:
+            return ()
         return (
             _make_insertion_or_replacement(
                 start,
@@ -485,20 +482,21 @@ class SyntaxInitialConditionalCommaRule:
                 category=self._CATEGORY,
                 message="Brakuje przecinka po początkowym zdaniu warunkowym.",
                 explanation=(
-                    "W tej zamkniętej konstrukcji po zdaniu warunkowym stawiamy "
-                    "przecinek."
+                    "Po początkowym zdaniu warunkowym stawiamy przecinek przed "
+                    "zdaniem nadrzędnym."
                 ),
             ),
         )
 
 
 class SyntaxInitialTemporalCommaRule:
-    """Insert commas after closed initial temporal clause heads only."""
+    """Insert a comma at a qualified initial temporal-clause boundary."""
 
     _CATEGORY = Category.SYNTAX
 
-    def __init__(self) -> None:
+    def __init__(self, provider: _QualifiedMorfeusz | None = None) -> None:
         self.source = Source(SourceKind.RULE, "syntax.initial_temporal_comma")
+        self._provider = provider
 
     @property
     def operation(self) -> str:
@@ -506,38 +504,34 @@ class SyntaxInitialTemporalCommaRule:
 
     @property
     def behavior_version(self) -> str:
-        return "syntax-initial-temporal-comma/1.0"
+        return "syntax-initial-temporal-comma/2.0"
 
     def find(self, text: str, *, options: AnalysisOptions) -> tuple[Finding, ...]:
         if options.categories is not None and self._CATEGORY not in options.categories:
             return ()
 
-        matches = tuple(_INITIAL_TEMPORAL_COMMA_PATTERN.finditer(text))
-        if not matches or not is_single_sentence(text):
+        if not is_single_sentence(text):
             return ()
-        findings: list[Finding] = []
-        for match in matches:
-            start = match.end("head")
-            if _is_quoted_position(text, match.start("head")):
-                continue
-            if start < len(text) and text[start] == ",":
-                continue
-            findings.append(
-                _make_insertion_or_replacement(
-                    start,
-                    start,
-                    "",
-                    ",",
-                    self.source,
-                    category=self._CATEGORY,
-                    message="Brakuje przecinka po początkowym zdaniu czasowym.",
-                    explanation=(
-                        "W tej zamkniętej konstrukcji po początkowym zdaniu "
-                        "czasowym stawiamy przecinek."
-                    ),
-                )
-            )
-        return tuple(findings)
+        start = initial_subordinate_comma_position(
+            text, self._provider, _INITIAL_TEMPORAL_CONJUNCTIONS
+        )
+        if start is None:
+            return ()
+        return (
+            _make_insertion_or_replacement(
+                start,
+                start,
+                "",
+                ",",
+                self.source,
+                category=self._CATEGORY,
+                message="Brakuje przecinka po początkowym zdaniu czasowym.",
+                explanation=(
+                    "Po początkowym zdaniu czasowym stawiamy przecinek przed "
+                    "zdaniem nadrzędnym."
+                ),
+            ),
+        )
 
 
 def _is_abbreviation_fragment(text: str, comma_end: int) -> bool:

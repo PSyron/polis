@@ -61,8 +61,8 @@ kompletności języka.
 | `rule:spelling.sentence_initial_capital` | `spelling` | zamknięty otwieracz zdania po kropce → wielka litera, wyłącznie do przeglądu |
 | `rule:syntax.comma_space` | `punctuation` | brakująca spacja po przecinku |
 | `rule:syntax.duplicate_comma` | `punctuation` | usuwa drugi przecinek wyłącznie z bezpiecznej pary `,,` |
-| `rule:syntax.initial_conditional_comma` | `syntax` | zamknięta konstrukcja `Jeśli pada zostaję w domu.` → `Jeśli pada, zostaję w domu.`, wyłącznie do przeglądu |
-| `rule:syntax.initial_temporal_comma` | `syntax` | zamknięte konstrukcje `Gdy/Kiedy …` z brakującym przecinkiem po początkowym zdaniu czasowym, wyłącznie do przeglądu |
+| `rule:syntax.initial_conditional_comma` | `syntax` | początkowe zdanie warunkowe ze spójnikiem `jeśli`, `jeżeli` albo `gdyby`; Morfeusz wyznacza granicę przed drugim orzeczeniem finitywnym, wyłącznie do przeglądu |
+| `rule:syntax.initial_temporal_comma` | `syntax` | początkowe zdanie czasowe ze spójnikiem `gdy` albo `kiedy`; Morfeusz wyznacza granicę przed drugim orzeczeniem finitywnym, wyłącznie do przeglądu |
 | `rule:syntax.comma_before_ze_reporting` | `syntax` | przecinek po zamkniętym czasowniku raportującym/kognitywnym przed `że`, wyłącznie do przeglądu |
 | `rule:syntax.comma_before_zeby_purpose` | `syntax` | przecinek po zamkniętym czasowniku wolicjonalnym przed `żeby`/`żebyś`, wyłącznie do przeglądu |
 | `rule:syntax.comma_before_bo` | `syntax` | przecinek przed `bo`/`ponieważ`/`gdyż` z zamkniętym zbiorem wykluczeń prekursora, wyłącznie do przeglądu |
@@ -93,7 +93,9 @@ korzysta z Morfeusza również dla lokalnych grup przymiotnik–rzeczownik; zach
 minimalny span przymiotnika i abstenuje przy niejednoznaczności, wołaczu,
 koordynacji, cytacie, przerwanym demonstratywie przed interpunkcją, nazwie
 własnej albo niepełnych danych. Reguły zgody grupy nominalnej i podmiotu z czasownikiem
-oraz druga i trzecia z reguł fleksyjnych działają wyłącznie po lokalnym załadowaniu dokładnie Morfeusz2
+oraz druga i trzecia z reguł fleksyjnych, a także obie reguły przecinka po
+początkowym zdaniu podrzędnym, działają wyłącznie po lokalnym załadowaniu
+dokładnie Morfeusz2
 1.99.15 ze słownikiem
 `pl.sgjp.sgjp-2026.06.01` i zakwalifikowaną notą; brak, dryft albo
 niejednoznaczność kończy się abstencją. `rule:spelling.napewno`,

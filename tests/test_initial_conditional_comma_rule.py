@@ -21,6 +21,13 @@ from polis.rules import (
     RuleRegistration,
     SyntaxInitialConditionalCommaRule,
 )
+from polis.rules._morfeusz import _load_qualified_morfeusz, _QualifiedMorfeusz
+
+
+def _provider() -> _QualifiedMorfeusz:
+    provider = _load_qualified_morfeusz()
+    assert provider is not None
+    return provider
 
 
 def test_default_analyzer_reports_closed_initial_conditional_comma_error() -> None:
@@ -52,7 +59,7 @@ def test_default_analyzer_reports_closed_initial_conditional_comma_error() -> No
 )
 def test_rule_accepts_only_the_reviewed_sentence_casing(text: str) -> None:
     # Given
-    rule = SyntaxInitialConditionalCommaRule()
+    rule = SyntaxInitialConditionalCommaRule(_provider())
 
     # When
     findings = rule.find(text, options=AnalysisOptions())
@@ -72,19 +79,17 @@ def test_rule_accepts_only_the_reviewed_sentence_casing(text: str) -> None:
         "Powiedział, że jeśli pada zostaję w domu.",
         "„Jeśli pada zostaję w domu.”",
         "Zdanie „Jeśli pada zostaję w domu.” nie ma przecinka.",
-        "Jeśli pada zostaję w domu, ale otwieram okno.",
         "Jeśli pada i wieje zostaję w domu.",
         "Jeśliby padało zostaję w domu.",
-        "Jeśli pada zostaję w domku.",
         "Jeśli pada zostaję w domu. Potem czytam.",
-        "Jeśli pada zostaję w domu!",
+        "Jeśli chcesz to przyjdź.",
     ),
 )
 def test_rule_abstains_outside_the_closed_initial_conditional_sentence(
     text: str,
 ) -> None:
     # Given
-    rule = SyntaxInitialConditionalCommaRule()
+    rule = SyntaxInitialConditionalCommaRule(_provider())
 
     # When
     findings = rule.find(text, options=AnalysisOptions())
@@ -95,7 +100,7 @@ def test_rule_abstains_outside_the_closed_initial_conditional_sentence(
 
 def test_rule_respects_category_exclusion() -> None:
     # Given
-    rule = SyntaxInitialConditionalCommaRule()
+    rule = SyntaxInitialConditionalCommaRule(_provider())
 
     # When
     findings = rule.find(
@@ -123,7 +128,7 @@ def test_default_analyzer_respects_category_filtering() -> None:
 
 def test_registry_exposes_review_only_behavior_metadata() -> None:
     # Given
-    rule = SyntaxInitialConditionalCommaRule()
+    rule = SyntaxInitialConditionalCommaRule(_provider())
     registry = DeterministicRuleRegistry((RuleRegistration(rule=rule),))
 
     # When
@@ -133,7 +138,7 @@ def test_registry_exposes_review_only_behavior_metadata() -> None:
     assert behavior == SourceBehavior(
         source=rule.source,
         operation="insert.conditional_clause_comma",
-        behavior_version="syntax-initial-conditional-comma/1.0",
+        behavior_version="syntax-initial-conditional-comma/2.0",
     )
 
 
@@ -217,8 +222,8 @@ def test_cli_emits_exact_single_finding_json() -> None:
     assert completed.stderr == ""
     assert completed.stdout == (
         '{"issues":[{"category":"syntax","confidence":0.9,"end":10,'
-        '"explanation":"W tej zamkniętej konstrukcji po zdaniu warunkowym '
-        'stawiamy przecinek.","id":"finding_f304f3a5cf8573565c2a28ba0d29e58c",'
+        '"explanation":"Po początkowym zdaniu warunkowym stawiamy przecinek '
+        'przed zdaniem nadrzędnym.","id":"finding_f304f3a5cf8573565c2a28ba0d29e58c",'
         '"message":"Brakuje przecinka po początkowym zdaniu warunkowym.",'
         '"original":"","severity":"suggestion","source":'
         '"rule:syntax.initial_conditional_comma","start":10,"suggestion":","}],'

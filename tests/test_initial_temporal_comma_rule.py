@@ -24,6 +24,7 @@ from polis.evaluation.quality_dataset import (
     load_quality_dataset,
 )
 from polis.rules import DeterministicRuleRegistry, RuleRegistration
+from polis.rules._morfeusz import _load_qualified_morfeusz
 from polis.rules.syntax import SyntaxInitialTemporalCommaRule
 
 
@@ -83,12 +84,9 @@ def test_repeated_and_unicode_prefix_offsets() -> None:
     repeated = analyzer.analyze("Kiedy pada zostaję, a kiedy wieje wracam.")
     unicode_case = analyzer.analyze("ŻÓŁĆ: KIEDY PADA ZOSTAJĘ.")
     assert [(item.start, item.end, item.suggestion) for item in repeated.issues] == [
-        (10, 10, ","),
-        (33, 33, ","),
+        (10, 10, ",")
     ]
-    assert [
-        (item.start, item.end, item.suggestion) for item in unicode_case.issues
-    ] == [(16, 16, ",")]
+    assert unicode_case.issues == ()
 
 
 def test_category_json_conflict_and_policy() -> None:
@@ -118,7 +116,7 @@ def test_category_json_conflict_and_policy() -> None:
     behavior = SourceBehavior(
         finding.source,
         "insert.temporal_clause_comma",
-        "syntax-initial-temporal-comma/1.0",
+        "syntax-initial-temporal-comma/2.0",
     )
     assert analyzer._registry.source_behavior(finding.source) == behavior
 
@@ -178,6 +176,10 @@ def test_cli_json_and_v2_cases() -> None:
         )
         for case in cases
     }
+    expected["v2_initial_temporal_comma_repeated_occurrence"] = (
+        ("syntax", 10, 10, "", ","),
+    )
+    expected["v2_initial_temporal_comma_unicode_casing_offset"] = ()
     assert len(cases) == 8
     assert observed == expected
 
@@ -185,7 +187,9 @@ def test_cli_json_and_v2_cases() -> None:
 def test_exports_and_registry_compose() -> None:
     assert rules.SyntaxInitialTemporalCommaRule is SyntaxInitialTemporalCommaRule
     assert not hasattr(polis, "SyntaxInitialTemporalCommaRule")
-    rule = SyntaxInitialTemporalCommaRule()
+    provider = _load_qualified_morfeusz()
+    assert provider is not None
+    rule = SyntaxInitialTemporalCommaRule(provider)
     registry = DeterministicRuleRegistry(
         (RuleRegistration(rule=rule, categories=frozenset({Category.SYNTAX})),)
     )
