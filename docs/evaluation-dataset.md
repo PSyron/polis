@@ -46,6 +46,58 @@ niezależnego, jednorazowego pomiaru jakości. Zewnętrzny korpus
 WikEd PL z #427 pozostaje zablokowany przez brak dostarczonej władzy/licencji i
 nie jest używany ani fabrykowany w ramach #426.
 
+Opcjonalny parametr `class_distribution` przyjmuje jawne kwoty dla dokładnie
+czterech kluczy: `case`, `agreement`, `punctuation` i `diacritics`. Każda kwota
+musi być nieujemną liczbą całkowitą, a ich suma musi odpowiadać `count`.
+Przykład rozkładu 5000 par z 500 przypadkami interpunkcyjnymi:
+
+```python
+from polis.evaluation.synthetic_corpus import generate
+
+corpus = generate(
+    seed=426,
+    count=5000,
+    class_distribution={
+        "case": 2600,
+        "agreement": 1500,
+        "punctuation": 500,
+        "diacritics": 400,
+    },
+)
+```
+
+Ta ścieżka dołącza jawnie oznaczony materiał
+`synthetic-punctuation-development` z licencją `CC0-1.0` i pochodzeniem
+`project-authored`. Materiał jest generowany deterministycznie z projektu i
+służy wyłącznie do rozwoju; nie jest holdoutem. Nie jest dołączany dla
+`clean_texts`, dlatego tekst oraz proweniencja przekazane przez wywołującego nie
+są mieszane ze źródłem projektowym.
+
+CLI przyjmuje tę samą mapę jako cztery niepowtarzalne flagi:
+
+```shell
+uv run --locked --extra dev python -m polis.evaluation.synthetic_corpus \
+  --output /tmp/polis-synthetic-cases.jsonl \
+  --manifest /tmp/polis-synthetic-manifest.json \
+  --seed 426 --count 5000 \
+  --class-quota case=2600 \
+  --class-quota agreement=1500 \
+  --class-quota punctuation=500 \
+  --class-quota diacritics=400
+```
+
+Przekroczenie pojemności którejkolwiek klasy kończy się kontrolowanym błędem
+`ClassCapacityError`, który podaje klasę, żądaną kwotę i dostępną pojemność.
+Generator nie obcina kwoty i nie zapisuje częściowego korpusu. Dla poprawnego
+żądania manifest dodaje `requested_class_distribution` oraz
+`obtained_class_distribution`; brak jawnej mapy nie dodaje tych pól.
+
+Domyślny rozkład zachowuje zgodność bitową, ale nie nadaje się na bramkę klasy
+interpunkcyjnej: dla `seed=426, count=5000` zawiera tylko 38 takich par. Do
+pomiaru interpunkcji należy podać jawne kwoty. Wywołanie bez
+`class_distribution` nadal odtwarza historyczny SHA-256
+`d1cd75a9289b12d6913ff4f9912d27f83936ce29bb743a5c13e23796b7d7b1d0`.
+
 ## Walidowany profil benchmarkowy (#452)
 
 Profil `validated` jest osobną, wersjonowaną ścieżką dla benchmarku hybrydowego.
