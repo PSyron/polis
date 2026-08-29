@@ -110,6 +110,21 @@ def test_prohibited_vendor_markers_reject_root_level_directories(name: str) -> N
         _assert_no_prohibited_vendor_members([name], sdist=False)
 
 
+def test_subordinate_comma_runtime_module_is_in_release_source_manifest() -> None:
+    # Given
+    runtime_module = "src/polis/rules/_subordinate_comma.py"
+
+    # When
+    repository_includes_module = runtime_module in EXPECTED_SOURCE_MEMBERS
+    verifier_includes_module = (
+        runtime_module in artifact_verifier.EXPECTED_SOURCE_MEMBERS
+    )
+
+    # Then
+    assert repository_includes_module
+    assert verifier_includes_module
+
+
 def test_built_distributions_declare_mit_metadata_and_contain_license(
     tmp_path: Path,
 ) -> None:
@@ -169,7 +184,7 @@ def test_built_distributions_declare_mit_metadata_and_contain_license(
     )
     assert not any(_is_repository_only_calibration_member(name) for name in sdist_names)
     assert EXPECTED_SOURCE_MEMBERS == artifact_verifier.EXPECTED_SOURCE_MEMBERS
-    assert len(EXPECTED_SOURCE_MEMBERS) == 75
+    assert len(EXPECTED_SOURCE_MEMBERS) == 76
 
 
 def _mutate_wheel(

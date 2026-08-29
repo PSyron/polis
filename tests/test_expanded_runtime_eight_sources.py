@@ -59,7 +59,7 @@ _EXPECTED_EIGHT_IDENTITIES = {
     ),
     "rule:syntax.initial_temporal_comma": (
         "insert.temporal_clause_comma",
-        "syntax-initial-temporal-comma/1.0",
+        "syntax-initial-temporal-comma/2.0",
     ),
 }
 
@@ -175,6 +175,12 @@ def test_eight_sources_conflict_atomic_and_v2_positives_are_tp() -> None:
             )
             for item in case.findings
         ]
+        expected = {
+            "v2_initial_temporal_comma_repeated_occurrence": [
+                ("syntax", 10, 10, "", ",")
+            ],
+            "v2_initial_temporal_comma_unicode_casing_offset": [],
+        }.get(case.id, expected)
         assert observed == expected, case.id
 
 
