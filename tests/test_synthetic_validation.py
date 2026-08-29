@@ -40,6 +40,20 @@ def test_validate_single_edit_uses_the_declared_span() -> None:
     )
 
 
+def test_validate_single_edit_accepts_declared_repeated_substring_span() -> None:
+    incorrect = "Ala ma kota, a Ala ma psa."
+    correct = "Ola ma kota, a Ala ma psa."
+
+    assert validate_single_edit(
+        incorrect,
+        correct,
+        start=0,
+        end=3,
+        original="Ala",
+        suggestion="Ola",
+    )
+
+
 def test_validate_single_edit_accepts_zero_width_insertions() -> None:
     incorrect = "Jeśli pada zostaję w domu."
     correct = "Jeśli pada, zostaję w domu."
