@@ -55,6 +55,7 @@ exclude = [
   "/src/polis/evaluation/holdout_*.py",
   "/src/polis/evaluation/rule_family_qualification.py",
   "/src/polis/evaluation/synthetic_corpus.py",
+  "/src/polis/evaluation/synthetic_benchmark.py",
   "/src/polis/evaluation/_synthetic_corpus_*.py",
   "/src/polis/evaluation/datasets/synthetic_v1/**",
 ]
@@ -70,6 +71,7 @@ exclude = [
   "/src/polis/evaluation/holdout_*.py",
   "/src/polis/evaluation/rule_family_qualification.py",
   "/src/polis/evaluation/synthetic_corpus.py",
+  "/src/polis/evaluation/synthetic_benchmark.py",
   "/src/polis/evaluation/_synthetic_corpus_*.py",
   "/src/polis/evaluation/datasets/synthetic_v1/**",
 ]

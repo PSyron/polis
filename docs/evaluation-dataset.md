@@ -86,6 +86,30 @@ niezależna miara jakości.
 Domyślna ścieżka legacy zachowuje bajty korpusu dla `seed=426, count=5000`
 (`sha256=d1cd75a9289b12d6913ff4f9912d27f83936ce29bb743a5c13e23796b7d7b1d0`).
 
+Konsument profilu uruchamia się jawnie po lokalnym wytworzeniu korpusu,
+predykcji i manifestu:
+
+```shell
+uv run --locked --extra dev python -m polis.evaluation.synthetic_benchmark \
+  --corpus PATH --predictions PATH --manifest PATH --output PATH
+```
+
+`predictions` jest plikiem JSONL o ścisłym kontrakcie: każdy rekord ma dokładnie
+`pair_id` i `edits`. Puste `edits` oznacza abstencję. Jednoelementowe `edits`
+zawiera wyłącznie `start`, `end` i `replacement`, gdzie zakres to półotwarte
+`[start, end)`. `original` nie jest przekazywane przez producenta predykcji;
+konsument wyprowadza je z zakresu w odpowiadającym rekordzie korpusu. Dwie
+edycje, rekord o nieprawidłowej strukturze, nieznany, zduplikowany albo
+pominięty `pair_id` kończą ocenę fail-closed.
+
+Raport zawiera wyłącznie bezpieczne dla prywatności agregaty: `profile`,
+`generator_version`, `score`, `by_error_class`, `coverage` oraz tożsamości
+splitów w `split`. Nie emituje surowego korpusu ani odpowiedzi modelu. Jest to
+pokrycie rozwojowe, a nie syntetyczny F1 ani miara jakości produktu. Qwen,
+inny model lub sieć mogą być wyłącznie opcjonalnym, zewnętrznym producentem
+predykcji: benchmark nie dodaje domyślnej zależności runtime'u, nie wymaga
+transportu modelu i nie otwiera ponownie holdoutu.
+
 Do podziału rozwojowego i testowego należy używać deterministycznego helpera
 `split_source_disjoint`. Łączy on rekordy z tym samym `source_case_id` albo
 tekstem poprawnym, więc jeden przypadek nie trafia do obu splitów. Ocena
