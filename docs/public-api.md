@@ -54,6 +54,11 @@ w wersji 1. `SourceKind.LLM`, `SuggestionOutcome` i `SuggestionStatus` pozostaj�
 w publicznym schemacie dla zgodności danych linii 0.x, lecz domyślny runtime v1
 nie generuje takich wyników.
 
+Znaczenie pięciu kategorii emitowanych przez analizatory v1 oraz granicę
+zgodnościowej wartości `Category.STYLE` określa [słownik kategorii](categories.md).
+`Category.STYLE` pozostaje wartością enumu i schematu, ale nie oznacza analizy
+ani korekty stylu w v1.
+
 ## Cykl życia i bezpieczeństwo wątkowe
 
 Instancja `Analyzer` jest bezpieczna wątkowo do współbieżnych wywołań `analyze()`

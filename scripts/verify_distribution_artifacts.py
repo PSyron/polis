@@ -21,6 +21,7 @@ REQUIRED_SDIST_MEMBERS = (
     "pyproject.toml",
     "src/polis/__init__.py",
     "src/polis/py.typed",
+    "docs/categories.md",
     "docs/cli.md",
     "docs/compatibility.md",
     "docs/distribution-verification.md",

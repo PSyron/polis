@@ -12,6 +12,8 @@ from urllib.parse import unquote
 import pytest
 import scripts.validate_documentation_inventory as validator
 
+from polis import AnalyzerConfig, Category
+
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "validate_documentation_inventory.py"
 INVENTORY = ROOT / "docs" / "project" / "documentation-migration-inventory.json"
@@ -67,6 +69,7 @@ MAINTAINED_V1_DOCUMENTS = (
     "docs/project/RISKS.md",
     "docs/architecture/README.md",
     "docs/architecture/protocols.md",
+    "docs/categories.md",
     "docs/compatibility.md",
     "docs/cli.md",
     "docs/customization.md",
@@ -359,6 +362,37 @@ def test_rules_documentation_order_matches_default_registry() -> None:
         )
     )
     assert documented_sources == EXPECTED_V1_RULE_SOURCE_ORDER
+
+
+def test_category_documentation_tracks_runtime_categories_and_entrypoints() -> None:
+    category_documentation = (ROOT / "docs/categories.md").read_text(encoding="utf-8")
+    documented_categories = tuple(
+        re.findall(r"^\| `([a-z]+)` \|", category_documentation, re.MULTILINE)
+    )
+    runtime_categories = tuple(
+        category.value for category in Category if category is not Category.STYLE
+    )
+
+    assert documented_categories == runtime_categories
+    assert category_documentation.count("`review-only`") >= len(runtime_categories)
+    assert "`Category.STYLE`" in category_documentation
+    for relative_path in (
+        "README.md",
+        "docs/public-api.md",
+        "docs/customization.md",
+        "docs/cli.md",
+        "docs/rules.md",
+    ):
+        assert "categories.md" in (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def test_example_configuration_lists_all_emitted_v1_categories() -> None:
+    example_config = AnalyzerConfig.from_toml(ROOT / "examples/polis.toml")
+    runtime_categories = frozenset(
+        category for category in Category if category is not Category.STYLE
+    )
+
+    assert example_config.categories == runtime_categories
 
 
 def test_configuration_docs_describe_exact_legacy_section_rejection() -> None:
