@@ -25,11 +25,18 @@ from polis.evaluation._synthetic_corpus_sources import (
     provided_source_texts,
     source_texts,
 )
+from polis.evaluation._synthetic_corpus_validation import (
+    SourceDisjointSplit,
+    assert_source_disjoint,
+    split_source_disjoint,
+)
 
 GENERATOR_VERSION: Final = "polis-synthetic-corpus-v1"
 VALIDATED_GENERATOR_VERSION: Final = "polis-synthetic-corpus-v2-validated"
 DEFAULT_SEED: Final = 426
 DEFAULT_COUNT: Final = 5000
+VALIDATED_DEVELOPMENT_RATIO: Final = 0.8
+VALIDATED_SPLIT_STRATEGY: Final = "source-disjoint"
 type SyntheticProfile = Literal["legacy", "validated"]
 ERROR_CLASSES: Final[tuple[ErrorClass, ...]] = (
     "case",
@@ -62,6 +69,8 @@ class SyntheticCorpus:
     sources: tuple[SourceMetadata, ...]
     profile: SyntheticProfile = "legacy"
     coverage: CoverageReport | None = None
+    split: SourceDisjointSplit[SyntheticPair] | None = None
+    split_report: SplitReport | None = None
 
     @property
     def class_counts(self) -> dict[ErrorClass, int]:
@@ -88,6 +97,22 @@ class CoverageReport(TypedDict):
     rejected_counts: dict[str, int]
 
 
+class SplitPartitionReport(TypedDict):
+    pair_count: int
+    class_counts: dict[ErrorClass, int]
+    phenomenon_counts: dict[str, int]
+    shape_strata_counts: dict[str, int]
+    source_case_ids: list[str]
+    correct_text_sha256: list[str]
+
+
+class SplitReport(TypedDict):
+    strategy: str
+    development_ratio: float
+    seed: int
+    partitions: dict[str, SplitPartitionReport]
+
+
 class Manifest(TypedDict):
     schema_id: str
     schema_version: int
@@ -104,6 +129,7 @@ class Manifest(TypedDict):
     holdout: bool
     sources: list[SourceManifest]
     coverage: NotRequired[CoverageReport]
+    split: NotRequired[SplitReport]
 
 
 def generate(
@@ -163,12 +189,26 @@ def generate(
         sorted({source.metadata for source in sources}, key=lambda item: item.path)
     )
     coverage = _coverage_report(sources, selected) if profile == "validated" else None
+    split = (
+        split_source_disjoint(
+            pairs,
+            development_ratio=VALIDATED_DEVELOPMENT_RATIO,
+            seed=seed,
+        )
+        if profile == "validated"
+        else None
+    )
+    if split is not None:
+        assert_source_disjoint(split.development, split.test)
+    split_report = _split_report(sources, split, seed) if split is not None else None
     return SyntheticCorpus(
         seed=seed,
         pairs=pairs,
         sources=metadata,
         profile=profile,
         coverage=coverage,
+        split=split,
+        split_report=split_report,
     )
 
 
@@ -204,11 +244,12 @@ def build_manifest(corpus: SyntheticCorpus, *, artifact_sha256: str) -> Manifest
         sources=[_source_manifest(source) for source in corpus.sources],
     )
     if corpus.profile == "validated":
-        if corpus.coverage is None:
-            raise ValueError("validated corpus is missing coverage report")
+        if corpus.coverage is None or corpus.split_report is None:
+            raise ValueError("validated corpus is missing validation metadata")
         manifest["profile"] = corpus.profile
         manifest["generator_version"] = VALIDATED_GENERATOR_VERSION
         manifest["coverage"] = corpus.coverage
+        manifest["split"] = corpus.split_report
     return manifest
 
 
@@ -331,6 +372,52 @@ def _coverage_report(
         shape_strata_counts=dict(sorted(strata.items())),
         hard_negative_count=rejected.get("no_controlled_pair", 0),
         rejected_counts=dict(sorted(rejected.items())),
+    )
+
+
+def _split_report(
+    sources: Sequence[SourceText],
+    split: SourceDisjointSplit[SyntheticPair],
+    seed: int,
+) -> SplitReport:
+    source_by_key = {
+        (source.metadata.dataset_id, source.case_id): source for source in sources
+    }
+    return SplitReport(
+        strategy=VALIDATED_SPLIT_STRATEGY,
+        development_ratio=VALIDATED_DEVELOPMENT_RATIO,
+        seed=seed,
+        partitions={
+            "development": _split_partition_report(source_by_key, split.development),
+            "test": _split_partition_report(source_by_key, split.test),
+        },
+    )
+
+
+def _split_partition_report(
+    source_by_key: dict[tuple[str, str], SourceText], pairs: Sequence[SyntheticPair]
+) -> SplitPartitionReport:
+    selected_sources = tuple(
+        source_by_key[(pair.source_dataset, pair.source_case_id)] for pair in pairs
+    )
+    phenomena = Counter(source.phenomenon or "unknown" for source in selected_sources)
+    strata = Counter(
+        shape
+        for source in selected_sources
+        for shape in (source.shape_strata or frozenset({"unstratified"}))
+    )
+    return SplitPartitionReport(
+        pair_count=len(pairs),
+        class_counts={
+            error_class: sum(pair.error_class == error_class for pair in pairs)
+            for error_class in ERROR_CLASSES
+        },
+        phenomenon_counts=dict(sorted(phenomena.items())),
+        shape_strata_counts=dict(sorted(strata.items())),
+        source_case_ids=sorted({pair.source_case_id for pair in pairs}),
+        correct_text_sha256=sorted(
+            {sha256(pair.correct_text.encode("utf-8")).hexdigest() for pair in pairs}
+        ),
     )
 
 

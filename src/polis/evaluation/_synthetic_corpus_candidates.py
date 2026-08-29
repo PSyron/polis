@@ -27,6 +27,10 @@ _PROTECTED_FEATURES: Final = frozenset(
 )
 _PUNCTUATION_FAMILIES: Final = ("rule:syntax.", "rule:punctuation.")
 _PUNCTUATION_CHARS: Final = frozenset(",.;:!?-—…")
+_VALIDATED_AGREEMENT_SURFACES: Final = frozenset(
+    {("nowy", "nowa"), ("czyta", "czytają")}
+)
+_VALIDATED_CASE_CATEGORIES: Final = frozenset({"inflection", "rection"})
 
 
 class MorphologyBackend(Protocol):
@@ -182,11 +186,11 @@ def _validated_rejection_reason(source: SourceText) -> str | None:
 def _validated_error_class(
     category: str | None, finding: SourceFinding
 ) -> ErrorClass | None:
-    if category == "agreement" and _is_single_agreement_change(
+    if category == "agreement" and _is_qualified_agreement_change(
         finding.original, finding.suggestion
     ):
         return "agreement"
-    if category in {"inflection", "rection"}:
+    if category in _VALIDATED_CASE_CATEGORIES:
         return "case"
     if category in {"punctuation", "syntax"} and _is_rule_punctuation(finding):
         return "punctuation"
@@ -207,13 +211,14 @@ def _is_protected(text: str, start: int, end: int) -> bool:
     return False
 
 
-def _is_single_agreement_change(original: str, suggestion: str) -> bool:
+def _is_qualified_agreement_change(original: str, suggestion: str) -> bool:
     original_words = tuple(match.group() for match in _WORD_PATTERN.finditer(original))
     suggestion_words = tuple(
         match.group() for match in _WORD_PATTERN.finditer(suggestion)
     )
     return (
-        len(original_words) == len(suggestion_words)
+        (original, suggestion) in _VALIDATED_AGREEMENT_SURFACES
+        and len(original_words) == len(suggestion_words)
         and _WORD_PATTERN.sub("\x00", original) == _WORD_PATTERN.sub("\x00", suggestion)
         and sum(
             left != right

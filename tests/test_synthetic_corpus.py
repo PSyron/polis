@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import Counter
 from pathlib import Path
 from typing import cast
 
@@ -12,7 +13,10 @@ from polis.evaluation._synthetic_corpus_sources import (
     protected_spans,
     source_texts,
 )
-from polis.evaluation._synthetic_corpus_validation import validate_single_edit
+from polis.evaluation._synthetic_corpus_validation import (
+    assert_source_disjoint,
+    validate_single_edit,
+)
 from polis.evaluation.synthetic_corpus import (
     DEFAULT_COUNT,
     ERROR_CLASSES,
@@ -67,6 +71,74 @@ def test_validated_profile_uses_reviewed_controlled_pairs() -> None:
     assert all("`" not in pair.incorrect_text for pair in corpus.pairs)
 
 
+def test_validated_agreement_pairs_are_explicitly_qualified() -> None:
+    corpus = generate(profile="validated", seed=426)
+
+    assert {
+        (pair.original, pair.suggestion)
+        for pair in corpus.pairs
+        if pair.error_class == "agreement"
+    } == {("nowy", "nowa"), ("czyta", "czytają")}
+
+
+def test_validated_manifest_reports_a_deterministic_source_disjoint_split() -> None:
+    corpus = generate(profile="validated", seed=426)
+    manifest = build_manifest(corpus, artifact_sha256="a" * 64)
+
+    assert corpus.split is not None
+    assert corpus.split_report is not None
+    assert_source_disjoint(corpus.split.development, corpus.split.test)
+    assert corpus.split.development
+    assert corpus.split.test
+    split = manifest["split"]
+    assert split == corpus.split_report
+    assert split["strategy"] == "source-disjoint"
+    assert split["development_ratio"] == 0.8
+    assert split["seed"] == 426
+    source_by_case_id = {
+        source.case_id: source
+        for source in source_texts(Path(__file__).resolve().parents[1])
+    }
+    for name, partition in (
+        ("development", corpus.split.development),
+        ("test", corpus.split.test),
+    ):
+        report = split["partitions"][name]
+        partition_sources = tuple(
+            source_by_case_id[pair.source_case_id] for pair in partition
+        )
+        assert report["pair_count"] == len(partition)
+        assert report["class_counts"] == {
+            error_class: sum(pair.error_class == error_class for pair in partition)
+            for error_class in ERROR_CLASSES
+        }
+        assert report["phenomenon_counts"] == dict(
+            sorted(
+                Counter(
+                    source.phenomenon or "unknown" for source in partition_sources
+                ).items()
+            )
+        )
+        assert report["shape_strata_counts"] == dict(
+            sorted(
+                Counter(
+                    shape
+                    for source in partition_sources
+                    for shape in (source.shape_strata or frozenset({"unstratified"}))
+                ).items()
+            )
+        )
+        assert report["source_case_ids"] == sorted(
+            {pair.source_case_id for pair in partition}
+        )
+        assert report["correct_text_sha256"] == sorted(
+            {
+                hashlib.sha256(pair.correct_text.encode("utf-8")).hexdigest()
+                for pair in partition
+            }
+        )
+
+
 def test_source_metadata_exposes_protected_literal_spans() -> None:
     root = Path(__file__).resolve().parents[1]
     source = next(
@@ -119,6 +191,7 @@ def test_legacy_manifest_shape_is_unchanged() -> None:
 
     assert "profile" not in manifest
     assert "coverage" not in manifest
+    assert "split" not in manifest
 
 
 def test_generate_default_corpus_has_at_least_five_thousand_pairs() -> None:
