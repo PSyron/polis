@@ -46,6 +46,16 @@ _COVERAGE_KEYS: Final = frozenset(
 _IDENTITY_KEYS: Final = frozenset(
     {"pair_ids", "source_case_ids", "correct_text_sha256"}
 )
+_PARTITION_KEYS: Final = frozenset(
+    {
+        "pair_count",
+        "class_counts",
+        "phenomenon_counts",
+        "shape_strata_counts",
+        "source_case_ids",
+        "correct_text_sha256",
+    }
+)
 
 
 class BenchmarkInputError(ValueError):
@@ -113,6 +123,13 @@ class _Manifest:
     generator_version: str
     coverage: Coverage
     split: Split
+
+
+@dataclass(frozen=True, slots=True)
+class _GeneratedPartition:
+    identity: SplitIdentity
+    pair_count: int
+    class_counts: dict[str, int]
 
 
 def evaluate_benchmark(
@@ -242,10 +259,44 @@ def _coverage(value: JsonValue) -> Coverage:
 
 def _split(value: JsonValue, pairs: tuple[_CorpusPair, ...]) -> Split:
     record = _mapping(value, "source-disjoint split")
-    if set(record) != {"development", "test"}:
+    if set(record) == {"development", "test"}:
+        development = _identity(record["development"])
+        test = _identity(record["test"])
+        return _validate_split_identities(development, test, pairs)
+    if set(record) != {"strategy", "development_ratio", "seed", "partitions"}:
         raise _split_error()
-    development = _identity(record["development"])
-    test = _identity(record["test"])
+    if _string(record, "strategy", nonempty=True) != "source-disjoint":
+        raise _split_error()
+    ratio = record.get("development_ratio")
+    if (
+        isinstance(ratio, bool)
+        or not isinstance(ratio, int | float)
+        or not 0 < ratio < 1
+        or _integer(record, "seed") < 0
+    ):
+        raise _split_error()
+    partitions = _mapping(record["partitions"], "source-disjoint partitions")
+    if set(partitions) != {"development", "test"}:
+        raise _split_error()
+    development_partition = _generated_partition(partitions["development"])
+    test_partition = _generated_partition(partitions["test"])
+    development = development_partition.identity
+    test = test_partition.identity
+    split = _validate_split_identities(development, test, pairs)
+    development_pairs = _partition_pairs(development, pairs)
+    test_pairs = _partition_pairs(test, pairs)
+    if {pair.pair_id for pair in development_pairs} | {
+        pair.pair_id for pair in test_pairs
+    } != {pair.pair_id for pair in pairs}:
+        raise _split_error()
+    _validate_generated_partition(development_partition, development_pairs)
+    _validate_generated_partition(test_partition, test_pairs)
+    return split
+
+
+def _validate_split_identities(
+    development: SplitIdentity, test: SplitIdentity, pairs: tuple[_CorpusPair, ...]
+) -> Split:
     identities = (development, test)
     for key in ("source_case_ids", "correct_text_sha256"):
         if set(identities[0][key]) & set(identities[1][key]):
@@ -278,6 +329,50 @@ def _split(value: JsonValue, pairs: tuple[_CorpusPair, ...]) -> Split:
             }:
                 raise _split_error()
     return Split(development=development, test=test)
+
+
+def _generated_partition(value: JsonValue) -> _GeneratedPartition:
+    record = _mapping(value, "source-disjoint partition")
+    if set(record) != _PARTITION_KEYS:
+        raise _split_error()
+    pair_count = _integer(record, "pair_count")
+    if pair_count <= 0:
+        raise _split_error()
+    _counts(record["phenomenon_counts"], "partition phenomenon counts")
+    _counts(record["shape_strata_counts"], "partition shape strata counts")
+    return _GeneratedPartition(
+        identity=_identity(
+            {
+                "source_case_ids": record["source_case_ids"],
+                "correct_text_sha256": record["correct_text_sha256"],
+            }
+        ),
+        pair_count=pair_count,
+        class_counts=_counts(record["class_counts"], "partition class counts"),
+    )
+
+
+def _partition_pairs(
+    identity: SplitIdentity, pairs: tuple[_CorpusPair, ...]
+) -> tuple[_CorpusPair, ...]:
+    source_case_ids = set(identity["source_case_ids"])
+    correct_text_hashes = set(identity["correct_text_sha256"])
+    return tuple(
+        pair
+        for pair in pairs
+        if pair.source_case_id in source_case_ids
+        and _digest(pair.correct_text) in correct_text_hashes
+    )
+
+
+def _validate_generated_partition(
+    partition: _GeneratedPartition, pairs: tuple[_CorpusPair, ...]
+) -> None:
+    if partition.pair_count != len(pairs) or partition.class_counts != {
+        error_class: sum(pair.error_class == error_class for pair in pairs)
+        for error_class in sorted(_ERROR_CLASSES)
+    }:
+        raise _split_error()
 
 
 def _identity(value: JsonValue) -> SplitIdentity:

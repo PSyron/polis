@@ -7,10 +7,12 @@ from hashlib import sha256
 from pathlib import Path
 
 import pytest
+
 from polis.evaluation.synthetic_benchmark import (
     BenchmarkInputError,
     evaluate_benchmark,
 )
+from polis.evaluation.synthetic_corpus import generate, write_artifacts
 
 type JsonValue = None | bool | int | str | list["JsonValue"] | dict[str, "JsonValue"]
 type PredictionFactory = Callable[["_BenchmarkFixture"], list[JsonValue]]
@@ -61,6 +63,45 @@ def test_evaluate_benchmark_reports_declared_edit_and_abstention(
     serialized = json.dumps(report, ensure_ascii=False, sort_keys=True)
     assert fixture.development_incorrect not in serialized
     assert fixture.development_correct not in serialized
+
+
+def test_evaluate_benchmark_consumes_generated_validated_partition_manifest(
+    tmp_path: Path,
+) -> None:
+    corpus = generate(profile="validated", seed=426)
+    corpus_path = tmp_path / "corpus.jsonl"
+    manifest_path = tmp_path / "manifest.json"
+    write_artifacts(corpus, corpus_path, manifest_path)
+    predictions_path = _write_predictions(
+        tmp_path,
+        [
+            {
+                "pair_id": pair.id,
+                "edits": [
+                    {
+                        "start": pair.start,
+                        "end": pair.end,
+                        "replacement": pair.suggestion,
+                    }
+                ],
+            }
+            for pair in corpus.pairs
+        ],
+    )
+
+    report = evaluate_benchmark(corpus_path, predictions_path, manifest_path)
+
+    assert report["profile"] == "validated"
+    assert report["generator_version"] == "polis-synthetic-corpus-v2-validated"
+    assert report["score"] == {
+        "total": len(corpus.pairs),
+        "accepted": len(corpus.pairs),
+        "abstained": 0,
+    }
+    assert report["coverage"]["phenomenon_counts"]
+    assert report["coverage"]["shape_strata_counts"]
+    assert report["split"]["development"]["source_case_ids"]
+    assert report["split"]["test"]["source_case_ids"]
 
 
 @pytest.mark.parametrize(
