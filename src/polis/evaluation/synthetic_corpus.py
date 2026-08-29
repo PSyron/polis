@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import argparse
 import importlib
 import json
-import random
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass
@@ -12,12 +10,21 @@ from pathlib import Path
 from typing import Final, Literal, NotRequired, TypedDict, cast
 
 from polis.evaluation._synthetic_corpus_candidates import (
-    Candidate,
     ErrorClass,
     MorphologyBackend,
-    _validated_rejection_reason,
     build_candidates,
     build_validated_candidates,
+)
+from polis.evaluation._synthetic_corpus_cli import run as _main
+from polis.evaluation._synthetic_corpus_coverage import (
+    CoverageReport,
+    coverage_report,
+)
+from polis.evaluation._synthetic_corpus_distribution import (
+    ERROR_CLASSES,
+    ClassDistribution,
+    punctuation_development_material,
+    select_candidates,
 )
 from polis.evaluation._synthetic_corpus_sources import (
     SourceMetadata,
@@ -38,12 +45,6 @@ DEFAULT_COUNT: Final = 5000
 VALIDATED_DEVELOPMENT_RATIO: Final = 0.8
 VALIDATED_SPLIT_STRATEGY: Final = "source-disjoint"
 type SyntheticProfile = Literal["legacy", "validated"]
-ERROR_CLASSES: Final[tuple[ErrorClass, ...]] = (
-    "case",
-    "agreement",
-    "punctuation",
-    "diacritics",
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +72,7 @@ class SyntheticCorpus:
     coverage: CoverageReport | None = None
     split: SourceDisjointSplit[SyntheticPair] | None = None
     split_report: SplitReport | None = None
+    requested_class_distribution: dict[ErrorClass, int] | None = None
 
     @property
     def class_counts(self) -> dict[ErrorClass, int]:
@@ -88,13 +90,6 @@ class SourceManifest(TypedDict):
     license: str
     source: str
     clean_case_count: int
-
-
-class CoverageReport(TypedDict):
-    phenomenon_counts: dict[str, int]
-    shape_strata_counts: dict[str, int]
-    hard_negative_count: int
-    rejected_counts: dict[str, int]
 
 
 class SplitPartitionReport(TypedDict):
@@ -130,6 +125,8 @@ class Manifest(TypedDict):
     sources: list[SourceManifest]
     coverage: NotRequired[CoverageReport]
     split: NotRequired[SplitReport]
+    requested_class_distribution: NotRequired[dict[ErrorClass, int]]
+    obtained_class_distribution: NotRequired[dict[ErrorClass, int]]
 
 
 def generate(
@@ -142,6 +139,7 @@ def generate(
     root: Path | None = None,
     backend: MorphologyBackend | None = None,
     profile: SyntheticProfile = "legacy",
+    class_distribution: ClassDistribution | None = None,
 ) -> SyntheticCorpus:
     if profile not in {"legacy", "validated"}:
         raise ValueError("profile must be legacy or validated")
@@ -171,13 +169,24 @@ def generate(
     if profile == "legacy":
         morphology = backend or _load_morfeusz()
         candidates = build_candidates(sources, morphology)
+        if class_distribution is not None and clean_texts is None:
+            punctuation_sources, punctuation_candidates = (
+                punctuation_development_material()
+            )
+            sources += punctuation_sources
+            candidates += punctuation_candidates
     else:
         candidates = build_validated_candidates(sources)
     if count is None:
         requested_count = DEFAULT_COUNT if profile == "legacy" else len(candidates)
     else:
         requested_count = count
-    selected = _select_candidates(candidates, requested_count, seed)
+    selected = select_candidates(
+        candidates,
+        requested_count,
+        seed,
+        class_distribution,
+    )
     pair_prefix = (
         "synthetic_426" if profile == "legacy" else f"synthetic_{profile}_{seed}"
     )
@@ -188,7 +197,7 @@ def generate(
     metadata = tuple(
         sorted({source.metadata for source in sources}, key=lambda item: item.path)
     )
-    coverage = _coverage_report(sources, selected) if profile == "validated" else None
+    coverage = coverage_report(sources, selected) if profile == "validated" else None
     split = (
         split_source_disjoint(
             pairs,
@@ -209,6 +218,9 @@ def generate(
         coverage=coverage,
         split=split,
         split_report=split_report,
+        requested_class_distribution=(
+            dict(class_distribution) if class_distribution is not None else None
+        ),
     )
 
 
@@ -250,6 +262,9 @@ def build_manifest(corpus: SyntheticCorpus, *, artifact_sha256: str) -> Manifest
         manifest["generator_version"] = VALIDATED_GENERATOR_VERSION
         manifest["coverage"] = corpus.coverage
         manifest["split"] = corpus.split_report
+    if corpus.requested_class_distribution is not None:
+        manifest["requested_class_distribution"] = corpus.requested_class_distribution
+        manifest["obtained_class_distribution"] = corpus.class_counts
     return manifest
 
 
@@ -269,71 +284,6 @@ def write_artifacts(
     return manifest
 
 
-def _select_candidates(
-    candidates: Sequence[Candidate], count: int, seed: int
-) -> tuple[Candidate, ...]:
-    pools: dict[ErrorClass, list[Candidate]] = {
-        error_class: sorted(
-            (
-                candidate
-                for candidate in candidates
-                if candidate.error_class == error_class
-            ),
-            key=lambda item: item.key,
-        )
-        for error_class in ERROR_CLASSES
-    }
-    if any(not pool for pool in pools.values()):
-        missing = [error_class for error_class, pool in pools.items() if not pool]
-        raise ValueError(f"synthetic source cannot cover classes: {', '.join(missing)}")
-    if count > len(candidates):
-        raise ValueError(
-            f"requested {count} pairs but only {len(candidates)} unique pairs exist"
-        )
-    randomizer = random.Random(seed)
-    for pool in pools.values():
-        randomizer.shuffle(pool)
-    quotas = _quotas(
-        {error_class: len(pool) for error_class, pool in pools.items()}, count
-    )
-    selected = [
-        candidate
-        for error_class in ERROR_CLASSES
-        for candidate in pools[error_class][: quotas[error_class]]
-    ]
-    randomizer.shuffle(selected)
-    return tuple(selected)
-
-
-def _quotas(capacities: dict[ErrorClass, int], count: int) -> dict[ErrorClass, int]:
-    total_capacity = sum(capacities.values())
-    quotas = {
-        error_class: max(1, count * capacity // total_capacity)
-        for error_class, capacity in capacities.items()
-    }
-    while sum(quotas.values()) < count:
-        candidates = [
-            error_class
-            for error_class in ERROR_CLASSES
-            if quotas[error_class] < capacities[error_class]
-        ]
-        selected = max(
-            candidates,
-            key=lambda error_class: (
-                capacities[error_class] / quotas[error_class],
-                -ERROR_CLASSES.index(error_class),
-            ),
-        )
-        quotas[selected] += 1
-    while sum(quotas.values()) > count:
-        selected = max(
-            (error_class for error_class in ERROR_CLASSES if quotas[error_class] > 1),
-            key=lambda error_class: quotas[error_class],
-        )
-        quotas[selected] -= 1
-    return quotas
-
-
 def _source_manifest(source: SourceMetadata) -> SourceManifest:
     return SourceManifest(
         dataset_id=source.dataset_id,
@@ -343,35 +293,6 @@ def _source_manifest(source: SourceMetadata) -> SourceManifest:
         license=source.license,
         source=source.source,
         clean_case_count=source.clean_case_count,
-    )
-
-
-def _coverage_report(
-    sources: Sequence[SourceText], selected: Sequence[Candidate]
-) -> CoverageReport:
-    source_by_key = {
-        (source.metadata.dataset_id, source.case_id): source for source in sources
-    }
-    selected_sources = [
-        source_by_key[(candidate.source_dataset, candidate.source_case_id)]
-        for candidate in selected
-    ]
-    phenomena = Counter(source.phenomenon or "unknown" for source in selected_sources)
-    strata = Counter(
-        shape
-        for source in selected_sources
-        for shape in (source.shape_strata or frozenset({"unstratified"}))
-    )
-    rejected = Counter(
-        reason
-        for source in sources
-        if (reason := _validated_rejection_reason(source)) is not None
-    )
-    return CoverageReport(
-        phenomenon_counts=dict(sorted(phenomena.items())),
-        shape_strata_counts=dict(sorted(strata.items())),
-        hard_negative_count=rejected.get("no_controlled_pair", 0),
-        rejected_counts=dict(sorted(rejected.items())),
     )
 
 
@@ -432,24 +353,6 @@ def _load_morfeusz() -> MorphologyBackend:
     if not callable(factory):
         raise RuntimeError("morfeusz2 does not expose Morfeusz")
     return cast(MorphologyBackend, factory())
-
-
-def _main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
-    parser.add_argument("--count", type=int, default=None)
-    parser.add_argument("--profile", choices=("legacy", "validated"), default="legacy")
-    args = parser.parse_args()
-    corpus = generate(
-        seed=args.seed,
-        count=args.count,
-        profile=cast(SyntheticProfile, args.profile),
-    )
-    manifest = write_artifacts(corpus, args.output, args.manifest)
-    print(json.dumps(manifest, ensure_ascii=False, sort_keys=True))
-    return 0
 
 
 if __name__ == "__main__":
