@@ -85,6 +85,7 @@ MAINTAINED_V1_DOCUMENTS = (
     "docs/privacy-audit.md",
     "docs/public-api.md",
     "docs/quick-start.md",
+    "docs/rule-authoring.md",
     "docs/rules.md",
     "examples/polis.toml",
 )

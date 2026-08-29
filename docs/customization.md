@@ -31,4 +31,6 @@ Wywołanie bez pliku i bez tych flag analizuje wszystkie kategorie z progiem
 Regułę można dodać wyłącznie w zmianie runtime'u: implementuje ona `Rule`, ma
 unikatowe stabilne `source`, deklaruje kategorie oraz zachowanie i przechodzi
 testy przesunięć, filtrowania i polityki automatycznej. Nie twórz rozszerzenia
-bez bieżącego konsumenta. Szczegóły rejestru opisują [reguły](rules.md).
+bez bieżącego konsumenta. Szczegółowy proces review-only-first, testów i
+kwalifikacji opisuje [przewodnik autorstwa reguł](rule-authoring.md), a wykaz
+źródeł opisują [reguły](rules.md).
