@@ -65,6 +65,52 @@ przypisuje tę samą kontrolę innemu wymaganemu zadaniu.
 - **Major**: zmiany łamiące udokumentowane symbole (`polis.__all__` i snapshot
   API) albo wersje serializowanych schematów.
 
+### Plan migracji 1.0 dla członków zgodności 0.x
+
+[ADR-0022](architecture/decisions/0022-conservative-v1-product-scope.md#zgodność-schematu-błędów-i-wyników)
+utrzymuje przez całą linię 0.x cztery członki cyklu życia `Analyzer`: `close()`,
+`__enter__()`, `__exit__()` oraz
+`language_tool_process_start_count`. Są to bezpieczne punkty zgodności, nie
+obietnica obecności procesu Java ani LanguageToola. Wspierany runtime v1 nie
+posiada procesu do zamknięcia, a licznik zawsze zwraca `0`.
+
+W wydaniu 1.0 te cztery członki zostaną usunięte w jednej, jawnie opisanej
+zmianie major. Przed wydaniem trzeba zaktualizować snapshot publicznego API,
+release notes i przewodnik migracji, a także potwierdzić, że żaden wspierany
+konsument nie używa już tych symboli. Zmiana nie może pojawić się jako cicha
+część wydania 0.x.
+
+| Członek 0.x | Zmiana w 1.0 | Migracja konsumenta |
+| --- | --- | --- |
+| `Analyzer.close()` | Usunąć no-op z publicznego API. | Usunąć wywołanie; `Analyzer` nie posiada zasobu wymagającego zamknięcia. |
+| `Analyzer.__enter__()` | Usunąć obsługę menedżera kontekstu. | Zastąpić blok `with` zwykłym utworzeniem `Analyzer` i wywołaniem metody analizy. |
+| `Analyzer.__exit__()` | Usunąć obsługę menedżera kontekstu. | Nie wywoływać ręcznie; po usunięciu `with` nie ma końcowego hooka cyklu życia. |
+| `Analyzer.language_tool_process_start_count` | Usunąć licznik procesu, którego runtime v1 nie uruchamia. | Usunąć odczyt i warunek; nie ma zamiennika, bo v1 nie posiada procesu LanguageTool. |
+
+Przykład kodu przed migracją, zgodny z linią 0.x:
+
+```python
+from polis import Analyzer, AnalyzerConfig
+
+with Analyzer(AnalyzerConfig()) as analyzer:  # __enter__() / __exit__()
+    result = analyzer.analyze("To jest tekst.")
+    assert analyzer.language_tool_process_start_count == 0
+    analyzer.close()  # jawny no-op; __exit__() wykona go ponownie
+```
+
+Po migracji do 1.0 ten sam przepływ używa bezpośrednio analizatora:
+
+```python
+from polis import Analyzer, AnalyzerConfig
+
+analyzer = Analyzer(AnalyzerConfig())
+result = analyzer.analyze("To jest tekst.")
+```
+
+Nie należy zastępować usuniętego licznika własnym licznikiem procesów ani
+przywracać LanguageToola jako ukrytej zależności. Jeżeli aplikacja potrzebuje
+zarządzać innym zasobem, powinna robić to poza cyklem życia `Analyzer`.
+
 ## Polityka wersji wydań
 
 Wersja SemVer `MAJOR.MINOR.PATCH` ma odpowiadającą postać PEP 440: zwykły rozwój
