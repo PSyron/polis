@@ -33,8 +33,10 @@ Pełny przykład znajduje się w [`examples/polis.toml`](../examples/polis.toml)
 
 ## Wejście
 
-Komenda `analyze` przyjmuje tekst na dokładnie jeden z trzech alternatywnych
-sposobów. Nie łącz wejścia pozycyjnego z `--stdin` ani `--file`.
+Wybierz dokładnie jeden z trzech sposobów wejścia. Parser obecnie nie odrzuca
+ich połączenia: obserwowana kolejność wyboru to `--stdin`, potem `--file`, a
+na końcu tekst pozycyjny. Takie połączenia są niewspierane i nie należy polegać
+na tej kolejności.
 
 ```console
 # Tekst pozycyjny
@@ -76,7 +78,11 @@ m.in. `id`, kategorię, komunikat, sugestię, źródło, pewność oraz zakres
 
 ## Filtrowanie i konfiguracja
 
-`--category CATEGORY` ogranicza analizę do kategorii i można je powtarzać.
+`--category CATEGORY` ogranicza analizę do kategorii i można je powtarzać;
+używaj niepustych wartości. Puste `--category ''` jest akceptowane (kod `0`),
+ale tworzy pusty filtr kategorii (`options.categories` ma wartość `[]`), także
+gdy TOML określa kategorie. Nie służy do żądania wszystkich kategorii: aby
+pozostawić domyślny filtr albo filtr z TOML, pomiń `--category`.
 `--minimum-confidence VALUE` przyjmuje próg od `0.0` do `1.0`. Flaga na
 wierszu poleceń zastępuje tylko odpowiadającą jej wartość z TOML; flaga kategorii
 nie zmienia progu z TOML, a flaga progu nie zmienia kategorii z TOML.
