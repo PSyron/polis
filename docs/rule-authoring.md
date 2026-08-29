@@ -121,7 +121,10 @@ def test_double_space_emits_a_minimal_unicode_span() -> None:
     findings = rule.find(text, options=AnalysisOptions())
 
     # Then
-    assert [(item.original, item.suggestion, item.start, item.end)] == [
+    assert [
+        (item.original, item.suggestion, item.start, item.end)
+        for item in findings
+    ] == [
         ("  ", " ", 4, 6),
     ]
     assert text[findings[0].start : findings[0].end] == findings[0].original
