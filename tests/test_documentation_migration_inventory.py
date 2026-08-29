@@ -12,7 +12,7 @@ from urllib.parse import unquote
 import pytest
 import scripts.validate_documentation_inventory as validator
 
-from polis import Category
+from polis import AnalyzerConfig, Category
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "validate_documentation_inventory.py"
@@ -384,6 +384,15 @@ def test_category_documentation_tracks_runtime_categories_and_entrypoints() -> N
         "docs/rules.md",
     ):
         assert "categories.md" in (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def test_example_configuration_lists_all_emitted_v1_categories() -> None:
+    example_config = AnalyzerConfig.from_toml(ROOT / "examples/polis.toml")
+    runtime_categories = frozenset(
+        category for category in Category if category is not Category.STYLE
+    )
+
+    assert example_config.categories == runtime_categories
 
 
 def test_configuration_docs_describe_exact_legacy_section_rejection() -> None:

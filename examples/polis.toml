@@ -1,4 +1,4 @@
 # Jedyną wspieraną sekcją konfiguracji v1 jest lokalna `[analysis]`.
 [analysis]
-categories = ["agreement", "syntax", "spelling", "punctuation"]
+categories = ["inflection", "agreement", "syntax", "spelling", "punctuation"]
 minimum_confidence = 0.0
