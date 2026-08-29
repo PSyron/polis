@@ -59,11 +59,18 @@ Profil dodatkowo:
 
 - chroni zakresy w cytatach, backtickach i innych literalach oraz wyklucza
   straty `quotation-or-literal`, `conflict-or-abstention` i jawne abstencje;
-- przy zgodzie dopuszcza zmianę dokładnie jednego tokenu, przy fleksji tylko
-  ręcznie sparowane kategorie `inflection`/`rection`;
+- przy zgodzie kwalifikuje wyłącznie zmianę dokładnie jednego tokenu, gdy para
+  powierzchniowa znajduje się na jawnej, audytowanej liście kwalifikacji, która
+  obecnie zawiera tylko `nowy -> nowa` oraz `czyta -> czytają`;
+- przy fleksji dopuszcza tylko ręcznie sparowane kategorie `inflection`/`rection`;
 - przy interpunkcji wymaga `rule_family` z rodziny `rule:syntax.*` albo
   `rule:punctuation.*` i zmiany ograniczonej do znaków interpunkcyjnych;
 - przy diakrytyce dopuszcza jedną zmianę znaku przy zachowanej bazie Unicode.
+
+Kwalifikacja `agreement` jest celowo konserwatywna i nie jest ogólnym
+scorerem zgodności polskiej. Zmiany wykraczające poza audytowaną listę pozostają
+odrzucone: `Te -> To` zmienia jednocześnie liczbę i rodzaj, a zmiany osoby, takie
+jak `jest -> jestem` albo `czyta -> czytamy`, również nie są akceptowane.
 
 Uruchomienie profilu nie wymaga Morfeusza ani połączenia z Qwenem:
 
@@ -116,6 +123,12 @@ tekstem poprawnym, więc jeden przypadek nie trafia do obu splitów. Ocena
 pojedynczej sugestii korzysta z deklarowanego zakresu `[start, end)` i sprawdza
 rekonstrukcję prefiksu oraz sufiksu; podobne podciągi wewnątrz dwóch form nie są
 już mylone z wieloma edycjami.
+
+Manifest profilu zapisuje ten podział jako `strategy`, `development_ratio`,
+`seed` i `partitions`. Partycje `development` i `test` zawierają tożsamości
+`source_case_ids` oraz `correct_text_sha256`; konsument benchmarku waliduje i
+normalizuje te tożsamości przed rozpoczęciem scoringu, sprawdzając ich
+rozłączność oraz zgodność z korpusem.
 
 ## WikEd PL: protokół zapieczętowanego holdoutu (#427)
 
