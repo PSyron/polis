@@ -68,6 +68,7 @@ MAINTAINED_V1_DOCUMENTS = (
     "docs/architecture/README.md",
     "docs/architecture/protocols.md",
     "docs/compatibility.md",
+    "docs/cli.md",
     "docs/customization.md",
     "docs/development/dependency-licenses.md",
     "docs/distribution-verification.md",
