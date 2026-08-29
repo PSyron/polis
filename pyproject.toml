@@ -78,6 +78,7 @@ include = [
   "/README.md",
   "/pyproject.toml",
   "/src/polis/**",
+  "/docs/cli.md",
   "/docs/compatibility.md",
   "/docs/customization.md",
   "/docs/development/dependency-licenses.md",

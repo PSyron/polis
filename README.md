@@ -80,7 +80,8 @@ for text in texts:
 znaleziskami i przesunięciami `[start, end)`. `Analyzer.correct()` oraz
 `polis.correct()` zwracają oryginalny oraz poprawiony tekst, znaleziska
 zastosowane i pominięte. Szczegóły zawiera
-[publiczne API](docs/public-api.md) oraz [szybki start](docs/quick-start.md).
+[publiczne API](docs/public-api.md), [szybki start](docs/quick-start.md) oraz
+[przewodnik CLI](docs/cli.md).
 
 ## Konfiguracja
 

@@ -81,6 +81,6 @@ blokady ani puli instancji. Nie modyfikuj konfiguracji ani prywatnego stanu
 analizatora po konstrukcji. Domyślny runtime nie posiada zasobów wymagających
 zamykania; `close()` oraz kontekst `with` są zachowane jako zgodnościowy no-op.
 
-Zobacz [przykład TOML](../examples/polis.toml), [reguły](rules.md) i
-[publiczne API](public-api.md). Polis działa offline i wstrzymuje się, gdy
-zmiana wymaga interpretacji znaczenia tekstu.
+Zobacz [przykład TOML](../examples/polis.toml), [przewodnik CLI](cli.md),
+[reguły](rules.md) i [publiczne API](public-api.md). Polis działa offline i
+wstrzymuje się, gdy zmiana wymaga interpretacji znaczenia tekstu.
