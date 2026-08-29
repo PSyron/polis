@@ -3,6 +3,8 @@
 Definicję tego, co wolno twierdzić o pokryciu kategorii, profilach i dowodach,
 opisują [kontrakt pokrycia reguł v1](project/rule-coverage.md) oraz
 [ADR-0028](architecture/decisions/0028-conservative-v1-rule-coverage-contract.md).
+Znaczenie pięciu kategorii emitowanych przez analizator oraz granicę
+zgodnościowej wartości `style` określa [słownik kategorii](categories.md).
 Liczba źródeł w poniższej tabeli jest snapshotem composition root, a nie miarą
 kompletności języka.
 

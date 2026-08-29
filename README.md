@@ -12,8 +12,9 @@ uzasadnionej minimalnej poprawki, nie zwraca sugestii. Automatyczna korekta
 stosuje tylko zakwalifikowane, niekolidujące znaleziska; pozostałe są dostępne
 do jawnego wyboru przez wywołującego.
 
-Obecny runtime obejmuje reguły zgodności, pisowni oraz lokalnej składni i
-interpunkcji. Pełny wykaz źródeł znajduje się w [opisie reguł](docs/rules.md).
+Obsługiwane kategorie analizatora v1, ich granice i znaczenie wartości
+zgodnościowej `style` opisuje [słownik kategorii](docs/categories.md). Pełny
+wykaz źródeł znajduje się w [opisie reguł](docs/rules.md).
 Historia badań v2 nie jest funkcją produktu; jej odtwarzalną lokalizację podaje
 [manifest archiwum](docs/project/v2-research-archive-manifest.md).
 Żaden przetestowany model lokalny nie został zakwalifikowany do runtime'u v1;
@@ -86,9 +87,10 @@ zastosowane i pominięte. Szczegóły zawiera
 ## Konfiguracja
 
 Jedyną wspieraną sekcją pliku TOML jest `[analysis]`. Może określać
-`categories` i `minimum_confidence`; kompletny przykład znajduje się w
-[`examples/polis.toml`](examples/polis.toml). Konfiguracja jest odczytywana z
-lokalnego, jawnie wskazanego pliku i nie szuka ustawień niejawnych.
+`categories` i `minimum_confidence`; znaczenie kategorii oraz przykładowe
+wartości opisuje [słownik kategorii](docs/categories.md), a kompletny przykład
+znajduje się w [`examples/polis.toml`](examples/polis.toml). Konfiguracja jest
+odczytywana z lokalnego, jawnie wskazanego pliku i nie szuka ustawień niejawnych.
 Dokładnie historyczne tabele `[backend]`, `[language_tool]`,
 `[contextual_inflection]` i `[vendored_language_tool]` są odrzucane przez
 `ConfigurationError`. Inne nieznane tabele i klucze parser obecnie ignoruje;

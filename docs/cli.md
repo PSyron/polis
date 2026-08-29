@@ -25,11 +25,13 @@ ustawieniami analizy; wspierana sekcja ma postać:
 
 ```toml
 [analysis]
-categories = ["agreement", "spelling", "punctuation"]
+categories = ["inflection", "agreement", "syntax", "spelling", "punctuation"]
 minimum_confidence = 0.8
 ```
 
 Pełny przykład znajduje się w [`examples/polis.toml`](../examples/polis.toml).
+Znaczenie wartości `--category` i `analysis.categories`, w tym zgodnościowego
+`style`, podaje [słownik kategorii](categories.md).
 
 ## Wejście
 

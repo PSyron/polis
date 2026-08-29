@@ -4,7 +4,7 @@ Wspierana konfiguracja v1 ogranicza się do lokalnego pliku TOML:
 
 ```toml
 [analysis]
-categories = ["agreement", "spelling", "syntax", "punctuation"]
+categories = ["inflection", "agreement", "syntax", "spelling", "punctuation"]
 minimum_confidence = 0.8
 ```
 
@@ -12,6 +12,10 @@ minimum_confidence = 0.8
 jawnie wskazany plik. `categories` ogranicza analizę do wartości `Category`, a
 `minimum_confidence` odrzuca mniej pewne znaleziska. Niepodana kategoria
 oznacza wszystkie kategorie.
+Znaczenie pięciu kategorii emitowanych przez analizator, ich ograniczenia i
+zgodnościową wartość `style` opisuje [słownik kategorii](categories.md).
+`style` można przekazać jako wartość enumu, ale domyślny analizator nie emituje
+znalezisk stylu, więc taki filtr może zwrócić pusty wynik.
 `minimum_confidence` musi być liczbą skończoną z przedziału domkniętego
 `0.0`–`1.0`; wartości logiczne, tekstowe, nieskończone i spoza zakresu kończą
 się kontrolowanym `ConfigurationError` już podczas tworzenia lub wczytywania

@@ -80,6 +80,7 @@ include = [
   "/README.md",
   "/pyproject.toml",
   "/src/polis/**",
+  "/docs/categories.md",
   "/docs/cli.md",
   "/docs/compatibility.md",
   "/docs/customization.md",
