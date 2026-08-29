@@ -93,6 +93,7 @@ include = [
   "/docs/privacy.md",
   "/docs/public-api.md",
   "/docs/quick-start.md",
+  "/docs/rule-authoring.md",
   "/docs/release-notes/0.1.0-erratum.md",
   "/docs/release-notes/0.1.0.md",
   "/docs/release-notes/0.2.0.md",

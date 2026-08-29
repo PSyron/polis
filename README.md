@@ -14,7 +14,9 @@ do jawnego wyboru przez wywołującego.
 
 Obsługiwane kategorie analizatora v1, ich granice i znaczenie wartości
 zgodnościowej `style` opisuje [słownik kategorii](docs/categories.md). Pełny
-wykaz źródeł znajduje się w [opisie reguł](docs/rules.md).
+wykaz źródeł znajduje się w [opisie reguł](docs/rules.md), a bezpieczny proces
+rozszerzania opisuje [przewodnik autorstwa reguł deterministycznych](docs/rule-
+authoring.md).
 Historia badań v2 nie jest funkcją produktu; jej odtwarzalną lokalizację podaje
 [manifest archiwum](docs/project/v2-research-archive-manifest.md).
 Żaden przetestowany model lokalny nie został zakwalifikowany do runtime'u v1;

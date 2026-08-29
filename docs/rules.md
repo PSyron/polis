@@ -161,4 +161,5 @@ znaczenia, kontekstu wykraczającego poza lokalny zapis albo nie ma uzasadnionej
 poprawki.
 
 Nowa reguła wymaga bieżącego konsumenta v1, testów regresyjnych i osobnego
-issue z kryteriami akceptacji.
+issue z kryteriami akceptacji. Pełny proces od przypadku błędu do bezpiecznej
+reguły review-only opisuje [przewodnik autorstwa reguł](rule-authoring.md).

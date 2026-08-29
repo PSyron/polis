@@ -29,6 +29,7 @@ REQUIRED_SDIST_MEMBERS = (
     "docs/privacy.md",
     "docs/public-api.md",
     "docs/quick-start.md",
+    "docs/rule-authoring.md",
     "docs/architecture/decisions/0023-evaluation-namespace-1-0.md",
 )
 REQUIRED_WHEEL_MEMBERS = (
@@ -116,6 +117,7 @@ ALLOWED_SDIST_MEMBERS = (
     "docs/limitations.md",
     "docs/prerelease-candidate.md",
     "docs/privacy-audit.md",
+    "docs/rule-authoring.md",
     "docs/release-notes/0.1.0-erratum.md",
     "docs/release-notes/0.1.0.md",
     "docs/release-notes/0.2.0.md",
