@@ -223,6 +223,7 @@ PUBLIC_EVIDENCE_PATHS: Final[frozenset[str]] = frozenset(
         "tests/test_issue_398_czyby.py",
         "tests/test_issue_400_arcy.py",
         "tests/test_issue_404_co_niemiara.py",
+        "tests/test_diacritics_restore.py",
         "tests/test_rule_source_contract.py",
     }
 )
