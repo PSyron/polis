@@ -227,6 +227,7 @@ def test_analyzer_reports_drifted_provider_and_abstains(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     backend = _MappedBackend({"isc": (_analysis_row("isc", "isc", "ign"),)})
+    monkeypatch.setattr(analyzer_module, "_morphology_drift_warning_emitted", False)
     identity = morfeusz_module._qualified_identity()
     drifted = _QualifiedMorfeusz(
         backend=backend,

@@ -63,6 +63,7 @@ runtime abstenuje: nie zwraca findingu, a wynik pozostaje równy wejściu.
 | `rule:spelling.narazie` | `Narazie zostaję w domu.` | `Narazie` → `Na razie` `[0, 7)` | `Na razie zostaję w domu.` |
 | `rule:spelling.wziasc` | `Chcę wziasc parasol.` | `wziasc` → `wziąć` `[5, 11)` | `Chcę wziąć parasol.` |
 | `rule:spelling.wziasc_diacritic` | `Chcę wziąść parasol.` | `wziąść` → `wziąć` `[5, 11)` | `Chcę wziąć parasol.` |
+| `rule:spelling.diacritics_restore` † | `To isc dalej.` | `isc` → `iść` `[3, 6)` | `To iść dalej.` |
 | `rule:spelling.conajmniej` | `To potrwa conajmniej godzinę.` | `conajmniej` → `co najmniej` `[10, 20)` | `To potrwa co najmniej godzinę.` |
 | `rule:spelling.poprostu` | `Poprostu nie wiem.` | `Poprostu` → `Po prostu` `[0, 8)` | `Po prostu nie wiem.` |
 | `rule:spelling.pozatym` | `Pozatym mam czas.` | `Pozatym` → `Poza tym` `[0, 7)` | `Poza tym mam czas.` |
