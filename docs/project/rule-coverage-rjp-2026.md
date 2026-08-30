@@ -9,7 +9,7 @@ obserwowalną, bezpieczną granicę dla v1.
 
 ## Zakres i źródła normy
 
-Audyt wiąże dokładnie 63 tożsamości zwróconych przez
+Audyt wiąże dokładnie 64 tożsamości zwróconych przez
 `Analyzer(AnalyzerConfig()).source_identity_snapshot`. Wykaz zachowuje
 kolejność runtime'u, operację, wersję zachowania, provider, politykę korekty,
 status konformancji, publiczne pozytywy, hard negatives, notatkę abstencji i

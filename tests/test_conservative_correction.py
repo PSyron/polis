@@ -113,7 +113,7 @@ def test_correct_handles_a_multi_sentence_paragraph_and_preserves_names() -> Non
     assert len(result.applied_findings) == 3
 
 
-def test_default_analyzer_composes_exactly_sixty_three_conservative_v1_rules() -> None:
+def test_default_analyzer_composes_exactly_sixty_four_conservative_v1_rules() -> None:
     analyzer = Analyzer(AnalyzerConfig())
 
     assert tuple(str(rule.source) for rule in analyzer._registry.rules()) == (
@@ -152,6 +152,7 @@ def test_default_analyzer_composes_exactly_sixty_three_conservative_v1_rules() -
         "rule:spelling.narazie",
         "rule:spelling.wziasc",
         "rule:spelling.wziasc_diacritic",
+        "rule:spelling.diacritics_restore",
         "rule:spelling.conajmniej",
         "rule:spelling.poprostu",
         "rule:spelling.pozatym",

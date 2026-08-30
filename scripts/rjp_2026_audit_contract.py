@@ -86,7 +86,7 @@ EXPECTED_CATEGORY_SUMMARY: Final[dict[str, dict[str, JsonValue]]] = {
         "claim_boundary": "Source audit, not completeness.",
     },
     "spelling": {
-        "source_count": 26,
+        "source_count": 27,
         "rjp_normative_scope": "bounded only",
         "claim_boundary": "Source audit, not completeness.",
     },
