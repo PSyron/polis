@@ -33,6 +33,14 @@
   `Analyzer.morphology_status` oraz jednorazowy `UserWarning`, ale nadal
   uruchamia abstencję reguł zależnych od morfologii; nie oznacza to ogólnej
   obsługi polskiej morfologii ani automatycznej akceptacji innego słownika.
+- `rule:spelling.diacritics_restore` działa tylko dla jednego samodzielnego
+  tokenu i najwyżej czterech pozycji, w których można przywrócić diakrytykę.
+  Zakwalifikowany Morfeusz musi zwrócić wyłącznie `ign` dla wejścia oraz
+  dokładnie jeden rozpoznany wariant bez analizy nazwy własnej. Poprawna forma
+  wejściowa, wieloznaczność (`sad`, `los`, `zle`), nazwa własna, cytat, token z
+  cyfrą, przekroczenie limitu, brak providera albo jego dryft pozostają bez
+  sugestii. Źródło jest review-only i nie jest częścią polityki automatycznej
+  korekty.
 - Wspierane są zwykłe napisy Pythona oraz indeksy Unicode `[start, end)`; Polis
   nie zachowuje struktury dokumentów biurowych i nie dostarcza GUI.
 

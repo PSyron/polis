@@ -16,6 +16,7 @@ from polis.rules.agreement import (
     AgreementTeNeuterNounRule,
     AgreementTeZdanieRule,
 )
+from polis.rules.diacritics import SpellingDiacriticsRestoreRule
 from polis.rules.government import (
     InflectionGovernmentBycNauczycielRule,
     InflectionGovernmentDoSklepRule,
@@ -340,6 +341,7 @@ __all__ = [
     "DuplicateFindingError",
     "DuplicateRuleSourceError",
     "IncompatibleRuleOutputError",
+    "SpellingDiacriticsRestoreRule",
     "SpellingArcyPrefixRule",
     "SpellingCoNiemiaraRule",
     "SpellingConajmniejRule",

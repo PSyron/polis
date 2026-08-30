@@ -142,6 +142,19 @@ _KNOWN_TAG_PREFIXES: Final = frozenset(
 )
 _KNOWN_NOUN_TAG_SUFFIXES: Final = frozenset({"col", "ncol"})
 _GOVERNMENT_CASES: Final = frozenset({"gen", "dat", "inst"})
+_DIACRITICS_KNOWN_TAG_PREFIXES: Final = _KNOWN_TAG_PREFIXES | {"aglt"}
+_PROPER_NAME_LABELS: Final = frozenset(
+    {
+        "imię",
+        "nazwisko",
+        "nazwa_geograficzna",
+        "nazwa_instytucji",
+        "nazwa_miejsca",
+        "nazwa_miejscowości",
+        "nazwa_miejscowosci",
+    }
+)
+_DIACRITICS_EXCLUDED_QUALIFIERS: Final = frozenset({"daw."})
 
 type _AgreementFeature = tuple[str, str, str]
 
@@ -211,6 +224,52 @@ class _ParsedAnalysis:
 class _QualifiedMorfeusz:
     backend: _QualifiedMorfeuszBackend
     identity: _ProviderIdentity
+
+    @lru_cache(maxsize=512)  # noqa: B019 - bounded provider lifecycle cache
+    def diacritics_restore_replacement(
+        self, source: str, candidates: tuple[str, ...]
+    ) -> str | None:
+        if self.identity != _qualified_identity():
+            return None
+        if not source or not candidates or len(candidates) != len(set(candidates)):
+            return None
+        try:
+            source_analyses = _diacritics_analyses_with_metadata(
+                self.backend.analyse(source), source
+            )
+            if (
+                source_analyses is None
+                or not source_analyses
+                or any(item.tag != "ign" for item in source_analyses)
+            ):
+                return None
+            recognized: list[str] = []
+            for candidate in candidates:
+                candidate_analyses = _diacritics_analyses_with_metadata(
+                    self.backend.analyse(candidate), candidate
+                )
+                if (
+                    candidate_analyses is None
+                    or not candidate_analyses
+                    or any(item.tag == "ign" for item in candidate_analyses)
+                    or all(
+                        any(
+                            qualifier in _DIACRITICS_EXCLUDED_QUALIFIERS
+                            for qualifier in item.qualifiers
+                        )
+                        for item in candidate_analyses
+                    )
+                    or any(
+                        label in _PROPER_NAME_LABELS
+                        for item in candidate_analyses
+                        for label in item.labels
+                    )
+                ):
+                    continue
+                recognized.append(candidate)
+        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
+            return None
+        return recognized[0] if len(recognized) == 1 else None
 
     @lru_cache(maxsize=64)  # noqa: B019 - bounded provider lifecycle cache
     def negated_widziec_nominal_group_replacement(
@@ -654,6 +713,73 @@ def _analyses_with_metadata(
                 qualifiers=tuple(qualifiers),
             )
         )
+    return tuple(
+        sorted(
+            parsed,
+            key=lambda item: (item.lemma, item.tag, item.labels, item.qualifiers),
+        )
+    )
+
+
+def _diacritics_analyses_with_metadata(
+    rows: Sequence[_AnalysisRow], input_form: str
+) -> tuple[_ParsedAnalysis, ...] | None:
+    if isinstance(rows, (str, bytes)):
+        return None
+    parsed: list[_ParsedAnalysis] = []
+    surfaces: dict[tuple[int, int], str] = {}
+    for row in rows:
+        if not isinstance(row, tuple) or len(row) != 3:
+            return None
+        start, end, interpretation = row
+        if (
+            type(start) is not int
+            or type(end) is not int
+            or start < 0
+            or end <= start
+            or not isinstance(interpretation, tuple)
+            or len(interpretation) != 5
+        ):
+            return None
+        surface, lemma, tag, labels, qualifiers = interpretation
+        if (
+            not isinstance(surface, str)
+            or not surface
+            or not isinstance(lemma, str)
+            or not lemma
+            or not isinstance(tag, str)
+            or not tag
+            or tag.partition(":")[0] not in _DIACRITICS_KNOWN_TAG_PREFIXES
+            or not isinstance(labels, list)
+            or not isinstance(qualifiers, list)
+            or not all(isinstance(value, str) for value in labels)
+            or not all(isinstance(value, str) for value in qualifiers)
+        ):
+            return None
+        span = (start, end)
+        previous_surface = surfaces.get(span)
+        if previous_surface is not None and previous_surface != surface:
+            return None
+        surfaces[span] = surface
+        parsed.append(
+            _ParsedAnalysis(
+                lemma=lemma,
+                tag=tag,
+                labels=tuple(labels),
+                qualifiers=tuple(qualifiers),
+            )
+        )
+    if not parsed:
+        return None
+    cursor = 0
+    surface_parts: list[str] = []
+    for (start, end), surface in sorted(surfaces.items()):
+        if start != cursor:
+            return None
+        cursor = end
+        surface_parts.append(surface)
+    if "".join(surface_parts) != input_form:
+        return None
     return tuple(
         sorted(
             parsed,

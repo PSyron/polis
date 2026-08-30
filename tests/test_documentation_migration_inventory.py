@@ -150,6 +150,7 @@ EXPECTED_V1_RULE_SOURCE_ORDER = (
     "rule:spelling.narazie",
     "rule:spelling.wziasc",
     "rule:spelling.wziasc_diacritic",
+    "rule:spelling.diacritics_restore",
     "rule:spelling.conajmniej",
     "rule:spelling.poprostu",
     "rule:spelling.pozatym",

@@ -99,6 +99,7 @@ EXPECTED_SOURCE_MEMBERS = tuple(
             "src/polis/rules/agreement.py "
             "src/polis/rules/government.py src/polis/rules/inflection.py "
             "src/polis/rules/przygladac.py "
+            "src/polis/rules/diacritics.py "
             "src/polis/rules/spelling.py "
             "src/polis/rules/subject_verb.py "
             "src/polis/rules/syntax.py "

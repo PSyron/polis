@@ -37,12 +37,12 @@ def test_valid_rjp_audit_has_full_snapshot_and_change_matrix() -> None:
     assert audit["schema_id"] == "polis.rule-coverage-rjp-2026-audit"
     snapshot = audit["source_snapshot"]
     assert isinstance(snapshot, dict)
-    assert snapshot["count"] == 63
+    assert snapshot["count"] == 64
     rows = audit["source_rows"]
     changes = audit["change_rows"]
     assert isinstance(rows, list)
     assert isinstance(changes, list)
-    assert len(rows) == 63
+    assert len(rows) == 64
     assert len(changes) == len(CHANGE_NUMBERS)
 
 
@@ -61,7 +61,7 @@ def test_source_rows_keep_live_order_and_category_counts() -> None:
         "agreement": 9,
         "inflection": 14,
         "punctuation": 5,
-        "spelling": 26,
+        "spelling": 27,
         "syntax": 9,
     }
     assert all(

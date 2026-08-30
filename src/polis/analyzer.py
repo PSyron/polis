@@ -57,6 +57,7 @@ from polis.rules import (
     SpellingConajmniejRule,
     SpellingCoNiemiaraRule,
     SpellingCzybyRule,
+    SpellingDiacriticsRestoreRule,
     SpellingJestesRule,
     SpellingMonthWeekdayLowercaseRule,
     SpellingNapewnoRule,
@@ -99,6 +100,7 @@ from polis.rules._morfeusz import (
     _ProviderIdentity,
     _QualifiedMorfeusz,
 )
+from polis.rules.spelling import _CasePatternRule
 
 __all__ = [
     "Analyzer",
@@ -532,74 +534,92 @@ def _make_default_registry(
 ) -> DeterministicRuleRegistry:
     """Compose the fixed conservative v1 rule set in public evaluation order."""
 
+    before_diacritics = (
+        RuleRegistration(rule=AgreementCopulaRule()),
+        RuleRegistration(rule=AgreementCopulaJaRule()),
+        RuleRegistration(rule=AgreementTeZdanieRule()),
+        RuleRegistration(rule=AgreementTeNeuterNounRule()),
+        RuleRegistration(rule=AgreementNominalGroupTeDuzeOknoRule(morphology)),
+        RuleRegistration(rule=AgreementNominalGroupTaNowyKsiazkaRule(morphology)),
+        RuleRegistration(rule=AgreementSubjectVerbOniCzytaRule(morphology)),
+        RuleRegistration(rule=AgreementSubjectVerbMyCzytaRule(morphology)),
+        RuleRegistration(rule=AgreementSubjectVerbPresentRule(morphology)),
+        RuleRegistration(rule=InflectionNegatedWidziecRule(morphology)),
+        RuleRegistration(rule=InflectionNegatedWidziecNominalGroupRule(morphology)),
+        RuleRegistration(rule=InflectionNegatedMiecCzasRule()),
+        RuleRegistration(rule=InflectionNegatedLubicKaweRule(morphology)),
+        RuleRegistration(rule=InflectionPrzygladacSieNowyBudynekRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentPotrzebowacPomocRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentSzukacKluczRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentSluchacRadioRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentUzywacTelefonRule(morphology)),
+        RuleRegistration(
+            rule=InflectionGovernmentInteresowacSieHistoriaRule(morphology)
+        ),
+        RuleRegistration(rule=InflectionGovernmentBycNauczycielRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentDoSklepRule(morphology)),
+        RuleRegistration(rule=InflectionGovernmentUfacLekarzRule(morphology)),
+        RuleRegistration(rule=InflectionNumeralFiveGenitivePluralRule()),
+        RuleRegistration(rule=SpellingJestesRule()),
+        RuleRegistration(rule=SpellingCzybyRule()),
+        RuleRegistration(rule=SpellingArcyPrefixRule()),
+        RuleRegistration(rule=SpellingCoNiemiaraRule()),
+        RuleRegistration(rule=SpellingNapewnoRule()),
+        RuleRegistration(rule=SpellingWlasnieRule()),
+        RuleRegistration(rule=SpellingZebyRule()),
+        RuleRegistration(rule=SpellingWogoleRule()),
+        RuleRegistration(rule=SpellingWogoleDiacriticRule()),
+        RuleRegistration(rule=SpellingNarazieRule()),
+        RuleRegistration(rule=SpellingWziascRule()),
+        RuleRegistration(rule=SpellingWziascDiacriticRule()),
+    )
+    after_diacritics = (
+        RuleRegistration(rule=SpellingConajmniejRule()),
+        RuleRegistration(rule=SpellingPoprostuRule()),
+        RuleRegistration(rule=SpellingPozatymRule()),
+        RuleRegistration(rule=SpellingPrzedewszystkimRule()),
+        RuleRegistration(rule=SpellingWkoncuRule()),
+        RuleRegistration(rule=SpellingSpowrotemRule()),
+        RuleRegistration(rule=SpellingTymbardziejRule()),
+        RuleRegistration(rule=SpellingNaprawdeRule()),
+        RuleRegistration(rule=SpellingNieBycJointRule()),
+        RuleRegistration(rule=SpellingPoszlemRule()),
+        RuleRegistration(rule=SpellingWlanczacRule()),
+        RuleRegistration(rule=SpellingMonthWeekdayLowercaseRule()),
+        RuleRegistration(rule=SpellingProperAdjectiveLowercaseRule()),
+        RuleRegistration(rule=SpellingSentenceInitialCapitalRule()),
+        RuleRegistration(rule=SyntaxCommaSpacingRule()),
+        RuleRegistration(rule=SyntaxDuplicateCommaRule()),
+        RuleRegistration(rule=SyntaxInitialConditionalCommaRule(morphology)),
+        RuleRegistration(rule=SyntaxInitialTemporalCommaRule(morphology)),
+        RuleRegistration(rule=SyntaxCommaBeforeZeReportingRule()),
+        RuleRegistration(rule=SyntaxCommaBeforeZebyPurposeRule()),
+        RuleRegistration(rule=SyntaxCommaBeforeBoRule()),
+        RuleRegistration(rule=SyntaxListSpacingRule()),
+        RuleRegistration(rule=SyntaxMissingCorrelativeRule()),
+        RuleRegistration(rule=SyntaxMissingDestinationPrepositionRule()),
+        RuleRegistration(rule=SyntaxMissingReflexiveRule()),
+        RuleRegistration(rule=SyntaxQuoteSpacingRule()),
+        RuleRegistration(rule=SyntaxSentenceSpacingRule()),
+        RuleRegistration(rule=PunctuationAbbreviationDotRule()),
+    )
+    existing_registrations = before_diacritics + after_diacritics
+    excluded_surfaces = frozenset(
+        surface.casefold()
+        for registration in existing_registrations
+        if isinstance(registration.rule, _CasePatternRule)
+        for surface in registration.rule._surface_map()
+    )
     return DeterministicRuleRegistry(
-        (
-            RuleRegistration(rule=AgreementCopulaRule()),
-            RuleRegistration(rule=AgreementCopulaJaRule()),
-            RuleRegistration(rule=AgreementTeZdanieRule()),
-            RuleRegistration(rule=AgreementTeNeuterNounRule()),
-            RuleRegistration(rule=AgreementNominalGroupTeDuzeOknoRule(morphology)),
-            RuleRegistration(rule=AgreementNominalGroupTaNowyKsiazkaRule(morphology)),
-            RuleRegistration(rule=AgreementSubjectVerbOniCzytaRule(morphology)),
-            RuleRegistration(rule=AgreementSubjectVerbMyCzytaRule(morphology)),
-            RuleRegistration(rule=AgreementSubjectVerbPresentRule(morphology)),
-            RuleRegistration(rule=InflectionNegatedWidziecRule(morphology)),
-            RuleRegistration(rule=InflectionNegatedWidziecNominalGroupRule(morphology)),
-            RuleRegistration(rule=InflectionNegatedMiecCzasRule()),
-            RuleRegistration(rule=InflectionNegatedLubicKaweRule(morphology)),
-            RuleRegistration(rule=InflectionPrzygladacSieNowyBudynekRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentPotrzebowacPomocRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentSzukacKluczRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentSluchacRadioRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentUzywacTelefonRule(morphology)),
+        before_diacritics
+        + (
             RuleRegistration(
-                rule=InflectionGovernmentInteresowacSieHistoriaRule(morphology)
+                rule=SpellingDiacriticsRestoreRule(
+                    morphology, excluded_surfaces=excluded_surfaces
+                )
             ),
-            RuleRegistration(rule=InflectionGovernmentBycNauczycielRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentDoSklepRule(morphology)),
-            RuleRegistration(rule=InflectionGovernmentUfacLekarzRule(morphology)),
-            RuleRegistration(rule=InflectionNumeralFiveGenitivePluralRule()),
-            RuleRegistration(rule=SpellingJestesRule()),
-            RuleRegistration(rule=SpellingCzybyRule()),
-            RuleRegistration(rule=SpellingArcyPrefixRule()),
-            RuleRegistration(rule=SpellingCoNiemiaraRule()),
-            RuleRegistration(rule=SpellingNapewnoRule()),
-            RuleRegistration(rule=SpellingWlasnieRule()),
-            RuleRegistration(rule=SpellingZebyRule()),
-            RuleRegistration(rule=SpellingWogoleRule()),
-            RuleRegistration(rule=SpellingWogoleDiacriticRule()),
-            RuleRegistration(rule=SpellingNarazieRule()),
-            RuleRegistration(rule=SpellingWziascRule()),
-            RuleRegistration(rule=SpellingWziascDiacriticRule()),
-            RuleRegistration(rule=SpellingConajmniejRule()),
-            RuleRegistration(rule=SpellingPoprostuRule()),
-            RuleRegistration(rule=SpellingPozatymRule()),
-            RuleRegistration(rule=SpellingPrzedewszystkimRule()),
-            RuleRegistration(rule=SpellingWkoncuRule()),
-            RuleRegistration(rule=SpellingSpowrotemRule()),
-            RuleRegistration(rule=SpellingTymbardziejRule()),
-            RuleRegistration(rule=SpellingNaprawdeRule()),
-            RuleRegistration(rule=SpellingNieBycJointRule()),
-            RuleRegistration(rule=SpellingPoszlemRule()),
-            RuleRegistration(rule=SpellingWlanczacRule()),
-            RuleRegistration(rule=SpellingMonthWeekdayLowercaseRule()),
-            RuleRegistration(rule=SpellingProperAdjectiveLowercaseRule()),
-            RuleRegistration(rule=SpellingSentenceInitialCapitalRule()),
-            RuleRegistration(rule=SyntaxCommaSpacingRule()),
-            RuleRegistration(rule=SyntaxDuplicateCommaRule()),
-            RuleRegistration(rule=SyntaxInitialConditionalCommaRule(morphology)),
-            RuleRegistration(rule=SyntaxInitialTemporalCommaRule(morphology)),
-            RuleRegistration(rule=SyntaxCommaBeforeZeReportingRule()),
-            RuleRegistration(rule=SyntaxCommaBeforeZebyPurposeRule()),
-            RuleRegistration(rule=SyntaxCommaBeforeBoRule()),
-            RuleRegistration(rule=SyntaxListSpacingRule()),
-            RuleRegistration(rule=SyntaxMissingCorrelativeRule()),
-            RuleRegistration(rule=SyntaxMissingDestinationPrepositionRule()),
-            RuleRegistration(rule=SyntaxMissingReflexiveRule()),
-            RuleRegistration(rule=SyntaxQuoteSpacingRule()),
-            RuleRegistration(rule=SyntaxSentenceSpacingRule()),
-            RuleRegistration(rule=PunctuationAbbreviationDotRule()),
         )
+        + after_diacritics
     )
 
 

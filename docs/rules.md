@@ -47,6 +47,7 @@ kompletności języka.
 | `rule:spelling.narazie` | `spelling` | `narazie` → `na razie`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
 | `rule:spelling.wziasc` | `spelling` | `wziasc` → `wziąć`, z pominięciem samodzielnych wzmianek w cudzysłowie i kodzie |
 | `rule:spelling.wziasc_diacritic` | `spelling` | `wziąść` → `wziąć` (bez mieszanych `wziąśc`/`wziasć`), wyłącznie do przeglądu |
+| `rule:spelling.diacritics_restore` | `spelling` | dla samodzielnego tokenu generuje warianty polskich diakrytyk do maksymalnie czterech pozycji; sugeruje wyłącznie jedyny wariant rozpoznany przez zakwalifikowanego Morfeusza, gdy wejście ma tylko analizę `ign`, wyłącznie do przeglądu |
 | `rule:spelling.conajmniej` | `spelling` | `conajmniej` → `co najmniej`, wyłącznie do przeglądu |
 | `rule:spelling.poprostu` | `spelling` | `poprostu` → `po prostu`, wyłącznie do przeglądu |
 | `rule:spelling.pozatym` | `spelling` | `pozatym` → `poza tym`, wyłącznie do przeglądu |
